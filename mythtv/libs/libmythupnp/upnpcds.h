@@ -264,8 +264,8 @@ class UPNP_PUBLIC UPnpCDSExtension
         virtual UPnpCDSExtensionResults *Browse( UPnpCDSRequest *pRequest );
         virtual UPnpCDSExtensionResults *Search( UPnpCDSRequest *pRequest );
 
-        virtual QString         GetSearchCapabilities() { return( "" ); }
-        virtual QString         GetSortCapabilities  () { return( "" ); }
+        virtual QString         GetSearchCapabilities() { return ""; }
+        virtual QString         GetSortCapabilities  () { return ""; }
         virtual CDSShortCutList GetShortCuts         () { return m_shortcuts; }
 };
 

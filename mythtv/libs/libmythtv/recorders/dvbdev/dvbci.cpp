@@ -129,9 +129,9 @@ static uint8_t *SetLength(uint8_t *Data, int Length)
 ///< \return Returns a pointer to the first byte after the length.
 {
   uint8_t *p = Data;
-  if (Length < 128)
+  if (Length < 128) {
      *p++ = Length;
-  else {
+  } else {
      int n = sizeof(Length);
      for (int i = n - 1; i >= 0; i--) {
          int b = (Length >> (8 * i)) & 0xFF;
@@ -849,7 +849,7 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
     static_cast<uint8_t>((m_sessionId     ) & 0xFF),
     static_cast<uint8_t>((Tag >> 16) & 0xFF),
     static_cast<uint8_t>((Tag >>  8) & 0xFF),
-    static_cast<uint8_t>((Tag      ) & 0xFF)} ;
+    static_cast<uint8_t>( Tag        & 0xFF)};
   buffer.reserve(2048);
 
   SetLength(buffer, Length);
@@ -1143,7 +1143,7 @@ bool cCiDateTime::SendDateTime(void)
      int M = tm_gmt.tm_mon + 1;
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
-     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
+     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + (L * 12)) * 30.6001);
      uint16_t mjd = htons(MJD);
      int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
      std::vector<uint8_t> T {

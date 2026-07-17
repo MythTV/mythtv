@@ -430,7 +430,9 @@ void MythUIVirtualKeyboard::charClicked(void)
     if (m_composing)
     {
         if (m_composeStr.isEmpty())
+        {
             m_composeStr = c;
+        }
         else
         {
             // Produce the composed key.

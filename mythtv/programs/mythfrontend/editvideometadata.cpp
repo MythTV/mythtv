@@ -995,7 +995,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
 {
     if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(levent);
+        auto *dce = (DialogCompletionEvent*)levent;
 
         const QString resultid = dce->GetId();
 

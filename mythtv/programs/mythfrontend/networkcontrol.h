@@ -99,14 +99,15 @@ class NetworkControl : public ServerPool, public QRunnable
   public:
     NetworkControl();
     ~NetworkControl() override;
+    void run(void) override; // QRunnable
+
+  protected:
+    void customEvent(QEvent *e) override; // QObject
 
   private slots:
     void newControlConnection(QTcpSocket *client);
     void receiveCommand(QString &command);
     void deleteClient(void);
-
-  protected:
-    void run(void) override; // QRunnable
 
   private:
     QString processJump(NetworkCommand *nc);
@@ -122,7 +123,6 @@ class NetworkControl : public ServerPool, public QRunnable
 
     void notifyDataAvailable(void);
     void sendReplyToClient(NetworkControlClient *ncc, const QString &reply);
-    void customEvent(QEvent *e) override; // QObject
 
     static QString listRecordings(const QString& chanid = "", const QString& starttime = "");
     static QString listSchedule(const QString& chanID = "") ;

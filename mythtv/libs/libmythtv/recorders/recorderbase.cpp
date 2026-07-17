@@ -154,9 +154,13 @@ void RecorderBase::SetNextRecording(const RecordingInfo *ri, MythMediaBuffer *Bu
 void RecorderBase::SetOption(const QString &name, const QString &value)
 {
     if (name == "videocodec")
+    {
         m_videocodec = value;
+    }
     else if (name == "videodevice")
+    {
         m_videodevice = value;
+    }
     else if (name == "tvformat")
     {
         m_ntsc = false;
@@ -757,7 +761,7 @@ void RecorderBase::AspectChange(uint aspect, long long frame)
         else if (m_videoWidth && m_videoHeight)
             customAspect = m_videoWidth * 1000000 / m_videoHeight;
 
-        mark = (customAspect) ? MARK_ASPECT_CUSTOM : mark;
+        mark = customAspect ? MARK_ASPECT_CUSTOM : mark;
     }
     if (aspect == ASPECT_4_3)
         mark = MARK_ASPECT_4_3;

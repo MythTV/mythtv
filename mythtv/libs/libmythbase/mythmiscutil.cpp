@@ -366,7 +366,7 @@ long long MythFile::copy(QFile &dst, QFile &src, uint block_size)
     if (osrc)
         src.close();
 
-    return (ok) ? total_bytes : -1LL;
+    return ok ? total_bytes : -1LL;
 }
 
 QString createTempFile(QString name_template, bool dir)
@@ -603,7 +603,9 @@ QString FileHash(const QString& filename)
         return {"NULL"};
 
     if (file.open(QIODevice::ReadOnly))
+    {
         hash = initialsize;
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -833,7 +835,7 @@ bool MythRemoveDirectory(QDir &aDir)
     if (!has_err && !aDir.rmdir(aDir.absolutePath()))
         has_err = true;
 
-    return(has_err);
+    return has_err;
 }
 
 /**

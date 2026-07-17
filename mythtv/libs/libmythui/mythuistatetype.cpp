@@ -215,7 +215,9 @@ bool MythUIStateType::ParseElement(
 {
     QMap<QString, QString> dependsMap;
     if (element.tagName() == "showempty")
+    {
         m_showEmpty = parseBool(element);
+    }
     else if (element.tagName() == "state")
     {
         QString name = element.attribute("name", "");

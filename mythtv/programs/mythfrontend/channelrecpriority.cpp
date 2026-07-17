@@ -107,11 +107,17 @@ bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "UPCOMING")
+        {
             upcoming();
+        }
         else if (action == "RANKINC")
+        {
             changeRecPriority(1);
+        }
         else if (action == "RANKDEC")
+        {
             changeRecPriority(-1);
+        }
         else if (action == "1")
         {
             if (m_sortType != byChannel)
@@ -195,7 +201,9 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
 
         // order may change if sorting by recoring priority, so resort
         if (m_sortType == byRecPriority)
+        {
             SortList();
+        }
         else
         {
             item->SetText(QString::number(chanInfo->m_recPriority), "priority");
@@ -449,7 +457,7 @@ void ChannelRecPriority::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

@@ -134,12 +134,14 @@ class HouseKeepingThread : public MThread
     explicit HouseKeepingThread(HouseKeeper *p) :
         MThread("HouseKeeping"), m_parent(p) {}
    ~HouseKeepingThread() override = default;
-    void run(void) override; // MThread
     void Discard(void)                  { m_keepRunning = false;        }
     bool isIdle(void) const             { return m_idle;                }
     void Wake(void)                     { m_waitCondition.wakeAll();    }
 
     void Terminate(void);
+
+  protected:
+    void run(void) override; // MThread
 
   private:
     bool                m_idle        { true };
@@ -163,6 +165,7 @@ class MBASE_PUBLIC HouseKeeper : public QObject
     void StartThread(void);
     HouseKeeperTask* GetQueuedTask(void);
 
+  protected:
     void customEvent(QEvent *e) override; // QObject
 
   public slots:

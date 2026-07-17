@@ -412,7 +412,7 @@ void ChannelEditor::fillList(void)
             bool sel = ((serviceid   == currentServiceID  ) &&
                         (transportid == currentTransportID) &&
                         (sourcename  == currentSourceName ));
-            selidx = (sel) ? idx : selidx;
+            selidx = sel ? idx : selidx;
 
             item = new MythUIButtonListItem(m_channelList, "", QVariant::fromValue(chanid));
             item->SetText(compoundname, "compoundname");
@@ -583,7 +583,9 @@ void ChannelEditor::menu()
 
     int chanid = item->GetData().toInt();
     if (chanid == 0)
+    {
        edit(item);
+    }
     else
     {
         QString label = tr("Channel Options");
@@ -794,7 +796,7 @@ void ChannelEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid= dce->GetId();
         int buttonnum  = dce->GetResult();

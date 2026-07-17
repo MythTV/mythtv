@@ -34,6 +34,8 @@ class MythInputDeviceHandler : public QObject
 
   public slots:
     void MainWindowReady (void);
+
+  protected:
     void customEvent     (QEvent *Event) override;
 
   private:

@@ -121,7 +121,7 @@ class TuningRequest
     int            m_progNum   {-1};
 };
 using TuningQueue = MythDeque<TuningRequest>;
-inline TuningRequest myth_deque_init(const TuningRequest */*request*/) { return (TuningRequest)(0); }
+inline TuningRequest myth_deque_init(const TuningRequest */*request*/) { return (TuningRequest)0; }
 
 class PendingInfo
 {
@@ -149,6 +149,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     explicit TVRec(int _inputid);
    ~TVRec(void) override;
 
+    void run(void) override; // QRunnable
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsleft, bool hasLater);
@@ -253,7 +254,6 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     void EnableActiveScan(bool enable);
 
   protected:
-    void run(void) override; // QRunnable
     bool WaitForEventThreadSleep(bool wake = true,
                                  std::chrono::milliseconds time = std::chrono::milliseconds::max());
 

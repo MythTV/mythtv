@@ -34,6 +34,8 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
         { return GetDataValue().toString(); }
     int GetIntValue(void) const override // MythUIButtonList
         { return GetDataValue().toInt(); }
+    bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
+    bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
     bool keyPressEvent(QKeyEvent *event) override; // MythUIButtonList
 
     template <typename T>
@@ -60,8 +62,6 @@ class MUI_PUBLIC MythUISpinBox : public MythUIButtonList
     void CopyFrom(MythUIType *base) override; // MythUIButtonList
     void CreateCopy(MythUIType *parent) override; // MythUIButtonList
 
-    bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
-    bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0) override; // MythUIButtonList
     void ShowEntryDialog(QString initialEntry);
 
     bool    m_hasTemplate      {false};

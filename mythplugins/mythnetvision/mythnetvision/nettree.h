@@ -48,14 +48,15 @@ class NetTree : public NetBase
     ~NetTree() override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   protected:
     ResultItem *GetStreamItem() override; // NetBase
+    void Load() override; // MythScreenType
+    void LoadData(void) override; // NetBase
 
   private:
-    void Load() override; // MythScreenType
-
     void FillTree(void);
     void SetCurrentNode(MythGenericTree *node);
     void HandleDirSelect(MythGenericTree *node);
@@ -99,12 +100,10 @@ class NetTree : public NetBase
     bool                m_treeAutoUpdate {false};
 
   private slots:
-    void ShowMenu(void) override; // MythScreenType
     MythMenu* CreateShowViewMenu(void);
     MythMenu* CreateShowManageMenu(void);
     void RunTreeEditor(void) const;
     void RunRSSEditor(void) const;
-    void LoadData(void) override; // NetBase
     void HandleSelect(MythUIButtonListItem *item);
 
     void SwitchTreeView(void);
@@ -121,9 +120,9 @@ class NetTree : public NetBase
     void DoTreeRefresh();
     void TreeRefresh();
 
+  protected:
     void customEvent(QEvent *levent) override; // NetBase
 
-  protected:
     static const QString kRSSNode;
     static const QString kSearchNode;
     static const QString kDownloadNode;

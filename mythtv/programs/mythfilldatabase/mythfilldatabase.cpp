@@ -149,16 +149,15 @@ int main(int argc, char *argv[])
 
             bool enable = !item.contains("not");
 
-            if (item.contains("today"))
+            if (item.contains("today")) {
                 fill_data.SetRefresh(0, enable);
-            else if (item.contains("tomorrow"))
+            } else if (item.contains("tomorrow")) {
                 fill_data.SetRefresh(1, enable);
-            else if (item.contains("second"))
+            } else if (item.contains("second")) {
                 fill_data.SetRefresh(2, enable);
-            else if (item.contains("all"))
+            } else if (item.contains("all")) {
                 fill_data.SetRefresh(FillData::kRefreshAll, enable);
-            else if (item.contains("-"))
-            {
+            } else if (item.contains("-")) {
                 bool ok = false;
                 QStringList r = item.split("-");
 

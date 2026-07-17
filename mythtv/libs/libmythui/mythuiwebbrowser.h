@@ -35,8 +35,9 @@ class MythWebEngineView : public QWebEngineView
     ~MythWebEngineView(void) override;
 
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void customEvent(QEvent *e) override; // QWidget
 
+  protected:
+    void customEvent(QEvent *e) override; // QWidget
 
   protected slots:
     QWebEngineView *createWindow(QWebEnginePage::WebWindowType type) override; // QWebEngineView

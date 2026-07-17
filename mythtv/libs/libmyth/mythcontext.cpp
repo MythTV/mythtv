@@ -142,9 +142,9 @@ class MythContext::Impl : public QObject
     bool    checkPort(const QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents();
 
-  protected:
     bool event(QEvent* /*e*/) override; // QObject
 
+  protected:
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup();
 
@@ -1422,7 +1422,7 @@ void MythContext::Impl::ShowConnectionFailurePopup(bool persistent)
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
 
-    QString description = (persistent) ?
+    QString description = persistent ?
         QObject::tr(
             "The connection to the master backend "
             "server has gone away for some reason. "

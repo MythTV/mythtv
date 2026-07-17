@@ -191,9 +191,13 @@ MythCDROM::ImageType MythCDROM::inspectImage(const QString &path)
     ImageType imageType = kUnknown;
 
     if (path.startsWith("bd:"))
+    {
         imageType = kBluray;
+    }
     else if (path.startsWith("dvd:"))
+    {
         imageType = kDVD;
+    }
     else
     {
         blockInput_t blockInput {};

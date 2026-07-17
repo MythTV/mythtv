@@ -302,7 +302,7 @@ bool MythRenderOpenGL::Init(void)
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxtexsz);
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxunits);
     m_maxTextureUnits = maxunits;
-    m_maxTextureSize  = (maxtexsz) ? maxtexsz : 512;
+    m_maxTextureSize  = maxtexsz ? maxtexsz : 512;
     QSurfaceFormat fmt = format();
 
     // Pixel buffer objects
@@ -547,7 +547,9 @@ void MythRenderOpenGL::SetWidget(QWidget *Widget)
 #endif
 
     if (!create())
+    {
         LOG(VB_GENERAL, LOG_CRIT, LOC + "Failed to create OpenGLContext!");
+    }
     else
     {
         Widget->setAttribute(Qt::WA_PaintOnScreen);

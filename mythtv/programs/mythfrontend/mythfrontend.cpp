@@ -236,7 +236,7 @@ namespace
     /// This dialog is used when playing something from the "Watch
     /// Videos" page. Playing from the "Watch Recordings" page uses
     /// the code in PlaybackBox::createPlayFromMenu.
-    class BookmarkDialog : MythScreenType
+    class BookmarkDialog : public MythScreenType
     {
         Q_DECLARE_TR_FUNCTIONS(BookmarkDialog)
 
@@ -281,23 +281,30 @@ namespace
             return true;
         }
 
+      protected:
         void customEvent(QEvent *event) override // MythUIType
         {
             if (event->type() != DialogCompletionEvent::kEventType)
                 return;
 
-            auto *dce = (DialogCompletionEvent*)(event);
+            auto *dce = (DialogCompletionEvent*)event;
             QString buttonText = dce->GetResultText();
 
             if (dce->GetId() != "bookmarkdialog")
                 return;
 
             if (buttonText == m_btnPlayLast)
+            {
                 TV::StartTV(m_pgi, kStartTVNoFlags);
+            }
             else if (buttonText == m_btnPlayBookmark)
+            {
                 TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos );
+            }
             else if (buttonText == m_btnPlayBegin)
+            {
                 TV::StartTV(m_pgi, kStartTVIgnoreLastPlayPos | kStartTVIgnoreBookmark);
+            }
             else if (buttonText == m_btnClearBookmark)
             {
                 m_pgi->SaveBookmark(0);
@@ -966,7 +973,9 @@ static void TVMenuCallback(void * /* data */, QString &selection)
     }
 
     if (sel == "tv_watch_live")
+    {
         startTVNormal();
+    }
     else if (sel.startsWith("tv_watch_recording"))
     {
         // use selection here because its case is untouched
@@ -2313,9 +2322,13 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         QStringList plugins = g_pmanager->EnumeratePlugins();
 
         if (plugins.contains(cmdline.toString("runplugin")))
+        {
             g_pmanager->run_plugin(cmdline.toString("runplugin"));
+        }
         else if (plugins.contains("myth" + cmdline.toString("runplugin")))
+        {
             g_pmanager->run_plugin("myth" + cmdline.toString("runplugin"));
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,
@@ -2332,7 +2345,9 @@ Q_DECL_EXPORT int main(int argc, char **argv)
         MythMainWindow *mmw = GetMythMainWindow();
 
         if (mmw->DestinationExists(cmdline.toString("jumppoint")))
+        {
             mmw->JumpTo(cmdline.toString("jumppoint"));
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,

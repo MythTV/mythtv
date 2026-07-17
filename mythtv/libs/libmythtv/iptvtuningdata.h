@@ -85,14 +85,13 @@ class MTV_PUBLIC IPTVTuningData
         m_bitrate[0] = data_bitrate;
         m_bitrate[1] = fec_bitrate0;
         m_bitrate[2] = fec_bitrate1;
-        if (fec_type.toLower() == "rfc2733")
+        if (fec_type.toLower() == "rfc2733") {
             m_fecType = kRFC2733;
-        else if (fec_type.toLower() == "rfc5109")
+        } else if (fec_type.toLower() == "rfc5109") {
             m_fecType = kRFC5109;
-        else if (fec_type.toLower() == "smpte2022")
+        } else if (fec_type.toLower() == "smpte2022") {
             m_fecType = kSMPTE2022;
-        else
-        {
+        } else {
             m_fecUrl0.clear();
             m_fecUrl1.clear();
         }
@@ -198,16 +197,15 @@ class MTV_PUBLIC IPTVTuningData
     // An HLSPlaylist URL is identified as http_ts if download fails.
     void GuessProtocol(void)
     {
-        if (!m_dataUrl.isValid())
-            m_protocol = IPTVTuningData::inValid; // NOLINT(bugprone-branch-clone)
-        else if (m_dataUrl.scheme() == "udp")
+        if (!m_dataUrl.isValid()) { // NOLINT(bugprone-branch-clone)
+            m_protocol = IPTVTuningData::inValid;
+        } else if (m_dataUrl.scheme() == "udp") {
             m_protocol = IPTVTuningData::udp;
-        else if (m_dataUrl.scheme() == "rtp")
+        } else if (m_dataUrl.scheme() == "rtp") {
             m_protocol = IPTVTuningData::rtp;
-        else if (m_dataUrl.scheme() == "rtsp")
+        } else if (m_dataUrl.scheme() == "rtsp") {
             m_protocol = IPTVTuningData::rtsp;
-        else if ((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https"))
-        {
+        } else if ((m_dataUrl.scheme() == "http") || (m_dataUrl.scheme() == "https")) {
             QByteArray buffer;
             if (CanReadHTTP(buffer))
             {

@@ -867,7 +867,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     double OrbitalPositionFloat()  const
         { return ((double) OrbitalPosition()) / 10.0; }
     /// west_east_flag          1   8.0
-    bool IsEast(void)             const { return ( (m_data[8]&0x80) ) != 0; }
+    bool IsEast(void)             const { return (m_data[8]&0x80) != 0; }
     bool IsWest(void)             const { return !IsEast(); }
     // polarization             2   8.1
     uint Polarization(void)       const { return (m_data[8]>>5)&0x3; }

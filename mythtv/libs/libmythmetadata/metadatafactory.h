@@ -116,9 +116,11 @@ class META_PUBLIC MetadataFactory : public QObject
 
     static bool VideoGrabbersFunctional();
 
-  private:
+  protected:
 
     void customEvent(QEvent *levent) override; // QObject
+
+  private:
 
     void OnMultiResult(const MetadataLookupList& list);
     void OnSingleResult(MetadataLookup *lookup);

@@ -470,7 +470,9 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if ((m_activeListID + 1 < m_visibleLists) &&
             (m_activeListID + 1 < (uint)m_buttonlists.count()))
+        {
             m_activeListID++;
+        }
         else if (m_currentNode && m_currentNode->visibleChildCount() > 0)
         {
             ++m_currentDepth;
@@ -484,7 +486,9 @@ void MythUIButtonTree::SwitchList(bool right)
     else if (!right)
     {
         if (m_activeListID > 0)
+        {
             --m_activeListID;
+        }
         else if (m_currentDepth > 0)
         {
             --m_currentDepth;
@@ -497,7 +501,9 @@ void MythUIButtonTree::SwitchList(bool right)
     }
 
     if (doUpdate)
+    {
         SetTreeState();
+    }
     else
     {
         if (m_activeList)

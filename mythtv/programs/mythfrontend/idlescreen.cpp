@@ -85,7 +85,9 @@ bool IdleScreen::CheckConnectionToServer(void)
     bool bRes = false;
 
     if (gCoreContext->IsConnectedToMaster())
+    {
         bRes = true;
+    }
     else
     {
         if (gCoreContext->SafeConnectToMasterServer(false))

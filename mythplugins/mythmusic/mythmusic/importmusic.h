@@ -35,6 +35,8 @@ class FileScannerThread: public MThread
 {
     public:
         explicit FileScannerThread(ImportMusicDialog *parent);
+
+    protected:
         void run() override; // MThread
 
     private:
@@ -47,9 +49,11 @@ class FileCopyThread: public MThread
         FileCopyThread(QString src, QString dst)
             : MThread("FileCopy"), m_srcFile(std::move(src)),
               m_dstFile(std::move(dst)) {}
-        void run() override; // MThread
 
         bool GetResult(void) const { return m_result; }
+
+    protected:
+        void run() override; // MThread
 
     private:
         QString m_srcFile;
@@ -68,7 +72,6 @@ class ImportMusicDialog : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasImported() const { return m_somethingWasImported; }
     void doScan(void);
@@ -107,6 +110,9 @@ class ImportMusicDialog : public MythScreenType
 
   signals:
     void importFinished(void);
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   private:
     void fillWidgets();

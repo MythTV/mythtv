@@ -126,10 +126,8 @@ class PlaybackBox : public ScheduleCommon
    ~PlaybackBox(void) override;
 
     bool Create(void) override; // MythScreenType
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
 
     void setInitialRecGroup(const QString& initialGroup) { m_recGroup = initialGroup; }
     static void * RunPlaybackBox(void *player, bool showTV);
@@ -137,6 +135,12 @@ class PlaybackBox : public ScheduleCommon
   public slots:
     void displayRecGroup(const QString &newRecGroup = "");
     void groupSelectorClosed(void);
+
+  protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
   protected slots:
     void updateRecList(MythUIButtonListItem *sel_item);
@@ -302,8 +306,6 @@ class PlaybackBox : public ScheduleCommon
               bool ignoreLastPlayPos,
               bool underNetworkControl);
 
-    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
-
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
 
@@ -342,7 +344,6 @@ class PlaybackBox : public ScheduleCommon
     void HandleUpdateItemEvent(uint recordingId, uint flags);
 
     void ScheduleUpdateUIList(void);
-    void ShowMenu(void) override; // MythScreenType
     bool CreatePopupMenu(const QString &title);
     void DisplayPopupMenu(void);
     //bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
@@ -586,6 +587,9 @@ class RecMetadataEdit : public MythScreenType
     void result(const QString &, const QString &, const QString &,
                 const QString &, uint, uint);
 
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
   protected slots:
     void SaveChanges(void);
     void ClearInetref();
@@ -593,7 +597,6 @@ class RecMetadataEdit : public MythScreenType
     void OnSearchListSelection(const RefCountHandler<MetadataLookup>& lookup);
 
   private:
-    void customEvent(QEvent *event) override; // MythUIType
     void QueryComplete(MetadataLookup *lookup);
 
     MythUITextEdit     *m_titleEdit       {nullptr};

@@ -183,32 +183,29 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         const QString& action = actions[i];
         handled = true;
 
-        if (action == "EDIT")
+        if (action == "EDIT") {
             EditScheduled();
-        else if (action == "CUSTOMEDIT")
+        } else if (action == "CUSTOMEDIT") {
             EditCustom();
-        else if (action == "UPCOMING")
+        } else if (action == "UPCOMING") {
             ShowUpcoming();
-        else if (action == "PREVRECORDED")
+        } else if (action == "PREVRECORDED") {
             ShowPrevious();
-        else if (action == "DETAILS" || action == "INFO")
+        } else if (action == "DETAILS" || action == "INFO") {
             ShowDetails();
-        else if (action == "TOGGLERECORD")
+        } else if (action == "TOGGLERECORD") {
             QuickRecord();
-        else if (action == "GUIDE" || action == "4")
+        } else if (action == "GUIDE" || action == "4") {
             ShowGuide();
-        else if (action == ACTION_CHANNELSEARCH)
+        } else if (action == ACTION_CHANNELSEARCH) {
             ShowChannelSearch();
-        else if (action == "ESCAPE")
-        {
+        } else if (action == "ESCAPE") {
             // don't fade the screen if we are returning to the player
             if (m_player && m_allowEPG)
                 GetScreenStack()->PopScreen(this, false);
             else
                 GetScreenStack()->PopScreen(this, true);
-        }
-        else
-        {
+        } else {
             handled = false;
         }
     }
@@ -279,7 +276,7 @@ void ProgFinder::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -689,19 +686,16 @@ bool ProgFinder::formatSelectedData(QString& data, int charNum)
     if (charNum == 29 || charNum == 10)
     {
         if ((data.startsWith("The T") && charNum == 29) ||
-            (data.startsWith("The A") && charNum == 10))
+            (data.startsWith("The A") && charNum == 10)) {
             data = data.mid(4) + ", The";
-        else if ((data.startsWith("A T") && charNum == 29) ||
-                 (data.startsWith("A A") && charNum == 10))
+        } else if ((data.startsWith("A T") && charNum == 29) ||
+                 (data.startsWith("A A") && charNum == 10)) {
             data = data.mid(2) + ", A";
-        else if (data.startsWith("An A") && charNum == 10)
+        } else if (data.startsWith("An A") && charNum == 10) {
              data = data.mid(3) + ", An";
-        else if (!data.startsWith("The ") && !data.startsWith("A "))
-        {
+        } else if (!data.startsWith("The ") && !data.startsWith("A ")) {
             // use as is
-        }
-        else
-        {
+        } else {
             // don't add
             retval = false;
         }

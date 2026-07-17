@@ -78,6 +78,8 @@ class RSSEditPopup : public MythScreenType
     static void SelectImagePopup(const QString &prefix,
                         QObject &inst,
                         const QString &returnEvent);
+
+  protected:
     void customEvent(QEvent *levent) override; // MythUIType
 };
 

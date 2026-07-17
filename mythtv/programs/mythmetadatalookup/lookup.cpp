@@ -267,7 +267,7 @@ void LookerUpper::customEvent(QEvent *levent)
                     if ((exactTitleMeta == nullptr) ||
                         (hasArtwork &&
                          ((!foundMatchWithArt) ||
-                          ((list[p]->GetPopularity() > exactTitlePopularity)) ||
+                          (list[p]->GetPopularity() > exactTitlePopularity) ||
                           ((exactTitlePopularity == 0.0F) && (list[p]->GetReleaseDate() > exactTitleDate)))))
                     {
                         // remember the most popular or most recently released exact match

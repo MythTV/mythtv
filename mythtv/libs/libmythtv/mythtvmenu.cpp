@@ -319,7 +319,7 @@ bool MythTVMenu::Show(const QDomNode& Node, const QDomNode& Selected,
             MenuCurrentContext currentContext = kMenuCurrentDefault;
             if ((current == "active") && !hasSelected)
                 currentContext = kMenuCurrentActive;
-            else if (((current.startsWith("y") || current.startsWith("t") || current == "1")) && !hasSelected)
+            else if ((current.startsWith("y") || current.startsWith("t") || current == "1") && !hasSelected)
                 currentContext = kMenuCurrentAlways;
 
             if (element.tagName() == "menu")

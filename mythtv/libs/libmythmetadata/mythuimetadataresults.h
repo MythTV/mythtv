@@ -21,14 +21,15 @@ class META_PUBLIC MetadataResultsDialog : public MythScreenType
   signals:
     void haveResult(RefCountHandler<MetadataLookup>);
 
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
+
   private:
     MetadataLookupList m_results;
     MythUIButtonList      *m_resultsList   {nullptr};
     MetadataImageDownload *m_imageDownload {nullptr};
 
   private slots:
-    void customEvent(QEvent *event) override; // MythUIType
-
     static void cleanCacheDir();
     void sendResult(MythUIButtonListItem* item);
 };

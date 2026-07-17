@@ -1116,7 +1116,7 @@ int V2Status::PrintEncoderStatus( QTextStream &os, const QDomElement& encoders )
 
     os << "  </div>\r\n\r\n";
 
-    return( nNumEncoders );
+    return nNumEncoders;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1128,7 +1128,7 @@ int V2Status::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
     QDateTime qdtNow          = MythDate::current();
 
     if (scheduled.isNull())
-        return( 0 );
+        return 0;
 
     int     nNumRecordings= scheduled.attribute( "count", "0" ).toInt();
 
@@ -1139,7 +1139,7 @@ int V2Status::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
     {
         os << "    There are no shows scheduled for recording.\r\n"
            << "    </div>\r\n";
-        return( 0 );
+        return 0;
     }
 
     os << "    The next " << nNumRecordings << " show" << (nNumRecordings == 1 ? "" : "s" )
@@ -1249,7 +1249,7 @@ int V2Status::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
     os  << "    </div>\r\n";
     os << "  </div>\r\n\r\n";
 
-    return( nNumRecordings );
+    return nNumRecordings;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1259,12 +1259,12 @@ int V2Status::PrintScheduled( QTextStream &os, const QDomElement& scheduled )
 int V2Status::PrintFrontends( QTextStream &os, const QDomElement& frontends )
 {
     if (frontends.isNull())
-        return( 0 );
+        return 0;
 
     int nNumFES= frontends.attribute( "count", "0" ).toInt();
 
     if (nNumFES < 1)
-        return( 0 );
+        return 0;
 
 
     os << "  <div class=\"content\">\r\n"
@@ -1297,12 +1297,12 @@ int V2Status::PrintFrontends( QTextStream &os, const QDomElement& frontends )
 int V2Status::PrintBackends( QTextStream &os, const QDomElement& backends )
 {
     if (backends.isNull())
-        return( 0 );
+        return 0;
 
     int nNumBES= backends.attribute( "count", "0" ).toInt();
 
     if (nNumBES < 1)
-        return( 0 );
+        return 0;
 
 
     os << "  <div class=\"content\">\r\n"
@@ -1336,7 +1336,7 @@ int V2Status::PrintBackends( QTextStream &os, const QDomElement& backends )
 int V2Status::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
 {
     if (jobs.isNull())
-        return( 0 );
+        return 0;
 
     int nNumJobs= jobs.attribute( "count", "0" ).toInt();
 
@@ -1470,7 +1470,7 @@ int V2Status::PrintJobQueue( QTextStream &os, const QDomElement& jobs )
 
     os << "  </div>\r\n\r\n ";
 
-    return( nNumJobs );
+    return nNumJobs;
 
 }
 
@@ -1483,7 +1483,7 @@ int V2Status::PrintMachineInfo( QTextStream &os, const QDomElement& info )
     QString   sRep;
 
     if (info.isNull())
-        return( 0 );
+        return 0;
 
     os << "<div class=\"content\">\r\n"
        << "    <h2 class=\"status\">Machine Information</h2>\r\n";
@@ -1721,13 +1721,13 @@ int V2Status::PrintMachineInfo( QTextStream &os, const QDomElement& info )
     }
     os << "\r\n  </div>\r\n";
 
-    return( 1 );
+    return 1;
 }
 
 int V2Status::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info )
 {
     if (info.isNull())
-        return( 0 );
+        return 0;
 
     // Miscellaneous information
 
@@ -1775,7 +1775,7 @@ int V2Status::PrintMiscellaneousInfo( QTextStream &os, const QDomElement& info )
         os << "</div>\r\n";
     }
 
-    return( 1 );
+    return 1;
 }
 
 void V2Status::FillProgramInfo(QDomDocument *pDoc,

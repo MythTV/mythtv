@@ -30,6 +30,8 @@ class CDScannerThread: public MThread
   public:
     explicit CDScannerThread(Ripper *ripper)
         : MThread("CDScanner"), m_parent(ripper) {}
+
+  protected:
     void run() override; // MThread
 
   private:
@@ -41,7 +43,9 @@ class CDEjectorThread: public MThread
     public:
     explicit CDEjectorThread(Ripper *ripper)
         : MThread("CDEjector"), m_parent(ripper) {}
-    void run() override; // MThread
+
+    protected:
+        void run() override; // MThread
 
     private:
         Ripper    *m_parent {nullptr};
@@ -70,8 +74,10 @@ class CDRipperThread: public MThread
 
         void cancel(void);
 
-    private:
+    protected:
         void run(void) override; // MThread
+
+    private:
         int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
 
         bool isCancelled(void) const;
@@ -101,13 +107,15 @@ class Ripper : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     bool somethingWasRipped() const;
     void scanCD(void);
     void ejectCD(void);
 
     void ShowMenu(void) override; // MythScreenType
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:
     void startRipper(void);
@@ -230,9 +238,10 @@ class RipStatus : public MythScreenType
   protected slots:
     void startRip(void);
 
-  private:
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
+  private:
     QVector<RipTrack*> *m_tracks         {nullptr};
     int                m_quality;
     QString            m_cdDevice;

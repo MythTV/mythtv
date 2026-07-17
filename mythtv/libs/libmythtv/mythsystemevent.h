@@ -37,6 +37,7 @@ class MTV_PUBLIC MythSystemEventHandler : public QObject
     static void SubstituteMatches(const QStringList &tokens, QString &command);
     static QString EventNameToSetting(const QString &name);
 
+  protected:
     // Custom Event Handler
     void customEvent(QEvent *e) override; // QObject
 };

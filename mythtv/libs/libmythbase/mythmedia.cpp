@@ -141,12 +141,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         if (QFile(PATHTO_PMOUNT).exists() && QFile(PATHTO_PUMOUNT).exists())
         {
             MountCommand = QString("%1 %2")
-                .arg((DoMount) ? PATHTO_PMOUNT : PATHTO_PUMOUNT, m_devicePath);
+                .arg(DoMount ? PATHTO_PMOUNT : PATHTO_PUMOUNT, m_devicePath);
         }
         else
         {
             MountCommand = QString("%1 %2")
-                .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT, m_devicePath);
+                .arg(DoMount ? PATHTO_MOUNT : PATHTO_UNMOUNT, m_devicePath);
         }
 
         LOG(VB_MEDIA, LOG_INFO, QString("Executing '%1'").arg(MountCommand));

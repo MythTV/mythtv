@@ -123,7 +123,7 @@ bool MythUIShape::ParseElement(
         if (style == "solid" && !color.isEmpty())
         {
             int orig_width = element.attribute("width", "1").toInt();
-            int width = (orig_width) ? std::max(NormX(orig_width), 1) : 0;
+            int width = orig_width ? std::max(NormX(orig_width), 1) : 0;
             int alpha = element.attribute("alpha", "255").toInt();
             auto lineColor = QColor(color);
             lineColor.setAlpha(alpha);

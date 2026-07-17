@@ -145,7 +145,7 @@ MuteState VolumeBase::SetMuteState(MuteState mstate)
 void VolumeBase::ToggleMute(void)
 {
     bool is_muted = GetMuteState() == kMuteAll;
-    SetMuteState((is_muted) ? kMuteOff : kMuteAll);
+    SetMuteState(is_muted ? kMuteOff : kMuteAll);
 }
 
 MuteState VolumeBase::GetMuteState(void) const
@@ -173,7 +173,7 @@ MuteState VolumeBase::NextMuteState(MuteState cur)
            break;
     }
 
-    return (next);
+    return next;
 }
 
 void VolumeBase::UpdateVolume(void)

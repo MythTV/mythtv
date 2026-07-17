@@ -2483,7 +2483,9 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     // changed even though the previous value might still be available.  Mark it
     // as unchanged in this case if it wasn't already changed.
     if (wasUnchanged && previousValue == getValue())
+    {
         setChanged(false);
+    }
     else
     {
         if ("640x480" == resolution || "720x480" == resolution)
@@ -4108,7 +4110,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting* /*unused*/) override;
 
   private:
@@ -4279,7 +4281,9 @@ MainGeneralSettings::MainGeneralSettings()
 void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_cecPowerOnTVAllowed->boolValue())
+    {
         m_cecPowerOnTVOnStart->setEnabled(true);
+    }
     else
     {
         m_cecPowerOnTVOnStart->setEnabled(false);
@@ -4287,7 +4291,9 @@ void MainGeneralSettings::cecChanged(bool /*setting*/)
     }
 
     if (m_cecPowerOffTVAllowed->boolValue())
+    {
         m_cecPowerOffTVOnExit->setEnabled(true);
+    }
     else
     {
         m_cecPowerOffTVOnExit->setEnabled(false);
@@ -4311,7 +4317,7 @@ class PlayBackScaling : public GroupSetting
     PlayBackScaling();
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
@@ -4696,7 +4702,7 @@ class GuiDimension : public GroupSetting
         //QString getValue() override; // StandardSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-    private slots:
+    public slots:
         void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};
@@ -4989,7 +4995,9 @@ void ChannelGroupSetting::LoadChannelGroupChannels()
     }
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("ChannelGroupSetting::LoadChannelGroupChannels", query);
+    }
     else
     {
         while (query.next())

@@ -571,7 +571,9 @@ MythConfirmationDialog  *ShowOkPopup(const QString &message, bool showCancel)
     MythMainWindow *win = GetMythMainWindow();
 
     if (win)
+    {
         stk = win->GetStack("popup stack");
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");

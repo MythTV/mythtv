@@ -163,6 +163,9 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     Q_OBJECT
 
   public:
+    bool event(QEvent* Event) override;
+    bool eventFilter(QObject* Object, QEvent* Event) override;
+
     static bool IsTVRunning();
     static bool StartTV(ProgramInfo* TVRec, uint Flags, const ChannelInfoList& Selection = ChannelInfoList());
     static bool IsPaused();
@@ -174,16 +177,17 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     MThreadPool* GetPosThreadPool();
 
     bool IsSameProgram(const ProgramInfo* ProgInfo) const;
+    bool MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu) override;
 
   public slots:
-    bool event(QEvent* Event) override;
-    bool eventFilter(QObject* Object, QEvent* Event) override;
-    void timerEvent(QTimerEvent* Event) override;
     void StopPlayback();
     void HandleOSDClosed(int OSDType);
 
   signals:
     void PlaybackExiting(TV* Player);
+
+  protected:
+    void timerEvent(QTimerEvent* Event) override;
 
   protected slots:
     void onApplicationStateChange(Qt::ApplicationState State);
@@ -499,7 +503,6 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     void FillOSDMenuActorShows(const QString & actor, int person_id,
                                const QString & category = "");
     void PlaybackMenuShow(const MythTVMenu &Menu, const QDomNode &Node, const QDomNode &Selected);
-    bool MenuItemDisplay(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu) override;
     bool MenuItemDisplayPlayback(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu);
     bool MenuItemDisplayCutlist(const MythTVMenuItemContext& Context, MythOSDDialogData* Menu);
     void PlaybackMenuInit(const MythTVMenu& Menu);

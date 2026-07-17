@@ -753,7 +753,9 @@ void EditMetadataDialog::customEvent(QEvent *event)
         if (resultid == "optionsmenu")
         {
             if (resulttext == tr("Edit Albumart Images"))
+            {
                 switchToAlbumArt();
+            }
             else if (resulttext == tr("Search Internet For Genre Image"))
             {
                 updateMetadata();
@@ -1016,7 +1018,9 @@ void EditAlbumartDialog::showTypeMenu(bool changeType)
 
     ImageType imageType = IT_UNKNOWN;
     if (changeType)
+    {
         menu->SetReturnEvent(this, "changetypemenu");
+    }
     else
     {
         menu->SetReturnEvent(this, "asktypemenu");
@@ -1181,7 +1185,9 @@ void EditAlbumartDialog::customEvent(QEvent *event)
         if (!tokens.isEmpty())
         {
             if (tokens[0] == "BROWSER_DOWNLOAD_FINISHED")
+            {
                 rescanForImages();
+            }
             else if (tokens[0] == "MUSIC_ALBUMART_CHANGED")
             {
                 if (tokens.size() >= 2)
@@ -1304,14 +1310,15 @@ class CopyImageThread: public MThread
     explicit CopyImageThread(QStringList strList) :
             MThread("CopyImage"), m_strList(std::move(strList)) {}
 
+    QStringList getResult(void) { return m_strList; }
+
+  protected:
     void run() override // MThread
     {
         RunProlog();
         gCoreContext->SendReceiveStringList(m_strList);
         RunEpilog();
     }
-
-    QStringList getResult(void) { return m_strList; }
 
   private:
     QStringList m_strList;

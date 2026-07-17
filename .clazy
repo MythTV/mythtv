@@ -45,9 +45,6 @@ level1
    container-inside-loop
    isempty-vs-count
    qhash-with-char-pointer-key
-   qt6-fwd-fixes
-   qt6-header-fixes
-   qt6-qhash-signature
    raw-environment-function
    use-chrono-in-qtimer
 

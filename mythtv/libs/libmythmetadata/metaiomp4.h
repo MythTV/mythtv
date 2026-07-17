@@ -22,8 +22,10 @@ class META_PUBLIC MetaIOMP4 : public MetaIO
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIO
     MusicMetadata* read(const QString &filename) override; // MetaIO
 
-  private:
+  protected:
     std::chrono::milliseconds getTrackLength(const QString &filename) override; // MetaIO
+
+  private:
     static QString getFieldValue(AVFormatContext* context, const char* tagname);
     static void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
 };

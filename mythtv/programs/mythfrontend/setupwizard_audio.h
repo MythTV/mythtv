@@ -27,10 +27,11 @@ class AudioSetupWizard : public MythScreenType
 
     void save(void);
 
-  private:
+  protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
 
+  private:
     QVector<AudioOutput::AudioDeviceConfig> *m_outputlist {nullptr};
     AudioTestThread     *m_testThread              {nullptr};
 

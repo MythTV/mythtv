@@ -1905,7 +1905,7 @@ int HLSRingBuffer::ParseSegmentInformation(const HLSStream *hls, const QString &
             duration = -1;
             return RET_ERROR;
         }
-        if ((d) - ((int)d) >= 0.5)
+        if (d - ((int)d) >= 0.5)
             duration = ((int)d) + 1;
         else
             duration = ((int)d);
@@ -2292,7 +2292,9 @@ int HLSRingBuffer::ParseM3U8(const QByteArray *buffer, StreamsList *streams)
     {
         HLSStream *hls = nullptr;
         if (m_meta)
+        {
             hls = GetLastStream(streams);
+        }
         else
         {
             /* No Meta playlist used */

@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    std::unique_ptr<LookerUpper> lookup {new LookerUpper};
+    std::unique_ptr<LookerUpper> lookup = std::make_unique<LookerUpper>();
 
     LOG(VB_GENERAL, LOG_INFO,
             "Testing grabbers and metadata sites for functionality...");

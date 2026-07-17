@@ -37,7 +37,6 @@ class EITScanner : public QRunnable
     void StartActiveScan(TVRec *rec, std::chrono::seconds max_seconds_per_multiplex);
     void StopActiveScan(void);
 
-  protected:
     void run(void) override; // QRunnable
 
   private:

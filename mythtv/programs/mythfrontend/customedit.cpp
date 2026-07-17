@@ -848,7 +848,9 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
         rule.title += m_exSuffix;
 
     if (!query.exec())
+    {
         MythDB::DBError("Store custom example", query);
+    }
     else if (is_new)
     {
         new MythUIButtonListItem(m_clauseList, rule.title,
@@ -889,7 +891,9 @@ void CustomEdit::deleteRule(void)
                                             .remove(m_exSuffix));
 
     if (!query.exec())
+    {
         MythDB::DBError("Delete custom example", query);
+    }
     else
     {
         m_clauseList->RemoveItem(item);
@@ -900,7 +904,7 @@ void CustomEdit::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

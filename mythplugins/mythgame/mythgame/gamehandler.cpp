@@ -33,7 +33,9 @@ static void checkHandlers(void)
     // If a handlers list doesn't currently exist create one. Otherwise
     // clear the existing list so that we can regenerate a new one.
     if (!handlers)
+    {
         handlers = new QList<GameHandler*>;
+    }
     else
     {
         while (!handlers->isEmpty())
@@ -493,7 +495,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 MythDB::DBError("GameHandler::UpdateGameDB - "
                                 "insert gamemetadata", query);
         }
-        else if ((game.FoundLoc() == inDatabase) && (removalprompt))
+        else if ((game.FoundLoc() == inDatabase) && removalprompt)
         {
 
             promptForRemoval( game );
@@ -682,7 +684,9 @@ void GameHandler::processGames(GameHandler *handler)
     {
         QDir d(handler->SystemRomPath());
         if (d.exists())
+        {
             maxcount = buildFileCount(handler->SystemRomPath(),handler);
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +
@@ -707,7 +711,9 @@ void GameHandler::processGames(GameHandler *handler)
                                                 "gamescanbusy");
 
         if (busyDialog->Create())
+        {
             popupStack->AddScreen(busyDialog, false);
+        }
         else
         {
             delete busyDialog;

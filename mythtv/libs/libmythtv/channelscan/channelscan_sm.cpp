@@ -286,7 +286,7 @@ void ChannelScanSM::HandleAllGood(void)
             kChannelVisible /* visible   */,
             freqid);
 
-        msg = (ok) ?
+        msg = ok ?
             QObject::tr("Added Channel %1").arg(cur_chan) :
             QObject::tr("Failed to add channel %1").arg(cur_chan);
     }
@@ -1116,11 +1116,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         SignalMonitor *sm = GetSignalMonitor();
         if (HasTimedOut())
         {
-            msg_tr = (cchan_cnt) ?
+            msg_tr = cchan_cnt ?
                 QObject::tr("%1 possible channels").arg(cchan_cnt) :
                 QObject::tr("no channels");
             msg_tr = QString("%1, %2").arg(chan_tr, msg_tr);
-            msg = (cchan_cnt) ?
+            msg = cchan_cnt ?
                 QString("%1 possible channels").arg(cchan_cnt) :
                 QString("no channels");
             msg = QString("%1, %2").arg(chan_tr, msg);
@@ -1377,7 +1377,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
 
     uint    mplexid   = (*trans_info).m_mplexid;
     int     freqid    = (*trans_info).m_friendlyNum;
-    QString freqidStr = (freqid) ? QString::number(freqid) : QString("");
+    QString freqidStr = freqid ? QString::number(freqid) : QString("");
     QString iptv_channel = (*trans_info).m_iptvChannel;
 
     // channels.conf
@@ -2571,7 +2571,7 @@ bool ChannelScanSM::AddToList(uint mplexid)
     DTVModulationSystem delsys;
     delsys.Parse(mod_sys);
     DTVTunerType tt = CardUtil::ConvertToTunerType(delsys);
-    QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
+    QString fn = tsid ? QString("Transport ID %1").arg(tsid) :
         QString("Multiplex #%1").arg(mplexid);
 
     if (modulation == "8vsb")

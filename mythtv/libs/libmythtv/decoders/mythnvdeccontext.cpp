@@ -277,7 +277,7 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
         {
             if (doubledeint)
             {
-                if (doublepref & (DEINT_DRIVER))
+                if (doublepref & DEINT_DRIVER)
                     deinterlacer = doubledeint;
                 else if (doublepref & (DEINT_CPU | DEINT_SHADER))
                     other = true;
@@ -311,9 +311,12 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
         if (!deinterlacer && !other && singledeint)
         {
             if (singlepref & (DEINT_DRIVER | DEINT_CPU))
+            {
                 deinterlacer = singledeint;
+            }
             else if (singlepref & DEINT_SHADER)
-                { }
+            {
+            }
         }
     }
 

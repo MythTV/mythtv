@@ -208,7 +208,9 @@ const QString& meta_node::getFQPath()
         return m_fqPath;
 
     if (m_parent && !m_pathRoot)
+    {
         m_fqPath = m_parent->getFQPath() + "/" + getPath();
+    }
     else
     {
         QString p = getPath();

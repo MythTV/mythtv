@@ -108,6 +108,8 @@ void ProgramRecPriorityInfo::ToMap(InfoMap &progMap,
         QObject::tr("Default") : m_recordingGroup;
 }
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
 class TitleSort
 {
   public:
@@ -276,6 +278,7 @@ class ProgramAvgDelaySort
   private:
     bool m_reverse {false};
 };
+// NOLINTEND(modernize-use-nullptr)
 
 ////////////////////////////////////////////////////////
 
@@ -352,9 +355,13 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "RANKINC")
+        {
             changeRecPriority(1);
+        }
         else if (action == "RANKDEC")
+        {
             changeRecPriority(-1);
+        }
         else if (action == "ESCAPE")
         {
             saveRecPriority();
@@ -566,7 +573,7 @@ void ProgramRecPriority::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -1002,7 +1009,9 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
 
         // order may change if sorting by recording priority, so resort
         if (m_sortType == byRecPriority)
+        {
             SortList();
+        }
         else
         {
             // No need to re-fill the entire list, just update this entry
@@ -1144,9 +1153,13 @@ void ProgramRecPriority::countMatches()
         {
             m_listMatch[recordid]++;
             if (recstatus == RecStatus::Conflict || recstatus == RecStatus::Offline)
+            {
                 m_conMatch[recordid]++;
+            }
             else if (recstatus == RecStatus::WillRecord)
+            {
                 m_recMatch[recordid]++;
+            }
             else if (recstatus == RecStatus::Recording)
             {
                 m_nowMatch[recordid]++;
@@ -1159,7 +1172,9 @@ void ProgramRecPriority::countMatches()
 void ProgramRecPriority::SortList(ProgramRecPriorityInfo *newCurrentItem)
 {
     if (newCurrentItem)
+    {
         m_currentItem = newCurrentItem;
+    }
     else
     {
         MythUIButtonListItem *item = m_programList->GetItemCurrent();

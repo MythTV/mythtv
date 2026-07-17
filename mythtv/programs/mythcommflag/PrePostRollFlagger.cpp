@@ -58,7 +58,7 @@ bool PrePostRollFlagger::go()
 
 
     // Don't bother flagging short ~realtime recordings
-    if ((wereRecording) && (!m_stillRecording) && (secsSince < requiredHeadStart))
+    if (wereRecording && (!m_stillRecording) && (secsSince < requiredHeadStart))
         return false;
 
     m_aggressiveDetection =

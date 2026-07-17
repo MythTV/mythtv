@@ -215,7 +215,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket *pkt)
             QString("Moving PTS offset of stream %1 by %2")
                 .arg(idx).arg(PtsTime(delta)));
     }
-    return (delta);
+    return delta;
 }
 
 MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
@@ -587,9 +587,13 @@ void MPEG2fixup::InitReplex()
     {
         LOG(VB_GENERAL, LOG_NOTICE, "MPEG2fixup::InitReplex(): High Definition input, increasing replex buffers");
         if (m_rx.m_otype == REPLEX_MPEG2)
+        {
             m_rx.m_otype = REPLEX_HDTV;
+        }
         else if (m_rx.m_otype == REPLEX_TS_SD)
+        {
             m_rx.m_otype = REPLEX_TS_HD;
+        }
         else
         {
             LOG(VB_GENERAL, LOG_WARNING, "MPEG2fixup::InitReplex(): Using '--ostream=dvd' with HD video is an invalid combination");

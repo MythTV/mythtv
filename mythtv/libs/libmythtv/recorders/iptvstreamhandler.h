@@ -42,7 +42,7 @@ class IPTVStreamHandlerReadHelper : public QObject
     uint               m_stream;
 };
 
-class IPTVStreamHandlerWriteHelper : QObject
+class IPTVStreamHandlerWriteHelper : public QObject
 {
     Q_OBJECT
 
@@ -62,7 +62,7 @@ public:
 
     void SendRTCPReport(void);
 
-private:
+protected:
     void timerEvent(QTimerEvent *event) override; // QObject
 
 private:

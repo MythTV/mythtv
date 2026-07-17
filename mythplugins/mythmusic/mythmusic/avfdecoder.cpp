@@ -236,7 +236,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, AudioOutput *o) :
     setURL(file);
 
     bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV, LOG_ANY);
-    av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
+    av_log_set_level(debug ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
 }
 

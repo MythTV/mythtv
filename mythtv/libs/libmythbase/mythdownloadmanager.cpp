@@ -296,7 +296,9 @@ void MythDownloadManager::run(void)
             }
 
             if (dlInfo->m_url.startsWith("myth://"))
+            {
                 downloadRemoteFile(dlInfo);
+            }
             else
             {
                 QMutexLocker cLock(&m_cookieLock);

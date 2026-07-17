@@ -85,7 +85,7 @@ This is equivalent to QVariant(bool).toString()
 */
 inline QString boolToQString(bool val)
 {
-    return (val) ? QStringLiteral("true") : QStringLiteral("false");
+    return val ? QStringLiteral("true") : QStringLiteral("false");
 }
 
 #endif

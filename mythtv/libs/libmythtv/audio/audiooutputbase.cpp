@@ -1375,7 +1375,9 @@ std::chrono::milliseconds AudioOutputBase::GetAudiotime(void)
     int64_t obpf = 0;
 
     if (m_passthru && !usesSpdif())
+    {
         obpf = m_sourceBitRate * 10 / m_sourceSampleRate;
+    }
     else if (m_enc && !usesSpdif())
     {
         // re-encode bitrate is hardcoded at 448000
@@ -1472,7 +1474,7 @@ void AudioOutputBase::SetAudiotime(int frames, std::chrono::milliseconds timecod
     }
 
     m_audbufTimecode =
-        timecode + std::chrono::milliseconds(m_effDsp ? ((frames + processframes_unstretched) * 100000 +
+        timecode + std::chrono::milliseconds(m_effDsp ? (((frames + processframes_unstretched) * 100000) +
                     (processframes_stretched * m_effStretchFactor)
                    ) / m_effDsp : 0);
 
@@ -1608,7 +1610,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         if (frames > 0)
             AudioConvert::MonoToStereo(WPOS, buffer + off, frames);
 
-        org_waud = (org_waud + frames * bpf) % kAudioRingBufferSize;
+        org_waud = (org_waud + (frames * bpf)) % kAudioRingBufferSize;
         return len;
     }
 
@@ -1644,7 +1646,7 @@ int AudioOutputBase::CopyWithUpmix(char *buffer, int frames, uint &org_waud)
         if (nFrames > 0)
             m_upmixer->receiveFrames((float *)(WPOS), nFrames);
 
-        org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
+        org_waud = (org_waud + (nFrames * bpf)) % kAudioRingBufferSize;
     }
     return len;
 }
@@ -1901,7 +1903,7 @@ bool AudioOutputBase::AddData(void *in_buffer, int in_len,
                 nFrames = m_pSoundStretch->receiveSamples((STST *)(WPOS),
                                                         nFrames);
 
-            org_waud = (org_waud + nFrames * bpf) % kAudioRingBufferSize;
+            org_waud = (org_waud + (nFrames * bpf)) % kAudioRingBufferSize;
         }
 
         if (m_internalVol && SWVolume())

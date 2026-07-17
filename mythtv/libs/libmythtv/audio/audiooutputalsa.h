@@ -15,12 +15,13 @@ class AudioOutputALSA : public AudioOutputBase
     explicit AudioOutputALSA(const AudioSettings &settings);
     ~AudioOutputALSA() override;
 
-    // Volume control
-    int GetVolumeChannel(int channel) const override; // VolumeBase
-    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
     static QMap<QString, QString> *GetDevices(const char *type);
 
   protected:
+    // Volume control
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
+
     // You need to implement the following functions
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase

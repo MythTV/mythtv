@@ -104,11 +104,11 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     //      reserved            5  3.2        0x1f
     //      line21_field        1  3.7
     bool Line21Field(int i) const
-        { return bool(((Offset(i,-1)[3])) & 1); }
+        { return bool((Offset(i,-1)[3]) & 1); }
     //   } else
     //      cap_service_number  6  3.2
     int CaptionServiceNumber(int i) const
-        { return ((Offset(i,-1)[3])) & 0x3f; }
+        { return (Offset(i,-1)[3]) & 0x3f; }
     //   easy_reader            1  4.0
     bool EasyReader(int i) const
         { return bool(((Offset(i,-1)[4])>>7) & 1); }

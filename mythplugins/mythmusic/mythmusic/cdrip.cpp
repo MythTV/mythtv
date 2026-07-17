@@ -669,7 +669,9 @@ void Ripper::ShowMenu()
     auto *menu = new MythDialogBox("", popupStack, "ripmusicmenu");
 
     if (menu->Create())
+    {
         popupStack->AddScreen(menu);
+    }
     else
     {
         delete menu;
@@ -697,7 +699,9 @@ void Ripper::chooseBackend(void) const
                   "FROM storagegroup "
                   "WHERE groupname = 'Music'";
     if (!query.exec(sql) || !query.isActive())
+    {
         MythDB::DBError("Ripper::chooseBackend get host list", query);
+    }
     else
     {
         while(query.next())
@@ -1398,7 +1402,9 @@ void Ripper::ShowConflictMenu(RipTrack* track)
     auto *menu = new MythDialogBox(msg, popupStack, "conflictmenu", true);
 
     if (menu->Create())
+    {
         popupStack->AddScreen(menu);
+    }
     else
     {
         delete menu;

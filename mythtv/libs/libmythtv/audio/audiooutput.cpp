@@ -600,7 +600,9 @@ int AudioOutput::DecodeAudio(AVCodecContext *ctx,
     if (ret == 0)
         ret = avcodec_send_packet(ctx, pkt);
     if (ret == AVERROR(EAGAIN))
+    {
         ret = 0;
+    }
     else if (ret < 0)
     {
         std::string error;

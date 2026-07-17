@@ -26,9 +26,10 @@ class VideoSetupWizard : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *e) override; // MythUIType
-
     void save(void);
+
+  protected:
+    void customEvent(QEvent *e) override; // MythUIType
 
   private:
     void initProgressDialog();

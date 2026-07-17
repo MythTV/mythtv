@@ -115,7 +115,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     m_requestPause  = false;
     m_paused        = false;
 
-    m_readQuanta   = (readQuanta) ? readQuanta : m_readQuanta;
+    m_readQuanta   = readQuanta ? readQuanta : m_readQuanta;
     m_devBufferCount = deviceBufferCount;
 #ifdef __cpp_size_t_suffix
     m_size          = gCoreContext->GetNumSetting(
@@ -126,7 +126,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
 #endif
     m_used          = 0;
     m_devReadSize = m_readQuanta * (m_usingPoll ? 256 : 48);
-    m_devReadSize = (deviceBufferSize) ?
+    m_devReadSize = deviceBufferSize ?
         std::min(m_devReadSize, (size_t)deviceBufferSize) : m_devReadSize;
     m_readThreshold = m_readQuanta * 128;
 

@@ -86,7 +86,9 @@ bool MetadataResultsDialog::Create()
             int pos = m_resultsList->GetItemPos(button);
 
             if (QFile::exists(dlfile))
+            {
                 button->SetImage(dlfile);
+            }
             else
             {
                 m_imageDownload->addThumb(m_results[i]->GetTitle(),

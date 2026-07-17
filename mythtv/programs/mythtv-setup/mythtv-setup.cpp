@@ -435,11 +435,17 @@ int main(int argc, char *argv[])
 
             int scantype { ScanTypeSetting::FullScan_ATSC };
             if (frequencyStandard == "atsc")
-                scantype = ScanTypeSetting::FullScan_ATSC; // NOLINT(bugprone-branch-clone)
+            { // NOLINT(bugprone-branch-clone)
+                scantype = ScanTypeSetting::FullScan_ATSC;
+            }
             else if (frequencyStandard == "dvbt")
+            {
                 scantype = ScanTypeSetting::FullScan_DVBT;
+            }
             else if (frequencyStandard == "mpeg")
+            {
                 scantype = ScanTypeSetting::CurrentTransportScan;
+            }
             else if (frequencyStandard == "iptv")
             {
                 scantype = ScanTypeSetting::IPTVImportMPTS;
@@ -473,7 +479,7 @@ int main(int argc, char *argv[])
                          startChan, frequencyStandard, modulation, region);
             ret = QCoreApplication::exec();
         }
-        return (ret) ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
+        return ret ? GENERIC_EXIT_NOT_OK : GENERIC_EXIT_OK;
     }
 
     if (doScanList)
@@ -569,7 +575,9 @@ int main(int argc, char *argv[])
         expertEditor =
             new ExpertSettingsEditor(mainStack, "Expert Settings Editor");
         if (expertEditor->Create())
+        {
             mainStack->AddScreen(expertEditor);
+        }
         else
         {
             delete expertEditor;

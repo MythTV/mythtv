@@ -42,9 +42,9 @@ class MPLUGIN_PUBLIC GamePlayersList : public GroupSetting
     Q_OBJECT
 public:
     GamePlayersList();
+    void Load() override; // StandardSetting
 
 private:
-    void Load() override; // StandardSetting
     void NewPlayerDialog() const;
     void CreateNewPlayer(const QString& name);
 };

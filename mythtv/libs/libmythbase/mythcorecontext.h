@@ -54,6 +54,11 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
     void SetEventSocket(MythSocket *eventSock);
     void SetScheduler(MythScheduler *sched);
 
+    void connected(MythSocket *sock) override { (void)sock; } //MythSocketCBs
+    void connectionFailed(MythSocket *sock) override { (void)sock; } //MythSocketCBs
+    void connectionClosed(MythSocket *sock) override; // MythSocketCBs
+    void readyRead(MythSocket *sock) override; // MythSocketCBs
+
     bool SafeConnectToMasterServer(bool blockingClient = true,
                                    bool openEventSocket = true);
     bool ConnectToMasterServer(bool blockingClient = true,
@@ -303,11 +308,6 @@ class MBASE_PUBLIC MythCoreContext : public QObject, public MythObservable, publ
   private:
     Q_DISABLE_COPY_MOVE(MythCoreContext)
     MythCoreContextPrivate *d {nullptr}; // NOLINT(readability-identifier-naming)
-
-    void connected(MythSocket *sock) override { (void)sock; } //MythSocketCBs
-    void connectionFailed(MythSocket *sock) override { (void)sock; } //MythSocketCBs
-    void connectionClosed(MythSocket *sock) override; // MythSocketCBs
-    void readyRead(MythSocket *sock) override; // MythSocketCBs
 
     QMap<QString,int>     m_testOverrideInts;
     QMap<QString,double>  m_testOverrideFloats;

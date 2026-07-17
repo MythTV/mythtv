@@ -149,7 +149,7 @@ class MTV_PUBLIC TSHeader
     { return TimePoint(std::chrono::microseconds(GetPCRraw() / 27)); }
 
     void SetTransportError(bool err) {
-        if (err) m_tsData[1] |= 0x80; else m_tsData[1] &= (0xff-(0x80));
+        if (err) m_tsData[1] |= 0x80; else m_tsData[1] &= (0xff-0x80);
     }
     void SetPayloadStart(bool start) {
         if (start) m_tsData[1] |= 0x40; else m_tsData[1] &= (0xff-0x40);

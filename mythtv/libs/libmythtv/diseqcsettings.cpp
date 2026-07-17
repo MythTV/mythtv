@@ -1144,8 +1144,7 @@ void DeviceTree::ConnectToValueChanged(DeviceTypeSetting *devtype,
     };
 
     connect(devtype,
-            static_cast<void (StandardSetting::*)(const QString&)>(
-                                                &StandardSetting::valueChanged),
+            qOverload<const QString&>(&StandardSetting::valueChanged),
             this,
             slot);
 }

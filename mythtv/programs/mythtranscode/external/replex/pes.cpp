@@ -184,8 +184,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				c++;
 				break;
 			case 2:
-				if (buf[c] == 0x01) p->found++;
-				else if (buf[c] == 0){
+				if (buf[c] == 0x01) {
+					p->found++;
+				} else if (buf[c] == 0) {
 					p->found = 2;
 				} else {
 					p->found = 0;
@@ -251,8 +252,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					p->flag1 = buf[c];
 					c++;
 					p->found++;
-					if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
-					else {
+					if ( (p->flag1 & 0xC0) == 0x80 ) {
+						p->mpeg = 2;
+					} else {
 						LOG(VB_GENERAL, LOG_ERR,
 						"Error: THIS IS AN MPEG1 FILE");
 						exit(1);
@@ -345,9 +347,9 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 					int l = count -c;
 					if (l+p->found > p->plength+6)
 						l = p->plength+6-p->found;
-					if (p->withbuf)
+					if (p->withbuf) {
 						memcpy(p->buf.data()+p->found, buf+c, l);
-					else {
+					} else {
 						if ( p->found < 
                                                      (unsigned int)p->hlength+9 ){
 							int rest = p->hlength+9-p->found;
@@ -630,7 +632,7 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	length -= 6;
 
 	le[0] |= ((uint8_t)(length >> 8) & 0xFF); 
-	le[1] |= ((uint8_t)(length) & 0xFF); 
+	le[1] |= ((uint8_t)length & 0xFF);
 	memcpy(obuf+c,le.data(),2);
 	c += 2;
 
@@ -817,7 +819,7 @@ int write_ac3_pes(  int pack_size, int extcnt, int n,
 	buf[pos] = 0x80 + n;
 	buf[pos+1] = nframes;
 	buf[pos+2] = (ac3_off >> 8)& 0xFF;
-	buf[pos+3] = (ac3_off)& 0xFF;
+	buf[pos+3] = ac3_off& 0xFF;
 	pos += 4;
 
 	int add = ring_read( ac3rbuffer, buf+pos, length-pos);

@@ -20,11 +20,10 @@ class SatIPRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
+
+  protected:
     void StartNewFile(void) override; // RecorderBase
-
     QString GetSIStandard(void) const override; // DTVRecorder
-
-  private:
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override;  // RecorderBase
 
   private:

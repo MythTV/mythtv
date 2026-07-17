@@ -9,7 +9,7 @@
 class MythScreenType;
 
 //! The info/details buttonlist overlay that displays key:data info
-class ProgInfoList : QObject
+class ProgInfoList : public QObject
 {
     Q_OBJECT
 

@@ -781,7 +781,7 @@ void NAMThread::run()
     m_nam->setObjectName("NetStream NAM");
 
     // Setup cache
-    std::unique_ptr<QNetworkDiskCache> cache(new QNetworkDiskCache());
+    std::unique_ptr<QNetworkDiskCache> cache = std::make_unique<QNetworkDiskCache>();
 
     cache->setCacheDirectory(GetConfDir() + "/cache/netstream-" +
                              gCoreContext->GetHostName());

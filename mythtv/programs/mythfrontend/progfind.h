@@ -29,6 +29,7 @@ class ProgFinder : public ScheduleCommon
     ~ProgFinder() override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private slots:
@@ -37,16 +38,16 @@ class ProgFinder : public ScheduleCommon
     void timesListTakeFocus(void);
     void timesListLosingFocus(void);
 
-    void ShowGuide() const override; // ScheduleCommon
     void select();
 
-    void customEvent(QEvent *e) override; // ScheduleCommon
     void updateInfo(void);
 
   protected:
     using ShowName = QMap<QString,QString>;
 
     void Init(void) override; // MythScreenType
+    void ShowGuide() const override; // ScheduleCommon
+    void customEvent(QEvent *e) override; // ScheduleCommon
 
     virtual void initAlphabetList(void);
     virtual bool formatSelectedData(QString &data);
@@ -55,7 +56,6 @@ class ProgFinder : public ScheduleCommon
     virtual void whereClauseGetSearchData(QString &where, MSqlBindings &bindings);
     ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
-    void ShowMenu(void) override; // MythScreenType
     void getShowNames(void);
     void updateShowList();
     void updateTimesList();

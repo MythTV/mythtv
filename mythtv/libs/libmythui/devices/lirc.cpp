@@ -443,7 +443,9 @@ void LIRC::run(void)
             d->m_lircState = nullptr;
 
             if (Init())
+            {
                 m_retryCount = 0;
+            }
             else
             {
                 // wait a while before we retry..

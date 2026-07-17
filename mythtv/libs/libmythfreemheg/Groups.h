@@ -48,6 +48,8 @@ class MHGroup : public MHRoot
   public:
     MHGroup() = default;
     ~MHGroup() override;
+    // Set this up from the parse tree.
+    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     void PrintMe(FILE *fd, int nTabs) const override; // MHRoot
 
     void Preparation(MHEngine *engine) override; // MHRoot
@@ -63,8 +65,6 @@ class MHGroup : public MHRoot
     void MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine) override; // MHRoot
 
   protected:
-    // Set this up from the parse tree.
-    void Initialise(MHParseNode *p, MHEngine *engine) override; // MHRoot
     // Standard ID, Standard version, Object information aren't recorded.
     int m_nOrigGCPriority {127};
     MHActionSequence m_startUp, m_closeDown;
@@ -178,8 +178,8 @@ class MHSendEvent: public MHElemAction
     MHSendEvent(): MHElemAction(":SendEvent") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
-    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
   protected:
+    void PrintArgs(FILE *fd, int nTabs) const override; // MHElemAction
     MHGenericObjectRef m_eventSource; // Event source
     enum EventType m_eventType { EventIsAvailable }; // Event type
     MHParameter m_eventData; // Optional - Null means not specified.  Can only be bool, int or string.

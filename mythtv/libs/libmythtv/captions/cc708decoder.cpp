@@ -398,18 +398,17 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     { // 1 byte of paramaters
         int param1 = blk_buf[i+1];
         send_str(cc, service_num);
-        if (CLW==code)
+        if (CLW==code) {
             cc->ClearWindows(service_num, param1);
-        else if (DSW==code)
+        } else if (DSW==code) {
             cc->DisplayWindows(service_num, param1);
-        else if (HDW==code)
+        } else if (HDW==code) {
             cc->HideWindows(service_num, param1);
-        else if (TGW==code)
+        } else if (TGW==code) {
             cc->ToggleWindows(service_num, param1);
-        else if (DLW==code)
+        } else if (DLW==code) {
             cc->DeleteWindows(service_num, param1);
-        else if (DLY==code)
-        {
+        } else if (DLY==code) {
             cc->Delay(service_num, param1);
             cc->m_delayed[service_num] = true;
         }

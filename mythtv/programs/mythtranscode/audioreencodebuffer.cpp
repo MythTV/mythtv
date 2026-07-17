@@ -42,7 +42,7 @@ void AudioBuffer::appendData(unsigned char *buffer, int len, int frames,
         // buffer is too small to fit all
         // can't use av_realloc as it doesn't guarantee reallocated memory
         // to be 16 bytes aligned
-        m_realsize = ((m_size + len) / ABLOCK_SIZE + 1 ) * ABLOCK_SIZE;
+        m_realsize = (((m_size + len) / ABLOCK_SIZE) + 1 ) * ABLOCK_SIZE;
         auto *tmp = (uint8_t *)av_malloc(m_realsize);
         if (tmp == nullptr)
         {

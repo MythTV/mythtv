@@ -60,7 +60,9 @@ MythCCExtractorPlayer::MythCCExtractorPlayer(PlayerContext *Context, PlayerFlags
     if (!comps.empty())
         comps.removeLast();
     if (destdir.isEmpty())
+    {
         m_workingDir = QDir(QFileInfo(m_fileName).path());
+    }
     else
     {
         m_workingDir = QDir(destdir);

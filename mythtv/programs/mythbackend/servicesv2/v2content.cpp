@@ -614,7 +614,9 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
     QString sNewFileName;
 
     if (bDefaultPixmap)
+    {
         sNewFileName = sPreviewFileName;
+    }
     else
     {
         sNewFileName = QString( "%1.%2.%3x%4.%5" )

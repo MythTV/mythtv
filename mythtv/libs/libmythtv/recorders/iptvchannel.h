@@ -21,7 +21,7 @@ class IPTVTuningData;
 class IPTVRecorder;
 class MPEGStreamData;
 
-class IPTVChannel : QObject, public DTVChannel
+class IPTVChannel : public QObject, public DTVChannel
 {
     Q_OBJECT
     friend class IPTVRecorder;
@@ -32,6 +32,8 @@ class IPTVChannel : QObject, public DTVChannel
 
     // Commands
     bool Open(void) override; // ChannelBase
+    void Close(void) override; // ChannelBase
+    bool EnterPowerSavingMode(void) override; // DTVChannel
 
     using DTVChannel::Tune;
     bool Tune(const IPTVTuningData &tuning, bool scanning) override ; // DTVChannel
@@ -51,8 +53,6 @@ class IPTVChannel : QObject, public DTVChannel
         { return true; }
 
   protected:
-    void Close(void) override; // ChannelBase
-    bool EnterPowerSavingMode(void) override; // DTVChannel
     bool IsExternalChannelChangeSupported(void) override // ChannelBase
         { return true; }
 

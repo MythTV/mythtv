@@ -33,12 +33,13 @@ class avfDecoder : public QObject, public Decoder
     void seek(double pos) override; // Decoder
     void stop() override; // Decoder
 
+  protected:
+    void run() override; // MThread
+
   protected slots:
     void checkMetatdata(void);
 
   private:
-    void run() override; // MThread
-
     void deinit();
 
     bool m_inited                         {false};

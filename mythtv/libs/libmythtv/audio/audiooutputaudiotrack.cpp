@@ -21,8 +21,9 @@
     env->ExceptionDescribe(); \
     env->ExceptionClear(); \
     exception=true; \
-  } else \
-    exception=false;
+  } else { \
+    exception=false; \
+  }
 // clear exception without checking
 #define ANDROID_EXCEPTION_CLEAR \
   if (env->ExceptionCheck()) { \

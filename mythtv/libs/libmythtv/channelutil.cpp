@@ -41,7 +41,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
         "  AND sistandard   = :SISTANDARD ";
 
     if (sistandard.toLower() != "dvb")
+    {
         qstr += "AND frequency    = :FREQUENCY   ";
+    }
     else
     {
         qstr += "AND transportid  = :TRANSPORTID ";
@@ -57,7 +59,9 @@ static uint get_dtv_multiplex(uint     db_source_id,  const QString& sistandard,
     query.bindValue(":SISTANDARD",        sistandard);
 
     if (sistandard.toLower() != "dvb")
+    {
         query.bindValue(":FREQUENCY",   QString::number(frequency));
+    }
     else
     {
         query.bindValue(":TRANSPORTID", transport_id);
@@ -148,7 +152,7 @@ static uint insert_dtv_multiplex(
         "WHERE sourceid    = :SOURCEID      AND "
         "      sistandard  = :SISTANDARD    AND ";
 
-    updateStr += (isDVB) ?
+    updateStr += isDVB ?
         " polarity     = :WHEREPOLARITY      AND "
         " transportid = :TRANSPORTID AND networkid = :NETWORKID " :
         " frequency = :FREQUENCY2 ";
@@ -159,7 +163,7 @@ static uint insert_dtv_multiplex(
 
     insertStr += (!modulation.isNull())     ? "modulation, "        : "";
     insertStr += (transport_id || isDVB)    ? "transportid, "       : "";
-    insertStr += (isDVB)                    ? "networkid, "         : "";
+    insertStr += isDVB                      ? "networkid, "         : "";
     insertStr += (symbol_rate >= 0)         ? "symbolrate, "        : "";
     insertStr += (bandwidth   >= 0)         ? "bandwidth, "         : "";
     insertStr += (polarity    >= 0)         ? "polarity, "          : "";
@@ -180,7 +184,7 @@ static uint insert_dtv_multiplex(
         "  (:SOURCEID,      :SISTANDARD,       :FREQUENCY1, ";
     insertStr += (!modulation.isNull())     ? ":MODULATION, "       : "";
     insertStr += (transport_id || isDVB)    ? ":TRANSPORTID, "      : "";
-    insertStr += (isDVB)                    ? ":NETWORKID, "        : "";
+    insertStr += isDVB                      ? ":NETWORKID, "        : "";
     insertStr += (symbol_rate >= 0)         ? ":SYMBOLRATE, "       : "";
     insertStr += (bandwidth   >= 0)         ? ":BANDWIDTH, "        : "";
     insertStr += (polarity    >= 0)         ? ":POLARITY, "         : "";
@@ -196,7 +200,7 @@ static uint insert_dtv_multiplex(
     insertStr += (!rolloff.isNull())        ? ":ROLLOFF, "          : "";
     insertStr = insertStr.left(insertStr.length()-2) + ");";
 
-    query.prepare((mplex) ? updateStr : insertStr);
+    query.prepare(mplex ? updateStr : insertStr);
 
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
@@ -627,7 +631,9 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
     query.bindValue(":MPLEX_ID", current_mplexid);
 
     if (!query.exec())
+    {
         MythDB::DBError("Getting mplexid global search", query);
+    }
     else if (query.next())
     {
         q_networkid   = query.value(0).toInt();
@@ -897,7 +903,9 @@ bool ChannelUtil::SaveCachedPids(uint chanid,
 
     /// delete
     if (delete_all)
+    {
         query.prepare("DELETE FROM pidcache WHERE chanid = :CHANID");
+    }
     else
     {
         query.prepare(
@@ -986,7 +994,7 @@ int ChannelUtil::GetChannelValueInt(const QString &channel_field,
     if (!val.isEmpty())
         retval = val.toInt();
 
-    return (retval) ? retval : -1;
+    return retval ? retval : -1;
 }
 
 QString ChannelUtil::GetChannelNumber(uint sourceid, const QString &channel_name)
@@ -1430,7 +1438,7 @@ uint ChannelUtil::FindChannel(uint sourceid, const QString &freqid)
 static uint get_max_chanid(uint sourceid)
 {
     QString qstr = "SELECT MAX(chanid) FROM channel ";
-    qstr += (sourceid) ? "WHERE sourceid = :SOURCEID" : "";
+    qstr += sourceid ? "WHERE sourceid = :SOURCEID" : "";
 
     MSqlQuery query(MSqlQuery::ChannelCon());
     query.prepare(qstr);
@@ -1903,7 +1911,9 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("getatscchannel", query);
+    }
     else if (query.next())
     {
         major = query.value(0).toUInt();
@@ -2104,7 +2114,7 @@ ChannelInfoList ChannelUtil::GetChannelsInternal(
         "FROM videosource "
         "%1 JOIN capturecard ON capturecard.sourceid = videosource.sourceid "
         "GROUP BY videosource.sourceid")
-        .arg((include_disconnected) ? "LEFT" : "");
+        .arg(include_disconnected ? "LEFT" : "");
 
     query.prepare(qstr);
     if (!query.exec())
@@ -2222,6 +2232,9 @@ std::vector<uint> ChannelUtil::GetChanIDs(int sourceid, bool onlyVisible)
 
 inline bool lt_callsign(const ChannelInfo &a, const ChannelInfo &b)
 {
+    // For the spaceship operator, the c++ standard library explicitly
+    // requires '0' and not nullptr.
+    // NOLINTNEXTLINE(modernize-use-nullptr)
     return StringUtil::naturalCompare(a.m_callSign, b.m_callSign) < 0;
 }
 
@@ -2311,9 +2324,13 @@ inline bool lt_smart(const ChannelInfo &a, const ChannelInfo &b)
     else
     {
         // neither of channels have a numeric channum
+        // For the spaceship operator, the c++ standard library explicitly
+        // requires '0' and not nullptr.
+        // NOLINTBEGIN(modernize-use-nullptr)
         auto cmp = StringUtil::naturalCompare(a.m_chanNum, b.m_chanNum);
         if (cmp != 0)
             return cmp < 0;
+        // NOLINTEND(modernize-use-nullptr)
     }
 
     return lt_callsign(a,b);
@@ -2548,7 +2565,9 @@ ChannelInfoList ChannelUtil::LoadChannels(uint startIndex, uint count,
         sql += "GROUP BY channel.chanid "; // We must always group for this query
 
     if (orderBy == kChanOrderByName)
+    {
         sql += "ORDER BY channel.name ";
+    }
     else if (orderBy == kChanOrderByChanNum)
     {
         // Natural sorting including subchannels e.g. 2_4, 1.3

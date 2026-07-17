@@ -412,6 +412,8 @@ class META_PUBLIC MetadataLoadingThread : public MThread
 
     explicit MetadataLoadingThread(AllMusic *parent_ptr)
         : MThread("MetadataLoading"), m_parent(parent_ptr) {}
+
+  protected:
     void run() override; // MThread
 
   private:
@@ -510,9 +512,10 @@ class AlbumArtScannerThread: public MThread
     explicit AlbumArtScannerThread(QStringList strList) :
             MThread("AlbumArtScanner"), m_strList(std::move(strList)) {}
 
-    void run() override; // MThread
-
     QStringList getResult(void) { return m_strList; }
+
+  protected:
+    void run() override; // MThread
 
   private:
     QStringList m_strList;

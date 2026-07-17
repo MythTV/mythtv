@@ -233,7 +233,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                 selExit = "STANDBY_MODE";
 
             if (!m_allocedstate)
+            {
                 handleAction(menuaction);
+            }
             else if (m_state->m_killable)
             {
                 m_wantpop = true;
@@ -257,7 +259,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                         MYTH_APPNAME_MYTHTV_SETUP))) && lastScreen)
             {
                 if (callbacks)
+                {
                     m_state->m_callback(m_state->m_callbackdata, selExit);
+                }
                 else
                 {
                     QCoreApplication::exit();
@@ -376,7 +380,7 @@ void MythThemedMenu::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid = dce->GetId();
         //int buttonnum = dce->GetResult();

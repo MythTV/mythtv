@@ -19,8 +19,6 @@ class IdleScreen : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *e) override; // MythUIType
-
 
   public slots:
     void UpdateStatus(void);
@@ -30,6 +28,7 @@ class IdleScreen : public MythScreenType
   protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
+    void customEvent(QEvent *e) override; // MythUIType
 
   private:
     bool CheckConnectionToServer(void);

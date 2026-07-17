@@ -612,11 +612,17 @@ void MusicPlayer::customEvent(QEvent *event)
             if (list.size() >= 3 && list[1] == gCoreContext->GetHostName())
             {
                 if (list[2] == "PLAY")
+                {
                     play();
+                }
                 else if (list[2] == "STOP")
+                {
                     stop();
+                }
                 else if (list[2] == "PAUSE")
+                {
                     pause();
+                }
                 else if (list[2] == "SET_VOLUME")
                 {
                     if (list.size() > 3)
@@ -819,7 +825,9 @@ void MusicPlayer::customEvent(QEvent *event)
         m_errorCount++;
 
         if (m_errorCount <= 5)
+        {
             nextAuto();
+        }
         else
         {
             m_errorCount = 0;
@@ -841,7 +849,9 @@ void MusicPlayer::customEvent(QEvent *event)
         m_errorCount++;
 
         if (m_playMode != PLAYMODE_RADIO && m_errorCount <= 5)
+        {
             nextAuto();
+        }
         else
         {
             m_errorCount = 0;
@@ -863,7 +873,9 @@ void MusicPlayer::customEvent(QEvent *event)
         m_errorCount++;
 
         if (m_errorCount <= 5)
+        {
             nextAuto();
+        }
         else
         {
             m_errorCount = 0;

@@ -237,7 +237,7 @@ bool FileServerHandler::HandleAnnounce(MythSocket *socket,
 
     QStringList checkfiles;
     while (++it != slist.cend())
-        checkfiles += *(it);
+        checkfiles += *it;
 
     slist.clear();
 
@@ -781,7 +781,9 @@ bool FileServerHandler::HandleGetFileList(SocketHandler *socket,
 
     bool fileNamesOnly = false;
     if (slist.size() == 5)
+    {
         fileNamesOnly = (slist[4].toInt() != 0);
+    }
     else if (slist.size() != 4)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("Invalid Request. %1")
@@ -924,7 +926,9 @@ bool FileServerHandler::HandleQueryFileTransfer(SocketHandler *socket,
         if (!m_ftMap.contains(recnum))
         {
             if (slist[1] == "DONE")
+            {
                 res << "OK";
+            }
             else
             {
                 LOG(VB_GENERAL, LOG_ERR,

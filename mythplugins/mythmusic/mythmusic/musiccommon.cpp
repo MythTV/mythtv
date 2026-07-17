@@ -1402,7 +1402,9 @@ void MusicCommon::customEvent(QEvent *event)
         if (resultid == "mainmenu")
         {
             if (resulttext == tr("Fullscreen Visualizer"))
+            {
                 switchView(MV_VISUALIZER);
+            }
             else if (resulttext == tr("Playlist Editor") ||
                      resulttext == tr("Browse Music Library"))
             {
@@ -2531,7 +2533,7 @@ void MusicCommon::fromCD(void)
         MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(x);
         if (mdata)
         {
-            m_songList.append((mdata)->ID());
+            m_songList.append(mdata->ID());
         }
     }
 

@@ -255,7 +255,9 @@ void StorageGroupEditor::Load(void)
         query.bindValue(":NAME", m_group);
         query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
         if (!query.exec() || !query.isActive())
+        {
             MythDB::DBError("StorageGroupEditor::Load", query);
+        }
         else
         {
             bool first = true;
@@ -328,7 +330,9 @@ void StorageGroupEditor::customEvent(QEvent *event)
             query.bindValue(":DIRNAME", dirname);
             query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
             if (!query.exec())
+            {
                 MythDB::DBError("StorageGroupEditor::customEvent", query);
+            }
             else
             {
                 SetLabel();

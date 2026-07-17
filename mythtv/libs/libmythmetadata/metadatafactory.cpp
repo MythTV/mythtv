@@ -656,12 +656,18 @@ LookupType GuessLookupType(ProgramInfo *pginfo)
     if ((!pginfo->GetSubtitle().isEmpty() || pginfo->GetEpisode() > 0) &&
        (catType == ProgramInfo::kCategorySeries ||
         catType == ProgramInfo::kCategoryTVShow))
-        ret = kProbableTelevision; // NOLINT(bugprone-branch-clone)
+    { // NOLINT(bugprone-branch-clone)
+        ret = kProbableTelevision;
+    }
     else if (catType == ProgramInfo::kCategoryMovie)
+    {
         ret = kProbableMovie;
+    }
     else if (pginfo->GetSeason() > 0 || pginfo->GetEpisode() > 0 ||
         !pginfo->GetSubtitle().isEmpty())
+    {
         ret = kProbableTelevision;
+    }
     else
     {
         // Before committing to something being a movie, we

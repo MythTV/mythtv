@@ -723,7 +723,7 @@ QString LCD::quotedString(const QString &string)
     sRes.replace(QString("\""), QString("\"\""));
     sRes = "\"" + sRes + "\"";
 
-    return(sRes);
+    return sRes;
 }
 
 bool LCD::startLCDServer(void)

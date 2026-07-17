@@ -261,7 +261,9 @@ void ChannelScanner::Scan(
 
             ok = m_sigmonScanner->ScanIPTVChannels(sourceid, m_iptvChannels);
             if (ok)
+            {
                 m_scanMonitor->ScanPercentComplete(0);
+            }
             else
             {
                 InformUser(tr("Error scanning MPTS in IPTV"));
@@ -330,7 +332,9 @@ DTVConfParser::return_t ChannelScanner::ImportDVBUtils(
 
     DTVConfParser::return_t ret { DTVConfParser::return_t::OK };
     if (type == DTVConfParser::cardtype_t::UNKNOWN)
+    {
         ret = DTVConfParser::return_t::ERROR_CARDTYPE;
+    }
     else
     {
         DTVConfParser parser(type, sourceid, file);
@@ -491,7 +495,7 @@ void ChannelScanner::PreScanCommon(
         if ((ScanTypeSetting::TransportScan     == scantype) ||
             (ScanTypeSetting::FullTransportScan == scantype))
         {
-            signal_timeout = (do_ignore_signal_timeout) ?
+            signal_timeout = do_ignore_signal_timeout ?
                 channel_timeout * 10 : signal_timeout;
         }
 

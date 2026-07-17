@@ -291,7 +291,7 @@ int MythVideoColourSpace::ChangePictureAttribute(PictureAttribute Attribute, boo
     int newvalue = Value;
     if (Value < 0)
     {
-        newvalue = current + ((Direction) ? +1 : -1);
+        newvalue = current + (Direction ? +1 : -1);
         if (kPictureAttribute_Hue == Attribute)
             newvalue = newvalue % 100;
         if ((kPictureAttribute_Range == Attribute) && newvalue > 1)

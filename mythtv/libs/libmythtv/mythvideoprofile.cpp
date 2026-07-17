@@ -172,7 +172,9 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                         // Other operators == > < >= <=
                         // Convert to a range
                         if (oper == "==")
+                        {
                             value1 = value2;
+                        }
                         else if (oper == ">")
                         {
                             value1 = value2 + 1;
@@ -287,7 +289,7 @@ QString MythVideoProfileItem::toString() const
         .arg(width, height, framerate, codecs);
     QString str =  QString("cmp(%1%2) %7 dec(%3) cpus(%4) skiploop(%5) rend(%6) ")
         .arg(cmp0, QString(cmp1.isEmpty() ? "" : ",") + cmp1,
-             decoder, QString::number(max_cpus), (skiploop) ? "enabled" : "disabled",
+             decoder, QString::number(max_cpus), skiploop ? "enabled" : "disabled",
              renderer, cond);
     str += QString("deint(%1,%2) upscale(%3)").arg(deint0, deint1, upscale);
     return str;
@@ -978,7 +980,7 @@ void MythVideoProfile::CreateProfile(uint GroupId, uint Priority,
     queryData  += QString::number(MaxCpus);
 
     queryValue += PREF_LOOP;
-    queryData  += (SkipLoop) ? "1" : "0";
+    queryData  += SkipLoop ? "1" : "0";
 
     queryValue += PREF_RENDER;
     queryData  += VideoRenderer;

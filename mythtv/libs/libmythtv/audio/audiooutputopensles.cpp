@@ -488,7 +488,7 @@ int AudioOutputOpenSLES::GetBufferedOnSoundcard(void) const
     {
         return 0;
     }
-    return numBufferesQueued * m_fragmentSize + m_bufWriteIndex;
+    return (numBufferesQueued * m_fragmentSize) + m_bufWriteIndex;
 }
 
 int AudioOutputOpenSLES::GetVolumeChannel(int channel) const

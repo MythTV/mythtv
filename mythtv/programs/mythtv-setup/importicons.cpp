@@ -821,7 +821,7 @@ bool ImportIconsWizard::submit()
         if (line[0] == QChar('#'))
             continue;
 
-        QStringList strSplit2=(line).split(":", Qt::SkipEmptyParts);
+        QStringList strSplit2=line.split(":", Qt::SkipEmptyParts);
         if (strSplit2.size() < 2)
             continue;
 
@@ -849,7 +849,7 @@ void ImportIconsWizard::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();

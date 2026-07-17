@@ -159,7 +159,9 @@ bool MythWebEngineView::handleKeyPress(QKeyEvent *event)
         if (action == "ESCAPE")
         {
             if (history()->canGoBack())
+            {
                 back();
+            }
             else
             {
                 m_parentBrowser->GetParentScreen()->keyPressEvent(event);
@@ -277,7 +279,7 @@ void MythWebEngineView::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)event;
 
         // make sure the user didn't ESCAPE out of the dialog
         if (dce->GetResult() < 0)
@@ -1166,7 +1168,9 @@ void MythUIWebBrowser::slotTopScreenChanged(MythScreenType * /* screen */)
     UpdateBuffer();
 
     if (IsOnTopScreen())
+    {
         SetActive(m_wasActive);
+    }
     else
     {
         bool wasActive = (m_wasActive || m_active);

@@ -482,7 +482,9 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                         s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(p, QSize(width, height)));
                     }
                     else
+                    {
                         s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(mimetype.second.first, QSize(width, height)));
+                    }
                 }
             }
         }

@@ -36,20 +36,19 @@ class V4L2encRecorder : public V4LRecorder
     bool Open(void);
     bool IsOpen(void) const { return m_streamHandler; }
     void Close(void);
-    void StartNewFile(void) override; // RecorderBase
 
-    bool PauseAndWait(std::chrono::milliseconds timeout = 500ms) override; // RecorderBase
-
-  protected:
-    bool StartEncoding(void);
-    bool StopEncoding(void);
-
-    void SetIntOption(RecordingProfile *profile, const QString &name);
-    void SetStrOption(RecordingProfile *profile, const QString &name);
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev) override; // DTVRecorder
+  protected:
+    bool StartEncoding(void);
+    bool StopEncoding(void);
+    void StartNewFile(void) override; // RecorderBase
+    bool PauseAndWait(std::chrono::milliseconds timeout = 500ms) override; // RecorderBase
+
+    void SetIntOption(RecordingProfile *profile, const QString &name);
+    void SetStrOption(RecordingProfile *profile, const QString &name);
 
   private:
     V4LChannel           *m_channel        {nullptr};

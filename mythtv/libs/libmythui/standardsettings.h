@@ -239,10 +239,10 @@ class MUI_PUBLIC MythUIComboBoxSetting : public StandardSetting
     QString getValueLabel(void) const;
     void resultEdit(DialogCompletionEvent *dce) override; // StandardSetting
     void edit(MythScreenType *screen) override; // StandardSetting
-    void addSelection(const QString &label, QString value = QString(),
+    virtual void addSelection(const QString &label, QString value = QString(),
                       bool select = false);
     void clearSelections();
-    void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
+    virtual void fillSelectionsFromDir(const QDir &dir, bool absPath = true);
     void updateButton(MythUIButtonListItem *item) override; // StandardSetting
     virtual int size(void) const;
 
@@ -521,7 +521,6 @@ class MUI_PUBLIC StandardSettingDialog : public MythScreenType
         : MythScreenType(parent, name), m_settingsTree(groupSettings) {}
     ~StandardSettingDialog() override;
     bool Create(void) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
     void ShowMenu(void) override; // MythScreenType
     void deleteEntry(void);
@@ -536,6 +535,7 @@ class MUI_PUBLIC StandardSettingDialog : public MythScreenType
   protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
+    void customEvent(QEvent *event) override; // MythUIType
     GroupSetting *GetGroupSettings(void) const;
     MythUIButtonList *m_buttonList         {nullptr};
 

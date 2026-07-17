@@ -88,17 +88,29 @@ bool DeleteMap::HandleAction(const QString &action, uint64_t frame)
 {
     bool handled = true;
     if (action == ACTION_UP)
+    {
         UpdateSeekAmount(1);
+    }
     else if (action == ACTION_DOWN)
+    {
         UpdateSeekAmount(-1);
+    }
     else if (action == ACTION_CLEARMAP)
+    {
         Clear(tr("Clear Cuts"));
+    }
     else if (action == ACTION_INVERTMAP)
+    {
         ReverseAll();
+    }
     else if (action == "MOVEPREV")
+    {
         MoveRelative(frame, false);
+    }
     else if (action == "MOVENEXT")
+    {
         MoveRelative(frame, true);
+    }
     else if (action == "CUTTOBEGINNING")
     {
         Push(tr("Cut to Beginning"));
@@ -415,7 +427,9 @@ void DeleteMap::NewCut(uint64_t frame)
         uint64_t total = m_ctx->m_player->GetTotalFrameCount();
         auto otherframe = static_cast<uint64_t>(existing);
         if (otherframe == frame)
+        {
             Delete(otherframe);
+        }
         else
         {
             uint64_t startframe = 0;

@@ -100,7 +100,9 @@ void CleanupTask::CleanupOrphanedLiveTV(void)
     }
 
     if (keepChains.isEmpty())
+    {
         msg = "DELETE FROM tvchain WHERE endtime < now();";
+    }
     else
     {
         msg = QString("DELETE FROM tvchain "

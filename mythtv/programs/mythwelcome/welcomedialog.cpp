@@ -411,7 +411,9 @@ void WelcomeDialog::updateScreen(void)
 
     // update status message
     if (m_statusList.empty())
+    {
         status = tr("Please Wait...");
+    }
     else
     {
         if ((int)m_statusListNo >= m_statusList.count())
@@ -569,7 +571,9 @@ bool WelcomeDialog::checkConnectionToServer(void)
     bool bRes = false;
 
     if (gCoreContext->IsConnectedToMaster())
+    {
         bRes = true;
+    }
     else
     {
         if (gCoreContext->SafeConnectToMasterServer(false))

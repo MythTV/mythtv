@@ -47,7 +47,7 @@ This is equivalent to QVariant(bool).toString()
 */
 inline QString bool_to_string(bool val)
 {
-    return (val) ? QStringLiteral("true") : QStringLiteral("false");
+    return val ? QStringLiteral("true") : QStringLiteral("false");
 }
 
 MBASE_PUBLIC
@@ -61,6 +61,7 @@ which is never used).
 inline bool naturalSortCompare(const QString &a, const QString &b,
                    Qt::CaseSensitivity caseSensitivity = Qt::CaseSensitive)
 {
+    // NOLINTNEXTLINE(modernize-use-nullptr)
     return naturalCompare(a, b, caseSensitivity) < 0;
 }
 

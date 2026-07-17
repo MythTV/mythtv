@@ -46,7 +46,7 @@ class MBASE_PUBLIC MythSocket : public QObject, public ReferenceCounter
     bool IsAnnounced(void) const { return m_isAnnounced; }
 
     void SetReadyReadCallbackEnabled(bool enabled)
-        { m_disableReadyReadCallback.fetchAndStoreOrdered((enabled) ? 0 : 1); }
+        { m_disableReadyReadCallback.fetchAndStoreOrdered(enabled ? 0 : 1); }
 
     bool SendReceiveStringList(
         QStringList &list, uint min_reply_length = 0,

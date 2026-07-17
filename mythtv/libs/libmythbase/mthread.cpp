@@ -58,15 +58,17 @@ bool is_current_thread(MThread &thread)
 
 class MThreadInternal : public QThread
 {
-  public:
-    explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
+    // Allow MThread::exec to directly call the inherited
+    // QThread::exec function (which is a protected function).
+    friend int MThread::exec(void);
+
+  protected:
     void run(void) override { m_parent.run(); } // QThread
 
+  public:
+    explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
+
     void QThreadRun(void) { QThread::run(); }
-    int exec(void)
-    {
-        return QThread::exec();
-    }
 
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }

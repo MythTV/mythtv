@@ -26,9 +26,10 @@ class LookerUpper : public QObject
 
     static void CopyRuleInetrefsToRecordings();
 
-  private:
+  protected:
     void customEvent(QEvent *event) override; // QObject
 
+  private:
     MetadataFactory      *m_metadataFactory { nullptr };
 
     QList<ProgramInfo*>   m_busyRecList;

@@ -466,7 +466,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     if (pbs)
         pbs->IncrRef();
 
-    bool bIsControl = (pbs) ? false : m_controlSocketList.contains(sock);
+    bool bIsControl = pbs ? false : m_controlSocketList.contains(sock);
     m_sockListLock.unlock();
 
     QStringList listline;
@@ -1052,7 +1052,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "SHUTDOWN_NOW")
     {
         if (tokens.size() != 1)
+        {
             SendErrorResponse(pbs, "Bad SHUTDOWN_NOW query");
+        }
         else if (!m_ismaster)
         {
             QString halt_cmd;
@@ -2057,7 +2059,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             for (const auto & file : std::as_const(checkfiles))
             {
                 if (dir.exists(file) &&
-                    ((file).endsWith(".srt") ||
+                    (file.endsWith(".srt") ||
                      QFileInfo(dir, file).size() >= kReadTestSize))
                 {
                     retlist<<file;
@@ -2520,7 +2522,9 @@ void MainServer::DeleteRecordedFiles(DeleteStruct *ds)
         bool deleteInDB = false;
 
         if (basename == QFileInfo(ds->m_filename).fileName())
+        {
             deleteInDB = true;
+        }
         else
         {
 //             LOG(VB_FILE, LOG_INFO, LOC +
@@ -2654,7 +2658,9 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks,
     if (followLinks && finfo.isSymLink())
     {
         if (!finfo.exists() && deleteBrokenSymlinks)
+        {
             unlink(fname.constData());
+        }
         else
         {
             fd = OpenAndUnlink(linktext);
@@ -3517,7 +3523,9 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
     std::chrono::seconds uptime = 0s;
 
     if (getUptime(uptime))
+    {
         strlist << QString::number(uptime.count());
+    }
     else
     {
         strlist << "ERROR";
@@ -3602,7 +3610,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
     if (recinfo.HasPathname() && (m_ismaster) &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
-        (checkSlaves))
+        checkSlaves)
     {
         PlaybackSock *slave = GetMediaServerByHostname(recinfo.GetHostname());
 
@@ -3809,7 +3817,9 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs,
     if (m_sched)
     {
         if (tmptable.isEmpty())
+        {
             m_sched->GetAllPending(strList);
+        }
         else
         {
             auto *sched = new Scheduler(false, m_encoderList, tmptable, m_sched);
@@ -4931,7 +4941,7 @@ void MainServer::HandleSetChannelInfo(QStringList &slist, PlaybackSock *pbs)
     }
     TVRec::s_inputsLock.unlock();
 
-    retlist << ((ok) ? "1" : "0");
+    retlist << (ok ? "1" : "0");
     SendResponse(pbssock, retlist);
 }
 
@@ -5716,7 +5726,9 @@ void MainServer::HandleScanMusic(const QStringList &slist, PlaybackSock *pbs)
                       "FROM storagegroup "
                       "WHERE groupname = 'Music'";
         if (!query.exec(sql) || !query.isActive())
+        {
             MythDB::DBError("MainServer::HandleScanMusic get host list", query);
+        }
         else
         {
             while(query.next())
@@ -6306,7 +6318,9 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
 
             // rename the old cached file to the new one
             if (image->m_filename != oldImage.m_filename && QFile::exists(oldImage.m_filename))
+            {
                 QFile::rename(oldImage.m_filename, image->m_filename);
+            }
             else
             {
                 // extract the image from the tag and cache it
@@ -7253,12 +7267,12 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     if (it != slist.cend())
     {
         width = (*it).toInt(&ok); ++it;
-        width = (ok) ? width : -1;
+        width = ok ? width : -1;
     }
     if (it != slist.cend())
     {
         height = (*it).toInt(&ok); ++it;
-        height = (ok) ? height : -1;
+        height = ok ? height : -1;
         has_extra_data = true;
     }
     QSize outputsize = QSize(width, height);
@@ -7498,7 +7512,7 @@ void MainServer::HandlePixmapGetIfModified(
                     strlist +=
                         QString("3: Failed to read preview file '%1'%2")
                         .arg(pginfo.GetPathname(),
-                             (open_ok) ? "" : " open failed");
+                             open_ok ? "" : " open failed");
                 }
             }
             else if (out_of_date && (max_file_size > 0))
@@ -7720,7 +7734,9 @@ void MainServer::connectionClosed(MythSocket *socket)
             // Since we may already be holding the scheduler lock
             // delay handling the disconnect until a little later. #9885
             if (!disconnectedSlaves.isEmpty())
+            {
                 SendSlaveDisconnectedEvent(disconnectedSlaves, needsReschedule);
+            }
             else
             {
                 // During idle periods customEvent() might never be called,
@@ -8108,7 +8124,7 @@ bool MainServer::isClientConnected(bool onlyBlockingClients)
 
     m_sockListLock.unlock();
 
-    return (foundClient);
+    return foundClient;
 }
 
 /// Sends the Slavebackends the request to shut down using haltcmd

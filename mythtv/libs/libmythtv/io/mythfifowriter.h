@@ -21,6 +21,7 @@ class MythFIFOThread : public MThread
     void SetId(int Id);
     void SetParent(MythFIFOWriter *Parent);
 
+  protected:
     void run(void) override;
 
   private:

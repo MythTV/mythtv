@@ -42,7 +42,11 @@ class BackendSelection : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     void Close(void) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *event) override; // QObject
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
 
   protected slots:
     void Accept(void);
@@ -51,8 +55,6 @@ class BackendSelection : public MythScreenType
     void Cancel(void);  ///< Linked to 'Cancel' button
 
   private:
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
     bool ConnectBackend(DeviceLocation *dev);
     void AddItem(DeviceLocation *dev);
     void RemoveItem(const QString& USN);

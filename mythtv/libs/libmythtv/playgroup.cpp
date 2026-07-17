@@ -19,8 +19,10 @@ class PlayGroupDBStorage : public SimpleDBStorage
     {
     }
 
+  protected:
     QString GetWhereClause(MSqlBindings &bindings) const override; // SimpleDBStorage
 
+  private:
     const PlayGroupConfig &m_parent;
 };
 
@@ -241,7 +243,9 @@ QStringList PlayGroup::GetNames(void)
     query.prepare("SELECT name FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
+    {
         MythDB::DBError("PlayGroupConfig::GetNames()", query);
+    }
     else
     {
         while (query.next())

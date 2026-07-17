@@ -740,9 +740,13 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if ((*iter).location == MusicFileScanner::kFileSystem)
+        {
             AddFileToDB(iter.key(), (*iter).startDir);
+        }
         else if ((*iter).location == MusicFileScanner::kDatabase)
+        {
             RemoveFileFromDB(iter.key(), (*iter).startDir);
+        }
         else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
             UpdateFileInDB(iter.key(), (*iter).startDir);
@@ -753,9 +757,13 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
     for (iter = art_files.begin(); iter != art_files.end(); iter++)
     {
         if ((*iter).location == MusicFileScanner::kFileSystem)
+        {
             AddFileToDB(iter.key(), (*iter).startDir);
+        }
         else if ((*iter).location == MusicFileScanner::kDatabase)
+        {
             RemoveFileFromDB(iter.key(), (*iter).startDir);
+        }
         else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
             UpdateFileInDB(iter.key(), (*iter).startDir);
@@ -831,7 +839,9 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files)
                 if (music_files[name].location == MusicFileScanner::kDatabase)
                     continue;
                 if (m_forceupdate || HasFileChanged(name, query.value(1).toString()))
+                {
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
+                }
                 else
                 {
                     ++m_tracksUnchanged;

@@ -50,7 +50,7 @@ MythFEXMLMethod MythFEXML::GetMethod(const QString &sURI)
     if (sURI == "GetScreenShot") return MFEXML_GetScreenShot;
     if (sURI == "GetActionTest") return MFEXML_ActionListTest;
 
-    return( MFEXML_Unknown );
+    return MFEXML_Unknown;
 }
 
 /////////////////////////////////////////////////////////////////////////////

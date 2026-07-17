@@ -474,7 +474,7 @@ class TestIPTVRecorder: public QObject
         QVERIFY (packet1.IsValid());
         QCOMPARE (packet1.GetDataReference().size(), 216);
         QCOMPARE (packet1.GetPaddingSize(), (unsigned int)0);
-        QCOMPARE (packet1.GetPayloadOffset(), (unsigned int)12+4+3*4);
+        QCOMPARE (packet1.GetPayloadOffset(), (unsigned int)12+4+(3*4));
         RTPTSDataPacket ts_packet1(packet1);
         QCOMPARE (ts_packet1.GetTSData()[0], (uint8_t)0x47);
         QCOMPARE (ts_packet1.GetTSDataSize(), (unsigned int)1 * 188);

@@ -222,7 +222,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // get the average clock rate in samples
     float maxima_avg_diff = find_clock_diff(m_maximas);
     float minima_avg_diff = find_clock_diff(m_minimas);
-    m_rate = (maxima_avg_diff * 7 + minima_avg_diff * 6) / 13.0F;
+    m_rate = ((maxima_avg_diff * 7) + (minima_avg_diff * 6)) / 13.0F;
     if (maxima_avg_diff == 0.0F || minima_avg_diff == 0.0F)
         return false;
 

@@ -168,7 +168,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 
 	/* test if the config has changed, update it if so */
 	uint32_t pointWidth = (resolx * 2) / 5;
-	uint32_t pointHeight = ((c_resoly) * 2) / 5;
+	uint32_t pointHeight = (c_resoly * 2) / 5;
 
 	/* ! etude du signal ... */
 	int incvar = 0;				// volume du son
@@ -192,10 +192,10 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 
 	s_speedVar += (s_speedVar + (i/2));
 	s_speedVar /= 2;
-	if ((s_speedVar) && (cycle%9==0)) {
+	if (s_speedVar && (cycle%9==0)) {
 		s_speedVar -= 1;
 	}
-	if ((s_speedVar) && (cycle%5==0)) {
+	if (s_speedVar && (cycle%5==0)) {
 		s_speedVar = (s_speedVar*7)/8;
 	}
 
@@ -205,7 +205,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	/* ! calcul du deplacement des petits points ... */
 
         // largfactor: elargissement de l'intervalle d'évolution
-	float largfactor = ((float) s_speedVar / 40.0F + (float) incvar / 50000.0F) / 1.5F;
+	float largfactor = (((float) s_speedVar / 40.0F) + ((float) incvar / 50000.0F)) / 1.5F;
 	largfactor = std::min(largfactor, 1.5F);
 
 	s_decayIfs--;
@@ -239,16 +239,16 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
                                      (((pointHeight / 2.0F) * largfactor) / i) + (10.0F * i),
                                      96.0F, i * 80.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, VIOLET,
-                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
-                                     (((pointHeight / 3.0F + 5.0F) * largfactor) / i) + (10.0F * i),
+                                     ((((pointHeight / 3.0F) + 5.0F) * largfactor) / i) + (10.0F * i),
+                                     ((((pointHeight / 3.0F) + 5.0F) * largfactor) / i) + (10.0F * i),
                                      i + 122.0F, 134.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, BLACK,
                                      (((pointHeight / 3.0F) * largfactor) + 20.0F),
                                      (((pointHeight / 3.0F) * largfactor) + 20.0F),
                                      58.0F, i * 66.0F, s_loopVar / i);
 			pointFilter (p1 + c_offset, WHITE,
-                                     (pointHeight * largfactor + 10.0F * i) / i,
-                                     (pointHeight * largfactor + 10.0F * i) / i,
+                                     ((pointHeight * largfactor) + (10.0F * i)) / i,
+                                     ((pointHeight * largfactor) + (10.0F * i)) / i,
                                      66.0F, 74.0F, s_loopVar + (i * 500)); }
 	}
 
@@ -517,9 +517,9 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 					}
 				}
 
-				if (!rand_bool(5))
+				if (!rand_bool(5)) {
 					s_zfd.noisify = 0;
-				else {
+				} else {
 					s_zfd.noisify = MythRandomInt(1, 2);
 					s_lockVar *= 2;
 				}
@@ -545,7 +545,7 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 						s_zfd.reverse = !s_zfd.reverse;
 					}
 					else {
-						s_zfd.vitesse = (newvit + s_zfd.vitesse * 7) / 8;
+						s_zfd.vitesse = (newvit + (s_zfd.vitesse * 7)) / 8;
 					}
 					s_lockVar += 50;
 				}
@@ -751,9 +751,9 @@ uint32_t * goom_update (GoomDualData& data, int forceMode) {
 	if ((cycle % 120 == 0)
 			&& rand_bool(4)
 			&& (curGState->m_drawScope)) {
-		if (s_lineMode == 0)
+		if (s_lineMode == 0) {
 			s_lineMode = DRAWLINES;
-		else if (s_lineMode == DRAWLINES) {
+		} else if (s_lineMode == DRAWLINES) {
 			float   param1 = NAN;
 			float   param2 = NAN;
 			float   amplitude = NAN;

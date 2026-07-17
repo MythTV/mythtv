@@ -191,7 +191,7 @@ bool PreviewGenerator::RunReal(void)
                 dt = fi.lastModified();
         }
 
-        QString message = (ok) ? "PREVIEW_SUCCESS" : "PREVIEW_FAILED";
+        QString message = ok ? "PREVIEW_SUCCESS" : "PREVIEW_FAILED";
         QStringList list;
         list.push_back(QString::number(m_programInfo.GetRecordingID()));
         list.push_back(output_fn);
@@ -329,7 +329,7 @@ bool PreviewGenerator::Run(void)
             dt = fi.lastModified();
     }
 
-    QString message = (ok) ? "PREVIEW_SUCCESS" : "PREVIEW_FAILED";
+    QString message = ok ? "PREVIEW_SUCCESS" : "PREVIEW_FAILED";
     if (m_listener)
     {
         QStringList list;
@@ -641,7 +641,9 @@ bool PreviewGenerator::LocalPreviewRun(void)
     QDateTime dt = MythDate::current();
 
     if (captime > 0s)
+    {
         LOG(VB_GENERAL, LOG_INFO, "Preview from time spec");
+    }
     else
     {
         capframe = m_programInfo.QueryStartMark();

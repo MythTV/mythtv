@@ -186,14 +186,18 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     RecordingInfo recinfo(chanid, recstartts);
     bool loaded = recinfo.GetChanID() != 0U;
     if (loaded)
+    {
         recinfo.SubstituteMatches(command);
+    }
     else
     {
         // 2rd Try searching for RecordingInfo
         RecordingInfo::LoadStatus status = RecordingInfo::kNoProgram;
         RecordingInfo recinfo2(chanid, recstartts, false, 0h, &status);
         if (status == RecordingInfo::kFoundProgram)
+        {
             recinfo2.SubstituteMatches(command);
+        }
         else
         {
             // 3th just use what we know

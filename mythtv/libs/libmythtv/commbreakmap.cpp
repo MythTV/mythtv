@@ -281,7 +281,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
 
     if ((m_skipcommercials > 0) &&
         ((m_commBreakIter == m_commBreakMap.end()) ||
-         (((totalFrames) != 0U) &&
+         ((totalFrames != 0U) &&
           ((m_commBreakIter.key() + (10 * video_frame_rate)) > totalFrames))))
     {
         comm_msg = tr("At End, cannot Skip.");
@@ -323,7 +323,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
             m_commBreakIter++;
 
             if ((m_commBreakIter == m_commBreakMap.end()) ||
-                (((totalFrames) != 0U) &&
+                ((totalFrames != 0U) &&
                  ((m_commBreakIter.key() + (10 * video_frame_rate)) >
                                                                 totalFrames)))
             {

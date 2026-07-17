@@ -338,12 +338,12 @@ void StatusBox::clicked(MythUIButtonListItem *item)
             menuPopup->SetReturnEvent(this, "AutoExpireManage");
 
             menuPopup->AddButtonV(tr("Delete Now"), QVariant::fromValue(rec));
-            if ((rec)->GetRecordingGroup() == "LiveTV")
+            if (rec->GetRecordingGroup() == "LiveTV")
             {
                 menuPopup->AddButtonV(tr("Move to Default group"),
                                                        QVariant::fromValue(rec));
             }
-            else if ((rec)->GetRecordingGroup() == "Deleted")
+            else if (rec->GetRecordingGroup() == "Deleted")
             {
                 menuPopup->AddButtonV(tr("Undelete"), QVariant::fromValue(rec));
             }
@@ -362,7 +362,7 @@ void StatusBox::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -424,7 +424,7 @@ void StatusBox::customEvent(QEvent *event)
             // button 1 is "Move To Default Group" or "UnDelete" or "Disable AutoExpire"
             else if (buttonnum == 1)
             {
-                if ((rec)->GetRecordingGroup() == "Deleted")
+                if (rec->GetRecordingGroup() == "Deleted")
                 {
                     RemoteUndeleteRecording(rec->GetRecordingID());
                 }
@@ -432,7 +432,7 @@ void StatusBox::customEvent(QEvent *event)
                 {
                     rec->SaveAutoExpire(kDisableAutoExpire);
 
-                    if ((rec)->GetRecordingGroup() == "LiveTV")
+                    if (rec->GetRecordingGroup() == "LiveTV")
                     {
                         RecordingInfo ri(*rec);
                         ri.ApplyRecordRecGroupChange(RecordingInfo::kDefaultRecGroup);
@@ -1071,7 +1071,9 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
         QString minstring = StatusBox::tr("%n minute(s)", "", minLeft%60);
         QString remainstring = StatusBox::tr("%1 remaining", "time");
         if (minLeft%60 == 0)
+        {
             out<<remainstring.arg(hourstring) + pro;
+        }
         else if (minLeft > 60)
         {
             out<<StatusBox::tr("%1 and %2 remaining", "time")

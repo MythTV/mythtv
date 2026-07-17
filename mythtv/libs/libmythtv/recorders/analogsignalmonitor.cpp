@@ -172,7 +172,9 @@ void AnalogSignalMonitor::UpdateValues(void)
     if (m_usingV4l2)
     {
         if (m_driver == "hdpvr")
+        {
             isLocked = handleHDPVR(videofd);
+        }
         else
         {
             struct v4l2_tuner tuner {};

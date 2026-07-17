@@ -251,26 +251,21 @@ bool Weather::keyPressEvent(QKeyEvent *event)
         const QString& action = actions[i];
         handled = true;
 
-        if (action == "LEFT")
+        if (action == "LEFT") {
             cursorLeft();
-        else if (action == "RIGHT")
+        } else if (action == "RIGHT") {
             cursorRight();
-        else if (action == "PAUSE")
+        } else if (action == "PAUSE") {
             holdPage();
-        else if (action == "MENU")
+        } else if (action == "MENU") {
             setupPage();
-        else if (action == "UPDATE")
-        {
+        } else if (action == "UPDATE") {
             m_srcMan->doUpdate();
-        }
-        else if (action == "ESCAPE")
-        {
+        } else if (action == "ESCAPE") {
             m_nextPageTimer->stop();
             hideScreen();
             Close();
-        }
-        else
-        {
+        } else {
             handled = false;
         }
     }

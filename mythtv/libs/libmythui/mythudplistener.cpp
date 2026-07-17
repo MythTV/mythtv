@@ -119,36 +119,33 @@ void MythUDPListener::Process(const QByteArray& Buffer, const QHostAddress& /*Se
         if (!dom.isNull())
         {
             auto tagname = dom.tagName();
-            if (tagname == "text")
+            if (tagname == "text") {
                 msg = dom.text();
-            else if (tagname == "timeout")
+            } else if (tagname == "timeout") {
                 timeout = std::chrono::seconds(dom.text().toUInt());
-            else if (notification && tagname == "image")
+            } else if (notification && tagname == "image") {
                 image = dom.text();
-            else if (notification && tagname == "origin")
+            } else if (notification && tagname == "origin") {
                 origin = dom.text();
-            else if (notification && tagname == "description")
+            } else if (notification && tagname == "description") {
                 description = dom.text();
-            else if (notification && tagname == "extra")
+            } else if (notification && tagname == "extra") {
                 extra = dom.text();
-            else if (notification && tagname == "progress_text")
+            } else if (notification && tagname == "progress_text") {
                 progress_text = dom.text();
-            else if (notification && tagname == "fullscreen")
+            } else if (notification && tagname == "fullscreen") {
                 fullscreen = dom.text().toLower() == "true";
-            else if (notification && tagname == "error")
+            } else if (notification && tagname == "error") {
                 error = dom.text().toLower() == "true";
-            else if (tagname == "visibility")
+            } else if (tagname == "visibility") {
                 visibility = dom.text().toInt();
-            else if (tagname == "type")
+            } else if (tagname == "type") {
                 type = dom.text();
-            else if (notification && tagname == "progress")
-            {
+            } else if (notification && tagname == "progress") {
                 bool ok = false;
                 if (progress = dom.text().toFloat(&ok); !ok)
                     progress = -1.0F;
-            }
-            else
-            {
+            } else {
                 LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unknown element: %1")
                     .arg(tagname));
             }

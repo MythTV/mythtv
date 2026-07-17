@@ -162,7 +162,9 @@ NetTree::~NetTree()
 void NetTree::LoadData(void)
 {
     if (m_type == DLG_TREE)
+    {
         m_siteMap->AssignTree(m_siteGeneric);
+    }
     else
     {
         m_siteButtonList->Reset();
@@ -618,7 +620,9 @@ void NetTree::BuildGenericTree(MythGenericTree *dst, QStringList paths,
         folder->addNode(tr("Back"), kUpFolder, true, false);
 
     if (!paths.empty())
+    {
         BuildGenericTree(folder, paths, dirthumb, videos);
+    }
     else
     {
         // File Handling
@@ -647,7 +651,9 @@ ResultItem* NetTree::GetStreamItem()
     ResultItem *item = nullptr;
 
     if (m_type == DLG_TREE)
+    {
         item = m_siteMap->GetCurrentNode()->GetData().value<ResultItem *>();
+    }
     else
     {
         MythGenericTree *node =
@@ -748,7 +754,9 @@ void NetTree::UpdateCurrentItem(void)
 
     QString thumb;
     if (m_type == DLG_TREE)
+    {
         thumb = m_siteMap->GetCurrentNode()->GetData().toString();
+    }
     else
     {
         MythGenericTree *node =

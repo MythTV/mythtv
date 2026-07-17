@@ -57,7 +57,7 @@ QString LookupUDN( const QString &sDeviceType )
         config.Save();
     }
 
-    return( sUDN );
+    return sUDN;
 }
 
 /**

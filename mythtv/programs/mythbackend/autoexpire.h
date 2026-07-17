@@ -41,6 +41,7 @@ class ExpireThread : public MThread
   public:
     explicit ExpireThread(AutoExpire *p) : MThread("Expire"), m_parent(p) {}
     ~ExpireThread() override { wait(); }
+  protected:
     void run(void) override; // MThread
   private:
     QPointer<AutoExpire> m_parent;

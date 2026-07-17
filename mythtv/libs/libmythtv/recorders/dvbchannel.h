@@ -94,13 +94,15 @@ class DVBChannel : public DTVChannel
 
     bool ProbeTuningParams(DTVMultiplex &tuning) const;
 
+    int  GetChanID(void) const override; // ChannelBase
+
+  protected:
+    void CheckOptions(DTVMultiplex &t) const override; // DTVChannel
+
   private:
     bool Open(DVBChannel *who);
     void Close(DVBChannel *who);
 
-    int  GetChanID(void) const override; // ChannelBase
-
-    void CheckOptions(DTVMultiplex &t) const override; // DTVChannel
     void CheckFrequency(uint64_t frequency) const;
     bool CheckModulation(DTVModulation modulation) const;
     bool CheckCodeRate(DTVCodeRate rate) const;

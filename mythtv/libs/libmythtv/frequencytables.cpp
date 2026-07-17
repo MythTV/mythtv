@@ -96,7 +96,9 @@ TransportScanItem::TransportScanItem(uint sourceid,
     m_tuning.m_modulation = ft.m_modulation;
 
     if (std.toLower() == "atsc")
+    {
         m_tuning.m_sistandard = "atsc";
+    }
     else if (std.toLower() == "analog")
     {
         m_tuning.m_sistandard = "analog";

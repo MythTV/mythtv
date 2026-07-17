@@ -139,7 +139,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     QString sgroup = qurl.userName();
 
     auto *lsock = new MythSocket();
-    QString stype = (control) ? "control socket" : "file data socket";
+    QString stype = control ? "control socket" : "file data socket";
 
     QString loc = QString("RemoteFile::openSocket(%1): ").arg(stype);
 
@@ -208,7 +208,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         {
             auto it = strlist.begin(); ++it;
             m_recorderNum = (*it).toInt(); ++it;
-            m_fileSize = (*(it)).toLongLong(); ++it;
+            m_fileSize = (*it).toLongLong(); ++it;
             for (; it != strlist.end(); ++it)
                 m_auxFiles << *it;
         }

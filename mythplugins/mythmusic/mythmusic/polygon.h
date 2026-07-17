@@ -26,7 +26,7 @@ class Bitmap
   
     void clear()
     {
-        memset(data,0,sizeof (Pixel)*(2*width*height+extra));
+        memset(data,0,sizeof (Pixel)*((2*width*height)+extra));
     }
 };
 #endif

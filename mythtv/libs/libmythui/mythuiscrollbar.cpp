@@ -84,7 +84,9 @@ void MythUIScrollBar::SetSliderPosition(int value)
 void MythUIScrollBar::CalculatePosition(void)
 {
     if (m_maximum > 0)
+    {
         Show();
+    }
     else
     {
         Hide();

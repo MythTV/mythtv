@@ -1361,7 +1361,9 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
     CommandLineArg *arg = nullptr;
 
     if (m_namedArgs.contains(name))
+    {
         arg = m_namedArgs[name];
+    }
     else
     {
         arg = new CommandLineArg(name, type, std::move(def), std::move(help), std::move(longhelp));
@@ -1752,7 +1754,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             std::cerr << "\nExtra argument list:\n";
             QStringList slist = toStringList("_args");
             for (const auto& lopt : std::as_const(slist))
-                std::cerr << "  " << (lopt).toLocal8Bit().constData() << '\n';
+                std::cerr << "  " << lopt.toLocal8Bit().constData() << '\n';
         }
 
         if (m_namedArgs.contains("_passthrough"))

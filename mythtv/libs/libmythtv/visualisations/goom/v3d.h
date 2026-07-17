@@ -31,7 +31,10 @@ struct v2d {
 	 (v2).x = Xp + ((width)>>1); \
 	 (v2).y = -Yp + ((height)>>1); \
   } \
-  else (v2).x=(v2).y=-666; \
+  else \
+  { \
+	 (v2).x=(v2).y=-666; \
+  } \
 }
 
 /*

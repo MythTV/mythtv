@@ -1239,7 +1239,9 @@ void Scheduler::MarkShowingsList(const RecList &showinglist, RecordingInfo *p)
             q->GetRecordingStatus() != RecStatus::LaterShowing)
             continue;
         if (q->IsSameTitleStartTimeAndChannel(*p))
+        {
             q->SetRecordingStatus(RecStatus::LaterShowing);
+        }
         else if (q->GetRecordingRuleType() != kSingleRecord &&
                  q->GetRecordingRuleType() != kOverrideRecord &&
                  IsSameProgram(q,p))
@@ -4790,9 +4792,13 @@ void Scheduler::AddNewRecords(void)
 
         // Check for RecStatus::CurrentRecording and RecStatus::PreviousRecording
         if (p->GetRecordingRuleType() == kDontRecord)
+        {
             newrecstatus = RecStatus::DontRecord;
+        }
         else if (result.value(15).toBool() && !p->IsReactivated())
+        {
             newrecstatus = RecStatus::PreviousRecording;
+        }
         else if (p->GetRecordingRuleType() != kSingleRecord &&
                  p->GetRecordingRuleType() != kOverrideRecord &&
                  !p->IsReactivated() &&
@@ -4925,9 +4931,9 @@ void Scheduler::AddNotListed(void) {
         auto *p = new RecordingInfo(
             result.value(0).toString(), // Title
             QString(), // Title Sort
-            (sor) ? result.value(1).toString() : QString(), // Subtitle
+            sor ? result.value(1).toString() : QString(), // Subtitle
             QString(), // Subtitle Sort
-            (sor) ? result.value(2).toString() : QString(), // Description
+            sor ? result.value(2).toString() : QString(), // Description
             result.value(3).toUInt(), // Season
             result.value(4).toUInt(), // Episode
             QString(), // Category
@@ -5518,7 +5524,7 @@ int Scheduler::FillRecordingDir(
     // uses
     EncoderLink *nexttv = (*m_tvList)[cardid];
     long long maxByterate = nexttv->GetMaxBitrate() / 8;
-    long long maxSizeKB = (maxByterate + maxByterate/3) *
+    long long maxSizeKB = (maxByterate + (maxByterate/3)) *
         recstartts.secsTo(recendts) / 1024;
 
     bool simulateAutoExpire =

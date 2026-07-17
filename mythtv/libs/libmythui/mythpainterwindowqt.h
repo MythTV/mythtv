@@ -11,6 +11,7 @@ class MythPainterWindowQt : public MythPainterWindow
   public:
     explicit MythPainterWindowQt(MythMainWindow *MainWin);
 
+  protected:
     void paintEvent(QPaintEvent *Event) override;
 
   private:

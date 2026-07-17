@@ -130,13 +130,15 @@ class OSD : public MythMediaOverlay
     bool DialogHandleGesture(MythGestureEvent *Event);
     void DialogGetText(InfoMap &Map);
 
+  protected:
+    void TearDown() override;
+
   private:
     void PositionWindow(MythScreenType* Window);
     void RemoveWindow(const QString& Window);
     void DialogShow(const QString& Window, const QString& Text = "", std::chrono::milliseconds UpdateFor = 0ms);
     void DialogAddButton(const QString& Text, QVariant Data, bool Menu = false, bool Current = false);
     void DialogBack(const QString& Text = "", const QVariant& Data = 0, bool Exit = false);
-    void TearDown() override;
     void LoadWindows();
     void CheckExpiry();
     void SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout, std::chrono::milliseconds CustomTimeout);

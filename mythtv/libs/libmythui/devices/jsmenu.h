@@ -101,9 +101,10 @@ class JoystickMenuThread : public MThread
     bool ReadConfig(const QString& config_file);
     void Stop(void) { m_bStop = true; }
 
-  private:
+  protected:
     void run() override; // MThread
 
+  private:
     bool m_configRead           {false};
     bool m_readError            {false};
     // put here to avoid changing other classes

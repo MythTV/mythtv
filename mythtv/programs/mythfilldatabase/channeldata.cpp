@@ -111,7 +111,7 @@ unsigned int ChannelData::promptForChannelUpdates(
                                      "(relative path to icon storage group) "),
                                      (*chaninfo).m_icon);
 
-    return(chanid);
+    return chanid;
 }
 
 QString ChannelData::normalizeChannelKey(const QString &chanName)
@@ -474,9 +474,13 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
                     QString w1 = !words.empty() ? words[0] : QString();
                     QString w2 = words.size() > 1 ? words[1] : QString();
                     if (w1.isEmpty())
+                    {
                         callsign = QString::number(chanid);
+                    }
                     else if (w2.isEmpty())
+                    {
                         callsign = words[0].left(5);
+                    }
                     else
                     {
                         callsign = w1.left(w2.length() == 1 ? 4:3);

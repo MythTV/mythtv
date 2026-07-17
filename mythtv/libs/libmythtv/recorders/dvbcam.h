@@ -36,8 +36,9 @@ class DVBCam : public QRunnable
     void SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt);
     void SetTimeOffset(double offset_in_seconds);
 
-  private:
     void run(void) override; // QRunnable
+
+  private:
     void HandleUserIO(void);
     void HandlePMT(void);
     void RemoveDuplicateServices(void);

@@ -724,7 +724,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             if (lines >= 1)
             {
                 // Too wide?
-                width -= width * (lines / num_lines - 1 + lines);
+                width -= width * ((lines / num_lines) - 1 + lines);
                 if (static_cast<int>(width) == last_width)
                 {
                     m_cutdown = cutdown;
@@ -734,7 +734,7 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
             else if (last_line_width < m_area.width())
             {
                 // Is the last line fully used?
-                width -= (1.0 - last_line_width / width) / num_lines;
+                width -= (1.0 - (last_line_width / width)) / num_lines;
                 width = std::min(width, last_line_width);
                 if (static_cast<int>(width) == last_width)
                 {
@@ -928,8 +928,8 @@ void MythUIText::FillCutMessage(void)
             min_rect.width() < m_minSize.x())
         {
             m_drawRect.moveLeft(m_area.x() +
-                                (((m_minSize.x() - min_rect.width() +
-                                   fm.averageCharWidth()) / 2)));
+                                ((m_minSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2));
             min_rect.setWidth(m_minSize.x());
         }
         else
@@ -946,8 +946,8 @@ void MythUIText::FillCutMessage(void)
             min_rect.width() < m_minSize.x())
         {
             m_drawRect.moveRight(m_area.x() + m_area.width() -
-                                (((m_minSize.x() - min_rect.width() +
-                                   fm.averageCharWidth()) / 2)));
+                                ((m_minSize.x() - min_rect.width() +
+                                   fm.averageCharWidth()) / 2));
             min_rect.setWidth(m_minSize.x());
         }
         else
@@ -1121,7 +1121,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
 
     int mid = m_drawRect.width() / 2;
     if (m_canvas.width() <= m_drawRect.width() || pos.x() <= mid)
+    {
         x = 0;  // start
+    }
     else if (pos.x() >= m_canvas.width() - mid) // end
     {
         x = m_canvas.width() - m_drawRect.width();
@@ -1139,7 +1141,9 @@ QPoint MythUIText::CursorPosition(int text_offset)
     y = pos.y() - mid;
 
     if (y <= 0 || m_canvas.height() <= m_area.height()) // Top of buffer
+    {
         y = 0;
+    }
     else if (y + m_area.height() > m_canvas.height()) // Bottom of buffer
     {
         int visible_lines = ((m_area.height() / line_height) * line_height);
@@ -1211,7 +1215,9 @@ void MythUIText::Pulse(void)
     if (m_scrolling)
     {
         if (m_scrollPause > 0.0F)
+        {
             m_scrollPause -= rate;
+        }
         else
         {
             if (m_scrollBounce)
@@ -1351,14 +1357,23 @@ void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor, in
     m_numSteps = numSteps;
     m_curStep = 0;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     m_curR = startColor.red();
     m_curG = startColor.green();
     m_curB = startColor.blue();
 
-    m_incR = (endColor.red()   * 1.0F - m_curR) / m_numSteps;
-    m_incG = (endColor.green() * 1.0F - m_curG) / m_numSteps;
-    m_incB = (endColor.blue()  * 1.0F - m_curB) / m_numSteps;
+    m_incR = ((endColor.red()   * 1.0F) - m_curR) / m_numSteps;
+    m_incG = ((endColor.green() * 1.0F) - m_curG) / m_numSteps;
+    m_incB = ((endColor.blue()  * 1.0F) - m_curB) / m_numSteps;
+#else
+    m_curR = startColor.redF();
+    m_curG = startColor.greenF();
+    m_curB = startColor.blueF();
 
+    m_incR = (endColor.redF()   - m_curR) / m_numSteps;
+    m_incG = (endColor.greenF() - m_curG) / m_numSteps;
+    m_incB = (endColor.blueF()  - m_curB) / m_numSteps;
+#endif
     m_colorCycling = true;
 }
 
@@ -1496,20 +1511,19 @@ bool MythUIText::ParseElement(
             {
                 tmp = tmp.toLower();
 
-                if (tmp == "left")
+                if (tmp == "left") {
                     m_scrollDirection = ScrollLeft;
-                else if (tmp == "right")
+                } else if (tmp == "right") {
                     m_scrollDirection = ScrollRight;
-                else if (tmp == "up")
+                } else if (tmp == "up") {
                     m_scrollDirection = ScrollUp;
-                else if (tmp == "down")
+                } else if (tmp == "down") {
                     m_scrollDirection = ScrollDown;
-                else if (tmp == "horizontal")
+                } else if (tmp == "horizontal") {
                     m_scrollDirection = ScrollHorizontal;
-                else if (tmp == "vertical")
+                } else if (tmp == "vertical") {
                     m_scrollDirection = ScrollVertical;
-                else
-                {
+                } else {
                     m_scrollDirection = ScrollNone;
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("'%1' (%2) Invalid scroll attribute")

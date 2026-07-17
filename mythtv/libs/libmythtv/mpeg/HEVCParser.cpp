@@ -1091,7 +1091,7 @@ static bool shortTermRefPicSet(BitReader& br, int stRPSIdx,
         if (abs_delta_rps_minus1 > 32767)
             LOG(VB_RECORD, LOG_WARNING, LOC +
                 QString("Invalid abs_delta_rps_minus1"));
-        int deltaRPS = ( 1 - 2 * delta_rps_sign ) * ( abs_delta_rps_minus1 + 1 );
+        int deltaRPS = ( 1 - (2 * delta_rps_sign) ) * ( abs_delta_rps_minus1 + 1 );
 
         /*
           The variable RefRPSIdx is derived as follows:
@@ -1587,7 +1587,9 @@ bool HEVCParser::parseSPS(BitReader& br)
     uint max_sub_layers_minus1 = 0;
 
     if (m_nuhLayerId == 0)
+    {
         max_sub_layers_minus1 = ext_or_max_sub_layers_minus1;
+    }
     else
     {
         if (!m_vps.contains(vps_id))

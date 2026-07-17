@@ -130,8 +130,6 @@ class MainServer : public QObject, public MythSocketCBs
 
     void Stop(void);
 
-    void customEvent(QEvent *e) override; // QObject
-
     bool isClientConnected(bool onlyBlockingClients = false);
     void ShutSlaveBackendsDown(const QString &haltcmd);
 
@@ -155,6 +153,9 @@ class MainServer : public QObject, public MythSocketCBs
     void UpdateSystemdStatus(void);
     void GetActiveBackends(QStringList &hosts);
     PlaybackSock *GetMediaServerByHostname(const QString &hostname);
+
+  protected:
+    void customEvent(QEvent *e) override; // QObject
 
   protected slots:
     void reconnectTimeout(void);

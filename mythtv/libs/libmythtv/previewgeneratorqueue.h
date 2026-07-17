@@ -97,6 +97,8 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     static void AddListener(QObject *listener);
     static void RemoveListener(QObject *listener);
 
+    bool event(QEvent *e) override; // QObject
+
   private:
     PreviewGeneratorQueue(PreviewGenerator::Mode mode,
                           uint maxAttempts, std::chrono::seconds minBlockSeconds);
@@ -114,8 +116,6 @@ class MTV_PUBLIC PreviewGeneratorQueue : public QObject, public MThread
     bool IsGeneratingPreview(const QString &key) const;
     uint IncPreviewGeneratorAttempts(const QString &key);
     void ClearPreviewGeneratorAttempts(const QString &key);
-
-    bool event(QEvent *e) override; // QObject
 
     void SendEvent(const ProgramInfo &pginfo,
                    const QString     &eventname,

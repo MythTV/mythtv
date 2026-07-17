@@ -162,7 +162,6 @@ public:
     // These two methods are declared by MythScreenType and their signatures
     // should not be changed
     bool Create(void) override; // MythScreenType
-    void Init(void)  override; // MythScreenType
 
     void SetNotification(MythNotification &notification);
 
@@ -196,6 +195,9 @@ signals:
 
 public slots:
     void ProcessTimer(void);
+
+protected:
+    void Init(void)  override; // MythScreenType
 
 public:
     int                         m_id;

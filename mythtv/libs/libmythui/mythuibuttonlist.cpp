@@ -392,7 +392,9 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         if (grow_right && col_cnt < m_columns)
         {
             if (wrapped)
+            {
                 end = first_item;
+            }
             else
             {
                 // Are we allowed to wrap when we run out of items?
@@ -467,7 +469,9 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
         if (grow_left && col_cnt < m_columns)
         {
             if (wrapped)
+            {
                 end = last_item + 1;
+            }
             else
             {
                 // Are we allowed to wrap when we run out of items?
@@ -642,7 +646,9 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
         added = false;
 
         if (wrapped)
+        {
             end = first_item;
+        }
         else
         {
             // Are we allowed to wrap when we run out of items?
@@ -688,7 +694,9 @@ bool MythUIButtonList::DistributeCols(int &first_button, int &last_button,
         }
 
         if (wrapped)
+        {
             end = last_item + 1;
+        }
         else
         {
             // Are we allowed to wrap when we run out of items?
@@ -994,9 +1002,9 @@ bool MythUIButtonList::DistributeButtons(void)
             if (m_scrollStyle == ScrollCenter)
             {
                 // Selected button needs to end up in the middle of area
-                top_spacing = m_topRows ? (m_contentsRect.height() / 2 -
+                top_spacing = m_topRows ? ((m_contentsRect.height() / 2) -
                                            top_height) / m_topRows : 0;
-                bottom_spacing = m_bottomRows ? (m_contentsRect.height() / 2 -
+                bottom_spacing = m_bottomRows ? ((m_contentsRect.height() / 2) -
                                                  bottom_height) / m_bottomRows : 0;
 
                 if (m_arrange == ArrangeSpread)
@@ -1118,9 +1126,9 @@ bool MythUIButtonList::DistributeButtons(void)
             if (m_scrollStyle == ScrollCenter)
             {
                 // Selected button needs to end up in the middle
-                left_spacing = m_leftColumns ? (m_contentsRect.width() / 2 -
+                left_spacing = m_leftColumns ? ((m_contentsRect.width() / 2) -
                                                 left_width) / m_leftColumns : 0;
-                right_spacing = m_rightColumns ? (m_contentsRect.width() / 2 -
+                right_spacing = m_rightColumns ? ((m_contentsRect.width() / 2) -
                                                   right_width) / m_rightColumns : 0;
 
                 if (m_arrange == ArrangeSpread)
@@ -2606,7 +2614,9 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
         else if (action == "RIGHT")
         {
             if (m_layout == LayoutHorizontal)
+            {
                 handled = MoveDown(MoveItem);
+            }
             else if (m_layout == LayoutGrid)
             {
                 if (m_scrollStyle == ScrollFree)
@@ -2622,7 +2632,9 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
         else if (action == "LEFT")
         {
             if (m_layout == LayoutHorizontal)
+            {
                 handled = MoveUp(MoveItem);
+            }
             else if (m_layout == LayoutGrid)
             {
                 if (m_scrollStyle == ScrollFree)
@@ -2746,7 +2758,9 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 
         case MythGestureEvent::Right:
             if (m_layout == LayoutHorizontal)
+            {
                 handled = MoveDown(MoveItem);
+            }
             else if (m_layout == LayoutGrid)
             {
                 if (m_scrollStyle == ScrollFree)
@@ -2758,7 +2772,9 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 
         case MythGestureEvent::Left:
             if (m_layout == LayoutHorizontal)
+            {
                 handled = MoveUp(MoveItem);
+            }
             else if (m_layout == LayoutGrid)
             {
                 if (m_scrollStyle == ScrollFree)
@@ -2893,7 +2909,9 @@ bool MythUIButtonList::ParseElement(
     const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "buttonarea")
+    {
         SetButtonArea(parseRect(element));
+    }
     else if (element.tagName() == "layout")
     {
         QString layout = getFirstText(element).toLower();
@@ -3909,7 +3927,9 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button,
     QString state;
 
     if (!m_parent->IsEnabled())
+    {
         state = "disabled";
+    }
     else if (!m_enabled)
     {
         state = m_parent->m_active ? "disabledactive" : "disabledinactive";

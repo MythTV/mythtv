@@ -241,12 +241,12 @@ void AutoExpire::CalcParams()
     uint expireFreq = 15;
     if (maxKBperMin > 0)
     {
-        expireFreq = kSpaceTooBigKB / (maxKBperMin + maxKBperMin/3);
+        expireFreq = kSpaceTooBigKB / (maxKBperMin + (maxKBperMin/3));
         expireFreq = std::clamp(expireFreq, 3U, 15U);
     }
 
-    double expireMinGB = ((maxKBperMin + maxKBperMin/3)
-                          * expireFreq + extraKB) >> 20;
+    double expireMinGB = (((maxKBperMin + (maxKBperMin/3))
+                          * expireFreq) + extraKB) >> 20;
     LOG(VB_GENERAL, LOG_NOTICE, LOC +
         QString("CalcParams(): Max required Free Space: %1 GB w/freq: %2 min")
             .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
@@ -258,7 +258,7 @@ void AutoExpire::CalcParams()
     QMap<int, uint64_t>::iterator it = fsMap.begin();
     while (it != fsMap.end())
     {
-        m_desiredSpace[it.key()] = ((*it + *it/3) * expireFreq) + extraKB;
+        m_desiredSpace[it.key()] = ((*it + (*it/3)) * expireFreq) + extraKB;
         ++it;
     }
     m_instanceLock.unlock();

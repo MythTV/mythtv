@@ -78,8 +78,6 @@ class NewsSite : public QObject
              QDateTime updated, bool     podcast);
     virtual void deleteLater();
 
-    void customEvent(QEvent *event) override; // QObject
-
     QString   url(void)  const;
     QString   name(void) const;
     QString   sortName(void) const;
@@ -100,10 +98,14 @@ class NewsSite : public QObject
     void parseRSS(const QDomDocument& domDoc);
     void parseAtom(const QDomDocument& domDoc);
     static bool sortByName(NewsSite *a, NewsSite *b)
+        // NOLINTNEXTLINE(modernize-use-nullptr)
         { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 
     bool     successful(void) const;
     QString  errorMsg(void) const;
+
+  protected:
+    void customEvent(QEvent *event) override; // QObject
 
   private:
     ~NewsSite() override;

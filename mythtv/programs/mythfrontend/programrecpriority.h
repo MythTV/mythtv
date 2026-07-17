@@ -70,7 +70,6 @@ class ProgramRecPriority : public ScheduleCommon
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
 
     enum SortType : std::uint8_t
     {
@@ -83,15 +82,18 @@ class ProgramRecPriority : public ScheduleCommon
         byAvgDelay
     };
 
+  protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
+
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
     void edit(MythUIButtonListItem *item) const;
     void scheduleChanged(int recid);
 
   private:
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
-
     void FillList(void);
     void SortList(ProgramRecPriorityInfo *newCurrentItem = nullptr);
     void UpdateList();
@@ -105,8 +107,6 @@ class ProgramRecPriority : public ScheduleCommon
 
     void showMenu(void);
     void showSortMenu(void);
-
-    ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon
 
     QMap<int, ProgramRecPriorityInfo> m_programData;
     std::vector<ProgramRecPriorityInfo*> m_sortedProgram;

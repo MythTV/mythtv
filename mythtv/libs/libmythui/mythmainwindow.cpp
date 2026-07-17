@@ -2005,7 +2005,9 @@ void MythMainWindow::customEvent(QEvent* Event)
         if (message.startsWith(ACTION_HANDLEMEDIA))
         {
             if (event->ExtraDataCount() == 1)
+            {
                 HandleMedia("Internal", event->ExtraData(0));
+            }
             else if (event->ExtraDataCount() >= 11)
             {
                 bool usebookmark = true;
@@ -2124,7 +2126,7 @@ void MythMainWindow::ShowMouseCursor(bool Show)
         return;
 
     // Set cursor call must come after Show() to work on some systems.
-    setCursor(Show ? (Qt::ArrowCursor) : (Qt::BlankCursor));
+    setCursor(Show ? Qt::ArrowCursor : Qt::BlankCursor);
     if (Show)
         m_priv->m_hideMouseTimer->start();
 }

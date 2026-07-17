@@ -321,7 +321,9 @@ WeightList FlatView::CalculateSeasonalWeights(ImageList &files)
         double weight = 0;
 
         if (im->m_date == 0s)
+        {
             weight = DEFAULT_WEIGHT;
+        }
         else
         {
             QDateTime timestamp = QDateTime::fromSecsSinceEpoch(im->m_date.count());

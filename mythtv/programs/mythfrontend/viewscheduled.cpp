@@ -389,7 +389,9 @@ void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
     const RecStatus::Type recstatus = pginfo->GetRecordingStatus();
     if (recstatus == RecStatus::Recording      ||
         recstatus == RecStatus::Tuning)
+    {
         state = "running";
+    }
     else if (recstatus == RecStatus::Conflict  ||
              recstatus == RecStatus::Offline   ||
              recstatus == RecStatus::TunerBusy ||
@@ -397,7 +399,9 @@ void ViewScheduled::UpdateUIListItem(MythUIButtonListItem* item,
              recstatus == RecStatus::Failing   ||
              recstatus == RecStatus::Aborted   ||
              recstatus == RecStatus::Missed)
+    {
         state = "error";
+    }
     else if (recstatus == RecStatus::WillRecord ||
              recstatus == RecStatus::Pending)
     {
@@ -661,7 +665,7 @@ void ViewScheduled::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();

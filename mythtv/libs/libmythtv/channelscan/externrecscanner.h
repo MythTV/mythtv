@@ -31,13 +31,12 @@ class ExternRecChannelScanner : public QRunnable
     void Scan(void);
     void Stop(void);
 
+    void run(void) override; // QRunnable
+
   private:
     void SetNumChannelsParsed(uint val);
     void SetNumChannelsInserted(uint val);
     void SetMessage(const QString &status);
-
-  protected:
-    void run(void) override; // QRunnable
 
   private:
     ScanMonitor *m_scanMonitor   {nullptr};

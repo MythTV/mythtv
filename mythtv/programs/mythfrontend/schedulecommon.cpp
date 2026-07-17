@@ -154,7 +154,9 @@ void ScheduleCommon::QuickRecord(void)
         return;
 
     if (pginfo->GetRecordingRuleID())
+    {
         EditRecording();
+    }
     else
     {
         RecordingInfo ri(*pginfo);
@@ -191,7 +193,9 @@ void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     auto *schededit = new ScheduleEditor(mainStack, recinfo);
     if (schededit->Create())
+    {
         mainStack->AddScreen(schededit);
+    }
     else
     {
         delete schededit;
@@ -485,7 +489,7 @@ void ScheduleCommon::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -500,7 +504,9 @@ void ScheduleCommon::customEvent(QEvent *event)
             if (resulttext == tr("Record this showing"))
             {
                 if (recInfo.GetRecordingRuleType() == kNotRecording)
+                {
                     recInfo.ApplyRecordStateChange(kSingleRecord);
+                }
                 else
                 {
                     recInfo.ApplyRecordStateChange(kOverrideRecord);

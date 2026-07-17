@@ -479,7 +479,9 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
 
             default:
                 if ((ch >= 0x80) && (ch <=0x9f)) // these aren't used
+                {
                     ch = ' '; // BAD_CHAR;
+                }
                 else
                 {
                     if (conceal && !m_teletextReader->RevealHidden())
@@ -500,7 +502,7 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
             if (ttpage)
             {
                 bool has_flof = ttpage->floflink[flof_link_count - 1] != 0;
-                ch = (has_flof) ? ch : ' ';
+                ch = has_flof ? ch : ' ';
             }
         }
 
@@ -520,7 +522,7 @@ void TeletextScreen::DrawLine(const tt_line_array& page, uint row, int lang)
                 if (doubleheight && row < (uint)kTeletextRows)
                     DrawBackground(x, row + 1);
 
-                if ((mosaic) && (ch < 0x40 || ch > 0x5F))
+                if (mosaic && (ch < 0x40 || ch > 0x5F))
                 {
                     SetBackgroundColor(newfgcolor);
                     DrawMosaic(x, row, ch, doubleheight);
@@ -616,7 +618,7 @@ void TeletextScreen::DrawMosaic(int x, int y, int code, bool doubleheight)
 
     int dx = (int)round((double)m_colWidth / 2) + 1;
     int dy = (int)round((double)m_rowHeight / 3) + 1;
-    dy = (doubleheight) ? (2 * dy) : dy;
+    dy = doubleheight ? (2 * dy) : dy;
 
     if (code & 0x10)
         DrawRect(row, QRect(x,      y + (2*dy), dx, dy));

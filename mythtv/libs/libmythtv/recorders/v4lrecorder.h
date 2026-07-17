@@ -63,6 +63,7 @@ class VBIThread : public MThread
         }
     }
 
+  protected:
     void run(void) override // MThread
     {
         RunProlog();

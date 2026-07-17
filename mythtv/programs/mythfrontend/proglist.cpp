@@ -269,28 +269,29 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         const QString& action = actions[i];
         handled = true;
 
-        if (action == "PREVVIEW")
+        if (action == "PREVVIEW") {
             SwitchToPreviousView();
-        else if (action == "NEXTVIEW")
+        } else if (action == "NEXTVIEW") {
             SwitchToNextView();
-        else if (action == "CUSTOMEDIT")
+        } else if (action == "CUSTOMEDIT") {
             EditCustom();
-        else if (action == "EDIT")
+        } else if (action == "EDIT") {
             EditScheduled();
-        else if (action == "DELETE")
+        } else if (action == "DELETE") {
             ShowDeleteItemMenu();
-        else if (action == "UPCOMING" && m_type != plTitle)
+        } else if (action == "UPCOMING" && m_type != plTitle) {
             ShowUpcoming();
-        else if (action == "PREVRECORDED" && m_type != plPreviouslyRecorded)
+        } else if (action == "PREVRECORDED" && m_type != plPreviouslyRecorded) {
             ShowPrevious();
-        else if (action == "DETAILS" || action == "INFO")
+        } else if (action == "DETAILS" || action == "INFO") {
             ShowDetails();
-        else if (action == "GUIDE")
+        } else if (action == "GUIDE") {
             ShowGuide();
-        else if (action == ACTION_CHANNELSEARCH && m_type != plChannel)
+        } else if (action == ACTION_CHANNELSEARCH && m_type != plChannel) {
             ShowChannelSearch();
-        else if (action == "TOGGLERECORD")
+        } else if (action == "TOGGLERECORD") {
             QuickRecord();
+        }
         else if (action == "1")
         {
             if (m_titleSort)
@@ -1080,6 +1081,8 @@ void ProgLister::FillViewList(const QString &view)
         m_curView = m_viewList.size() - 1;
 }
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
 static bool plTitleSort(const ProgramInfo *a, const ProgramInfo *b)
 {
     if (a->GetSortTitle() != b->GetSortTitle())
@@ -1121,6 +1124,7 @@ static bool plPrevTitleSort(const ProgramInfo *a, const ProgramInfo *b)
 
     return a->GetScheduledStartTime() < b->GetScheduledStartTime();
 };
+// NOLINTEND(modernize-use-nullptr)
 
 static bool plTimeSort(const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -1404,7 +1408,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
     }
 
     ProgramInfo        selected;
-    const ProgramInfo *selectedP = (restorePosition) ? GetCurrentProgram() : nullptr;
+    const ProgramInfo *selectedP = restorePosition ? GetCurrentProgram() : nullptr;
     if (selectedP)
     {
         selected = *selectedP;
@@ -1535,7 +1539,9 @@ void ProgLister::UpdateDisplay(const ProgramInfo *selected)
     UpdateButtonList();
 
     if (selected)
+    {
         RestoreSelection(selected, offset);
+    }
     else if (m_selectedTime.isValid())
     {
         size_t i = 0;
@@ -1669,7 +1675,7 @@ void ProgLister::customEvent(QEvent *event)
 
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
 //      QString resulttext = dce->GetResultText();
@@ -1741,7 +1747,7 @@ void ProgLister::customEvent(QEvent *event)
     }
     else if (event->type() == ScreenLoadCompletionEvent::kEventType)
     {
-        auto *slce = (ScreenLoadCompletionEvent*)(event);
+        auto *slce = (ScreenLoadCompletionEvent*)event;
         QString id = slce->GetId();
 
         if (id == objectName())

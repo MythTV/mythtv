@@ -47,9 +47,10 @@ class CdDecoder : public Decoder
     void setDevice(const QString &dev);
     void setCDSpeed(int speed);
 
-  private:
+  protected:
     void run() override; // MThread
 
+  private:
     void writeBlock();
     void deinit();
 

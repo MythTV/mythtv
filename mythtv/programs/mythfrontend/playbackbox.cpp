@@ -621,9 +621,13 @@ void PlaybackBox::Init()
     m_recordingList->SetSearchFields("titlesubtitle");
 
     if (gCoreContext->GetNumSetting("QueryInitialFilter", 0) == 1)
+    {
         showGroupFilter();
+    }
     else if (!m_player)
+    {
         displayRecGroup(m_recGroup);
+    }
     else
     {
         UpdateUILists();
@@ -1576,7 +1580,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     if (m_noRecordingsText)
     {
         if (!progList.empty())
+        {
             m_noRecordingsText->SetVisible(false);
+        }
         else
         {
             QString txt = m_programInfoCache.empty() ?
@@ -2515,7 +2521,7 @@ bool PlaybackBox::Play(
         !rec.IsPathSet())
     {
         m_helper.CheckAvailability(
-            rec, (inPlaylist) ? kCheckForPlaylistAction : kCheckForPlayAction);
+            rec, inPlaylist ? kCheckForPlaylistAction : kCheckForPlayAction);
         return false;
     }
 
@@ -2984,7 +2990,9 @@ void PlaybackBox::ShowMenu()
         return;
 
     if (GetFocusWidget() == m_groupList)
+    {
         ShowGroupPopup();
+    }
     else
     {
         ProgramInfo *pginfo = GetCurrentProgram();
@@ -3158,7 +3166,7 @@ MythMenu* PlaybackBox::createJobMenu()
 
         MythMenu *submenu = ((kJobs[i] == JOB_TRANSCODE) && !running)
             ? createTranscodingProfilesMenu() : nullptr;
-        menu->AddItem((running) ? stop_desc : start_desc,
+        menu->AddItem(running ? stop_desc : start_desc,
                       kMySlots[(i * 2) + (running ? 0 : 1)], submenu);
     }
 
@@ -3468,7 +3476,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
         JobQueue::ChangeJobCmds(
             jobType, pginfo->GetChanID(), pginfo->GetRecordingStartTime(),
             JOB_STOP);
-        if ((jobType & JOB_COMMFLAG) && (tmpItem))
+        if ((jobType & JOB_COMMFLAG) && tmpItem)
         {
             tmpItem->SetEditing(false);
             tmpItem->SetFlagging(false);
@@ -3693,7 +3701,7 @@ void PlaybackBox::toggleWatched(void)
 
     bool on = !pginfo->IsWatched();
     pginfo->SaveWatched(on);
-    item->DisplayState((on)?"yes":"on", "watched");
+    item->DisplayState(on?"yes":"on", "watched");
     updateIcons(pginfo);
 
     // A refill affects the responsiveness of the UI and we only
@@ -3715,8 +3723,8 @@ void PlaybackBox::toggleAutoExpire()
         return;
 
     bool on = !pginfo->IsAutoExpirable();
-    pginfo->SaveAutoExpire((on) ? kNormalAutoExpire : kDisableAutoExpire, true);
-    item->DisplayState((on)?"yes":"no", "autoexpire");
+    pginfo->SaveAutoExpire(on ? kNormalAutoExpire : kDisableAutoExpire, true);
+    item->DisplayState(on?"yes":"no", "autoexpire");
     updateIcons(pginfo);
 }
 
@@ -3921,7 +3929,9 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == ACTION_1 || action == "HELP")
+        {
             showIconHelp();
+        }
         else if (action == "MENU")
         {
             ShowMenu();
@@ -4131,7 +4141,9 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "UPDATE_UI_LIST")
         {
             if (m_playingSomething)
+            {
                 m_needUpdate = true;
+            }
             else
             {
                 UpdateUILists();

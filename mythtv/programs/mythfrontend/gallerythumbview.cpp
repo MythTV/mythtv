@@ -42,6 +42,7 @@ public:
 
     int GetResult(void) const { return m_result; }
 
+protected:
     void run() override // MThread
     {
         RunProlog();
@@ -77,6 +78,7 @@ public:
 
     ImageSet GetResult(void) { return m_failed; }
 
+protected:
     void run() override // MThread
     {
         RunProlog();
@@ -287,21 +289,37 @@ bool GalleryThumbView::keyPressEvent(QKeyEvent *event)
         handled = true;
 
         if (action == "MENU")
+        {
             MenuMain();
+        }
         else if (action == "INFO")
+        {
             ShowDetails();
+        }
         else if (action == "ZOOMIN")
+        {
             ZoomIn();
+        }
         else if (action == "ZOOMOUT")
+        {
             ZoomOut();
+        }
         else if (action == "ROTRIGHT")
+        {
             RotateCW();
+        }
         else if (action == "ROTLEFT")
+        {
             RotateCCW();
+        }
         else if (action == "FLIPHORIZONTAL")
+        {
             FlipHorizontal();
+        }
         else if (action == "FLIPVERTICAL")
+        {
             FlipVertical();
+        }
         else if (action == "COVER")
         {
             ImagePtrK im = m_view->GetSelected();
@@ -473,7 +491,7 @@ void GalleryThumbView::customEvent(QEvent *event)
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent *)(event);
+        auto *dce = (DialogCompletionEvent *)event;
 
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
@@ -1982,7 +2000,9 @@ void GalleryThumbView::Copy(bool deleteAfter)
     auto *progress = new MythUIProgressDialog(tr("Copying files"), popupStack,
                                               "copydialog");
     if (progress->Create())
+    {
         popupStack->AddScreen(progress, false);
+    }
     else
     {
         delete progress;
@@ -2122,7 +2142,9 @@ void GalleryThumbView::Move()
                                               "movedialog");
 
     if (progress->Create())
+    {
         popupStack->AddScreen(progress, false);
+    }
     else
     {
         delete progress;

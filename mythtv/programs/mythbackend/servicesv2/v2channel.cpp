@@ -161,7 +161,9 @@ V2ChannelInfoList* V2Channel::GetChannelInfoList( uint nSourceID,
         nTotalPages = (int)std::ceil((float)nTotalAvailable / nCount);
 
     if (nTotalPages == 1)
+    {
         nCurPage = 1;
+    }
     else
     {
         nCurPage = (int)std::ceil((float)nStartIndex / nCount) + 1;
@@ -251,7 +253,9 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
     if (HAS_PARAMv2("UseEIT"))
         channel.m_useOnAirGuide = UseEIT;
     if (HAS_PARAMv2("ExtendedVisible"))
+    {
         channel.m_visible = channelVisibleTypeFromString(ExtendedVisible);
+    }
     else if (HAS_PARAMv2("Visible"))
     {
         if (channel.m_visible == kChannelVisible ||
@@ -814,7 +818,9 @@ V2VideoMultiplexList* V2Channel::GetVideoMultiplexList( uint nSourceID,
         totalPages = (int)std::ceil((float)muxCount / nCount);
 
     if (totalPages == 1)
+    {
         curPage = 1;
+    }
     else
     {
         curPage = (int)std::ceil((float)nStartIndex / nCount) + 1;

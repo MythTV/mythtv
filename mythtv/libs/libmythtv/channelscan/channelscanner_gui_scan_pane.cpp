@@ -137,7 +137,7 @@ void ChannelScannerGUIScanPane::SetStatusSignalStrength(int value)
 void ChannelScannerGUIScanPane::SetStatusLock(int value)
 {
     if (m_signalLockedText)
-        m_signalLockedText->SetText((value) ? tr("Locked") : tr("No Lock"));
+        m_signalLockedText->SetText(value ? tr("Locked") : tr("No Lock"));
 }
 
 void ChannelScannerGUIScanPane::SetStatusText(const QString &value)

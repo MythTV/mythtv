@@ -670,7 +670,7 @@ bool XMLTVParser::parseFile(
                             {
                                 bool ok = false;
                                 partno = partnumber.toUInt(&ok) + 1;
-                                partno = (ok) ? partno : 0;
+                                partno = ok ? partno : 0;
                             }
                             if (!parttotal.isEmpty() && partno > 0)
                             {
@@ -810,7 +810,9 @@ bool XMLTVParser::parseFile(
                 {
                     // so we have a (relatively) clean program element now, which is good enough to process or to store
                     if (pginfo->m_clumpidx.isEmpty())
+                    {
                         (*proglist)[pginfo->m_channel].push_back(*pginfo);
+                    }
                     else
                     {
                         /* append all titles/descriptions from one clump */

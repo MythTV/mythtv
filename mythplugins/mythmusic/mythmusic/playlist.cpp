@@ -18,6 +18,7 @@
 #include <libmythbase/mythdb.h>
 #include <libmythbase/mythlogging.h>
 #include <libmythbase/mythmiscutil.h>
+#include <libmythbase/mythrandom.h>
 #include <libmythbase/mythsystemlegacy.h>
 #include <libmythui/mediamonitor.h>
 
@@ -162,22 +163,12 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
     {
         case MusicPlayer::SHUFFLE_RANDOM:
         {
-            QMultiMap<int, MusicMetadata::IdType> songMap;
+            QMultiMap<uint32_t, MusicMetadata::IdType> songMap;
 
-            for (int x = 0; x < m_songs.count(); x++)
-            {
-                // Pseudo-random is good enough. Don't need a true random.
-                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-                songMap.insert(rand(), m_songs.at(x));
-            }
-
-            QMultiMap<int, MusicMetadata::IdType>::const_iterator i = songMap.constBegin();
-            while (i != songMap.constEnd())
-            {
-                m_shuffledSongs.append(i.value());
-                ++i;
-            }
-
+            for (auto song : std::as_const(m_songs))
+                songMap.insert(MythRandom(), song);
+            for (auto song : std::as_const(songMap))
+                m_shuffledSongs.append(song);
             break;
         }
 
@@ -240,7 +231,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     int rating = mdata->Rating();
                     int playcount = mdata->PlayCount();
                     double lastplaydbl = mdata->LastPlay().toSecsSinceEpoch();
-                    double ratingValue = (double)(rating) / 10;
+                    double ratingValue = (double)rating / 10;
                     double playcountValue = __builtin_nan("");
                     double lastplayValue = __builtin_nan("");
 
@@ -254,9 +245,9 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
                     else
                         lastplayValue = (((lastplayMin - lastplaydbl) / (lastplayMax - lastplayMin)) + 1);
 
-                    double weight = (RatingWeight * ratingValue +
-                                        PlayCountWeight * playcountValue +
-                                        LastPlayWeight * lastplayValue) / TotalWeight;
+                    double weight = ((RatingWeight * ratingValue) +
+                                        (PlayCountWeight * playcountValue) +
+                                        (LastPlayWeight * lastplayValue)) / TotalWeight;
                     weights[mdata->ID()] = weight;
                     ratings[mdata->ID()] = rating;
                     ++ratingCounts[rating];
@@ -278,9 +269,7 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
             uint32_t orderCpt = 1;
             while (!weights.empty())
             {
-                // Pseudo-random is good enough. Don't need a true random.
-                // NOLINTNEXTLINE(cert-msc30-c,cert-msc50-cpp)
-                double hit = totalWeights * (double)rand() / (double)RAND_MAX;
+                double hit = totalWeights * MythRandom() / std::numeric_limits<uint32_t>::max();
                 auto weightEnd = weights.end();
                 auto weightIt = weights.begin();
                 double pos = 0;
@@ -651,7 +640,9 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
         {
             // check this is a valid stream ID
             if (gMusicData->m_all_streams->isValidID(id))
+            {
                 m_songs.push_back(id);
+            }
             else
             {
                 badTrack = true;
@@ -662,7 +653,9 @@ void Playlist::fillSongsFromSonglist(const QString& songList)
         {
             // check this is a valid track ID
             if (gMusicData->m_all_music->isValidID(id))
+            {
                 m_songs.push_back(id);
+            }
             else
             {
                 badTrack = true;

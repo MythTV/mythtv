@@ -470,7 +470,7 @@ class Frequency : public MythUITextEditSetting, public MuxDBStorage
     explicit Frequency(const MultiplexID *id, bool in_kHz = false) :
         MythUITextEditSetting(this), MuxDBStorage(this, id, "frequency")
     {
-        QString hz = (in_kHz) ? "kHz" : "Hz";
+        QString hz = in_kHz ? "kHz" : "Hz";
         setLabel(QObject::tr("Frequency") + " (" + hz + ")");
         setHelpText(QObject::tr(
                         "Frequency (Option has no default).\n"

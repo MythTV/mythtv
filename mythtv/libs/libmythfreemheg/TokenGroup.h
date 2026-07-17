@@ -190,9 +190,9 @@ class MHAddItem: public MHElemAction {
   public:
     MHAddItem(): MHElemAction(":AddItem") {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
-    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
     void Perform(MHEngine *engine) override; // MHElemAction
   protected:
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
     MHGenericInteger m_index;
     MHGenericObjectRef m_item;
 
@@ -210,8 +210,8 @@ class MHGetListActionData: public MHElemAction {
   public:
     explicit MHGetListActionData(const char *name): MHElemAction(name) {}
     void Initialise(MHParseNode *p, MHEngine *engine) override; // MHElemAction
-    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
   protected:
+    void PrintArgs(FILE *fd, int /*nTabs*/) const override; // MHElemAction
     MHGenericInteger m_index;
     MHObjectRef m_result;
 };
