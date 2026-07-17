@@ -98,6 +98,7 @@ def buildList(tvtitle, opts):
         m.collectionref = check_item(m, ("collectionref", str(show_info.id)), ignore=False)
         m.language = check_item(m, ("language", str(locales.Language.getstored(show_info.language))))
         m.userrating = check_item(m, ("userrating", show_info.rating['average']))
+        m.runtime = check_item(m, ("runtime", show_info.runtime))
         try:
             m.popularity = check_item(m, ("popularity", float(show_info.weight)), ignore=False)
         except (TypeError, ValueError):
@@ -247,6 +248,7 @@ def buildNumbers(args, opts):
                 episodes = []
             time_match_list = []
             early_match_list = []
+            date_match_list = []
             minTimeDelta = timedelta(minutes=60)
             for i, ep in enumerate(episodes):
                 if ep.timestamp:
@@ -287,9 +289,27 @@ def buildNumbers(args, opts):
                             minTimeDelta = epInTgtZone - dtInTgtZone
                             early_match_list = [i]
 
+                # In some cases, tvmaze only specifies the date and not the time.
+                # This is most common in webChannel originated shows. For example:
+                #  tvmaze.py -N "Criminal Minds" "2022-11-24 21:00:00"
+                #    ep.airtime = , ep.airdate = 2022-11-24,
+                #    ep.timestamp = 2022-11-24T12:00:00+00:00
+                # In such a scenario, look for date matches, ignoring the time.
+                if not ep.airtime and ep.airdate:
+                    epDateInTgtZone = datetime(ep.airdate.year, ep.airdate.month, ep.airdate.day)\
+                        .astimezone(posixtzinfo(show_tz))
+                    if epDateInTgtZone <= dtInTgtZone < epDateInTgtZone+timedelta(hours=24):
+                        if opts.debug:
+                            print('Adding episode \'%s\' to date match list' % ep)
+                        date_match_list.append(i)
+
             if not time_match_list:
                 # No exact matches found, so use the list of the closest episode(s)
                 time_match_list = early_match_list
+
+            if not time_match_list:
+                # No close matches found, so use the list of episodes on the day
+                time_match_list = date_match_list
 
             if time_match_list:
                 for ep_index in time_match_list:
