@@ -1710,6 +1710,7 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
 struct lineSeg { int m_yBottom, m_yTop, m_xBottom; float m_slope; };
+Q_DECLARE_TYPEINFO(lineSeg, Q_PRIMITIVE_TYPE);
 
 void MHIDLA::DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec& yArray)
 {
