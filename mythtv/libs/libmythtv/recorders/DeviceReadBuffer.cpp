@@ -236,7 +236,7 @@ void DeviceReadBuffer::SetPaused(bool val)
 // The WakePoll code is copied from MythSocketThread::WakeReadyReadThread()
 void DeviceReadBuffer::WakePoll(void) const
 {
-    std::string buf(1,'\0');
+    std::array<char,1> buf {};
     ssize_t wret = 0;
     while (isRunning() && (wret <= 0) && (m_wakePipe[1] >= 0))
     {

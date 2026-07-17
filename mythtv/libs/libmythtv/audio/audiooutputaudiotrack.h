@@ -1,5 +1,5 @@
-#ifndef _AUDIOOUTPUTAUDIOTRACK_H_
-#define _AUDIOOUTPUTAUDIOTRACK_H_
+#ifndef AUDIOOUTPUTAUDIOTRACK_H
+#define AUDIOOUTPUTAUDIOTRACK_H
 
 #include "audiooutputbase.h"
 
@@ -43,4 +43,4 @@ class AudioOutputAudioTrack : public AudioOutputBase
     int m_bitsPer10Frames {0};
 };
 
-#endif //_AUDIOOUTPUTAUDIOTRACK_H_
+#endif //AUDIOOUTPUTAUDIOTRACK_H

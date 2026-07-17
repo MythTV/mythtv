@@ -13,8 +13,8 @@ class MonitorThreadDarwin : public MonitorThread
     void run(void) override; // MThread
 
     void  diskInsert(const char *devName,
-                     const char *volName, QString model, bool isCDorDVD = 1);
-    void  diskRemove(QString devName);
+                     const char *volName, const QString& model, bool isCDorDVD = 1);
+    void  diskRemove(const QString& devName);
     void  diskRename(const char *devName, const char *volName);
 };
 

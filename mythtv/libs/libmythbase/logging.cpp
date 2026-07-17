@@ -431,7 +431,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 
 #else // Q_OS_ANDROID
 
-    android_LogPriority aprio;
+    android_LogPriority aprio {ANDROID_LOG_UNKNOWN};
     switch (item->m_level)
     {
     case LOG_EMERG:

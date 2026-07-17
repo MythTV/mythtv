@@ -3,6 +3,7 @@
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 #include <QtAndroidExtras>
 #include <QAndroidJniEnvironment>
+#include <algorithm>
 #else
 #include <QCoreApplication>
 #include <QJniEnvironment>
@@ -32,51 +33,65 @@ extern "C" {
 #define LOC QString("MediaCodec: ")
 
 // MedicaCodec profile constants from MediaCodecInfo.CodecProfileLevel
-#define MC_MPEG2_SIMPLE           (0x0)
-#define MC_MPEG2_MAIN             (0x1)
-#define MC_MPEG2_422              (0x2)
-#define MC_MPEG2_SNR              (0x3)
-#define MC_MPEG2_SPATIAL          (0x4)
-#define MC_MPEG2_HIGH             (0x5)
-#define MC_MPEG4_SIMPLE           (0x0001)
-#define MC_MPEG4_SIMPLE_SCALEABLE (0x0002)
-#define MC_MPEG4_CORE             (0x0004)
-#define MC_MPEG4_MAIN             (0x0008)
-#define MC_MPEG4_NBIT             (0x0010)
-#define MC_MPEG4_SCALEABLE_TEX    (0x0020)
-#define MC_MPEG4_SIMPLE_FACE      (0x0040)
-#define MC_MPEG4_SIMPLE_FBA       (0x0080)
-#define MC_MPEG4_BASIC_ANIMATED   (0x0100)
-#define MC_MPEG4_HYBRID           (0x0200)
-#define MC_MPEG4_ADV_REALTIME     (0x0400)
-#define MC_MPEG4_CORE_SCALEABLE   (0x0800)
-#define MC_MPEG4_ADV_CODING       (0x1000)
-#define MC_MPEG4_ADV_CORE         (0x2000)
-#define MC_MPEG4_ADV_SCALEABLE    (0x4000)
-#define MC_MPEG4_ADV_SIMPLE       (0x8000)
-#define MC_H264_BASELINE          (0x00001)
-#define MC_H264_MAIN              (0x00002)
-#define MC_H264_EXTENDED          (0x00004)
-#define MC_H264_HIGH              (0x00008)
-#define MC_H264_HIGH10            (0x00010)
-#define MC_H264_HIGH422           (0x00020)
-#define MC_H264_HIGH444           (0x00040)
-#define MC_H264_CONST_BASELINE    (0x10000)
-#define MC_H264_CONST_HIGH        (0x80000)
-#define MC_HEVC_MAIN              (0x0001)
-#define MC_HEVC_MAIN10            (0x0002)
-#define MC_HEVC_MAIN_STILL        (0x0004)
-#define MC_HEVC_MAIN10HDR10       (0x1000)
-#define MC_HEVC_MMAIN10HDR10PLUS  (0x2000)
-#define MC_VP8_MAIN               (0x0001)
-#define MC_VP9_0                  (0x0001)
-#define MC_VP9_1                  (0x0002)
-#define MC_VP9_2                  (0x0004)
-#define MC_VP9_3                  (0x0008)
-#define MC_VP9_2HDR               (0x1000)
-#define MC_VP9_3HDR               (0x2000)
-#define MC_VP9_2HDRPLUS           (0x4000)
-#define MC_VP9_3HDRPLUS           (0x8000)
+// NOLINTBEGIN(cppcoreguidelines-use-enum-class)
+enum MC_MPEG2 : uint8_t  {
+    MC_MPEG2_SIMPLE           = 0x0,
+    MC_MPEG2_MAIN             = 0x1,
+    MC_MPEG2_422              = 0x2,
+    MC_MPEG2_SNR              = 0x3,
+    MC_MPEG2_SPATIAL          = 0x4,
+    MC_MPEG2_HIGH             = 0x5,
+};
+enum MC_MPEG4 : uint16_t  {
+    MC_MPEG4_SIMPLE =           0x0001,
+    MC_MPEG4_SIMPLE_SCALEABLE = 0x0002,
+    MC_MPEG4_CORE =             0x0004,
+    MC_MPEG4_MAIN =             0x0008,
+    MC_MPEG4_NBIT =             0x0010,
+    MC_MPEG4_SCALEABLE_TEX =    0x0020,
+    MC_MPEG4_SIMPLE_FACE =      0x0040,
+    MC_MPEG4_SIMPLE_FBA =       0x0080,
+    MC_MPEG4_BASIC_ANIMATED =   0x0100,
+    MC_MPEG4_HYBRID =           0x0200,
+    MC_MPEG4_ADV_REALTIME =     0x0400,
+    MC_MPEG4_CORE_SCALEABLE =   0x0800,
+    MC_MPEG4_ADV_CODING =       0x1000,
+    MC_MPEG4_ADV_CORE =         0x2000,
+    MC_MPEG4_ADV_SCALEABLE =    0x4000,
+    MC_MPEG4_ADV_SIMPLE =       0x8000,
+};
+enum MC_H264 : uint32_t  {
+    MC_H264_BASELINE =          0x00001,
+    MC_H264_MAIN =              0x00002,
+    MC_H264_EXTENDED =          0x00004,
+    MC_H264_HIGH =              0x00008,
+    MC_H264_HIGH10 =            0x00010,
+    MC_H264_HIGH422 =           0x00020,
+    MC_H264_HIGH444 =           0x00040,
+    MC_H264_CONST_BASELINE =    0x10000,
+    MC_H264_CONST_HIGH =        0x80000,
+};
+enum MC_HEVC : uint16_t  {
+    MC_HEVC_MAIN =              0x0001,
+    MC_HEVC_MAIN10 =            0x0002,
+    MC_HEVC_MAIN_STILL =        0x0004,
+    MC_HEVC_MAIN10HDR10 =       0x1000,
+    MC_HEVC_MMAIN10HDR10PLUS =  0x2000,
+};
+enum MC_VP8 : uint8_t  {
+    MC_VP8_MAIN =               0x0001,
+};
+enum MC_VP9 : uint16_t  {
+    MC_VP9_0 =                  0x0001,
+    MC_VP9_1 =                  0x0002,
+    MC_VP9_2 =                  0x0004,
+    MC_VP9_3 =                  0x0008,
+    MC_VP9_2HDR =               0x1000,
+    MC_VP9_3HDR =               0x2000,
+    MC_VP9_2HDRPLUS =           0x4000,
+    MC_VP9_3HDRPLUS =           0x8000,
+};
+// NOLINTEND(cppcoreguidelines-use-enum-class)
 
 inline MythCodecContext::CodecProfile MediaCodecToMythProfile(int Codec, int Profile)
 {
@@ -200,10 +215,10 @@ int MythMediaCodecContext::InitialiseDecoder(AVCodecContext *Context)
 
     // Create the hardware context
     AVBufferRef *hwdeviceref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_MEDIACODEC);
-    AVHWDeviceContext *hwdevicectx = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
+    auto *hwdevicectx = reinterpret_cast<AVHWDeviceContext*>(hwdeviceref->data);
     hwdevicectx->free = &MythCodecContext::DeviceContextFinished;
     hwdevicectx->user_opaque = interop;
-    AVMediaCodecDeviceContext *hwctx = reinterpret_cast<AVMediaCodecDeviceContext*>(hwdevicectx->hwctx);
+    auto *hwctx = reinterpret_cast<AVMediaCodecDeviceContext*>(hwdevicectx->hwctx);
     hwctx->surface = interop->GetSurface();
     if (av_hwdevice_ctx_init(hwdeviceref) < 0)
     {
@@ -224,8 +239,8 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
                                                          uint            StreamType)
 {
     bool decodeonly = Decoder == "mediacodec-dec";
-    MythCodecID success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
-    MythCodecID failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
+    auto success = static_cast<MythCodecID>((decodeonly ? kCodec_MPEG1_MEDIACODEC_DEC : kCodec_MPEG1_MEDIACODEC) + (StreamType - 1));
+    auto failure = static_cast<MythCodecID>(kCodec_MPEG1 + (StreamType - 1));
 
     if (!Decoder.startsWith("mediacodec"))
         return failure;
@@ -252,7 +267,7 @@ MythCodecID MythMediaCodecContext::GetBestSupportedCodec(AVCodecContext **Contex
         }
     }
 
-    AvFormatDecoder *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
+    auto *decoder = dynamic_cast<AvFormatDecoder*>(reinterpret_cast<DecoderBase*>((*Context)->opaque));
     QString profilestr = MythCodecContext::GetProfileDescription(mythprofile, QSize());
     if (found && decoder)
     {
@@ -299,7 +314,7 @@ int MythMediaCodecContext::HwDecoderInit(AVCodecContext *Context)
 {
     if (codec_is_mediacodec_dec(m_codecID))
         return 0;
-    else if (codec_is_mediacodec(m_codecID))
+    if (codec_is_mediacodec(m_codecID))
         return MythCodecContext::InitialiseDecoder2(Context, MythMediaCodecContext::InitialiseDecoder, "Create MediaCodec decoder");
     return -1;
 }
@@ -313,7 +328,7 @@ bool MythMediaCodecContext::RetrieveFrame(AVCodecContext *Context, MythVideoFram
     return false;
 }
 
-AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFormat *PixFmt)
+AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext* /*Context*/, const AVPixelFormat *PixFmt)
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
@@ -328,7 +343,7 @@ AVPixelFormat MythMediaCodecContext::GetFormat(AVCodecContext*, const AVPixelFor
  *
  * \note This may not be appropriate for all devices
 */
-void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Frame)
+void MythMediaCodecContext::PostProcessFrame(AVCodecContext* /*Context*/, MythVideoFrame* Frame)
 {
     if (!Frame)
         return;
@@ -346,7 +361,7 @@ void MythMediaCodecContext::PostProcessFrame(AVCodecContext*, MythVideoFrame* Fr
  *
  * \note As for PostProcessFrame this may not be accurate.
 */
-bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool)
+bool MythMediaCodecContext::IsDeinterlacing(bool &DoubleRate, bool /*StreamChange*/)
 {
     DoubleRate = true;
     return true;
@@ -364,7 +379,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
         return s_profiles;
     s_initialised = true;
 
-    static const QPair<QString,QPair<MythCodecContext::CodecProfile, QList<int> > > mimetypes[] =
+    static const std::vector< QPair<QString,QPair<MythCodecContext::CodecProfile, QList<int> > > > mimetypes =
     {
         { "video/mpeg2", { MythCodecContext::MPEG2,
           { MC_MPEG2_SIMPLE, MC_MPEG2_MAIN, MC_MPEG2_422, MC_MPEG2_SNR,
@@ -403,7 +418,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
         return s_profiles;
 
     // Iterate over MediaCodecInfo's
-    jobjectArray codecs = qtcodecs.object<jobjectArray>();
+    auto *codecs = qtcodecs.object<jobjectArray>();
     jsize codeccount = env->GetArrayLength(codecs);
     for (jsize i = 0; i < codeccount; ++i)
     {
@@ -422,7 +437,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
 
         // Retrieve supported mimetypes (there is usually just one)
         QAndroidJniObject qttypes = codec.callObjectMethod("getSupportedTypes", "()[Ljava/lang/String;");
-        jobjectArray types = qttypes.object<jobjectArray>();
+        auto *types = qttypes.object<jobjectArray>();
         jsize typecount = env->GetArrayLength(types);
         for (jsize j = 0; j < typecount; ++j)
         {
@@ -432,7 +447,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
 
             // Match mimetype to types supported by FFmpeg
             QString typestr = type.toString();
-            for (auto mimetype : mimetypes)
+            for (const auto& mimetype : mimetypes)
             {
                 if (mimetype.first != typestr)
                     continue;
@@ -460,7 +475,7 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                 // Profiles are available from CodecCapabilities.profileLevel field
                 QAndroidJniObject profiles = caps.getObjectField("profileLevels",
                         "[Landroid/media/MediaCodecInfo$CodecProfileLevel;");
-                jobjectArray profilearr = profiles.object<jobjectArray>();
+                auto *profilearr = profiles.object<jobjectArray>();
                 jsize profilecount = env->GetArrayLength(profilearr);
                 if (profilecount < 1)
                 {
@@ -474,9 +489,9 @@ MCProfiles &MythMediaCodecContext::GetProfiles(void)
                     jclass objclass = env->GetObjectClass(profile);
                     jfieldID id     = env->GetFieldID(objclass, "profile", "I");
                     int value       = static_cast<int>(env->GetIntField(profile, id));
-                    QList<int>& mcprofiles = mimetype.second.second;
+                    const QList<int>& mcprofiles = mimetype.second.second;
                     auto sameprof = [value](auto mcprofile) { return value == mcprofile; };
-                    if (std::any_of(mcprofiles.cbegin(), mcprofiles.cend(), sameprof))
+                    if (std::ranges::any_of(mcprofiles, sameprof))
                     {
                         MythCodecContext::CodecProfile p = MediaCodecToMythProfile(mimetype.second.first, value);
                         s_profiles.append(QPair<MythCodecContext::CodecProfile,QSize>(p, QSize(width, height)));

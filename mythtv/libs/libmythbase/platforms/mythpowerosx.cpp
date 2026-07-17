@@ -123,19 +123,19 @@ void MythPowerOSX::Refresh(void)
         if (static_cast<CFBooleanRef>(CFDictionaryGetValue(description, CFSTR(kIOPSIsPresentKey))) == kCFBooleanFalse)
             continue;
 
-        auto type = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSTransportTypeKey)));
+        const auto *type = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSTransportTypeKey)));
         if (type && CFStringCompare(type, CFSTR(kIOPSInternalType), 0) == kCFCompareEqualTo)
         {
-            auto state = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSPowerSourceStateKey)));
+            const auto *state = static_cast<CFStringRef>(CFDictionaryGetValue(description, CFSTR(kIOPSPowerSourceStateKey)));
             if (state && CFStringCompare(state, CFSTR(kIOPSACPowerValue), 0) == kCFCompareEqualTo)
             {
                 newlevel = ACPower;
             }
             else if (state && CFStringCompare(state, CFSTR(kIOPSBatteryPowerValue), 0) == kCFCompareEqualTo)
             {
-                int32_t current;
-                int32_t max;
-                auto capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey)));
+                int32_t current = 0;
+                int32_t max = 0;
+                const auto *capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSCurrentCapacityKey)));
                 CFNumberGetValue(capacity, kCFNumberSInt32Type, &current);
                 capacity = static_cast<CFNumberRef>(CFDictionaryGetValue(description, CFSTR(kIOPSMaxCapacityKey)));
                 CFNumberGetValue(capacity, kCFNumberSInt32Type, &max);

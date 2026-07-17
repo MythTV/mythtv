@@ -33,6 +33,7 @@ bool MythEGL::IsEGL()
     return InitEGL();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool MythEGL::InitEGL(void)
 {
     // N.B. Strictly speaking this reports both whether EGL is in use and whether
@@ -62,7 +63,8 @@ bool MythEGL::InitEGL(void)
     return false;
 }
 
-bool MythEGL::HasEGLExtension([[maybe_unused]] QString Extension)
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
+bool MythEGL::HasEGLExtension([[maybe_unused]] const QString& Extension)
 {
 #if CONFIG_EGL
     OpenGLLocker locker(m_context);
@@ -128,7 +130,7 @@ QString MythEGL::GetEGLVendor(void)
 
     return CheckDisplay(eglGetDisplay(EGL_DEFAULT_DISPLAY));
 #else
-    return QString();
+    return {};
 #endif
 }
 

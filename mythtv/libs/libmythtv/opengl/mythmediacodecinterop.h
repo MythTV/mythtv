@@ -16,13 +16,13 @@
 // MythTV
 #include "mythopenglinterop.h"
 
-extern "C" MTV_PUBLIC void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*, jobject, jlong Wait, jobject);
+extern "C" MTV_PUBLIC void Java_org_mythtv_video_SurfaceTextureListener_frameAvailable(JNIEnv*/*env*/, jobject /*listener*/, jlong Wait, jobject /*texture*/);
 
 class MythMediaCodecInterop : public MythOpenGLInterop
 {
   public:
     static MythMediaCodecInterop* CreateMediaCodec(MythPlayerUI* Player, MythRenderOpenGL* Context, QSize Size);
-    virtual std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
+    std::vector<MythVideoTextureOpenGL*> Acquire(MythRenderOpenGL *Context,
                                                          MythVideoColourSpace *ColourSpace,
                                                          MythVideoFrame *Frame, FrameScanType Scan) override;
     void* GetSurface(void);
@@ -35,11 +35,11 @@ class MythMediaCodecInterop : public MythOpenGLInterop
   private:
     QWaitCondition    m_frameWait;
     QMutex            m_frameWaitLock;
-    bool              m_colourSpaceInitialised;
+    bool              m_colourSpaceInitialised { false };
     QAndroidJniObject m_surface;
     QAndroidJniObject m_surfaceTexture;
     QAndroidJniObject m_surfaceListener;
-    jfloatArray       m_textureTransform;
+    jfloatArray       m_textureTransform { nullptr };
     QMatrix4x4        m_transform;
 };
 

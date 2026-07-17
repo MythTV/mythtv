@@ -1657,8 +1657,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 #ifdef Q_OS_DARWIN
         if (opt.startsWith("-psn_"))
         {
-            std::cerr << "Ignoring Process Serial Number from command line"
-                      << std::endl;
+            std::cerr << "Ignoring Process Serial Number from command line\n";
             continue;
         }
 #endif
@@ -3077,7 +3076,7 @@ int MythCommandLineParser::Daemonize(void) const
 #ifdef Q_OS_DARWIN
     if (toBool("daemon"))
     {
-        std::cerr << "Daemonizing is unavailable in OSX" << std::endl;
+        std::cerr << "Daemonizing is unavailable in OSX\n";
         LOG(VB_GENERAL, LOG_WARNING, "Unable to daemonize");
     }
 #else

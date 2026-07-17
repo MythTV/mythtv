@@ -43,8 +43,8 @@ BumpScope::~BumpScope()
     delete [] m_rgbBuf;
     delete m_image;
     for (auto & dat : m_phongDat)
-        dat.resize(0);
-    m_phongDat.resize(0);
+        dat.clear();
+    m_phongDat.clear();
 }
 
 void BumpScope::resize(const QSize &newsize)

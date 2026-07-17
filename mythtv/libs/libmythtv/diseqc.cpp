@@ -484,6 +484,7 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     return true;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
 {
     bool success = false;
@@ -674,6 +675,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
  *  \param data_len Length of optional data.
  *  \param data Pointer to optional data.
  */
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
                                 [[maybe_unused]] uint cmd,
                                 [[maybe_unused]] uint repeats,
@@ -1364,6 +1366,7 @@ void DiSEqCDevSwitch::SetNumPorts(uint num_ports)
     m_numPorts = num_ports;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &settings,
                                     [[maybe_unused]] const DTVMultiplex &tuning,
                                     [[maybe_unused]] uint pos)
@@ -1497,6 +1500,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 }
 #endif // CONFIG_DVB
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
                                   const DTVMultiplex &/*tuning*/,
                                   uint pos)
@@ -1513,6 +1517,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     return false;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &settings,
                                      [[maybe_unused]] const DTVMultiplex &tuning,
                                      uint pos)
@@ -1533,6 +1538,7 @@ bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &s
     return false;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteMiniDiSEqC([[maybe_unused]] const DiSEqCDevSettings &settings,
                                         [[maybe_unused]] const DTVMultiplex &tuning,
                                         uint pos)

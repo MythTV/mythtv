@@ -36,7 +36,7 @@ void DeleteOSXCocoaPool(void* &pool)
 {
     if (pool)
     {
-        NSAutoreleasePool *a_pool = (NSAutoreleasePool*) pool;
+        auto* a_pool = (NSAutoreleasePool*) pool;
         pool = nullptr;
         [a_pool release];
     }

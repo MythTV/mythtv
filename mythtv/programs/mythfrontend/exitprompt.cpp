@@ -172,14 +172,14 @@ void ExitPrompter::HandleExit()
     bool allowStandby  = false;
     bool allowSuspend  = false;
 
+#ifndef Q_OS_ANDROID
     bool haveshutdown = !m_haltCommand.isEmpty();
     bool havereboot   = !m_rebootCommand.isEmpty();
     bool havesuspend  = !m_suspendCommand.isEmpty();
-
-#ifdef Q_OS_ANDROID
-    haveshutdown = false;
-    havereboot   = false;
-    havesuspend  = false;
+#else
+    bool haveshutdown = false;
+    bool havereboot   = false;
+    bool havesuspend  = false;
 #endif
 
     if (m_power)

@@ -19,12 +19,12 @@
 
 #define LOC QString("AOSLES: ")
 
-#define OPENSLES_BUFFERS 10  /* maximum number of buffers */
+static constexpr size_t OPENSLES_BUFFERS { 10 };  /* maximum number of buffers */
 static constexpr std::chrono::milliseconds OPENSLES_BUFLEN { 10ms };
-//#define POSITIONUPDATEPERIOD 1000
-//#define POSITIONUPDATEPERIOD 25000
-#define POSITIONUPDATEPERIOD 40
-//#define POSITIONUPDATEPERIOD 200000
+// static constexpr int32_t POSITIONUPDATEPERIOD { 1000 };
+// static constexpr int32_t POSITIONUPDATEPERIOD { 25000 };
+static constexpr int32_t POSITIONUPDATEPERIOD { 40 };
+// static constexpr int32_t POSITIONUPDATEPERIOD { 200000 };
 
 #define CHECK_OPENSL_ERROR(msg)                \
     if (result != SL_RESULT_SUCCESS) \
@@ -93,17 +93,15 @@ int GetNativeOutputFramesPerBuffer(void)
 
 bool AudioOutputOpenSLES::CreateEngine()
 {
-    SLresult result;
-
-    m_so_handle = dlopen("libOpenSLES.so", RTLD_NOW);
-    if (m_so_handle == nullptr)
+    m_soHandle = dlopen("libOpenSLES.so", RTLD_NOW);
+    if (m_soHandle == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load libOpenSLES");
         Close();
         return false;
     }
 
-    m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_so_handle, "slCreateEngine");
+    m_slCreateEnginePtr = (slCreateEngine_t)dlsym(m_soHandle, "slCreateEngine");
     if (m_slCreateEnginePtr == nullptr)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Error: Failed to load symbol slCreateEngine");
@@ -113,7 +111,7 @@ bool AudioOutputOpenSLES::CreateEngine()
 
 #define OPENSL_DLSYM(dest, name)                       \
     do {                                                       \
-        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(m_so_handle, "SL_IID_" name);        \
+        const SLInterfaceID *sym = (const SLInterfaceID *)dlsym(m_soHandle, "SL_IID_" name);        \
         if (sym == nullptr)                             \
         {                                                      \
             LOG(VB_GENERAL, LOG_ERR, "AOOSLES Error: Failed to load symbol SL_IID_" name); \
@@ -123,14 +121,14 @@ bool AudioOutputOpenSLES::CreateEngine()
         (dest) = *sym;                                         \
     } while(0)
 
-    OPENSL_DLSYM(m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, "ANDROIDSIMPLEBUFFERQUEUE");
-    OPENSL_DLSYM(m_SL_IID_ENGINE, "ENGINE");
-    OPENSL_DLSYM(m_SL_IID_PLAY, "PLAY");
-    OPENSL_DLSYM(m_SL_IID_VOLUME, "VOLUME");
+    OPENSL_DLSYM(m_slIidAndroidSimpleBufferQueue, "ANDROIDSIMPLEBUFFERQUEUE");
+    OPENSL_DLSYM(m_slIidEngine, "ENGINE");
+    OPENSL_DLSYM(m_slIidPlay, "PLAY");
+    OPENSL_DLSYM(m_slIidVolume, "VOLUME");
 #undef OPENSL_DLSYM
 
     // create engine
-    result = m_slCreateEnginePtr(&m_engineObject, 0, nullptr, 0, nullptr, nullptr);
+    SLresult result = m_slCreateEnginePtr(&m_engineObject, 0, nullptr, 0, nullptr, nullptr);
     CHECK_OPENSL_ERROR("Failed to create engine");
 
     // realize the engine in synchronous mode
@@ -138,13 +136,15 @@ bool AudioOutputOpenSLES::CreateEngine()
     CHECK_OPENSL_ERROR("Failed to realize engine");
 
     // get the engine interface, needed to create other objects
-    result = GetInterface(m_engineObject, m_SL_IID_ENGINE, &m_engineEngine);
+    result = GetInterface(m_engineObject, m_slIidEngine,
+                          static_cast<void*>(&m_engineEngine));
     CHECK_OPENSL_ERROR("Failed to get the engine interface");
 
     // create output mix, with environmental reverb specified as a non-required interface
-    const SLInterfaceID ids1[] = { m_SL_IID_VOLUME };
-    const SLboolean req1[] = { SL_BOOLEAN_FALSE };
-    result = CreateOutputMix(m_engineEngine, &m_outputMixObject, 1, ids1, req1);
+    const std::array<SLInterfaceID,1> ids1 { m_slIidVolume };
+    const std::array<SLboolean,1> req1 { SL_BOOLEAN_FALSE };
+    result = CreateOutputMix(m_engineEngine, &m_outputMixObject,
+                             1, ids1.data(), req1.data());
     CHECK_OPENSL_ERROR("Failed to create output mix");
 
     // realize the output mix in synchronous mode
@@ -156,8 +156,6 @@ bool AudioOutputOpenSLES::CreateEngine()
 
 bool AudioOutputOpenSLES::StartPlayer()
 {
-    SLresult       result;
-
     // configure audio source - this defines the number of samples you can enqueue.
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {
         SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
@@ -204,13 +202,13 @@ bool AudioOutputOpenSLES::StartPlayer()
     SLDataSink audioSnk = {&loc_outmix, nullptr};
 
     //create audio player
-    const SLInterfaceID ids2[] = { m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE, m_SL_IID_VOLUME };
-    static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+    const std::array<SLInterfaceID,2> ids2 { m_slIidAndroidSimpleBufferQueue, m_slIidVolume };
+    static const std::array<SLboolean,2> req2 { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
+    SLresult result {0};
     if (GetNativeOutputSampleRate() >= m_sampleRate) { // FIXME
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
-                                    &audioSnk, sizeof(ids2) / sizeof(*ids2),
-                                    ids2, req2);
+                                   &audioSnk, ids2.size(), ids2.data(), req2.data());
     } else {
         // Don't try to play back a sample rate higher than the native one,
         // since OpenSL ES will try to use the fast path, which AudioFlinger
@@ -225,22 +223,23 @@ bool AudioOutputOpenSLES::StartPlayer()
         //fmt->i_rate = 44100;
         format_pcm.samplesPerSec = ((SLuint32) 48000 * 1000) ;
         result = CreateAudioPlayer(m_engineEngine, &m_playerObject, &audioSrc,
-                &audioSnk, sizeof(ids2) / sizeof(*ids2),
-                ids2, req2);
+                &audioSnk, ids2.size(), ids2.data(), req2.data());
     }
     CHECK_OPENSL_ERROR("Failed to create audio player");
 
     result = Realize(m_playerObject, SL_BOOLEAN_FALSE);
     CHECK_OPENSL_ERROR("Failed to realize player object.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_PLAY, &m_playerPlay);
+    result = GetInterface(m_playerObject, m_slIidPlay,
+                          static_cast<void*>(&m_playerPlay));
     CHECK_OPENSL_ERROR("Failed to get player interface.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_VOLUME, &m_volumeItf);
+    result = GetInterface(m_playerObject, m_slIidVolume,
+                          static_cast<void*>(&m_volumeItf));
     CHECK_OPENSL_ERROR("failed to get volume interface.");
 
-    result = GetInterface(m_playerObject, m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE,
-                                                  &m_playerBufferQueue);
+    result = GetInterface(m_playerObject, m_slIidAndroidSimpleBufferQueue,
+                          static_cast<void*>(&m_playerBufferQueue));
     CHECK_OPENSL_ERROR("Failed to get buff queue interface");
 
     result = RegisterCallback(m_playerBufferQueue,
@@ -254,9 +253,9 @@ bool AudioOutputOpenSLES::StartPlayer()
 
     /* XXX: rounding shouldn't affect us at normal sampling rate */
     uint32_t samplesPerBuf = OPENSLES_BUFLEN.count() * m_sampleRate / 1000;
-    m_buf = (uint8_t*)malloc(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
-    if (!m_buf)
-    {
+    try {
+        m_buf.resize(OPENSLES_BUFFERS * samplesPerBuf * m_bytesPerFrame);
+    } catch (std::bad_alloc &ex) {
         Stop();
         return false;
     }
@@ -281,20 +280,16 @@ bool AudioOutputOpenSLES::StartPlayer()
 
 bool AudioOutputOpenSLES::Stop()
 {
-    SLresult       result;
     if (m_playerObject)
     {
         // set the player's state to playing
-        result = SetPlayState(m_playerPlay, SL_PLAYSTATE_STOPPED);
+        SLresult result = SetPlayState(m_playerPlay, SL_PLAYSTATE_STOPPED);
         CHECK_OPENSL_ERROR("Failed to switch to not playing state");
         Destroy(m_playerObject);
         m_playerObject = nullptr;
     }
-    if (m_buf)
-    {
-        free(m_buf);
-        m_buf = nullptr;
-    }
+    m_buf.clear();
+    m_buf.shrink_to_fit();
     return true;
 }
 
@@ -325,10 +320,10 @@ void AudioOutputOpenSLES::Close()
         Destroy(m_engineObject);
         m_engineObject = nullptr;
     }
-    if (m_so_handle)
+    if (m_soHandle)
     {
-        dlclose(m_so_handle);
-        m_so_handle = nullptr;
+        dlclose(m_soHandle);
+        m_soHandle = nullptr;
     }
 }
 
@@ -351,7 +346,7 @@ AudioOutputOpenSLES::~AudioOutputOpenSLES()
 
 AudioOutputSettings* AudioOutputOpenSLES::GetOutputSettings(bool /*digital*/)
 {
-    AudioOutputSettings *settings = new AudioOutputSettings();
+    auto *settings = new AudioOutputSettings();
 
     int32_t nativeRate = GetNativeOutputSampleRate(); // in Hz
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Native Rate %1").arg(nativeRate));
@@ -430,7 +425,7 @@ int AudioOutputOpenSLES::GetNumberOfBuffersQueued() const
     return st.count;
 }
 
-void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
+void AudioOutputOpenSLES::WriteAudio(unsigned char * aubuf, int size)
 {
     LOG(VB_AUDIO, LOG_INFO, LOC + QString("WriteAudio %1").arg(size));
     while (size > 0)
@@ -449,16 +444,13 @@ void AudioOutputOpenSLES::WriteAudio(unsigned char * buffer, int size)
 
         if (size < (m_fragmentSize + m_bufWriteIndex))
         {
-            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, size);
-            size = 0;
+            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], aubuf, size);
             // no more to do so exit now, dont have a full buffer
             break;
         }
-        else
-        {
-            memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], buffer, m_fragmentSize - m_bufWriteIndex);
-            size -= m_fragmentSize - m_bufWriteIndex;
-        }
+
+        memcpy(&m_buf[m_bufWriteBase + m_bufWriteIndex], aubuf, m_fragmentSize - m_bufWriteIndex);
+        size -= m_fragmentSize - m_bufWriteIndex;
 
         SLresult r = Enqueue(m_playerBufferQueue, &m_buf[m_bufWriteBase], m_fragmentSize);
         LOG(VB_AUDIO, LOG_INFO, LOC + QString("Enqueue %1").arg(m_bufWriteBase));
@@ -526,9 +518,9 @@ void AudioOutputOpenSLES::SetVolumeChannel(int channel, int volume)
     // Volume is 0-100
     // android expects 0-1.0 before conversion
     // Convert UI volume to linear factor (cube) in log
-    float vol = volume / 100.f;
+    float vol = volume / 100.0F;
 
-    int mb;
+    int mb = 0;
     if (volume == 0)
     {
         mb = SL_MILLIBEL_MIN;

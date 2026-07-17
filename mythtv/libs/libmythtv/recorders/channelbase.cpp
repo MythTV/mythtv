@@ -367,6 +367,7 @@ void ChannelBase::HandleScript(const QString &freqid)
     }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool ChannelBase::ChangeInternalChannel([[maybe_unused]] const QString &freqid,
                                         [[maybe_unused]] uint inputid) const
 {
@@ -724,12 +725,12 @@ ChannelBase *ChannelBase::CreateChannel(
             dvbchannel->SetSlowTuning(dvbOpt.m_dvbTuningDelay);
 #endif
     }
+#if CONFIG_FIREWIRE
     else if (genOpt.m_inputType == "FIREWIRE")
     {
-#if CONFIG_FIREWIRE
         channel = new FirewireChannel(tvrec, genOpt.m_videoDev, fwOpt);
-#endif
     }
+#endif
 #if CONFIG_HDHOMERUN
     else if (genOpt.m_inputType == "HDHOMERUN")
     {

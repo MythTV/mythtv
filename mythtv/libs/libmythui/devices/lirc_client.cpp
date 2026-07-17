@@ -123,7 +123,7 @@ static int lirc_send_command(const struct lirc_state *state, int sockfd, const s
 
 static void lirc_printf(const struct lirc_state *state, const char *format_str, ...)
 {
-	va_list ap;  
+	va_list ap; // NOLINT(cppcoreguidelines-init-variables) for macos
 	
 	if(state)
 	{
