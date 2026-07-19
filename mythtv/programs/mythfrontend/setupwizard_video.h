@@ -34,7 +34,7 @@ class VideoSetupWizard : public MythScreenType
   private:
     void initProgressDialog();
 
-    enum TestType
+    enum TestType : uint8_t
     {
         ttNone = 0,
         ttHighDefinition,

@@ -64,7 +64,7 @@ class TestMythSystem: public QObject
     }
 
     // called at the end of these sets of tests
-    void cleanupTestCase(void)
+    static void cleanupTestCase(void)
     {
         ShutdownMythSystemLegacy();
     }
@@ -120,7 +120,7 @@ class TestMythSystem: public QObject
                                kMSStdIn | kMSRunShell));
         cmd->GetStandardInputStream()->write(in);
         cmd->GetStandardInputStream()->close();
-        std::cerr << "stdin_works -- Wait starting" << std::endl;
+        std::cerr << "stdin_works -- Wait starting\n";
         cmd->Wait(0ms);
         QVERIFY(cmd->GetExitCode() == 0);
         QByteArray out = tempfile.readAll();

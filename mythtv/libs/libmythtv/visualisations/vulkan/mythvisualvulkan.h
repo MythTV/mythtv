@@ -25,8 +25,8 @@ class MythVisualVulkan : public MythVulkanObject
     VkDescriptorPool         m_descriptorPool       { MYTH_NULL_DISPATCH };
     VkDescriptorSet          m_projectionDescriptor { MYTH_NULL_DISPATCH };
     MythUniformBufferVulkan* m_projectionUniform    { nullptr };
-    std::vector<VkDynamicState> m_dynamicState      { };
-    std::vector<int>         m_shaderStages         { };
+    std::vector<VkDynamicState> m_dynamicState;
+    std::vector<int>         m_shaderStages;
     const MythShaderMap*     m_shaderSources        { nullptr };
     const MythBindingMap*    m_shaderBindings       { nullptr };
 };

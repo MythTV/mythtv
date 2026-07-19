@@ -22,6 +22,8 @@
 
 #include <QTest>
 
+#include <array>
+
 #include "libmythtv/iptvtuningdata.h"
 #include "libmythtv/channelscan/iptvchannelfetcher.h"
 #include "libmythtv/recorders/rtp/rtpdatapacket.h"
@@ -255,7 +257,7 @@ class TestIPTVRecorder: public QObject
     static void ParseRTP(void)
     {
         /* #11852 - RTP packet from VLC - minimal RTP header and 7 TS packets */
-        unsigned char packet_data0[1328] = {
+        std::array<unsigned char,1328> packet_data0 = {
             0x80, 0xA1, 0xB0, 0x16, 0x66, 0x2D, 0x90, 0x6E,  0x32, 0x4C, 0x6F, 0x10, 0x47, 0x00, 0x45, 0x17,
             0x69, 0x4D, 0x0E, 0xCC, 0xD9, 0x49, 0x8B, 0x3F,  0xAB, 0x6A, 0x0C, 0xA8, 0xBA, 0x69, 0x0E, 0x49,
             0x49, 0xEA, 0x90, 0x5E, 0xD3, 0xC4, 0xD0, 0x98,  0x53, 0x81, 0x0A, 0xD1, 0xCC, 0x67, 0xB0, 0x3A,
@@ -347,7 +349,7 @@ class TestIPTVRecorder: public QObject
         };
 
         /* #11852 - RTP packet from A1 TV - small with RTP header extensions */
-        unsigned char packet_data1[216] = {
+        std::array<unsigned char,216> packet_data1 = {
             0x90, 0x21, 0x70, 0x40, 0x5B, 0xBA, 0x12, 0x0E,  0x00, 0x00, 0x00, 0x01, 0xBE, 0xDE, 0x00, 0x03,
             0x13, 0x45, 0xF0, 0x00, 0x46, 0x12, 0x74, 0x00,  0x20, 0x01, 0x59, 0xEF, 0x47, 0x00, 0x20, 0x32,
             0x61, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -365,7 +367,7 @@ class TestIPTVRecorder: public QObject
         };
 
         /* #11852 - RTP packet from A1 TV - big with RTP header extensions */
-        unsigned char packet_data2[1348] = {
+        std::array<unsigned char,1348> packet_data2 = {
             0x90, 0x21, 0x70, 0xDE, 0x5B, 0xBA, 0xC9, 0xC6,  0x00, 0x00, 0x00, 0x01, 0xBE, 0xDE, 0x00, 0x04,
             0x13, 0x87, 0xF0, 0x00, 0x72, 0x01, 0x6C, 0x16,  0x46, 0x13, 0x12, 0x02, 0x02, 0x00, 0x20, 0x01,
             0x47, 0x40, 0x00, 0x1A, 0x00, 0x00, 0xB0, 0x0D,  0x00, 0x01, 0xC1, 0x00, 0x00, 0x00, 0x01, 0xE0,
@@ -461,7 +463,7 @@ class TestIPTVRecorder: public QObject
 
         /* regression test of working packet */
         RTPDataPacket packet0;
-        packet0.GetDataReference().append((char*)packet_data0, sizeof(packet_data0));
+        packet0.GetDataReference().append((char*)packet_data0.data(), packet_data0.size());
         QVERIFY (packet0.IsValid());
         RTPTSDataPacket ts_packet0(packet0);
         QCOMPARE (ts_packet0.GetTSData()[0], (uint8_t)0x47);
@@ -470,7 +472,7 @@ class TestIPTVRecorder: public QObject
 
         /* test of short packet with header extension */
         RTPDataPacket packet1;
-        packet1.GetDataReference().append((char*)packet_data1, sizeof(packet_data1));
+        packet1.GetDataReference().append((char*)packet_data1.data(), packet_data1.size());
         QVERIFY (packet1.IsValid());
         QCOMPARE (packet1.GetDataReference().size(), 216);
         QCOMPARE (packet1.GetPaddingSize(), (unsigned int)0);
@@ -482,7 +484,7 @@ class TestIPTVRecorder: public QObject
 
         /* test with header extension */
         RTPDataPacket packet2;
-        packet2.GetDataReference().append((char*)packet_data2, sizeof(packet_data2));
+        packet2.GetDataReference().append((char*)packet_data2.data(), packet_data2.size());
         QVERIFY (packet2.IsValid());
         RTPTSDataPacket ts_packet2(packet2);
         QCOMPARE (ts_packet2.GetTSData()[0], (uint8_t)0x47);

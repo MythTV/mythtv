@@ -17,7 +17,7 @@ class MythQtPainter : public MythPainter
    ~MythQtPainter() override;
 
     QString GetName(void) override // MythPainter
-        { return QString("Qt"); }
+        { return "Qt"; }
     bool SupportsAnimation(void) override // MythPainter
         { return false; }
     bool SupportsAlpha(void) override // MythPainter

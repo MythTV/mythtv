@@ -10,6 +10,9 @@
 
 #include <QtEndian>
 
+#ifndef __cpp_size_t_suffix
+#include "libmythbase/sizetliteral.h"
+#endif
 #include "libmythtv/mythtvexp.h"
 #include "udppacket.h"
 
@@ -29,8 +32,8 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
 {
   public:
     RTPDataPacket(const RTPDataPacket&)  = default;
-    explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o), m_off(0) { }
-    explicit RTPDataPacket(uint64_t key) : UDPPacket(key), m_off(0) { }
+    explicit RTPDataPacket(const UDPPacket &o) : UDPPacket(o) { }
+    explicit RTPDataPacket(uint64_t key) : UDPPacket(key) { }
     RTPDataPacket(void) : UDPPacket(0ULL) { }
 
     RTPDataPacket& operator=(const RTPDataPacket&) = default;
@@ -42,7 +45,7 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
     bool HasExtension(void) const { return (m_data[0] >> 4) & 0x1; }
     uint GetCSRCCount(void) const { return m_data[0] & 0xf; }
 
-    enum {
+    enum : uint8_t {
         kPayLoadTypePCMAudio   = 8,
         kPayLoadTypeMPEGAudio  = 12,
         kPayLoadTypeH261Video  = 31,
@@ -73,8 +76,13 @@ class MTV_PUBLIC RTPDataPacket : public UDPPacket
 
     uint GetContributingSource(uint i) const
     {
+#ifdef __cpp_size_t_suffix
         const uint32_t tmp =
-            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4 * i));
+            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4UZ * i));
+#else
+        const uint32_t tmp =
+            *reinterpret_cast<const uint32_t*>(m_data.data() + 12 + (4_UZ * i));
+#endif
         return qFromBigEndian(tmp);
     }
 

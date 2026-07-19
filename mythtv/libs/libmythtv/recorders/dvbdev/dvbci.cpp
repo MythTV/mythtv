@@ -1086,7 +1086,7 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
 bool cCiConditionalAccessSupport::SendPMT(const cCiCaPmt &CaPmt)
 {
   if (m_state == 2) {
-     SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt);
+     SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt.data());
      m_needCaPmt = false;
      return true;
      }
@@ -1435,7 +1435,7 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
   : m_mmi(MMI),
     m_selectable(Selectable)
 {
-  m_entries.resize(MAX_CIMENU_ENTRIES);
+  m_entries.resize(kMAX_CIMENU_ENTRIES);
 }
 
 bool cCiMenu::Select(int Index)
@@ -1488,7 +1488,7 @@ cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 
 void cCiCaPmt::AddElementaryStream(int type, int pid)
 {
-  if (m_length + 5 > int(sizeof(m_capmt)))
+  if (m_length + 5 > int(m_capmt.size()))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
@@ -1530,7 +1530,7 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
     return;
   }
 
-  if (m_length + data_len + 7 > int(sizeof(m_capmt)))
+  if (m_length + data_len + 7 > int(m_capmt.size()))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
@@ -2007,7 +2007,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
         return false;
     }
 
-    memcpy(&msg.msg[4], CaPmt.m_capmt, CaPmt.m_length);
+    memcpy(&msg.msg[4], CaPmt.m_capmt.data(), CaPmt.m_length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
         esyslog("HLCI communication failed");

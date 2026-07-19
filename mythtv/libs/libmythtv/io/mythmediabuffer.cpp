@@ -217,7 +217,7 @@ MythBufferType MythMediaBuffer::GetType(void) const
  */
 MythMediaBuffer::~MythMediaBuffer(void)
 {
-    assert(!isRunning());
+    assert(!isRunning()); // NOLINT(misc-static-assert)
     wait();
 
     delete [] m_readAheadBuffer;

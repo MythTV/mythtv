@@ -41,6 +41,9 @@
 #include <QString>
 
 // MythTV includes
+#ifndef __cpp_size_t_suffix
+#include "libmythbase/sizetliteral.h"
+#endif
 #include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "frequencytables.h"
 #include "iptvchannelfetcher.h"
@@ -267,8 +270,13 @@ class ChannelScanSM : public MPEGStreamListener,
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 {
-    int tmp = (m_transportsScanned * 100) /
+#ifdef __cpp_size_t_suffix
+    int tmp = (m_transportsScanned * 100Z) /
               (m_scanTransports.size() + m_extendTransports.size());
+#else
+    int tmp = (m_transportsScanned * 100_Z) /
+              (m_scanTransports.size() + m_extendTransports.size());
+#endif
     m_scanMonitor->ScanPercentComplete(tmp);
 }
 

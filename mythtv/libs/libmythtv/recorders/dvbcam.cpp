@@ -296,7 +296,7 @@ void DVBCam::HandlePMT(void)
 
     for (auto *pmt : std::as_const(m_pmtList))
     {
-        uint cplm = (count     == 0)      ? CPLM_FIRST : CPLM_MORE;
+        CPLM cplm = (count     == 0)      ? CPLM_FIRST : CPLM_MORE;
         cplm      = (count + 1 == length) ? CPLM_LAST  : cplm;
         cplm      = (length    == 1)      ? CPLM_ONLY  : cplm;
 

@@ -36,7 +36,7 @@ class TestProgramInfo : public QObject
   private:
     static ProgramInfo mockMovie (QString const &inetref, QString const &programid, QString const &title, unsigned int year)
     {
-        return ProgramInfo (
+        return {
             (uint) 0, /* recordedid */
             title,          /* title */
             "",              /* sortTitle */
@@ -68,7 +68,7 @@ class TestProgramInfo : public QObject
             inetref, /* inetref */
             ProgramInfo::kCategoryMovie, /* cat type */
 
-            (int) 0, /* rec priority */
+            0, /* rec priority */
 
             (uint64_t) 0, /* filesize */
 
@@ -101,7 +101,7 @@ class TestProgramInfo : public QObject
             (uint) 0, /* subtitle type */
             "", /* inputname */
             QDateTime() /* bookmark update */
-        );
+        };
     }
 
     QString m_draculaList = "Dracula||Its a movie.|0|0|0|||4294967295|||||0|"
@@ -310,7 +310,7 @@ class TestProgramInfo : public QObject
     ProgramInfo m_flash34;
     ProgramInfo m_supergirl23;
 
-    QMap<QString,int> m_intOverrides {};
+    QMap<QString,int> m_intOverrides;
 
   private slots:
     void initTestCase()
@@ -492,7 +492,7 @@ class TestProgramInfo : public QObject
         QVERIFY(m_supergirl23 == lrigrepus23c);
     }
 
-    void printList (const QStringList& list)
+    static void printList (const QStringList& list)
     {
         Q_UNUSED(list);
 #if DEBUG
@@ -614,7 +614,7 @@ class TestProgramInfo : public QObject
         QCOMPARE(output, expected);
     }
 
-    void checkMap (const InfoMap& actual, InfoMap expected)
+    static void checkMap (const InfoMap& actual, InfoMap expected)
     {
         for (auto it = actual.constKeyValueBegin(); it != actual.constKeyValueEnd(); it++)
         {

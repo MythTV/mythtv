@@ -324,7 +324,7 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     QDateTime GetRecordEndTime(const ProgramInfo *pi) const;
     void CheckForRecGroupChange(void);
     void NotifySchedulerOfRecording(RecordingInfo *rec);
-    enum AutoRunInitType { kAutoRunProfile, kAutoRunNone, };
+    enum AutoRunInitType : uint8_t { kAutoRunProfile, kAutoRunNone, };
     void InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
                          RecordingProfile *recpro, int line);
 

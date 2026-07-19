@@ -28,7 +28,7 @@
 class MythNotificationScreen;
 class MythNotificationScreenStack;
 
-#define MIN_LIFE 1000
+static constexpr int MIN_LIFE {1000};
 
 class NCPrivate : public QObject
 {
@@ -180,14 +180,14 @@ public:
     void SetIndex(int index);
     int  GetHeight(void);
 
-    enum Content {
+    enum Content : uint8_t {
         kNone       = 0,
         kImage      = 1 << 0,
         kDuration   = 1 << 1,
         kMetaData   = 1 << 2,
         kStyle      = 1 << 3,
         kNoArtwork  = 1 << 4,
-        kAll        = ~kNone,
+        kAll        = 0xFF,
     };
 
 signals:
@@ -213,8 +213,8 @@ public:
     bool                        m_fullscreen      {false};
     bool                        m_added           {false};
     bool                        m_created         {false};
-    uint32_t                    m_content         {kNone};
-    uint32_t                    m_update          {(uint32_t)kAll};
+    std::underlying_type_t<Content> m_content     {kNone};
+    std::underlying_type_t<Content> m_update      {kAll};
     MythNotification::Type      m_type            {MythNotification::kNew};
     MythUIImage                *m_artworkImage    {nullptr};
     MythUIText                 *m_titleText       {nullptr};

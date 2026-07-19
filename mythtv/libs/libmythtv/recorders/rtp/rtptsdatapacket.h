@@ -28,6 +28,9 @@ class RTPTSDataPacket : public RTPDataPacket
 
     unsigned int GetTSDataSize(void) const
     {
+        // The static_cast is needed for because Qt6 changed ::size()
+        // to return qsizetype.
+        // NOLINTNEXTLINE(readability-redundant-casting)
         return std::max(static_cast<int>(m_data.size() - (int)GetTSOffset() - (int)GetPaddingSize()), 0);
     }
 
