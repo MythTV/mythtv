@@ -56,12 +56,16 @@ extern "C" {
  * Note, the MPEG-2 Program Pack and Private Stream 1 PES packet header
  * definitions are not included here.  See the MPEG-2 specifications for details
  * on these headers.
+ *
+ * https://www.kernel.org/doc/html/v6.2/userspace-api/media/v4l/dev-sliced-vbi.html
+ * Section 4.7.5.8.
  */
 
 /* Line type IDs */
 enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
     V4L2_MPEG_VBI_IVTV_TELETEXT_B     = 1, ///< Teletext (uses lines 6-22 for PAL, 10-21 for NTSC)
     V4L2_MPEG_VBI_IVTV_CAPTION_525    = 4, ///< Closed Captions (line 21 NTSC, line 22 PAL)
+    // clazy:exclude-next-line=unexpected-flag-enumerator-value
     V4L2_MPEG_VBI_IVTV_WSS_625        = 5, ///< Wide Screen Signal (line 20 NTSC, line 23 PAL)
     V4L2_MPEG_VBI_IVTV_VPS            = 7, ///< Video Programming System (PAL) (line 16)
 };

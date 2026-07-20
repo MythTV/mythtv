@@ -105,7 +105,7 @@ class WebSocketFrame
         kOpTextFrame    = 0x1,
         kOpBinaryFrame  = 0x2,
         // Reserved
-        kOpClose        = 0x8,
+        kOpClose        = 0x8, // clazy:exclude=unexpected-flag-enumerator-value
         kOpPing         = 0x9,
         kOpPong         = 0xA
         // Reserved

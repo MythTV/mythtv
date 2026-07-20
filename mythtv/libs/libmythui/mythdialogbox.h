@@ -474,7 +474,7 @@ class MUI_PUBLIC MythTimeInputDialog : public MythScreenType
         // Work forward/backwards or backwards and fowards from start time
         kFutureDates  = 0x100,
         kPastDates    = 0x200,
-        kAllDates     = 0x300
+        kAllDates     = 0x300  // clazy:exclude=unexpected-flag-enumerator-value
     };
 
     MythTimeInputDialog(MythScreenStack *parent, QString message,
