@@ -1,6 +1,6 @@
 
 // libmythmetadata
-#include "metaiooggvorbis.h"
+#include "metaiooggopus.h"
 #include "musicmetadata.h"
 #include "musicutils.h"
 
@@ -10,25 +10,25 @@
 * \param filename The filename
 * \returns A taglib file object for this format
 */
-TagLib::Ogg::Vorbis::File *MetaIOOggVorbis::OpenFile(const QString &filename)
+TagLib::Ogg::Opus::File *MetaIOOggOpus::OpenFile(const QString &filename)
 {
     QByteArray fname = filename.toLocal8Bit();
-    auto *oggfile = new TagLib::Ogg::Vorbis::File(fname.constData());
+    auto *opusfile = new TagLib::Ogg::Opus::File(fname.constData());
 
-    if (!oggfile->isOpen())
+    if (!opusfile->isOpen())
     {
-        delete oggfile;
-        oggfile = nullptr;
+        delete opusfile;
+        opusfile = nullptr;
     }
 
-    return oggfile;
+    return opusfile;
 }
 
 
 /*!
  * \copydoc MetaIO::write()
  */
-bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
+bool MetaIOOggOpus::write(const QString &filename, MusicMetadata* mdata)
 {
     if (!mdata)
         return false;
@@ -38,16 +38,16 @@ bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
 
     m_filename = filename;
 
-    TagLib::Ogg::Vorbis::File *oggfile = OpenFile(m_filename);
+    TagLib::Ogg::Opus::File *opusfile = OpenFile(m_filename);
 
-    if (!oggfile)
+    if (!opusfile)
         return false;
 
-    TagLib::Ogg::XiphComment *tag = oggfile->tag();
+    TagLib::Ogg::XiphComment *tag = opusfile->tag();
 
     if (!tag)
     {
-        delete oggfile;
+        delete opusfile;
         return false;
     }
 
@@ -74,29 +74,29 @@ bool MetaIOOggVorbis::write(const QString &filename, MusicMetadata* mdata)
     }
 
     saveTimeStamps();
-    bool result = oggfile->save();
+    bool result = opusfile->save();
     restoreTimeStamps();
 
-    delete oggfile;
+    delete opusfile;
 
-    return result;
+    return (result);
 }
 
 /*!
 * \copydoc MetaIO::read()
 */
-MusicMetadata* MetaIOOggVorbis::read(const QString &filename)
+MusicMetadata* MetaIOOggOpus::read(const QString &filename)
 {
-    TagLib::Ogg::Vorbis::File *oggfile = OpenFile(filename);
+    TagLib::Ogg::Opus::File *opusfile = OpenFile(filename);
 
-    if (!oggfile)
+    if (!opusfile)
         return nullptr;
 
-    TagLib::Ogg::XiphComment *tag = oggfile->tag();
+    TagLib::Ogg::XiphComment *tag = opusfile->tag();
 
     if (!tag)
     {
-        delete oggfile;
+        delete opusfile;
         return nullptr;
     }
 
@@ -128,9 +128,9 @@ MusicMetadata* MetaIOOggVorbis::read(const QString &filename)
     metadata->setCompilation(compilation);
 
     if (metadata->Length() <= 0ms)
-        metadata->setLength(getTrackLength(oggfile));
+        metadata->setLength(getTrackLength(opusfile));
 
-    delete oggfile;
+    delete opusfile;
 
     return metadata;
 }
