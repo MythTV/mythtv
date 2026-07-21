@@ -45,9 +45,7 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devkey);
-
-    if (it == s_iptvhandlers.end())
+    if (!s_iptvhandlers.contains(devkey))
     {
         auto *newhandler = new IPTVStreamHandler(tuning, inputid);
         newhandler->Start();

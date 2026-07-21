@@ -314,21 +314,7 @@ void MythScreenStack::CheckDeletes(bool force)
         }
 
         if (!deleteit)
-        {
-            bool found = false;
-
-            for (const auto *test : std::as_const(m_drawOrder))
-            {
-                if (*it == test)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                deleteit = true;
-        }
+            deleteit = !m_drawOrder.contains(*it);
 
         if (deleteit)
         {

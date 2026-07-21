@@ -47,10 +47,7 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<QString,DVBStreamHandler*>::iterator it =
-        s_handlers.find(devname);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devname))
     {
         s_handlers[devname] = new DVBStreamHandler(devname, inputid);
         s_handlersRefCnt[devname] = 1;

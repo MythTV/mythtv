@@ -1568,13 +1568,13 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     m_recordingList->Reset();
 
-    ProgramMap::iterator pmit = m_progLists.find(groupname);
-    if (pmit == m_progLists.end())
+    auto pmit = m_progLists.constFind(groupname);
+    if (pmit == m_progLists.constEnd())
         return;
 
-    ProgramList &progList = *pmit;
+    const ProgramList &progList = *pmit;
 
-    for (auto & prog : progList)
+    for (const auto & prog : progList)
     {
         if (prog->GetAvailableStatus() == asPendingDelete ||
             prog->GetAvailableStatus() == asDeleted)

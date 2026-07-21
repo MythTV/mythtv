@@ -9914,8 +9914,8 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         if (ok)
         {
             QMutexLocker locker(&m_progListsLock);
-            auto pit = m_progLists.find(key);
-            if (pit != m_progLists.end())
+            auto pit = m_progLists.constFind(key);
+            if (pit != m_progLists.constEnd())
             {
                 const ProgramInfo* tmp = (*pit)[index];
                 if (tmp)

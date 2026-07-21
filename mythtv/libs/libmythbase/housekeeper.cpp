@@ -662,8 +662,8 @@ void HouseKeeper::RegisterTask(HouseKeeperTask *task)
 void HouseKeeper::UnregisterTask(const QString& tag)
 {
     QMutexLocker mapLock(&m_mapLock);
-    auto it = m_taskMap.find(tag);
-    if (it == m_taskMap.end())
+    auto it = m_taskMap.constFind(tag);
+    if (it == m_taskMap.constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
                 QString("HouseKeeperTask '%1' doesn't exist.").arg(tag));

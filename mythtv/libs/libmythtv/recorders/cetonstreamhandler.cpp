@@ -35,10 +35,7 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
     QMutexLocker locker(&s_handlersLock);
 
     QString devkey = devname.toUpper();
-
-    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devkey);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devkey))
     {
         auto *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();

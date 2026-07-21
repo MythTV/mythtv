@@ -134,7 +134,7 @@ DVBChannel::~DVBChannel()
 
     // If we're the last one out delete dvbcam
     s_master_map_lock.lockForRead();
-    MasterMap::iterator mit = s_master_map.find(m_key);
+    auto mit = s_master_map.constFind(m_key);
     if ((*mit).empty())
         delete m_dvbCam;
     m_dvbCam = nullptr;

@@ -89,8 +89,8 @@ Property *CDSObject::AddProperty( Property *pProp )
 QList<Property*> CDSObject::GetProperties( const QString &sName )
 {
     QList<Property*> props;
-    Properties::iterator it = m_properties.find(sName);
-    while (it != m_properties.end() && it.key() == sName)
+    auto it = m_properties.constFind(sName);
+    while (it != m_properties.constEnd() && it.key() == sName)
     {
         if (*it)
             props.append(*it);
@@ -107,7 +107,7 @@ QList<Property*> CDSObject::GetProperties( const QString &sName )
 void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
                               const QString &sType )
 {
-    Properties::iterator it = m_properties.find(sName);
+    auto it = m_properties.find(sName);
     if (it !=  m_properties.end() && *it)
     {
         if ((*it)->m_bMultiValue)

@@ -278,8 +278,8 @@ bool PreviewGeneratorQueue::event(QEvent *e)
 
         {
             QMutexLocker locker(&m_lock);
-            QMap<QString,QString>::iterator kit = m_tokenToKeyMap.find(token);
-            if (kit == m_tokenToKeyMap.end())
+            const auto kit = m_tokenToKeyMap.constFind(token);
+            if (kit == m_tokenToKeyMap.constEnd())
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("Failed to find token %1 in map.").arg(token));
@@ -319,9 +319,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             list.push_back(datetime);
             for (const auto & tok : std::as_const((*it).m_tokens))
             {
-                kit = m_tokenToKeyMap.find(tok);
-                if (kit != m_tokenToKeyMap.end())
-                    m_tokenToKeyMap.erase(kit);
+                m_tokenToKeyMap.remove(tok);
                 list.push_back(tok);
             }
 
@@ -618,8 +616,8 @@ void PreviewGeneratorQueue::GetInfo(
 {
     QMutexLocker locker(&m_lock);
     queue_depth = m_queue.size();
-    PreviewMap::iterator pit = m_previewMap.find(key);
-    token_cnt = (pit == m_previewMap.end()) ? 0 : (*pit).m_tokens.size();
+    const auto pit = m_previewMap.constFind(key);
+    token_cnt = (pit == m_previewMap.constEnd()) ? 0 : (*pit).m_tokens.size();
 }
 
 /**

@@ -949,8 +949,8 @@ LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void)
     if (!m_priv)
         return nullptr;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
-    return (it == m_priv->m_devices.end()) ? nullptr : *it;
+    auto it = m_priv->m_devices.constFind(m_guid);
+    return (it == m_priv->m_devices.constEnd()) ? nullptr : *it;
 }
 
 const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
@@ -958,8 +958,8 @@ const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
     if (!m_priv)
         return nullptr;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
-    return (it == m_priv->m_devices.end()) ? nullptr : *it;
+    auto it = m_priv->m_devices.constFind(m_guid);
+    return (it == m_priv->m_devices.constEnd()) ? nullptr : *it;
 }
 
 int linux_firewire_device_tspacket_handler(

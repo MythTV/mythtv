@@ -62,8 +62,8 @@ DeviceLocation *SSDPCacheEntries::Find(const QString &sUSN)
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::iterator it = m_mapEntries.find(GetNormalizedUSN(sUSN));
-    DeviceLocation *pEntry = (it != m_mapEntries.end()) ? *it : nullptr;
+    const auto it = m_mapEntries.constFind(GetNormalizedUSN(sUSN));
+    DeviceLocation *pEntry = (it != m_mapEntries.constEnd()) ? *it : nullptr;
     if (pEntry)
         pEntry->IncrRef();
 
@@ -108,8 +108,8 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
 
     QString usn = GetNormalizedUSN(sUSN);
 
-    EntryMap::iterator it = m_mapEntries.find(usn);
-    if ((it != m_mapEntries.end()) && (*it != nullptr))
+    auto it = m_mapEntries.constFind(usn);
+    if ((it != m_mapEntries.constEnd()) && (*it != nullptr))
         (*it)->DecrRef();
 
     m_mapEntries[usn] = pEntry;
@@ -342,11 +342,11 @@ SSDPCacheEntries *SSDPCache::Find(const QString &sURI)
 {
     QMutexLocker locker(&m_mutex);
 
-    SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
-    if (it != m_cache.end() && (*it != nullptr))
+    auto it = m_cache.constFind(sURI);
+    if (it != m_cache.constEnd() && (*it != nullptr))
         (*it)->IncrRef();
 
-    return (it != m_cache.end()) ? *it : nullptr;
+    return (it != m_cache.constEnd()) ? *it : nullptr;
 }
 
 /// Finds the Device in the cache, returns nullptr when absent

@@ -1218,11 +1218,10 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault )
+QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault ) const
 {
-    auto it = m_mapHeaders.find( sKey.toLower() );
-
-    if ( it == m_mapHeaders.end())
+    auto it = m_mapHeaders.constFind( sKey.toLower() );
+    if ( it == m_mapHeaders.constEnd())
         return sDefault;
 
     return *it;
@@ -1252,7 +1251,7 @@ QString HTTPRequest::GetResponseHeaders( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HTTPRequest::ParseKeepAlive()
+bool HTTPRequest::ParseKeepAlive() const
 {
     // TODO: Think about whether we should use a longer timeout if the client
     //       has explicitly specified 'Keep-alive'

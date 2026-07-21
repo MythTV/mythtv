@@ -3565,8 +3565,8 @@ MythImage *MythUIButtonListItem::GetImage(const QString &name)
 {
     if (!name.isEmpty())
     {
-        QMap<QString, MythImage*>::iterator it = m_images.find(name);
-        if (it != m_images.end())
+        auto it = m_images.constFind(name);
+        if (it != m_images.constEnd())
         {
             (*it)->IncrRef();
             return (*it);

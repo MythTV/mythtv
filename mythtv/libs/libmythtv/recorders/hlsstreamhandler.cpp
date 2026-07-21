@@ -29,9 +29,7 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devkey);
-
-    if (it == s_hlshandlers.end())
+    if (!s_hlshandlers.contains(devkey))
     {
         auto* newhandler = new HLSStreamHandler(tuning, inputid);
         newhandler->Start();

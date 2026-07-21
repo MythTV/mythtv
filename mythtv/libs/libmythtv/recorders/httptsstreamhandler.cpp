@@ -23,9 +23,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HTTPTSStreamHandler*>::iterator it = s_httphandlers.find(devkey);
-
-    if (it == s_httphandlers.end())
+    if (!s_httphandlers.contains(devkey))
     {
         auto* newhandler = new HTTPTSStreamHandler(tuning, inputid);
         newhandler->Start();

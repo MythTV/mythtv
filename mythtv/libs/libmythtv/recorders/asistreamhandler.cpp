@@ -43,10 +43,7 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
     QMutexLocker locker(&s_handlersLock);
 
     const QString& devkey = devname;
-
-    QMap<QString,ASIStreamHandler*>::iterator it = s_handlers.find(devkey);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devkey))
     {
         auto *newhandler = new ASIStreamHandler(devname, inputid);
         newhandler->Open();

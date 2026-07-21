@@ -290,7 +290,7 @@ QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(const ProcSource& V
     if (!m_render)
         return nullptr;
 
-    if (auto program = m_procedurals.find(SourceHash); program != m_procedurals.end())
+    if (auto program = m_procedurals.constFind(SourceHash); program != m_procedurals.constEnd())
         return *program;
 
     auto * result = m_render->CreateShaderProgram(QString(*VertexSource), QString(*FragmentSource));

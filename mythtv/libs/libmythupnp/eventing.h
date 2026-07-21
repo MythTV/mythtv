@@ -193,8 +193,8 @@ class UPNP_PUBLIC StateVariables
         template < class T >
         bool SetValue( const QString &sName, const T& value )
         {
-            SVMap::iterator it = m_map.find(sName);
-            if (it == m_map.end())
+            auto it = m_map.constFind(sName);
+            if (it == m_map.constEnd())
                 return false;
 
             auto *pVariable = dynamic_cast< StateVariable< T > *>( *it );
@@ -219,8 +219,8 @@ class UPNP_PUBLIC StateVariables
         T GetValue( const QString &sName )
         {
             T *dummy = nullptr;
-            SVMap::iterator it = m_map.find(sName);
-            if (it == m_map.end())
+            auto it = m_map.constFind(sName);
+            if (it == m_map.constEnd())
                 return state_var_init(dummy);
 
             auto *pVariable = dynamic_cast< StateVariable< T > *>( *it );

@@ -1191,8 +1191,8 @@ PIDPriority MPEGStreamData::GetPIDPriority(uint pid) const
 
 void MPEGStreamData::SavePartialPSIP(uint pid, PSIPTable* packet)
 {
-    pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
-    if (it == m_partialPsipPacketCache.end())
+    const auto it = m_partialPsipPacketCache.constFind(pid);
+    if (it == m_partialPsipPacketCache.constEnd())
     {
         m_partialPsipPacketCache[pid] = packet;
     }
@@ -1610,8 +1610,8 @@ void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
 
     QMutexLocker locker(&m_cacheLock);
 
-    pat_cache_t::iterator it = m_cachedPats.find(key);
-    if (it != m_cachedPats.end())
+    const auto it = m_cachedPats.constFind(key);
+    if (it != m_cachedPats.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedPats[key] = pat;
@@ -1624,8 +1624,8 @@ void MPEGStreamData::CacheCAT(const ConditionalAccessTable *_cat)
 
     QMutexLocker locker(&m_cacheLock);
 
-    cat_cache_t::iterator it = m_cachedCats.find(key);
-    if (it != m_cachedCats.end())
+    const auto it = m_cachedCats.constFind(key);
+    if (it != m_cachedCats.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedCats[key] = cat;
@@ -1638,8 +1638,8 @@ void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)
 
     QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::iterator it = m_cachedPmts.find(key);
-    if (it != m_cachedPmts.end())
+    const auto it = m_cachedPmts.constFind(key);
+    if (it != m_cachedPmts.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedPmts[key] = pmt;

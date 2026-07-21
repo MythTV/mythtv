@@ -1059,8 +1059,8 @@ void DVBStreamData::CacheNIT(NetworkInformationTable *nit)
 {
     QMutexLocker locker(&m_cacheLock);
 
-    nit_cache_t::iterator it = m_cachedNit.find(nit->Section());
-    if (it != m_cachedNit.end())
+    const auto it = m_cachedNit.constFind(nit->Section());
+    if (it != m_cachedNit.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedNit[nit->Section()] = nit;
@@ -1072,8 +1072,8 @@ void DVBStreamData::CacheBAT(BouquetAssociationTable *bat)
 
     QMutexLocker locker(&m_cacheLock);
 
-    bat_cache_t::iterator it = m_cachedBats.find(key);
-    if (it != m_cachedBats.end())
+    const auto it = m_cachedBats.constFind(key);
+    if (it != m_cachedBats.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedBats[key] = bat;
@@ -1085,8 +1085,8 @@ void DVBStreamData::CacheSDT(ServiceDescriptionTable *sdt)
 
     QMutexLocker locker(&m_cacheLock);
 
-    sdt_cache_t::iterator it = m_cachedSdts.find(key);
-    if (it != m_cachedSdts.end())
+    const auto it = m_cachedSdts.constFind(key);
+    if (it != m_cachedSdts.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedSdts[key] = sdt;

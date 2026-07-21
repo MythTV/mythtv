@@ -277,12 +277,12 @@ QStringList ActionSet::GetAllKeys(void) const
  */
 QString ActionSet::GetDescription(const ActionID &id) const
 {
-    ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
-    if (cit == m_contexts.end())
+    ContextMap::const_iterator cit = m_contexts.constFind(id.GetContext());
+    if (cit == m_contexts.constEnd())
         return {};
 
-    ActionContext::const_iterator it = (*cit).find(id.GetAction());
-    if (it != (*cit).end())
+    ActionContext::const_iterator it = (*cit).constFind(id.GetAction());
+    if (it != (*cit).constEnd())
         return (*it)->GetDescription();
 
     return {};
@@ -294,8 +294,8 @@ QString ActionSet::GetDescription(const ActionID &id) const
  */
 Action *ActionSet::GetAction(const ActionID &id)
 {
-    ContextMap::iterator cit = m_contexts.find(id.GetContext());
-    if (cit == m_contexts.end())
+    ContextMap::const_iterator cit = m_contexts.constFind(id.GetContext());
+    if (cit == m_contexts.constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find context '%1'")
@@ -304,9 +304,8 @@ Action *ActionSet::GetAction(const ActionID &id)
         return nullptr;
     }
 
-    ActionContext::iterator it = (*cit).find(id.GetAction());
-
-    if (it == (*cit).end())
+    ActionContext::const_iterator it = (*cit).constFind(id.GetAction());
+    if (it == (*cit).constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find action '%1' in context '%1'")

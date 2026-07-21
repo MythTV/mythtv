@@ -481,9 +481,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<int, ExternalStreamHandler*>::iterator it = s_handlers.find(majorid);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(majorid))
     {
         auto *newhandler = new ExternalStreamHandler(devname, inputid, majorid);
         s_handlers[majorid] = newhandler;

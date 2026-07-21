@@ -205,9 +205,9 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
     QMutexLocker locker(&m_lock);
 
     uint recordingId = pginfo.GetRecordingID();
-    Cache::iterator it = m_cache.find(recordingId);
 
-    if (it == m_cache.end())
+    auto it = m_cache.constFind(recordingId);
+    if (it == m_cache.constEnd())
         return PIC_NO_ACTION;
 
     ProgramInfo& pg = **it;
@@ -243,14 +243,13 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
 void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
                                       UpdateStates flags)
 {
-    Cache::iterator it = m_cache.find(recordingID);
-    if (it == m_cache.end())
-        return;
-
-    if ((*it)->GetAvailableStatus() != asAvailable)
+    auto it = m_cache.constFind(recordingID);
+    if (it == m_cache.constEnd())
         return;
 
     ProgramInfo *pg = *it;
+    if (pg->GetAvailableStatus() != asAvailable)
+        return;
 
     pg->CalculateProgress(pg->QueryLastPlayPos());
 
@@ -296,12 +295,12 @@ void ProgramInfoCache::Add(const ProgramInfo &pginfo)
  */
 bool ProgramInfoCache::Remove(uint recordingID)
 {
-    Cache::iterator it = m_cache.find(recordingID);
+    auto it = m_cache.constFind(recordingID);
 
-    if (it != m_cache.end())
+    if (it != m_cache.constEnd())
         (*it)->SetAvailableStatus(asDeleted, "PIC::Remove");
 
-    return it != m_cache.end();
+    return it != m_cache.constEnd();
 }
 
 // two helper functions that are used only in this file

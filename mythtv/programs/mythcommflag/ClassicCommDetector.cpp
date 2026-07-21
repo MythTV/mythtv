@@ -2085,12 +2085,12 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         m_sceneCommBreakMap[m_framesProcessed] = MARK_COMM_END;
 
     frm_dir_map_t deleteMap;
-    frm_dir_map_t::iterator it = m_sceneCommBreakMap.begin();
-    frm_dir_map_t::iterator prev = it;
-    if (it != m_sceneCommBreakMap.end())
+    auto it = m_sceneCommBreakMap.constBegin();
+    auto prev = it;
+    if (it != m_sceneCommBreakMap.constEnd())
     {
         ++it;
-        while (it != m_sceneCommBreakMap.end())
+        while (it != m_sceneCommBreakMap.constEnd())
         {
             if ((*it == MARK_COMM_END) &&
                 (it.key() - prev.key()) < (30 * m_fps))
@@ -2099,7 +2099,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
                 deleteMap[prev.key()] = MARK_CUT_START;
             }
             ++prev;
-            if (it != m_sceneCommBreakMap.end())
+            if (it != m_sceneCommBreakMap.constEnd())
                 ++it;
         }
 

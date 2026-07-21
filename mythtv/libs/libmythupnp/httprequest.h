@@ -186,7 +186,7 @@ class UPNP_PUBLIC HTTPRequest
                                               long long *pllStart,
                                               long long *pllEnd   );
 
-        bool            ParseKeepAlive      ( void );
+        bool            ParseKeepAlive      ( void ) const;
 
         void            ParseCookies        ( void );
 
@@ -228,7 +228,7 @@ class UPNP_PUBLIC HTTPRequest
                                     const QDateTime &expiryDate,
                                     bool secure );
 
-        QString         GetRequestHeader  ( const QString &sKey, const QString &sDefault );
+        QString         GetRequestHeader  ( const QString &sKey, const QString &sDefault ) const;
 
         bool            GetKeepAlive () const { return m_bKeepAlive; }
 

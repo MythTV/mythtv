@@ -59,9 +59,7 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
 
     const QString& devkey = devname;
 
-    QMap<QString,V4L2encStreamHandler*>::iterator it = s_handlers.find(devkey);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devkey))
     {
         auto *newhandler = new V4L2encStreamHandler(devname, audioinput, inputid);
 

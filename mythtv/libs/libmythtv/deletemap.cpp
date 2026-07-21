@@ -306,8 +306,8 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
         (MARK_PLACEHOLDER != type))
         return;
 
-    frm_dir_map_t::Iterator find_temporary = m_deleteMap.find(frame);
-    if (find_temporary != m_deleteMap.end())
+    auto find_temporary = m_deleteMap.constFind(frame);
+    if (find_temporary != m_deleteMap.constEnd())
     {
         if (MARK_PLACEHOLDER == find_temporary.value())
         {
@@ -385,8 +385,8 @@ void DeleteMap::Delete(uint64_t frame, const QString& undoMessage)
 
     // If frame is a cut point, GetNearestMark() would return the previous/next
     // mark (not this frame), so check to see if we need to use frame, instead
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
-    if (it != m_deleteMap.end())
+    auto it = m_deleteMap.constFind(frame);
+    if (it != m_deleteMap.constEnd())
     {
         int type = it.value();
         if (MARK_PLACEHOLDER == type)
@@ -442,8 +442,8 @@ void DeleteMap::NewCut(uint64_t frame)
                 MarkTypes type = MARK_UNSET;
                 cut_start = GetNearestMark(frame, false);
                 cut_end = GetNearestMark(frame, true);
-                frm_dir_map_t::Iterator it2 = m_deleteMap.find(frame);
-                if (it2 != m_deleteMap.end())
+                auto it2 = m_deleteMap.constFind(frame);
+                if (it2 != m_deleteMap.constEnd())
                     type = it2.value();
                 if (MARK_CUT_START == type)
                 {
@@ -514,8 +514,8 @@ void DeleteMap::NewCut(uint64_t frame)
 /// Move the previous (!right) or next (right) cut to frame.
 void DeleteMap::MoveRelative(uint64_t frame, bool right)
 {
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
-    if (it != m_deleteMap.end())
+    auto it = m_deleteMap.constFind(frame);
+    if (it != m_deleteMap.constEnd())
     {
         int type = it.value();
         if (((MARK_CUT_START == type) && !right) ||
@@ -830,8 +830,8 @@ void DeleteMap::TrackerReset(uint64_t frame)
     if (IsEmpty())
         return;
 
-    frm_dir_map_t::iterator cutpoint = m_deleteMap.find(frame);
-    if (cutpoint != m_deleteMap.end())
+    auto cutpoint = m_deleteMap.constFind(frame);
+    if (cutpoint != m_deleteMap.constEnd())
     {
         if (cutpoint.value() == MARK_CUT_START)
         {
@@ -841,7 +841,7 @@ void DeleteMap::TrackerReset(uint64_t frame)
         else
         {
             ++cutpoint;
-            m_nextCutStartIsValid = (cutpoint != m_deleteMap.end());
+            m_nextCutStartIsValid = (cutpoint != m_deleteMap.constEnd());
             m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() :
                 m_ctx->m_player->GetTotalFrameCount();
         }

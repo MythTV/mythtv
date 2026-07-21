@@ -164,14 +164,14 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
     // around back to itself.  Start by geting an iterator pointing at
     // the current focus (or at the end if the focus isn't in the
     // list).
-    auto it = m_focusWidgetList.find(m_currentFocusWidget->m_focusOrder,
+    auto it = m_focusWidgetList.constFind(m_currentFocusWidget->m_focusOrder,
                                      m_currentFocusWidget);
     if (up)
     {
-        if (it != m_focusWidgetList.end())
+        if (it != m_focusWidgetList.constEnd())
             it++;
-        if (it == m_focusWidgetList.end())
-            it = m_focusWidgetList.begin();
+        if (it == m_focusWidgetList.constEnd())
+            it = m_focusWidgetList.constBegin();
         // Put an upper limit on loops to guarantee exit at some point.
         for (auto count = m_focusWidgetList.size() * 2; count > 0; count--)
         {
@@ -179,16 +179,16 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             if (current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
             it++;
-            if (it == m_focusWidgetList.end())
-                it = m_focusWidgetList.begin();
+            if (it == m_focusWidgetList.constEnd())
+                it = m_focusWidgetList.constBegin();
             if (*it == m_currentFocusWidget)
                 return false;
         }
     }
     else
     {
-        if (it == m_focusWidgetList.begin())
-            it = m_focusWidgetList.end();
+        if (it == m_focusWidgetList.constBegin())
+            it = m_focusWidgetList.constEnd();
         // Put an upper limit on loops to guarantee exit at some point.
         for (auto count = m_focusWidgetList.size() * 2; count > 0; count--)
         {
@@ -198,8 +198,8 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
             MythUIType *current = *it;
             if (current->IsVisible(true) && current->IsEnabled())
                 return SetFocusWidget(current);
-            if (it == m_focusWidgetList.begin())
-                it = m_focusWidgetList.end();
+            if (it == m_focusWidgetList.constBegin())
+                it = m_focusWidgetList.constEnd();
         }
     }
 

@@ -88,9 +88,8 @@ bool MythUIStateType::DisplayState(const QString &name)
 
     MythUIType *old = m_currentState;
 
-    QMap<QString, MythUIType *>::Iterator i = m_objectsByName.find(name.toLower());
-
-    if (i != m_objectsByName.end())
+    auto i = m_objectsByName.constFind(name.toLower());
+    if (i != m_objectsByName.constEnd())
         m_currentState = i.value();
     else
         m_currentState = nullptr;
@@ -118,9 +117,8 @@ bool MythUIStateType::DisplayState(StateType type)
 {
     MythUIType *old = m_currentState;
 
-    QMap<int, MythUIType *>::Iterator i = m_objectsByState.find((int)type);
-
-    if (i != m_objectsByState.end())
+    auto i = m_objectsByState.constFind((int)type);
+    if (i != m_objectsByState.constEnd())
         m_currentState = i.value();
     else
         m_currentState = nullptr;
@@ -316,17 +314,15 @@ void MythUIStateType::EnsureStateLoaded(const QString &name)
     if (name.isEmpty())
         return;
 
-    QMap<QString, MythUIType *>::Iterator i = m_objectsByName.find(name);
-
-    if (i != m_objectsByName.end())
+    auto i = m_objectsByName.constFind(name);
+    if (i != m_objectsByName.constEnd())
         i.value()->LoadNow();
 }
 
 void MythUIStateType::EnsureStateLoaded(StateType type)
 {
-    QMap<int, MythUIType *>::Iterator i = m_objectsByState.find((int)type);
-
-    if (i != m_objectsByState.end())
+    auto i = m_objectsByState.constFind((int)type);
+    if (i != m_objectsByState.constEnd())
         i.value()->LoadNow();
 }
 

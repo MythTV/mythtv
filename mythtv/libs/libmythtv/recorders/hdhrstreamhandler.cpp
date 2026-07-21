@@ -36,9 +36,7 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<int,HDHRStreamHandler*>::iterator it = s_handlers.find(majorid);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(majorid))
     {
         auto *newhandler = new HDHRStreamHandler(devname, inputid, majorid);
         newhandler->Open();
