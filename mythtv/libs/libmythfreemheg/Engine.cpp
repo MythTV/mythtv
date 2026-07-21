@@ -1064,6 +1064,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QList<MHExternContent *>::iterator it = m_externContentTable.begin();
 
     while (it != m_externContentTable.end())
@@ -1095,6 +1096,7 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 // See if we can satisfy any of the outstanding requests.
 void MHEngine::CheckContentRequests()
 {
+    // clazy:exclude-next-line=detaching-member (erases item)
     QList<MHExternContent*>::iterator it = m_externContentTable.begin();
     while (it != m_externContentTable.end())
     {

@@ -88,6 +88,7 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
     if (rit == s_handlers_refcnt.end())
         return;
@@ -103,7 +104,7 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
     }
 
     QMap<QString, V4L2encStreamHandler*>::iterator it =
-        s_handlers.find(devname);
+        s_handlers.find(devname); // clazy:exclude=detaching-member (modifies item)
     if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Closing handler for %2")

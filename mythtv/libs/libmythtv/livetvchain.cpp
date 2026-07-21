@@ -152,6 +152,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 {
     QMutexLocker lock(&m_lock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid    == pginfo->GetChanID() &&

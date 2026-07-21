@@ -1191,6 +1191,7 @@ void MainServer::customEvent(QEvent *e)
                     const QString& token = me->ExtraData(i);
                     extra.push_back(token);
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+                    // clazy:exclude-next-line=detaching-member (erases item)
                     RequestedBy::iterator it = m_previewRequestedBy.find(token);
                     if (it != m_previewRequestedBy.end())
                     {
@@ -1240,6 +1241,7 @@ void MainServer::customEvent(QEvent *e)
                 const QString& token = me->ExtraData(i);
                 extra.push_back(token);
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+                // clazy:exclude-next-line=detaching-member (erases item)
                 RequestedBy::iterator it = m_previewRequestedBy.find(token);
                 if (it != m_previewRequestedBy.end())
                 {
@@ -7798,6 +7800,7 @@ void MainServer::connectionClosed(MythSocket *socket)
 
     bool found {false};
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QSet<MythSocket*>::iterator cs = m_controlSocketList.find(socket);
     if (cs != m_controlSocketList.end())
     {

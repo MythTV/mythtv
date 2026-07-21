@@ -1033,6 +1033,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
     for (const auto& url : std::as_const(urls))
     {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         for (auto lit = m_downloadQueue.begin();
              lit != m_downloadQueue.end();
              /* no inc */)
@@ -1096,6 +1097,7 @@ void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto lit = m_cancellationQueue.begin();
          lit != m_cancellationQueue.end();
          /* no inc */)

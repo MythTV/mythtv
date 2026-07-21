@@ -334,6 +334,7 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
     if (TryStartInternal(runnable, debugName, false))
         return;
 
+    // clazy:exclude-next-line=detaching-member
     MPoolQueues::iterator it = m_priv->m_runQueues.find(priority);
     if (it != m_priv->m_runQueues.end())
     {
@@ -388,6 +389,7 @@ bool MThreadPool::TryStartInternal(
         m_priv->m_deleteThreads.pop_back();
     }
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto iter = m_priv->m_availThreads.begin();
          iter != m_priv->m_availThreads.end(); )
     {
@@ -449,6 +451,7 @@ void MThreadPool::NotifyAvailable(MPoolThread *thread)
         return;
     }
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     MPoolQueues::iterator it = m_priv->m_runQueues.begin();
     if (it == m_priv->m_runQueues.end())
     {

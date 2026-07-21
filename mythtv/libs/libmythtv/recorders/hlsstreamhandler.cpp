@@ -59,6 +59,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_hlshandlers_refcnt.find(devname);
     if (rit == s_hlshandlers_refcnt.end())
         return;
@@ -74,6 +75,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devname);
     if ((it != s_hlshandlers.end()) && (*it == ref))
     {

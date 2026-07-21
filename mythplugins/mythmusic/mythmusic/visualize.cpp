@@ -1524,9 +1524,9 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     m_rdftTmp[1] = m_rdftTmp[m_fftlen];
     memcpy(m_dftR, m_rdftTmp, m_fftlen * sizeof(float));
 
-    QRect *rectspL = m_rectsL.data();
-    QRect *rectspR = m_rectsR.data();
-    float *magnitudesp = m_magnitudes.data();
+    QRect *rectspL = m_rectsL.data();         // clazy:exclude=detaching-member
+    QRect *rectspR = m_rectsR.data();         // clazy:exclude=detaching-member
+    float *magnitudesp = m_magnitudes.data(); // clazy:exclude=detaching-member
 
     int index = 1;              // frequency index of this pixel
     int prev = 0;               // frequency index of previous pixel
@@ -1591,8 +1591,8 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectspL = m_rectsL.data();
-    QRect *rectspR = m_rectsR.data();
+    QRect *rectspL = m_rectsL.data(); // clazy:exclude=detaching-member
+    QRect *rectspR = m_rectsR.data(); // clazy:exclude=detaching-member
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
     for (uint i = 0; i < (uint)m_rectsL.size(); i++)

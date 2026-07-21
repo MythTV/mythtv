@@ -1148,7 +1148,9 @@ void NCPrivate::DeleteUnregistered(void)
  */
 int NCPrivate::InsertScreen(MythNotificationScreen *screen)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
 
 //    if (screen->m_id > 0)
@@ -1177,7 +1179,9 @@ int NCPrivate::InsertScreen(MythNotificationScreen *screen)
  */
 int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
 
     for (; it != itend; ++it)

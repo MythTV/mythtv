@@ -4342,6 +4342,7 @@ void SatIPConfigurationGroup::FillDeviceList(void)
     QStringList db = CardUtil::GetVideoDevices("SATIP");
     for (const auto& dev : std::as_const(db))
     {
+        // clazy:exclude-next-line=detaching-member (updates value)
         auto dit = m_deviceList.find(dev);
         if (dit != m_deviceList.end())
         {

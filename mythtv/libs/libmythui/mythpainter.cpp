@@ -568,7 +568,7 @@ void MythPainter::ExpireImages(int64_t max)
         m_stringExpireList.pop_front();
 
         QMap<QString, MythImage*>::iterator it =
-            m_stringToImageMap.find(oldmsg);
+            m_stringToImageMap.find(oldmsg); // clazy:exclude=detaching-member (erases item)
         if (it == m_stringToImageMap.end())
         {
             recompute = true;

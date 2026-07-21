@@ -790,6 +790,7 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     fInfo.format = COMM_FORMAT_NORMAL;
     fInfo.flagMask = 0;
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     int& flagMask = m_frameInfo[m_curFrameNumber].flagMask;
 
     // Fill in dummy info records for skipped frames.

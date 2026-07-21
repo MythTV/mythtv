@@ -228,6 +228,7 @@ void MythVisualMonoScopeVulkan::Prepare(const QRect Area)
     }
 
     // Update the newest vertex buffer
+    // clazy:exclude-next-line=detaching-member (modifies item)
     auto & vertex = m_vertexBuffers.back();
     vertex.second[0] = m_hue;
     vertex.second[1] = 1.0;

@@ -306,7 +306,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
     };
 
     // for each CC of each video...
-    // NOLINTNEXTLINE(modernize-loop-convert)
+    // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
     for (auto it = m_cc608Info.begin(); it != m_cc608Info.end(); ++it)
     {
         while (true)
@@ -337,6 +337,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 
             textlist->m_lock.unlock();
 
+            // clazy:exclude-next-line=detaching-member (can't reference temporary)
             IngestSubtitle((*it).m_subs[ccIdx], content);
         }
     }

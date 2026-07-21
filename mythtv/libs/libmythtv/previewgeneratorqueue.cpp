@@ -101,12 +101,13 @@ PreviewGeneratorQueue::PreviewGeneratorQueue(
  * \note Never directly destroy this object. Call the
  * TeardownPreviewGeneratorQueue function instead.
  */
+// clazy:exclude-next-line=detaching-member (modifies item)
 PreviewGeneratorQueue::~PreviewGeneratorQueue()
 {
     // disconnect preview generators
     QMutexLocker locker(&m_lock);
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
-    // NOLINTNEXTLINE(modernize-loop-convert)
+    // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member
     for (auto it = m_previewMap.begin(); it != m_previewMap.end(); ++it)
     {
         if ((*it).m_gen)
@@ -294,6 +295,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
                     QString("Failed to find token %1 in map.").arg(token));
                 return true;
             }
+            // clazy:exclude-next-line=detaching-member (updates value)
             PreviewMap::iterator it = m_previewMap.find(*kit);
             if (it == m_previewMap.end())
             {
@@ -642,6 +644,7 @@ void PreviewGeneratorQueue::IncPreviewGeneratorPriority(
     QMutexLocker locker(&m_lock);
     m_queue.removeAll(key);
 
+    // clazy:exclude-next-line=detaching-member (updates map)
     PreviewMap::iterator pit = m_previewMap.find(key);
     if (pit == m_previewMap.end())
         return;
@@ -668,6 +671,7 @@ void PreviewGeneratorQueue::UpdatePreviewGeneratorThreads(void)
     {
         QString fn = q.back();
         q.pop_back();
+        // clazy:exclude-next-line=detaching-member (updates value)
         PreviewMap::iterator it = m_previewMap.find(fn);
         if (it != m_previewMap.end() && (*it).m_gen && !(*it).m_genStarted)
         {
@@ -695,6 +699,7 @@ void PreviewGeneratorQueue::SetPreviewGenerator(
     {
         QMutexLocker locker(&m_lock);
         m_tokenToKeyMap[g->GetToken()] = key;
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         PreviewGenState &state = m_previewMap[key];
         if (state.m_gen)
         {

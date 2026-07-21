@@ -125,6 +125,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 
     QString usn = GetNormalizedUSN(sUSN);
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     EntryMap::iterator it = m_mapEntries.find(usn);
     if (it != m_mapEntries.end())
     {
@@ -167,6 +168,7 @@ uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
     uint nCount = 0;
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     EntryMap::iterator it = m_mapEntries.begin();
     while (it != m_mapEntries.end())
     {
@@ -422,6 +424,7 @@ void SSDPCache::Add( const QString &sURI,
     SSDPCacheEntries *pEntries = nullptr;
     {
         QMutexLocker locker(&m_mutex);
+        // clazy:exclude-next-line=detaching-member (adds item)
         SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
         if (it == m_cache.end() || (*it == nullptr))
         {
@@ -499,6 +502,7 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
     // Get a Pointer to a Entries QDict... (Create if not found)
     // --------------------------------------------------------------
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     SSDPCacheEntriesMap::Iterator it = m_cache.find( sURI );
 
     if (it != m_cache.end())
@@ -579,6 +583,7 @@ int SSDPCache::RemoveStale()
     for (const auto & key : std::as_const(lstKeys))
     {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         SSDPCacheEntriesMap::iterator it = m_cache.find( key );
         if (it == m_cache.end())
             continue;

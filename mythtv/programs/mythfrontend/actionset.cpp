@@ -63,6 +63,7 @@ bool ActionSet::Add(const ActionID &id, const QString &key)
         return false;
     }
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     ActionList &ids = m_keyToActionMap[key];
     ids.push_back(id);
     SetModifiedFlag(id, true);
@@ -195,6 +196,7 @@ bool ActionSet::AddAction(const ActionID &id,
                           const QString  &description,
                           const QString  &keys)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     ContextMap::iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
         cit = m_contexts.insert(id.GetContext(), ActionContext());

@@ -921,6 +921,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
 void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 {
+    // clazy:exclude-next-line=detaching-member (modifies item)
     avcinfo_list_t::iterator it = m_priv->m_devices.find(guid);
 
     if (it == m_priv->m_devices.end())
@@ -1010,6 +1011,7 @@ static int linux_firewire_device_bus_reset_handler(
 {
     QMutexLocker locker(&LFDPriv::s_lock);
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     handle_to_lfd_t::iterator it = LFDPriv::s_handle_info.find(handle);
 
     if (it != LFDPriv::s_handle_info.end())

@@ -145,6 +145,7 @@ MythUIType *MythUIType::GetChild(const QString &name) const
 void MythUIType::DeleteChild(const QString &name)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc*/)
     {
         MythUIType *type = *it;
@@ -178,6 +179,7 @@ void MythUIType::DeleteChild(MythUIType *child)
         return;
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc */)
     {
         MythUIType *type = *it;

@@ -223,6 +223,7 @@ bool CetonRTSP::ProcessRequest(
     if (contentLength > 0)
     {
         m_responseContent.resize(contentLength);
+        // clazy:exclude-next-line=detaching-member (modifies item)
         char* data = m_responseContent.data();
         int bytesRead = 0;
         while (bytesRead < contentLength)

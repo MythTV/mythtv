@@ -172,6 +172,7 @@ void MPEGStreamData::Reset(int desiredProgram)
 void MPEGStreamData::DeletePartialPSIP(uint pid)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
     if (it != m_partialPsipPacketCache.end())
     {
@@ -1933,6 +1934,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     std::map<uint,bool> pnumEncrypted;
     const uint pid = tspacket.PID();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     CryptInfo &info = m_encryptionPidToInfo[pid];
 
     CryptStatus status = kEncUnknown;
@@ -1962,11 +1964,13 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         QString("PID 0x%1 status: %2") .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     const uint_vec_t &pnums = m_encryptionPidToPnums[pid];
     for (uint pnum : pnums)
     {
         status = m_encryptionPnumToStatus.value(pnum);
 
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         const uint_vec_t &pids = m_encryptionPnumToPids[pnum];
         if (!pids.empty())
         {

@@ -14,6 +14,7 @@ void ProgramInfoUpdater::insert(
     QMutexLocker locker(&m_lock);
     if (kPIUpdate == action || kPIUpdateFileSize == action)
     {
+        // clazy:exclude-next-line=detaching-member (updates value)
         QHash<uint,PIKeyData>::iterator it = m_needsUpdate.find(recordedid);
         // If there is no action in the set we can insert
         // If it is the same type of action we can overwrite,

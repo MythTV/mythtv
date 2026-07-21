@@ -1356,6 +1356,7 @@ void MythBDBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("update palette  = %1")
         .arg(Overlay->palette_update_flag ? "yes":"no"));
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     MythBDOverlay*& osd = m_overlayPlanes[Overlay->plane];
 
     switch(Overlay->cmd)
@@ -1395,6 +1396,7 @@ void MythBDBuffer::SubmitOverlay(const bd_overlay_s* const Overlay)
             {
                 const BD_PG_RLE_ELEM *rlep = Overlay->img;
                 int actual = Overlay->w * Overlay->h;
+                // clazy:exclude-next-line=detaching-member (updating item)
                 uint8_t *data = osd->m_image.bits();
                 data = &data[(Overlay->y * osd->m_image.bytesPerLine()) + Overlay->x];
                 for (int i = 0; i < actual; i += rlep->len, rlep++)
@@ -1433,6 +1435,7 @@ void MythBDBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
         .arg(Overlay->x).arg(Overlay->y).arg(Overlay->w).arg(Overlay->h).arg(Overlay->stride));
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("overlay->pts       = %1").arg(Overlay->pts));
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     MythBDOverlay*& osd = m_overlayPlanes[Overlay->plane];
     switch(Overlay->cmd)
     {
@@ -1460,6 +1463,7 @@ void MythBDBuffer::SubmitARGBOverlay(const bd_argb_overlay_s * const Overlay)
             if (osd)
             {
                 /* draw image */
+                // clazy:exclude-next-line=detaching-member (updating item)
                 uint8_t* data = osd->m_image.bits();
                 int32_t srcOffset = 0;
                 int32_t dstOffset = (Overlay->y * osd->m_image.bytesPerLine()) + (Overlay->x * 4);

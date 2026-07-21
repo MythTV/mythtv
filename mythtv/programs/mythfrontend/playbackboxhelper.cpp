@@ -431,6 +431,7 @@ void PlaybackBoxHelper::CheckAvailability(
     QString catstr = QString::number((int)cat);
     QMutexLocker locker(&m_lock);
     QHash<uint, QStringList>::iterator it =
+        // clazy:exclude-next-line=detaching-member (modifies item)
         m_eventHandler->m_checkAvailability.find(pginfo.GetRecordingID());
     if (it == m_eventHandler->m_checkAvailability.end())
     {

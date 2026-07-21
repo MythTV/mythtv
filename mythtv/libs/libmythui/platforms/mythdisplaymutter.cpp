@@ -316,12 +316,14 @@ const MythDisplayModes& MythDisplayMutter::GetVideoModes()
 
     m_videoModes.clear();
     m_modeMap.clear();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     MythMutterOutput& output = m_outputs[m_outputIdx];
     QSize physical(output.widthmm, output.heightmm);
     DisplayModeMap screenmap;
 
     for (auto & mode : output.modes)
     {
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         MythMutterMode& mmode = m_modes[static_cast<int32_t>(mode)];
 
         // the flags field will contain values dependant on enums for the

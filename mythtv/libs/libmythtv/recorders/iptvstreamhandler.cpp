@@ -75,6 +75,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_iptvhandlers_refcnt.find(devname);
     if (rit == s_iptvhandlers_refcnt.end())
         return;
@@ -90,6 +91,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
     if ((it != s_iptvhandlers.end()) && (*it == ref))
     {

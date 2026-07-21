@@ -33,6 +33,7 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
 {
     QMutexLocker locker(&s_handlersLock);
 
+    // clazy:exclude-next-line=detaching-member (updates value)
     QMap<QString, SatIPStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (it == s_handlers.end())
@@ -66,6 +67,7 @@ void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (updates value)
     QMap<QString, uint>::iterator rit = s_handlersRefCnt.find(devname);
     if (rit == s_handlersRefCnt.end())
     {

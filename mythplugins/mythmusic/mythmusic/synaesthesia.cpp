@@ -598,7 +598,9 @@ bool Synaesthesia::draw(QPainter *p, [[maybe_unused]] const QColor &back)
 
     for (int j = 0; j < m_outHeight * 2; j += 2) 
     {
+        // clazy:exclude-next-line=detaching-member (modifies item)
         auto *ptrTop = (uint32_t *)(m_outputImage->scanLine(j));
+        // clazy:exclude-next-line=detaching-member (modifies item)
         auto *ptrBot = (uint32_t *)(m_outputImage->scanLine(j+1));
 
         for (int i = m_outWidth / 4; i > 0; i--)

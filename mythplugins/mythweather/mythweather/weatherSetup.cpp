@@ -1011,7 +1011,7 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
     auto *ri = item->GetData().value<ResultListInfo *>();
     if (ri)
     {
-        // NOLINTNEXTLINE(modernize-loop-convert)
+        // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
         for (auto it = m_screenListInfo->m_types.begin();
              it != m_screenListInfo->m_types.end(); ++it)
         {

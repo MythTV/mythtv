@@ -377,6 +377,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
                 {
                     QString url = RelativeURI(m_segmentBase, uri).toString();
 
+                    // clazy:exclude-next-line=detaching-member (updates map)
                     StreamContainer::iterator Istream = m_streams.find(url);
                     if (Istream == m_streams.end())
                     {
@@ -414,6 +415,7 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         if (stream == nullptr)
         {
             /* No Meta playlist used */
+            // clazy:exclude-next-line=detaching-member (updates map)
             StreamContainer::iterator Istream =
                 m_streams.find(M3U::DecodedURI(m_m3u8));
             if (Istream == m_streams.end())

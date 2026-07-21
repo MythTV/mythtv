@@ -246,6 +246,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
         pInfo = new SubscriberInfo( sCallBack, nDuration );
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         Subscribers::iterator it = m_subscribers.find(pInfo->m_sUUID);
         if (it != m_subscribers.end())
         {
@@ -320,6 +321,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
     sSID = sSID.mid( 5 );
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     Subscribers::iterator it = m_subscribers.find(sSID);
     if (it != m_subscribers.end())
     {
@@ -349,6 +351,7 @@ void Eventing::Notify()
     m_mutex.lock();
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     Subscribers::iterator it = m_subscribers.begin();
     while (it != m_subscribers.end())
     { 

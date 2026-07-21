@@ -1537,6 +1537,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         return;
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<int, MythUIButtonListItem*>::iterator it = m_buttonToItem.begin();
     while (it != m_buttonToItem.end())
     {
@@ -3525,6 +3526,7 @@ void MythUIButtonListItem::SetImage(MythImage *image, const QString &name)
 
     if (!name.isEmpty())
     {
+        // clazy:exclude-next-line=detaching-member (replaces or erases item)
         QMap<QString, MythImage*>::iterator it = m_images.find(name);
         if (it != m_images.end())
         {
@@ -3589,6 +3591,7 @@ void MythUIButtonListItem::SetImage(
 
     if (!name.isEmpty())
     {
+        // clazy:exclude-next-line=detaching-member (updates value)
         InfoMap::iterator it = m_imageFilenames.find(name);
 
         if (it == m_imageFilenames.end())
@@ -3659,6 +3662,7 @@ void MythUIButtonListItem::DisplayState(const QString &state,
         return;
 
     bool do_update = false;
+    // clazy:exclude-next-line=detaching-member (updates value)
     InfoMap::iterator it = m_states.find(name);
 
     if (it == m_states.end())

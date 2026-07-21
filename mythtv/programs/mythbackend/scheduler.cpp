@@ -1949,7 +1949,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     // now check other inputs in the same input group as the recording.
     uint inputid = rcinfo->GetInputID();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     const std::vector<unsigned int> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     std::vector<unsigned int> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
     for (uint id : inputids)
     {
@@ -2614,6 +2616,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
         }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         QSet<QString>::iterator sit = m_sysEvents[i].begin();
         while (sit != m_sysEvents[i].end())
         {
@@ -5291,7 +5294,7 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
+    // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
     for (auto fsit = m_fsInfoCache.begin(); fsit != m_fsInfoCache.end(); ++fsit)
     {
         FileSystemInfo *fs = &(*fsit);
@@ -5464,7 +5467,7 @@ int Scheduler::FillRecordingDir(
                              fs->getHostname(), fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
-                // NOLINTNEXTLINE(modernize-loop-convert)
+                // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
                 for (auto fsit2 = m_fsInfoCache.begin();
                      fsit2 != m_fsInfoCache.end(); ++fsit2)
                 {
@@ -5946,6 +5949,7 @@ bool Scheduler::InitInputInfoMap(void)
 
         // This code should stay substantially similar to that below
         // in AddChildInput().
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         SchedInputInfo &siinfo = m_sinputInfoMap[inputid];
         siinfo.m_inputId = inputid;
         if (parentid && m_sinputInfoMap.value(parentid).m_schedGroup)
@@ -5975,6 +5979,7 @@ void Scheduler::AddChildInput(uint parentid, uint childid)
 
     // This code should stay substantially similar to that above in
     // InitInputInfoMap().
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     SchedInputInfo &siinfo = m_sinputInfoMap[childid];
     siinfo.m_inputId = childid;
     if (m_sinputInfoMap.value(parentid).m_schedGroup)

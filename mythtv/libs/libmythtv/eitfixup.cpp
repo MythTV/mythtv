@@ -3024,6 +3024,7 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event)
 
     // handle cast and crew in items in the DVB Extended Event Descriptor
     // remove handled items from the map, so the left overs can be reported
+    // clazy:exclude-next-line=detaching-member (erases item)
     auto i = event.m_items.begin();
     while (i != event.m_items.end())
     {

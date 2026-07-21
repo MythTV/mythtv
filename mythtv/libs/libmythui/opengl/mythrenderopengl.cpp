@@ -1500,6 +1500,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
 
     // Uniform value cacheing
     QString tag = QString("%1-%2").arg(Program->programId()).arg(Uniform);
+    // clazy:exclude-next-line=detaching-member (updates value)
     QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
     if (it == m_cachedMatrixUniforms.end())
         m_cachedMatrixUniforms.insert(tag, Value);
@@ -1511,6 +1512,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
     // Uniform location cacheing
     QByteArray uniform(Uniform);
     GLint location = 0;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     QHash<QByteArray, GLint> &uniforms = m_cachedUniformLocations[Program];
     if (uniforms.contains(uniform))
     {

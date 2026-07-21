@@ -345,7 +345,7 @@ void MythMainWindow::Animate(void)
         redraw = true;
 
     // The call to GetDrawOrder can apparently alter m_stackList.
-    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6 // clazy:exclude-next-line=detaching-member (modifies item)
     for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
@@ -1372,6 +1372,7 @@ void MythMainWindow::ClearJump(const QString& Destination)
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_priv->m_jumpMap.begin();
          it != m_priv->m_jumpMap.end();
          /* no inc */)

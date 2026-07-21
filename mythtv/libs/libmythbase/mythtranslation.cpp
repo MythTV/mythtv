@@ -76,6 +76,7 @@ void MythTranslation::load_real(const QString &module_name)
 void MythTranslation::unload(const QString &module_name)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     TransMap::Iterator it = d.m_translators.find(module_name);
     if (it != d.m_translators.end())
     {

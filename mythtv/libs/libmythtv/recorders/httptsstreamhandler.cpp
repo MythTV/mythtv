@@ -53,6 +53,7 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_httphandlers_refcnt.find(devname);
     if (rit == s_httphandlers_refcnt.end())
         return;

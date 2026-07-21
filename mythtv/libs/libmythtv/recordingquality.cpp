@@ -48,6 +48,7 @@ RecordingQuality::RecordingQuality(
     while (!m_recordingGaps.empty() &&
            m_recordingGaps.constFirst().GetStart() < start)
     {
+        // clazy:exclude-next-line=detaching-member (modifies item)
         RecordingGap &firstGap = m_recordingGaps.first();
         if (start < firstGap.GetEnd())
             firstGap = RecordingGap(start, firstGap.GetEnd());
@@ -60,6 +61,7 @@ RecordingQuality::RecordingQuality(
     while (!m_recordingGaps.empty() &&
            m_recordingGaps.constLast().GetEnd() > end)
     {
+        // clazy:exclude-next-line=detaching-member (modifies item)
         RecordingGap &back = m_recordingGaps.back();
         if (back.GetStart() < end)
             back = RecordingGap(back.GetStart(), end);

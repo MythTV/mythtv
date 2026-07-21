@@ -500,6 +500,7 @@ QList<QByteArray> LIRC::GetCodes(void)
 
     while (true)
     {
+        // clazy:exclude-next-line=detaching-member (modifies item)
         len = read(d->m_lircState->lirc_lircd, m_buf.data() + m_bufOffset, 128);
         if (len >= 0)
             break;

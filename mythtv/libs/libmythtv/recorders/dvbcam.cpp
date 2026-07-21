@@ -356,7 +356,9 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
 {
     QMutexLocker locker(&m_pmtLock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     pmt_list_t::iterator it = m_pmtList.find(chan);
+    // clazy:exclude-next-line=detaching-member (erases item)
     pmt_list_t::iterator it2 = m_pmtAddList.find(chan);
     if (!pmt && (it != m_pmtList.end()))
     {

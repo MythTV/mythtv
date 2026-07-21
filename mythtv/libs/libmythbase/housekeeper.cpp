@@ -755,6 +755,7 @@ void HouseKeeper::Run(void)
     QMutexLocker mapLock(&m_mapLock);
     // Remove any tasks that have finished
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_taskMap.begin(); it != m_taskMap.end(); )
     {
         if ((*it)->IsFinished())
@@ -812,6 +813,7 @@ void HouseKeeper::Run(void)
         int count1 = m_threadList.size();
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         auto it = m_threadList.begin();
         ++it; // skip the primary thread
         while (it != m_threadList.end())

@@ -30,6 +30,7 @@ void SatIPRTCPPacket::parse()
 
                 if (offset + 16 + str_length <= pkt_length)
                 {
+                    // clazy:exclude-next-line=detaching-member (modifies item)
                     QString str = QString::fromUtf8(m_data.data() + offset + 16, str_length);
                     m_satipData = str;
                     return;

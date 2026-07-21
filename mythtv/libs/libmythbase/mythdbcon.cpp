@@ -329,6 +329,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
     }
 #endif
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &list = m_pool[QThread::currentThread()];
     if (list.isEmpty())
     {
@@ -395,6 +396,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     leaveOne = leaveOne || (gCoreContext && gCoreContext->IsUIThread());
 
     QDateTime now = MythDate::current();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &list = m_pool[QThread::currentThread()];
     DBList::iterator it = list.begin();
 
@@ -500,6 +502,7 @@ void MDBManager::CloseDatabases()
     }
 
     m_lock.lock();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &slist = m_staticPool[QThread::currentThread()];
     while (!slist.isEmpty())
     {

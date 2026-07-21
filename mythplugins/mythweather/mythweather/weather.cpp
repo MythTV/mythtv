@@ -170,6 +170,7 @@ bool Weather::SetupScreens()
             units_t units = db.value(2).toUInt();
             uint draworder = db.value(3).toUInt();
 
+            // clazy:exclude-next-line=detaching-member (can't reference temporary)
             ScreenListInfo &screenListInfo = m_allScreens[container];
 
             WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, &screenListInfo, id);

@@ -183,6 +183,7 @@ void ProgramInfoCache::Refresh(void)
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_cache.begin(); it != m_cache.end(); )
     {
         if ((*it)->GetAvailableStatus() == asDeleted)

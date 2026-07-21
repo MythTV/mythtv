@@ -723,6 +723,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
 
     LOG(VB_COMMFLAG, LOG_INFO, QString("TemplateMatcher adjusting for blanks"));
 
+    // clazy:exclude-next-line=detaching-member (modifies map)
     FrameAnalyzer::FrameMap::Iterator ii = m_breakMap.begin();
     long long prevbrke = 0;
     while (ii != m_breakMap.end())

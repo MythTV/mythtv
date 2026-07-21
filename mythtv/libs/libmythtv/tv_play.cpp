@@ -1643,6 +1643,7 @@ void TV::AskAllowRecording(const QStringList &Msg, int Timeuntil, bool HasRec, b
         LOG(VB_GENERAL, LOG_INFO, LOC + "-- " +
             QString("removing '%1'").arg(info->GetTitle()));
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.find(key);
         if (it != m_askAllowPrograms.end())
         {
@@ -1684,6 +1685,7 @@ void TV::ShowOSDAskAllow()
     // eliminate timed out programs
     QDateTime timeNow = MythDate::current();
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<QString,AskProgramInfo>::iterator it2 = m_askAllowPrograms.begin();
     while (it2 != m_askAllowPrograms.end())
     {

@@ -304,7 +304,9 @@ void MythScreenStack::CheckDeletes(bool force)
     bool changed = false;
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QVector<MythScreenType *>::Iterator it = m_toDelete.begin();
+    // clazy:exclude-next-line=detaching-member (erases item)
     while (it != m_toDelete.end() && !m_toDelete.isEmpty())
     {
         bool deleteit = false;

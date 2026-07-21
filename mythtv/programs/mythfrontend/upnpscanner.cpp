@@ -545,6 +545,7 @@ void UPNPScanner::CheckStatus(void)
     // notifications for expired (rather than explicitly closed) connections
     m_lock.lock();
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_servers.begin(); it != m_servers.end(); /* no inc */)
     {
         // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves

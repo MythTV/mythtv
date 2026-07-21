@@ -519,12 +519,13 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 
     int majorid = ref->m_majorId;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<int, uint>::iterator rit = s_handlersRefCnt.find(majorid);
     if (rit == s_handlersRefCnt.end())
         return;
 
     QMap<int, ExternalStreamHandler*>::iterator it =
-        s_handlers.find(majorid);
+        s_handlers.find(majorid); // clazy:exclude=detaching-member (modifies item)
 
     s_handlers[majorid]->m_refs.remove(from);
 

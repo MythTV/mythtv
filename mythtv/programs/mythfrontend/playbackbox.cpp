@@ -3766,6 +3766,7 @@ void PlaybackBox::togglePlayListTitle(void)
 {
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     for (auto *pl : std::as_const(m_progLists[groupname]))
     {
         if (pl && (pl->GetAvailableStatus() == asAvailable))
@@ -4416,6 +4417,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
     if (sel_item)
         groupname = sel_item->GetData().toString();
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     ProgramMap::iterator git = m_progLists.begin();
     while (git != m_progLists.end())
     {

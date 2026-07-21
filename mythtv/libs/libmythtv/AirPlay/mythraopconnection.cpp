@@ -500,6 +500,7 @@ void MythRAOPConnection::ExpireResendRequests(std::chrono::milliseconds timestam
         return;
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_resends.begin(); it != m_resends.end(); /* no inc */)
     {
         if (it.value() < timestamp && m_streamingStarted)
@@ -856,6 +857,7 @@ int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     int res = 0;
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto packet_it = m_audioQueue.begin();
          packet_it != m_audioQueue.end();
          /* no inc */)

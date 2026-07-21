@@ -130,6 +130,7 @@ void MythSystemLegacyIOHandler::run(void)
             else if( retval > 0 )
             {
                 // HandleRead/HandleWrite can modify m_pMap!!!
+                // clazy:exclude-next-line=detaching-member
                 auto it = m_pMap.keyValueBegin();
                 while (it != m_pMap.keyValueEnd())
                 {

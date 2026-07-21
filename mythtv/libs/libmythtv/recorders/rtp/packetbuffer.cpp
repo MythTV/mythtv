@@ -34,6 +34,7 @@ UDPPacket PacketBuffer::PopDataPacket(void)
 
 UDPPacket PacketBuffer::GetEmptyPacket(void)
 {
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<uint64_t, UDPPacket>::iterator it = m_emptyPackets.begin();
     if (it == m_emptyPackets.end())
     {

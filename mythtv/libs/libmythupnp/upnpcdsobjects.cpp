@@ -107,6 +107,7 @@ QList<Property*> CDSObject::GetProperties( const QString &sName ) const
 void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
                               const QString &sType )
 {
+    // clazy:exclude-next-line=detaching-member (modifies item)
     auto it = m_properties.find(sName);
     if (it !=  m_properties.end() && *it)
     {

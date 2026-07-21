@@ -65,10 +65,12 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
     if (rit == s_handlersRefCnt.end())
         return;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)

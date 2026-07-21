@@ -2023,7 +2023,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         }
 
         QList<CommandLineArg*>::iterator req_it =
-            (*args_it)->m_requiredby.begin();
+            (*args_it)->m_requiredby.begin(); // clazy:exclude=detaching-member (erases item)
         while (req_it != (*args_it)->m_requiredby.end())
         {
             if ((*req_it)->m_type == QMetaType::UnknownType)
@@ -2048,7 +2048,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
         }
 
         QList<CommandLineArg*>::iterator block_it =
-            (*args_it)->m_blocks.begin();
+            (*args_it)->m_blocks.begin(); // clazy:exclude=detaching-member (erases item)
         while (block_it != (*args_it)->m_blocks.end())
         {
             if ((*block_it)->m_type != QMetaType::UnknownType)

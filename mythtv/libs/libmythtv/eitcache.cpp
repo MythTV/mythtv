@@ -331,6 +331,7 @@ void EITCache::WriteToDB(void)
 
     QStringList value_clauses;
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     key_map_t::iterator it = m_channelMap.begin();
     while (it != m_channelMap.end())
     {

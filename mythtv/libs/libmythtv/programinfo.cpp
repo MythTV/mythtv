@@ -3908,7 +3908,7 @@ void ProgramInfo::SavePositionMap(
         if ((min_frame >= 0) || (max_frame >= 0))
         {
             frm_pos_map_t new_map;
-            // NOLINTNEXTLINE(modernize-loop-convert)
+            // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member
             for (auto it = m_positionMapDBReplacement->map[type].begin();
                  it != m_positionMapDBReplacement->map[type].end();
                  ++it)

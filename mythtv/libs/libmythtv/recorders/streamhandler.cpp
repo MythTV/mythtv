@@ -104,6 +104,7 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
                 .arg((uint64_t)data,0,16));
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     StreamDataList::iterator it = m_streamDataList.find(data);
 
     if (it != m_streamDataList.end())
@@ -231,6 +232,7 @@ bool StreamHandler::RemovePIDFilter(uint pid)
 
     QMutexLocker write_locker(&m_pidLock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     PIDInfoMap::iterator it = m_pidInfo.find(pid);
     if (it == m_pidInfo.end())
         return false;

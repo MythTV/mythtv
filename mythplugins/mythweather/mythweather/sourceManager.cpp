@@ -308,6 +308,7 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
         return false;
     }
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     SourceMap::iterator it = m_sourcemap.find(id);
     if (it == m_sourcemap.end())
     {
@@ -333,6 +334,7 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
         return false;
     }
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     SourceMap::iterator it = m_sourcemap.find(screen->getId());
     if (it == m_sourcemap.end())
     {

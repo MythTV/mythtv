@@ -291,6 +291,7 @@ void BackendSelection::RemoveItem(const QString& USN_)
     m_mutex.lock();
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     ItemMap::iterator it = m_devices.find(USN_);
 
     if (it != m_devices.end())

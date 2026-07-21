@@ -319,6 +319,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
             QString("inputid [%1]").arg(rcinfo->GetInputID()));
 
+        // clazy:exclude-next-line=detaching-member (updates item)
         PendingMap::iterator it = m_pendingRecordings.find(rcinfo->GetInputID());
         if (it != m_pendingRecordings.end())
         {
@@ -390,6 +391,7 @@ void TVRec::CancelNextRecording(bool cancel)
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("CancelNextRecording(%1) -- begin").arg(cancel));
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
     if (it == m_pendingRecordings.end())
     {
@@ -486,6 +488,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     PendingInfo pendinfo;
 
     m_pendingRecLock.lock();
+    // clazy:exclude-next-line=detaching-member (modifies item)
     PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
     if (it != m_pendingRecordings.end())
     {
@@ -1015,6 +1018,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
     // Handle JobQueue
     QHash<QString,int>::iterator autoJob =
+        // clazy:exclude-next-line=detaching-member (erases item)
         m_autoRunJobs.find(curRec->MakeUniqueKey());
     if (autoJob == m_autoRunJobs.end())
     {
@@ -1701,6 +1705,7 @@ void TVRec::HandlePendingRecordings(void)
     QMutexLocker pendlock(&m_pendingRecLock);
 
 #if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (replaces or erases item)
     for (auto it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
     {
         if (MythDate::current() > (*it).m_recordingStart.addSecs(30))
