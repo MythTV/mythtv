@@ -120,9 +120,9 @@ void StorageGroup::Init(const QString &group, const QString &hostname,
 
     if (!found && m_builtinGroups.contains(group))
     {
-        QDir testdir(m_builtinGroups[group]);
+        QDir testdir(m_builtinGroups.value(group));
         if (!testdir.exists())
-            testdir.mkpath(m_builtinGroups[group]);
+            testdir.mkpath(m_builtinGroups.value(group));
 
         if (testdir.exists())
         {
@@ -590,7 +590,7 @@ bool StorageGroup::FindDirs(const QString &group, const QString &hostname,
 
     if (m_builtinGroups.contains(group))
     {
-        QDir testdir(m_builtinGroups[group]);
+        QDir testdir(m_builtinGroups.value(group));
         if (testdir.exists())
         {
             if (dirlist && !dirlist->contains(testdir.absolutePath()))
@@ -639,7 +639,7 @@ QString StorageGroup::FindFileDir(const QString &filename)
                 .arg(m_dirlist[curDir], testFile));
         checkFile.setFile(testFile);
         if (checkFile.exists() || checkFile.isSymLink())
-            return m_dirlist[curDir];
+            return m_dirlist.at(curDir);
 
         curDir++;
     }

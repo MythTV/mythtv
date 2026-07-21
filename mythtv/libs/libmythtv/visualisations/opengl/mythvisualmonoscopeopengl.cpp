@@ -50,7 +50,7 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect Area, MythPainter* /*Painter*/,
         }
 
         // drop oldest
-        auto vertex = m_vbos.front();
+        auto vertex = m_vbos.constFirst();
         m_vbos.pop_front();
         m_vbos.append(vertex);
     }

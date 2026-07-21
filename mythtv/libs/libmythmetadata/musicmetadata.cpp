@@ -1579,7 +1579,7 @@ void AllMusic::resync()
             else
             {
                 // existing track, check for any changes
-                MusicMetadata *cacheMeta = m_musicMap[id];
+                MusicMetadata *cacheMeta = m_musicMap.value(id);
 
                 if (cacheMeta && !cacheMeta->compare(dbMeta))
                 {
@@ -1629,7 +1629,7 @@ void AllMusic::resync()
     // remove the no longer available tracks
     for (uint id : deleteList)
     {
-        MusicMetadata *mdata = m_musicMap[id];
+        MusicMetadata *mdata = m_musicMap.value(id);
         m_allMusic.removeAll(mdata);
         m_musicMap.remove(id);
         removed++;
@@ -1647,7 +1647,7 @@ void AllMusic::resync()
 MusicMetadata* AllMusic::getMetadata(int an_id)
 {
     if (m_musicMap.contains(an_id))
-        return m_musicMap[an_id];
+        return m_musicMap.value(an_id);
 
     return nullptr;
 }
@@ -1686,11 +1686,11 @@ void AllMusic::clearCDData(void)
 {
     while (!m_cdData.empty())
     {
-        MusicMetadata *mdata = m_cdData.back();
+        MusicMetadata *mdata = m_cdData.constLast();
         if (m_musicMap.contains(mdata->ID()))
             m_musicMap.remove(mdata->ID());
 
-        delete m_cdData.back();
+        delete m_cdData.constLast();
         m_cdData.pop_back();
     }
 
@@ -2149,7 +2149,7 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 AlbumArtImage *AlbumArtImages::getImageAt(uint index)
 {
     if (index < (uint)m_imageList.size())
-        return m_imageList[index];
+        return m_imageList.at(index);
 
     return nullptr;
 }

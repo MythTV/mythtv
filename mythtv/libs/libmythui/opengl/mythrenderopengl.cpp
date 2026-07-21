@@ -1246,7 +1246,7 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect Area)
     {
         m_vertexExpiry.removeOne(ref);
         m_vertexExpiry.append(ref);
-        return m_cachedVertices[ref];
+        return m_cachedVertices.value(ref);
     }
 
     auto *vertices = new GLfloat[8];
@@ -1273,7 +1273,7 @@ void MythRenderOpenGL::ExpireVertices(int Max)
 {
     while (m_vertexExpiry.size() > Max)
     {
-        uint64_t ref = m_vertexExpiry.first();
+        uint64_t ref = m_vertexExpiry.constFirst();
         m_vertexExpiry.removeFirst();
         GLfloat *vertices = nullptr;
         if (m_cachedVertices.contains(ref))
@@ -1322,7 +1322,7 @@ void MythRenderOpenGL::ExpireVBOS(int Max)
 {
     while (m_vboExpiry.size() > Max)
     {
-        uint64_t ref = m_vboExpiry.first();
+        uint64_t ref = m_vboExpiry.constFirst();
         m_vboExpiry.removeFirst();
         if (m_cachedVBOS.contains(ref))
         {
@@ -1378,7 +1378,7 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
 
 void MythRenderOpenGL::PushTransformation(const UIEffects &Fx, QPointF &Center)
 {
-    QMatrix4x4 newtop = m_transforms.top();
+    QMatrix4x4 newtop = std::as_const(m_transforms).top();
     if (Fx.m_hzoom != 1.0F || Fx.m_vzoom != 1.0F || Fx.m_angle != 0.0F)
     {
         newtop.translate(static_cast<GLfloat>(Center.x()), static_cast<GLfloat>(Center.y()));
@@ -1488,7 +1488,7 @@ void MythRenderOpenGL::SetShaderProjection(QOpenGLShaderProgram *Program)
     if (Program)
     {
         SetShaderProgramParams(Program, m_projection,       "u_projection");
-        SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(Program, std::as_const(m_transforms).top(), "u_transform");
     }
 }
 

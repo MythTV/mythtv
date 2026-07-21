@@ -297,12 +297,12 @@ QUrl CetonRTSP::GetBaseUrl(void)
 {
     if (m_responseHeaders.contains("Content-Base"))
     {
-        QUrl url { m_responseHeaders["Content-Base"] };
+        QUrl url { m_responseHeaders.value("Content-Base") };
         return url;
     }
     if (m_responseHeaders.contains("Content-Location"))
     {
-        QUrl url { m_responseHeaders["Content-Location"] };
+        QUrl url { m_responseHeaders.value("Content-Location") };
         return url;
     }
     return m_requestUrl;

@@ -117,10 +117,10 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
     for (uint i = 0; i < uint(m_rawMaximas.size()); i++)
     {
-        uint start_idx = m_rawMaximas[i];
+        uint start_idx = m_rawMaximas.at(i);
         while ((i+1) < uint(m_rawMaximas.size()) &&
-               (m_rawMaximas[i+1] == m_rawMaximas[i] + 1)) i++;
-        uint end_idx = m_rawMaximas[i];
+               (m_rawMaximas.at(i+1) == m_rawMaximas.at(i) + 1)) i++;
+        uint end_idx = m_rawMaximas.at(i);
         if (end_idx - start_idx > noise_flr_lg)
             m_maximas.push_back((start_idx + end_idx) * 0.5F);
     }
@@ -142,7 +142,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         float avg_diff = 0.0F;
         for (uint i = 1; i < uint(m_maximas.size()); i++)
         {
-            float diff = m_maximas[i] - m_maximas[i-1];
+            float diff = m_maximas.at(i) - m_maximas.at(i-1);
             min_diff = std::min(diff, min_diff);
             max_diff = std::max(diff, max_diff);
             avg_diff += diff;
@@ -154,14 +154,14 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         dropped = false;
         if (avg_diff * 1.1F < max_diff)
         {
-            float last_diff = m_maximas.back() -
-                              m_maximas[(uint)(m_maximas.size())-2];
+            float last_diff = m_maximas.constLast() -
+                              m_maximas.at((uint)(m_maximas.size())-2);
             if (last_diff*1.01F >= max_diff || last_diff > avg_diff * 1.2F)
             {
                 m_maximas.pop_back();
                 dropped = true;
             }
-            float first_diff = m_maximas[1] - m_maximas[0];
+            float first_diff = m_maximas.at(1) - m_maximas.at(0);
             if ((m_maximas.size() > 7) && (first_diff*1.01F >= max_diff))
             {
                 m_maximas.pop_front();
@@ -171,15 +171,15 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
         if (avg_diff * 0.9F > min_diff)
         {
-            float last_diff = m_maximas.back() -
-                              m_maximas[(uint)(m_maximas.size())-2];
+            float last_diff = m_maximas.constLast() -
+                              m_maximas.at((uint)(m_maximas.size())-2);
             if ((m_maximas.size() > 7) &&
                 (last_diff*0.99F <= min_diff || last_diff < avg_diff * 0.80F))
             {
                 m_maximas.pop_back();
                 dropped = true;
             }
-            float first_diff = m_maximas[1] - m_maximas[0];
+            float first_diff = m_maximas.at(1) - m_maximas.at(0);
             if ((m_maximas.size() > 7) && (first_diff*0.99F <= min_diff))
             {
                 m_maximas.pop_front();
@@ -199,13 +199,13 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
     // find the minimas
     for (uint i = 0; i < uint(m_rawMinimas.size()); i++)
     {
-        uint start_idx = m_rawMinimas[i];
+        uint start_idx = m_rawMinimas.at(i);
         while ((i+1) < uint(m_rawMinimas.size()) &&
-               (m_rawMinimas[i+1] == m_rawMinimas[i] + 1)) i++;
-        uint end_idx = m_rawMinimas[i];
+               (m_rawMinimas.at(i+1) == m_rawMinimas.at(i) + 1)) i++;
+        uint end_idx = m_rawMinimas.at(i);
         float center = (start_idx + end_idx) * 0.5F;
         if (end_idx - start_idx > noise_flr_lg &&
-            center > m_maximas[0] && center < m_maximas.back())
+            center > m_maximas.at(0) && center < m_maximas.constLast())
         {
             m_minimas.push_back(center);
         }
@@ -228,9 +228,9 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
 
     // get the estimated location of the first maxima
     // based on the rate and location of all maximas
-    m_start = m_maximas[0];
+    m_start = m_maximas.at(0);
     for (uint i = 1; i < uint(m_maximas.size()); i++)
-        m_start += m_maximas[i] - (i * m_rate);
+        m_start += m_maximas.at(i) - (i * m_rate);
     m_start /= m_maximas.size();
     // then move it back by a third to make each sample
     // more or less in the center of each encoded byte.

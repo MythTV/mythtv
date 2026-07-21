@@ -86,14 +86,14 @@ VisualNode* VideoVisual::GetNode(void)
     {
         if (m_nodes.front()->m_offset > timestamp)
             break;
-        delete m_nodes.front();
+        delete m_nodes.constFirst();
         m_nodes.pop_front();
     }
 
     if (m_nodes.isEmpty())
         return nullptr;
 
-    return m_nodes.first();
+    return m_nodes.constFirst();
 }
 
 // TODO Add MMX path

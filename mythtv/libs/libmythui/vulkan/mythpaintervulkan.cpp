@@ -106,7 +106,7 @@ bool MythPainterVulkan::SupportsClipping()
 
 void MythPainterVulkan::PushTransformation(const UIEffects &Fx, QPointF Center)
 {
-    QMatrix4x4 newtop = m_transforms.top();
+    QMatrix4x4 newtop = std::as_const(m_transforms).top();
     if (Fx.m_hzoom != 1.0F || Fx.m_vzoom != 1.0F || Fx.m_angle != 0.0F)
     {
         newtop.translate(static_cast<float>(Center.x()), static_cast<float>(Center.y()));
@@ -375,7 +375,7 @@ void MythPainterVulkan::DrawImage(const QRect Dest, MythImage *Image, const QRec
     if (texture)
     {
         // Update push constant buffer
-        texture->PushData(m_transforms.top(), Source, Dest, Alpha);
+        texture->PushData(std::as_const(m_transforms).top(), Source, Dest, Alpha);
         // Queue
         m_queuedTextures.emplace_back(texture);
     }
@@ -390,7 +390,7 @@ void MythPainterVulkan::DeleteFormatImagePriv(MythImage *Image)
 {
     if (m_imageToTextureMap.contains(Image))
     {
-        m_texturesToDelete.push_back(m_imageToTextureMap[Image]);
+        m_texturesToDelete.push_back(m_imageToTextureMap.value(Image));
         m_imageToTextureMap.remove(Image);
         m_imageExpire.remove(Image);
     }
@@ -403,7 +403,7 @@ void MythPainterVulkan::ClearCache()
     for (auto it = m_imageToTextureMap.cbegin();
          it != m_imageToTextureMap.cend(); ++it)
     {
-        m_texturesToDelete.push_back(m_imageToTextureMap[it.key()]);
+        m_texturesToDelete.push_back(m_imageToTextureMap.value(it.key()));
         m_imageExpire.remove(it.key());
     }
     m_imageToTextureMap.clear();
@@ -420,7 +420,7 @@ MythTextureVulkan* MythPainterVulkan::GetTextureFromCache(MythImage *Image)
         {
             m_imageExpire.remove(Image);
             m_imageExpire.push_back(Image);
-            return m_imageToTextureMap[Image];
+            return m_imageToTextureMap.value(Image);
         }
         DeleteFormatImagePriv(Image);
     }
@@ -528,7 +528,7 @@ void MythPainterVulkan::DeleteTextures()
 
     while (!m_texturesToDelete.empty())
     {
-        MythTextureVulkan *texture = m_texturesToDelete.front();
+        MythTextureVulkan *texture = m_texturesToDelete.constFirst();
         m_hardwareCacheSize -= texture->m_dataSize;
         VkDescriptorSet descriptor = texture->TakeDescriptor();
         if (descriptor)

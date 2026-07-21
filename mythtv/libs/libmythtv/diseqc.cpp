@@ -2008,7 +2008,7 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
 {
     // determine stored position from position map
     dbl_to_uint_t::const_iterator it =
-        m_posmap.lowerBound(angle - EPS); // clazy:exclude=strict-iterators
+        std::as_const(m_posmap).lowerBound(angle - EPS);
     cmd_vec_t index { static_cast<uint8_t>(angle) };
     if (it != m_posmap.cend())
     {

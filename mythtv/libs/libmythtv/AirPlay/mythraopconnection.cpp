@@ -680,10 +680,10 @@ uint32_t MythRAOPConnection::decodeAudioPacket(uint8_t type,
 #if OPENSSL_VERSION_NUMBER < 0x030000000L
         // Debian < 12, Fedora < 36, RHEL < 9, SuSe 15, Ubuntu < 2204
         EVP_DecryptInit_ex(m_cctx, m_cipher, nullptr, m_sessionKey.data(),
-                           reinterpret_cast<const uint8_t *>(m_aesIV.data()))
+                           reinterpret_cast<const uint8_t *>(m_aesIV.constData()))
 #else
         EVP_DecryptInit_ex2(m_cctx, m_cipher, m_sessionKey.data(),
-                            reinterpret_cast<const uint8_t *>(m_aesIV.data()),
+                            reinterpret_cast<const uint8_t *>(m_aesIV.constData()),
                             nullptr)
 #endif
         != 1)
@@ -1234,10 +1234,10 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 for (int fmt : std::as_const(m_audioFormat))
                     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
                         QString("Audio parameter: %1").arg(fmt));
-                m_framesPerPacket = m_audioFormat[1];
-                m_sampleSize      = m_audioFormat[3];
-                m_channels        = m_audioFormat[7];
-                m_frameRate       = m_audioFormat[11];
+                m_framesPerPacket = m_audioFormat.at(1);
+                m_sampleSize      = m_audioFormat.at(3);
+                m_channels        = m_audioFormat.at(7);
+                m_frameRate       = m_audioFormat.at(11);
             }
         }
     }
@@ -1523,8 +1523,8 @@ void MythRAOPConnection::ProcessRequest(const QStringList &header,
                 m_dmap = decodeDMAP(content);
                 LOG(VB_PLAYBACK, LOG_INFO,
                     QString("Receiving Title:%1 Artist:%2 Album:%3 Format:%4")
-                    .arg(m_dmap["minm"], m_dmap["asar"],
-                         m_dmap["asal"], m_dmap["asfm"]));
+                    .arg(m_dmap.value("minm"), m_dmap.value("asar"),
+                         m_dmap.value("asal"), m_dmap.value("asfm")));
                 SendNotification(false);
             }
         }
@@ -1757,16 +1757,16 @@ bool MythRAOPConnection::CreateDecoder(void)
         }
         else
         {
-            uint32_t fs = m_audioFormat[1]; // frame size
+            uint32_t fs = m_audioFormat.at(1); // frame size
             extradata[12] = (fs >> 24) & 0xff;
             extradata[13] = (fs >> 16) & 0xff;
             extradata[14] = (fs >> 8)  & 0xff;
             extradata[15] = fs & 0xff;
             extradata[16] = m_channels;       // channels
-            extradata[17] = m_audioFormat[3]; // sample size
-            extradata[18] = m_audioFormat[4]; // rice_historymult
-            extradata[19] = m_audioFormat[5]; // rice_initialhistory
-            extradata[20] = m_audioFormat[6]; // rice_kmodifier
+            extradata[17] = m_audioFormat.at(3); // sample size
+            extradata[18] = m_audioFormat.at(4); // rice_historymult
+            extradata[19] = m_audioFormat.at(5); // rice_initialhistory
+            extradata[20] = m_audioFormat.at(6); // rice_kmodifier
         }
         m_codecContext->extradata = extradata;
         m_codecContext->extradata_size = 36;
@@ -1779,7 +1779,7 @@ bool MythRAOPConnection::CreateDecoder(void)
             return false;
         }
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC + "Opened ALAC decoder.");
-        m_codecContext->sample_rate = m_audioFormat[11]; // sampleRate
+        m_codecContext->sample_rate = m_audioFormat.at(11); // sampleRate
     }
 
     return true;

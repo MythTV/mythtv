@@ -269,7 +269,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
         if ( sSID.length() != 0 )   
         {
             sSID  = sSID.mid( 5 );
-            pInfo = m_subscribers[sSID];
+            pInfo = m_subscribers.value(sSID);
         }
 
     }

@@ -626,7 +626,7 @@ void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
 
     m_currentEncryptionStatus[pnum] = encrypted ? kEncEncrypted : kEncDecrypted;
 
-    if (kEncDecrypted == m_currentEncryptionStatus[pnum])
+    if (kEncDecrypted == m_currentEncryptionStatus.value(pnum))
         m_currentTestingDecryption = false;
 
     UpdateChannelInfo(true);
@@ -1812,7 +1812,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-        info.m_decryptionStatus = scan_info->m_programEncryptionStatus[pnum];
+        info.m_decryptionStatus = scan_info->m_programEncryptionStatus.value(pnum);
     }
 
     return pnum_to_dbchan;

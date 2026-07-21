@@ -32,7 +32,7 @@ MythScreenStack::~MythScreenStack()
 
     while (!m_children.isEmpty())
     {
-        MythScreenType *child = m_children.back();
+        MythScreenType *child = m_children.constLast();
         MythScreenStack::PopScreen(child, false, true); // Don't fade, do delete
     }
 }

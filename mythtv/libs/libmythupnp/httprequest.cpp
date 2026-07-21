@@ -1411,7 +1411,7 @@ bool HTTPRequest::ParseRequest()
         // Allow session resumption for TLS connections
         if (m_mapCookies.contains("sessionToken"))
         {
-            QString sessionToken = m_mapCookies["sessionToken"];
+            QString sessionToken = m_mapCookies.value("sessionToken");
             MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
             MythUserSession session = sessionManager->GetSession(sessionToken);
 

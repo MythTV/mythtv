@@ -222,7 +222,7 @@ bool SatIPRTSP::Setup(const QUrl& url, ushort clientPort1, ushort clientPort2)
     {
         static const QRegularExpression sessionTimeoutRegex {
             "^([^\\r\\n]+);timeout=([0-9]+)?", QRegularExpression::CaseInsensitiveOption };
-        auto match = sessionTimeoutRegex.match(m_responseHeaders["SESSION"]);
+        auto match = sessionTimeoutRegex.match(m_responseHeaders.value("SESSION"));
         if (!match.hasMatch())
         {
             LOG(VB_RECORD, LOG_ERR, LOC +

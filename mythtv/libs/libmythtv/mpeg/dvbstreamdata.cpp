@@ -1020,25 +1020,25 @@ bool DVBStreamData::DeleteCachedTable(const PSIPTable *psip) const
     uint bid = psip->TableIDExtension();    // For BATs
 
     QMutexLocker locker(&m_cacheLock);
-    if (m_cachedRefCnt[psip] > 0)
+    if (m_cachedRefCnt.value(psip) > 0)
     {
         m_cachedSlatedForDeletion[psip] = 1;
         return false;
     }
     if ((TableID::NIT == psip->TableID()) &&
-             m_cachedNit[psip->Section()])
+             m_cachedNit.value(psip->Section()))
     {
         m_cachedNit[psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::SDT == psip->TableID()) &&
-             m_cachedSdts[tid << 8 | psip->Section()])
+             m_cachedSdts.value(tid << 8 | psip->Section()))
     {
         m_cachedSdts[tid << 8 | psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::BAT == psip->TableID()) &&
-             m_cachedBats[bid << 8 | psip->Section()])
+             m_cachedBats.value(bid << 8 | psip->Section()))
     {
         m_cachedBats[bid << 8 | psip->Section()] = nullptr;
         delete psip;

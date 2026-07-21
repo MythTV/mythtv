@@ -222,7 +222,7 @@ MythMainWindow::~MythMainWindow()
 
     while (!m_priv->m_stackList.isEmpty())
     {
-        MythScreenStack *stack = m_priv->m_stackList.back();
+        MythScreenStack *stack = m_priv->m_stackList.constLast();
         m_priv->m_stackList.pop_back();
 
         if (stack == m_priv->m_mainStack)
@@ -302,7 +302,7 @@ void MythMainWindow::AddScreenStack(MythScreenStack* Stack, bool Main)
 
 void MythMainWindow::PopScreenStack()
 {
-    MythScreenStack *stack = m_priv->m_stackList.back();
+    MythScreenStack *stack = m_priv->m_stackList.constLast();
     m_priv->m_stackList.pop_back();
     if (stack == m_priv->m_mainStack)
         m_priv->m_mainStack = nullptr;
@@ -1153,14 +1153,14 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
         keycontext && (keycontext->GetMapping(keynum, localActions)))
     {
-        if (localActions.contains(m_priv->m_jumpMap[keynum]->m_localAction))
+        if (localActions.contains(m_priv->m_jumpMap.value(keynum)->m_localAction))
             AllowJumps = false;
     }
 
     if (AllowJumps && m_priv->m_jumpMap.contains(keynum) &&
             !m_priv->m_jumpMap[keynum]->m_exittomain && m_priv->m_exitMenuCallback == nullptr)
     {
-        void (*callback)(void) = m_priv->m_jumpMap[keynum]->m_callback;
+        void (*callback)(void) = m_priv->m_jumpMap.value(keynum)->m_callback;
         callback();
         return true;
     }
@@ -1169,7 +1169,7 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         m_priv->m_jumpMap.contains(keynum) && m_priv->m_exitMenuCallback == nullptr)
     {
         m_priv->m_exitingtomain = true;
-        m_priv->m_exitMenuCallback = m_priv->m_jumpMap[keynum]->m_callback;
+        m_priv->m_exitMenuCallback = m_priv->m_jumpMap.value(keynum)->m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return true;
@@ -1470,7 +1470,7 @@ void MythMainWindow::JumpTo(const QString& Destination, bool Pop)
     {
         m_priv->m_exitingtomain = true;
         m_priv->m_popwindows = Pop;
-        m_priv->m_exitMenuCallback = m_priv->m_destinationMap[Destination].m_callback;
+        m_priv->m_exitMenuCallback = m_priv->m_destinationMap.value(Destination).m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return;
@@ -1518,7 +1518,7 @@ bool MythMainWindow::HandleMedia(const QString& Handler, const QString& Mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (m_priv->m_mediaPluginMap.contains(lhandler))
     {
-        m_priv->m_mediaPluginMap[lhandler].second(Mrl, Plot, Title, Subtitle,
+        m_priv->m_mediaPluginMap.value(lhandler).second(Mrl, Plot, Title, Subtitle,
                                                   Director, Season, Episode,
                                                   Inetref, LenMins, Year, Id,
                                                   UseBookmarks);

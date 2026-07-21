@@ -281,8 +281,8 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         if (m_imageCache.contains(Label) &&
             m_cacheTrack[Label] + kImageCacheTimeout > now)
         {
-            m_imageCache[Label]->IncrRef();
-            return m_imageCache[Label];
+            m_imageCache.value(Label)->IncrRef();
+            return m_imageCache.value(Label);
         }
     }
 
@@ -415,8 +415,8 @@ MythImage* MythUIThemeCache::GetImageFromCache(const QString& URL)
     if (m_imageCache.contains(URL))
     {
         m_cacheTrack[URL] = SystemClock::now();
-        m_imageCache[URL]->IncrRef();
-        return m_imageCache[URL];
+        m_imageCache.value(URL)->IncrRef();
+        return m_imageCache.value(URL);
     }
 
     /*
@@ -479,8 +479,8 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
                 .arg(m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes())
                 .arg(oldestKey));
 
-            m_imageCache[oldestKey]->SetIsInCache(false);
-            m_imageCache[oldestKey]->DecrRef();
+            m_imageCache.value(oldestKey)->SetIsInCache(false);
+            m_imageCache.value(oldestKey)->DecrRef();
             m_imageCache.remove(oldestKey);
             m_cacheTrack.remove(oldestKey);
         }
@@ -507,7 +507,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
         .arg(m_imageCache.count()).arg(m_cacheSize.fetchAndAddRelaxed(0)));
 
-    return m_imageCache[URL];
+    return m_imageCache.value(URL);
 }
 
 void MythUIThemeCache::RemoveFromCacheByURL(const QString& URL)
@@ -517,8 +517,8 @@ void MythUIThemeCache::RemoveFromCacheByURL(const QString& URL)
 
     if (it != m_imageCache.end())
     {
-        m_imageCache[URL]->SetIsInCache(false);
-        m_imageCache[URL]->DecrRef();
+        m_imageCache.value(URL)->SetIsInCache(false);
+        m_imageCache.value(URL)->DecrRef();
         m_imageCache.remove(URL);
         m_cacheTrack.remove(URL);
     }

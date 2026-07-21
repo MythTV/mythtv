@@ -82,7 +82,7 @@ void MythOpenGLPainter::ClearCache(void)
     for (auto it = m_imageToTextureMap.cbegin();
          it != m_imageToTextureMap.cend(); ++it)
     {
-        m_textureDeleteList.push_back(m_imageToTextureMap[it.key()]);
+        m_textureDeleteList.push_back(m_imageToTextureMap.value(it.key()));
         m_imageExpireList.remove(it.key());
     }
     m_imageToTextureMap.clear();
@@ -184,7 +184,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
         {
             m_imageExpireList.remove(Image);
             m_imageExpireList.push_back(Image);
-            return m_imageToTextureMap[Image];
+            return m_imageToTextureMap.value(Image);
         }
         DeleteFormatImagePriv(Image);
     }
@@ -339,7 +339,7 @@ void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)
     QMutexLocker locker(&m_imageAndTextureLock);
     if (m_imageToTextureMap.contains(Image))
     {
-        m_textureDeleteList.push_back(m_imageToTextureMap[Image]);
+        m_textureDeleteList.push_back(m_imageToTextureMap.value(Image));
         m_imageToTextureMap.remove(Image);
         m_imageExpireList.remove(Image);
     }

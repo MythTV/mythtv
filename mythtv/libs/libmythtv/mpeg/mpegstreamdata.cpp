@@ -1495,7 +1495,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    int val = m_cachedRefCnt[psip] - 1;
+    int val = m_cachedRefCnt.value(psip) - 1;
     m_cachedRefCnt[psip] = val;
 
     // if ref <= 0 and table was slated for deletion, delete it.
@@ -1556,7 +1556,7 @@ void MPEGStreamData::ReturnCachedPMTTables(pmt_map_t &pmts) const
 void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
 {
     QMutexLocker locker(&m_cacheLock);
-    m_cachedRefCnt[psip] = m_cachedRefCnt[psip] + 1;
+    m_cachedRefCnt[psip] = m_cachedRefCnt.value(psip) + 1;
 }
 
 bool MPEGStreamData::DeleteCachedTable(const PSIPTable *psip) const
@@ -1567,25 +1567,25 @@ bool MPEGStreamData::DeleteCachedTable(const PSIPTable *psip) const
     uint tid = psip->TableIDExtension();
 
     QMutexLocker locker(&m_cacheLock);
-    if (m_cachedRefCnt[psip] > 0)
+    if (m_cachedRefCnt.value(psip) > 0)
     {
         m_cachedSlatedForDeletion[psip] = 1;
         return false;
     }
     if (TableID::PAT == psip->TableID() &&
-             (m_cachedPats[(tid << 8) | psip->Section()] == psip))
+             (m_cachedPats.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedPats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if (TableID::CAT == psip->TableID() &&
-             (m_cachedCats[(tid << 8) | psip->Section()] == psip))
+             (m_cachedCats.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedCats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::PMT == psip->TableID()) &&
-             (m_cachedPmts[(tid << 8) | psip->Section()] == psip))
+             (m_cachedPmts.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedPmts[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
@@ -1818,7 +1818,7 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
     QMap<uint, uint_vec_t>::iterator list;
     uint_vec_t::iterator it;
 
-    uint_vec_t pids = m_encryptionPnumToPids[pnum];
+    uint_vec_t pids = m_encryptionPnumToPids.value(pnum);
     for (uint pid : pids)
     {
 #if 0
@@ -1956,7 +1956,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
     const uint_vec_t &pnums = m_encryptionPidToPnums[pid];
     for (uint pnum : pnums)
     {
-        status = m_encryptionPnumToStatus[pnum];
+        status = m_encryptionPnumToStatus.value(pnum);
 
         const uint_vec_t &pids = m_encryptionPnumToPids[pnum];
         if (!pids.empty())
@@ -1964,7 +1964,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
             std::array<uint,3> enc_cnt { 0, 0, 0 };
             for (uint pid2 : pids)
             {
-                CryptStatus stat = m_encryptionPidToInfo[pid2].m_status;
+                CryptStatus stat = m_encryptionPidToInfo.value(pid2).m_status;
                 enc_cnt[stat]++;
 
 #if 0
@@ -1981,7 +1981,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
                 status = kEncDecrypted;
         }
 
-        if (status == m_encryptionPnumToStatus[pnum])
+        if (status == m_encryptionPnumToStatus.value(pnum))
             continue; // program encryption status unchanged
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Program %1 status: %2")

@@ -1051,12 +1051,12 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 
     if (dependee)
     {
-        bool reverse = m_reverseDepend[dependee];
+        bool reverse = m_reverseDepend.value(dependee);
         visible = reverse ? !isDefault : isDefault;
         // NOLINTNEXTLINE(modernize-loop-convert)
         for (int i = 0; i < m_dependsValue.size(); i++)
         {
-            if (m_dependsValue[i].first != dependee)
+            if (m_dependsValue.at(i).first != dependee)
                 continue;
             m_dependsValue[i].second = visible;
             break;
@@ -1064,13 +1064,13 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
     }
 
     if (!m_dependsValue.empty())
-        visible = m_dependsValue[0].second;
+        visible = m_dependsValue.at(0).second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
-        bool v = m_dependsValue[i].second;
+        bool v = m_dependsValue.at(i).second;
 
         if (((i-1) < m_dependOperator.size()) &&
-            m_dependOperator[i-1] == 1)
+            m_dependOperator.at(i-1) == 1)
         {
             // OR operator
             visible = visible && v;

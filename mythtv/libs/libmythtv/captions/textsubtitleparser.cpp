@@ -56,14 +56,14 @@ class SubtitleLoadHelper : public QRunnable
 
         QMutexLocker locker(&s_lock);
         --s_loading[m_target];
-        if (!s_loading[m_target])
+        if (!s_loading.value(m_target))
             s_wait.wakeAll();
     }
 
     static bool IsLoading(TextSubtitles *target)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[target] != 0U;
+        return s_loading.value(target) != 0U;
     }
 
     static void Wait(TextSubtitles *target)
@@ -73,7 +73,7 @@ class SubtitleLoadHelper : public QRunnable
             return;
         while (s_wait.wait(&s_lock))
         {
-            if (!s_loading[target])
+            if (!s_loading.value(target))
                 return;
         }
     }

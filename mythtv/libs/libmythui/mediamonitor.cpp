@@ -404,7 +404,7 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
             // Ensure device gets an unmount
             (*it)->checkMedia();
 
-            if (m_useCount[*it] == 0)
+            if (m_useCount.value(*it) == 0)
             {
                 m_useCount.remove(*it);
                 (*it)->deleteLater();
@@ -520,7 +520,7 @@ void MediaMonitor::Unlock(MythMediaDevice *pMedia)
 
     m_useCount[pMedia]--;
 
-    if (m_useCount[pMedia] == 0 && m_removedDevices.contains(pMedia))
+    if (m_useCount.value(pMedia) == 0 && m_removedDevices.contains(pMedia))
     {
         m_removedDevices.removeAll(pMedia);
         m_useCount.remove(pMedia);

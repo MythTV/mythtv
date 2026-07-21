@@ -377,7 +377,7 @@ std::chrono::seconds LiveTVChain::GetLengthAtPos(int pos)
 {
     QMutexLocker lock(&m_lock);
 
-    LiveTVChainEntry entry = m_chain[pos];
+    LiveTVChainEntry entry = m_chain.at(pos);
     if (pos == (m_chain.count() - 1))
     {
         // We're on live program, it hasn't ended. Use current time as end time
@@ -388,7 +388,7 @@ std::chrono::seconds LiveTVChain::GetLengthAtPos(int pos)
     // the end time is set as per the EPG, but should playback be interrupted
     // such as a channel change, the end value wouldn't have reflected the actual
     // duration of the program
-    LiveTVChainEntry nextentry = m_chain[pos+1];
+    LiveTVChainEntry nextentry = m_chain.at(pos+1);
     return std::chrono::seconds(entry.starttime.secsTo(nextentry.starttime));
 }
 

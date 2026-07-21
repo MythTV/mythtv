@@ -60,14 +60,14 @@ ASIStreamHandler *ASIStreamHandler::Get(const QString &devname,
     else
     {
         s_handlersRefCnt[devkey]++;
-        uint rcount = s_handlersRefCnt[devkey];
+        uint rcount = s_handlersRefCnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("ASISH[%1]: Using existing stream handler %2 for %3")
                 .arg(QString::number(inputid), devkey, devname) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_handlers.value(devkey);
 }
 
 void ASIStreamHandler::Return(ASIStreamHandler * & ref, int inputid)

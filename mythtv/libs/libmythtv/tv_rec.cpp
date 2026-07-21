@@ -2872,7 +2872,7 @@ void TVRec::InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
     LOG(VB_JOBQUEUE, LOG_INFO,
         QString("InitAutoRunJobs for %1, line %2 -> 0x%3")
         .arg(rec->MakeUniqueKey()).arg(line)
-        .arg(m_autoRunJobs[rec->MakeUniqueKey()],0,16));
+        .arg(m_autoRunJobs.value(rec->MakeUniqueKey()),0,16));
 }
 
 /** \fn TVRec::SetLiveRecording(int)

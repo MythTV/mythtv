@@ -319,7 +319,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
 #if REUSE_CONNECTION
     if (reuse)
     {
-        db = m_inuse[QThread::currentThread()];
+        db = m_inuse.value(QThread::currentThread());
         if (db != nullptr)
         {
             m_inuseCount[QThread::currentThread()]++;
@@ -365,7 +365,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
     m_lock.lock();
 
 #if REUSE_CONNECTION
-    if (db == m_inuse[QThread::currentThread()])
+    if (db == m_inuse.value(QThread::currentThread()))
     {
         int cnt = --m_inuseCount[QThread::currentThread()];
         if (cnt > 0)
@@ -486,7 +486,7 @@ MSqlDatabase *MDBManager::getChannelCon()
 void MDBManager::CloseDatabases()
 {
     m_lock.lock();
-    DBList list = m_pool[QThread::currentThread()];
+    DBList list = m_pool.value(QThread::currentThread());
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 

@@ -75,13 +75,13 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
     else
     {
         s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        uint rcount = s_handlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("V4L2SH[%1]: Using existing stream handler for %2")
             .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_handlers.value(devkey);
 }
 
 void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)

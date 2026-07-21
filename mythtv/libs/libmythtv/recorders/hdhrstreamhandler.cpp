@@ -52,14 +52,14 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
     else
     {
         s_handlersRefCnt[majorid]++;
-        uint rcount = s_handlersRefCnt[majorid];
+        uint rcount = s_handlersRefCnt.value(majorid);
         LOG(VB_RECORD, LOG_INFO,
             QString("HDHRSH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(majorid)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[majorid];
+    return s_handlers.value(majorid);
 }
 
 void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)

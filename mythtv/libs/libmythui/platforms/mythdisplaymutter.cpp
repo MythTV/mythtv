@@ -587,8 +587,8 @@ void MythDisplayMutter::UpdateResources()
     // retrieve details
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using device '%1'").arg(m_outputs[m_outputIdx].name));
 
-    int32_t mode    = m_crtcs[m_outputs[m_outputIdx].current_crtc].currentmode;
-    m_refreshRate   = m_modes[mode].frequency;
+    int32_t mode    = m_crtcs.at(m_outputs.at(m_outputIdx).current_crtc).currentmode;
+    m_refreshRate   = m_modes.at(mode).frequency;
     m_resolution    = QSize(static_cast<int>(m_modes[mode].width),
                             static_cast<int>(m_modes[mode].height));
     m_physicalSize  = QSize(m_outputs[m_outputIdx].widthmm, m_outputs[m_outputIdx].heightmm);

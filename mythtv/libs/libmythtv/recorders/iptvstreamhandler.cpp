@@ -61,14 +61,14 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
     else
     {
         s_iptvhandlers_refcnt[devkey]++;
-        uint rcount = s_iptvhandlers_refcnt[devkey];
+        uint rcount = s_iptvhandlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("IPTVSH[%1]: Using existing stream handler %2 for %3")
             .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_iptvhandlers[devkey];
+    return s_iptvhandlers.value(devkey);
 }
 
 void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)

@@ -31,24 +31,24 @@ void MythRebuildSaver::run()
 
     QMutexLocker locker(&s_lock);
     s_count[m_decoder]--;
-    if (!s_count[m_decoder])
+    if (!s_count.value(m_decoder))
         s_wait.wakeAll();
 }
 
 uint MythRebuildSaver::GetCount(DecoderBase* Decoder)
 {
     QMutexLocker locker(&s_lock);
-    return s_count[Decoder];
+    return s_count.value(Decoder);
 }
 
 void MythRebuildSaver::Wait(DecoderBase*Decoder)
 {
     QMutexLocker locker(&s_lock);
-    if (!s_count[Decoder])
+    if (!s_count.value(Decoder))
         return;
 
     while (s_wait.wait(&s_lock))
-        if (!s_count[Decoder])
+        if (!s_count.value(Decoder))
             return;
 }
 

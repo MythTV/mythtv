@@ -1713,13 +1713,13 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         if (isp)
         {
             si = &m_pmtTracks[pidx];
-            type = kTrackTypeCC708 == m_pmtTrackTypes[pidx] ? 1 : 0;
+            type = kTrackTypeCC708 == m_pmtTrackTypes.at(pidx) ? 1 : 0;
             pidx++;
         }
         else
         {
             si = &m_streamTracks[sidx];
-            type = kTrackTypeCC708 == m_streamTrackTypes[sidx] ? 1 : 0;
+            type = kTrackTypeCC708 == m_streamTrackTypes.at(sidx) ? 1 : 0;
             sidx++;
         }
 
@@ -2529,9 +2529,9 @@ int AvFormatDecoder::GetCaptionLanguage(TrackType TrackType, int ServiceNum)
     int ret = -1;
     for (int i = 0; i < m_pmtTrackTypes.size(); i++)
     {
-        if ((m_pmtTrackTypes[i] == TrackType) && (m_pmtTracks[i].m_stream_id == ServiceNum))
+        if ((m_pmtTrackTypes.at(i) == TrackType) && (m_pmtTracks.at(i).m_stream_id == ServiceNum))
         {
-            ret = m_pmtTracks[i].m_language;
+            ret = m_pmtTracks.at(i).m_language;
             if (!iso639_is_key_undefined(ret))
                 return ret;
         }
@@ -2539,9 +2539,9 @@ int AvFormatDecoder::GetCaptionLanguage(TrackType TrackType, int ServiceNum)
 
     for (int i = 0; i < m_streamTrackTypes.size(); i++)
     {
-        if ((m_streamTrackTypes[i] == TrackType) && (m_streamTracks[i].m_stream_id == ServiceNum))
+        if ((m_streamTrackTypes.at(i) == TrackType) && (m_streamTracks.at(i).m_stream_id == ServiceNum))
         {
-            ret = m_streamTracks[i].m_language;
+            ret = m_streamTracks.at(i).m_language;
             if (!iso639_is_key_undefined(ret))
                 return ret;
         }

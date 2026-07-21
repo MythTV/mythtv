@@ -281,14 +281,14 @@ void MThreadPool::DeletePoolThreads(void)
 
     while (!m_priv->m_deleteThreads.empty())
     {
-        MPoolThread *thread = m_priv->m_deleteThreads.back();
+        MPoolThread *thread = m_priv->m_deleteThreads.constLast();
         locker.unlock();
 
         thread->wait();
 
         locker.relock();
         delete thread;
-        if (m_priv->m_deleteThreads.back() == thread)
+        if (m_priv->m_deleteThreads.constLast() == thread)
             m_priv->m_deleteThreads.pop_back();
         else
             m_priv->m_deleteThreads.removeAll(thread);
@@ -385,8 +385,8 @@ bool MThreadPool::TryStartInternal(
 
     while (!m_priv->m_deleteThreads.empty())
     {
-        m_priv->m_deleteThreads.back()->wait();
-        delete m_priv->m_deleteThreads.back();
+        m_priv->m_deleteThreads.constLast()->wait();
+        delete m_priv->m_deleteThreads.constLast();
         m_priv->m_deleteThreads.pop_back();
     }
 
@@ -562,8 +562,8 @@ void MThreadPool::waitForDone(void)
     {
         while (!m_priv->m_deleteThreads.empty())
         {
-            m_priv->m_deleteThreads.back()->wait();
-            delete m_priv->m_deleteThreads.back();
+            m_priv->m_deleteThreads.constLast()->wait();
+            delete m_priv->m_deleteThreads.constLast();
             m_priv->m_deleteThreads.pop_back();
         }
 

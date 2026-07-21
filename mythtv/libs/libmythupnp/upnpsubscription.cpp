@@ -109,7 +109,7 @@ std::chrono::seconds UPNPSubscription::Subscribe(const QString &usn, const QUrl 
     }
 
     return SendSubscribeRequest(m_callback, usn, url, path, QString(),
-                                m_subscriptions[usn]->m_uuid);
+                                m_subscriptions.value(usn)->m_uuid);
 }
 
 void UPNPSubscription::Unsubscribe(const QString &usn)
@@ -158,7 +158,7 @@ std::chrono::seconds UPNPSubscription::Renew(const QString &usn)
     if (!sid.isEmpty())
     {
         return SendSubscribeRequest(m_callback, usn, url, path, sid,
-                                    m_subscriptions[usn]->m_uuid);
+                                    m_subscriptions.value(usn)->m_uuid);
     }
 
     LOG(VB_UPNP, LOG_ERR, LOC + QString("No uuid - not renewing usn: %1")
@@ -214,7 +214,7 @@ bool UPNPSubscription::ProcessRequest(HTTPRequest *pRequest)
     if (nt != "upnp:event" || nts != "upnp:propchange")
         return true;
 
-    QString usn = pRequest->m_mapParams["usn"];
+    QString usn = pRequest->m_mapParams.value("usn");
     QString sid = pRequest->GetLastHeader("sid");
     if (usn.isEmpty() || sid.isEmpty())
         return true;

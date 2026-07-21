@@ -45,14 +45,14 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
     else
     {
         s_hlshandlers_refcnt[devkey]++;
-        uint rcount = s_hlshandlers_refcnt[devkey];
+        uint rcount = s_hlshandlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH[%1]: Using existing stream handler %2 for %3")
             .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_hlshandlers[devkey];
+    return s_hlshandlers.value(devkey);
 }
 
 void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)

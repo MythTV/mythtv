@@ -590,7 +590,7 @@ void WebSocketWorker::ProcessFrames(QTcpSocket *socket)
         {
             frame.m_mask = header.right(4);
             for (uint i = 0; i < frame.m_payloadSize; i++)
-                frame.m_payload[i] = frame.m_payload.at(i) ^ frame.m_mask[i % 4];
+                frame.m_payload[i] = frame.m_payload.at(i) ^ frame.m_mask.at(i % 4);
         }
 
         if (m_readFrame.m_fragmented

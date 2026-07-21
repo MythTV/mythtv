@@ -911,7 +911,7 @@ QString MythCoreContext::GetSetting(const QString &key,
                                     const QString &defaultval)
 {
     if (!m_testOverrideStrings.empty())
-        return m_testOverrideStrings[key];
+        return m_testOverrideStrings.value(key);
     return d->m_database->GetSetting(key, defaultval);
 }
 
@@ -924,14 +924,14 @@ bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
 {
     if (!m_testOverrideInts.empty())
-        return m_testOverrideInts[key];
+        return m_testOverrideInts.value(key);
     return d->m_database->GetNumSetting(key, defaultval);
 }
 
 double MythCoreContext::GetFloatSetting(const QString &key, double defaultval)
 {
     if (!m_testOverrideFloats.empty())
-        return m_testOverrideFloats[key];
+        return m_testOverrideFloats.value(key);
     return d->m_database->GetFloatSetting(key, defaultval);
 }
 
@@ -940,7 +940,7 @@ QString MythCoreContext::GetSettingOnHost(const QString &key,
                                           const QString &defaultval)
 {
     if (!m_testOverrideStrings.empty())
-        return m_testOverrideStrings[key];
+        return m_testOverrideStrings.value(key);
     return d->m_database->GetSettingOnHost(key, host, defaultval);
 }
 
@@ -957,7 +957,7 @@ int MythCoreContext::GetNumSettingOnHost(const QString &key,
                                          int defaultval)
 {
     if (!m_testOverrideInts.empty())
-        return m_testOverrideInts[key];
+        return m_testOverrideInts.value(key);
     return d->m_database->GetNumSettingOnHost(key, host, defaultval);
 }
 
@@ -966,7 +966,7 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
                                               double defaultval)
 {
     if (!m_testOverrideFloats.empty())
-        return m_testOverrideFloats[key];
+        return m_testOverrideFloats.value(key);
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 

@@ -222,7 +222,7 @@ void MythVisualMonoScopeVulkan::Prepare(const QRect Area)
         }
 
         // drop oldest
-        auto vertex = m_vertexBuffers.front();
+        auto vertex = m_vertexBuffers.constFirst();
         m_vertexBuffers.pop_front();
         m_vertexBuffers.append(vertex);
     }

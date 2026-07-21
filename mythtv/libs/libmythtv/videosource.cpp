@@ -920,7 +920,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
                 continue;
 
             // ignore duplicates if allow_duplicates not set
-            if (!allow_duplicates && m_minorList[minor_num])
+            if (!allow_duplicates && m_minorList.value(minor_num))
                 continue;
 
             // if the driver returns any info add this device to our list

@@ -89,7 +89,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
 
     s_master_map[m_key].push_back(this); // == RegisterForMaster
-    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
     if (master == this)
     {
         m_dvbCam = new DVBCam(m_device);
@@ -110,13 +110,13 @@ DVBChannel::~DVBChannel()
     // Set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     s_master_map_lock.lockForWrite();
-    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
     if (master == this)
     {
         s_master_map[m_key].pop_front();
         DVBChannel *new_master = nullptr;
-        if (!s_master_map[m_key].empty())
-            new_master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+        if (!s_master_map.value(m_key).empty())
+            new_master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
         if (new_master)
         {
             QMutexLocker master_locker(&(master->m_hwLock));

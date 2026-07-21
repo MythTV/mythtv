@@ -109,11 +109,11 @@ void MythSystemLegacy::SetCommand(const QString &command, uint flags)
         SetCommand(abscommand, args, flags);
     }
 
-    if (m_settings["UseStdin"])
+    if (m_settings.value("UseStdin"))
         m_stdbuff[0].open(QIODevice::WriteOnly);
-    if (m_settings["UseStdout"])
+    if (m_settings.value("UseStdout"))
         m_stdbuff[1].open(QIODevice::ReadOnly);
-    if (m_settings["UseStderr"])
+    if (m_settings.value("UseStderr"))
         m_stdbuff[2].open(QIODevice::ReadOnly);
 }
 

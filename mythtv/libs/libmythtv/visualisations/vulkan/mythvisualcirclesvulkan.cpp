@@ -288,7 +288,7 @@ void MythVisualCirclesVulkan::DrawPriv(MythPainter* /*Painter*/, QPaintDevice* /
 
     for (int i = 0; i < count; i++)
     {
-        float mag = static_cast<float>(qAbs((m_magnitudes[i] + m_magnitudes[i + count]) / 2.0));
+        float mag = static_cast<float>(qAbs((m_magnitudes.at(i) + m_magnitudes.at(i + count)) / 2.0));
         if (mag > 1.0F)
         {
             // Setup circle and push constants

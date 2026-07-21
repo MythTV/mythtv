@@ -211,7 +211,7 @@ void MythDVDDecoder::CheckContext(int64_t Pts)
     {
         // Remove any contexts we should have
         // already processed.(but have somehow jumped past)
-        while (!m_contextList.empty() && (Pts >= m_contextList.first()->GetEndPTS()))
+        while (!m_contextList.empty() && (Pts >= m_contextList.constFirst()->GetEndPTS()))
         {
             ReleaseContext(m_curContext);
             m_curContext = m_contextList.takeFirst();
@@ -220,7 +220,7 @@ void MythDVDDecoder::CheckContext(int64_t Pts)
         }
 
         // See whether we can take the next context from the list
-        if (!m_contextList.empty() && (Pts >= m_contextList.first()->GetStartPTS()))
+        if (!m_contextList.empty() && (Pts >= m_contextList.constFirst()->GetStartPTS()))
         {
             ReleaseContext(m_curContext);
             m_curContext = m_contextList.takeFirst();
@@ -364,7 +364,7 @@ bool MythDVDDecoder::ProcessDataPacket(AVStream *Curstream, AVPacket *Pkt,
         {
             // If we don't have a current context, use
             // the first in the list
-            CheckContext(m_contextList.first()->GetStartPTS());
+            CheckContext(m_contextList.constFirst()->GetStartPTS());
 
             if (m_lastVideoPkt && m_curContext)
             {

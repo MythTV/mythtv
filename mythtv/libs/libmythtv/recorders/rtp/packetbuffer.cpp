@@ -26,7 +26,7 @@ UDPPacket PacketBuffer::PopDataPacket(void)
     if (m_availablePackets.empty())
         return UDPPacket(0);
 
-    UDPPacket packet(m_availablePackets.front());
+    UDPPacket packet(m_availablePackets.constFirst());
     m_availablePackets.pop_front();
 
     return packet;

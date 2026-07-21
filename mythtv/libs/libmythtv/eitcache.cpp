@@ -260,7 +260,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
 
 bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
 {
-    event_map_t * eventMap = m_channelMap[chanid];
+    event_map_t * eventMap = m_channelMap.value(chanid);
 
     if (!eventMap)
         return false;
@@ -394,7 +394,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
         return false;
     }
 
-    event_map_t * eventMap = m_channelMap[chanid];
+    event_map_t * eventMap = m_channelMap.value(chanid);
     event_map_t::iterator it = eventMap->find(eventid);
     if (it != eventMap->end())
     {

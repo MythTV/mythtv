@@ -137,7 +137,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
         clearSelections();
         for (uint rate : m_rates)
         {
-            if (m_allowedRate[rate])
+            if (m_allowedRate.value(rate))
                 addSelection(QString::number(rate));
         }
 
@@ -154,7 +154,7 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     {
         QString val = value.isEmpty() ? label : value;
         uint rate = val.toUInt();
-        if (m_allowedRate[rate])
+        if (m_allowedRate.value(rate))
         {
             MythUIComboBoxSetting::addSelection(label, value, select);
         }

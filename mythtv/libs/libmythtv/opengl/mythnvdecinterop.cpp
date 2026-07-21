@@ -291,9 +291,9 @@ MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
         RotateReferenceFrames(cudabuffer);
         int size = m_referenceFrames.size();
 
-        CUdeviceptr next    = m_referenceFrames[0];
-        CUdeviceptr current = m_referenceFrames[size > 1 ? 1 : 0];
-        CUdeviceptr last    = m_referenceFrames[size > 2 ? 2 : 0];
+        CUdeviceptr next    = m_referenceFrames.at(0);
+        CUdeviceptr current = m_referenceFrames.at(size > 1 ? 1 : 0);
+        CUdeviceptr last    = m_referenceFrames.at(size > 2 ? 2 : 0);
 
         if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
             !m_openglTextures.contains(last))
@@ -303,8 +303,8 @@ MythNVDECInterop::Acquire(MythRenderOpenGL* Context,
         }
 
         result = m_openglTextures[last];
-        std::copy(m_openglTextures[current].cbegin(), m_openglTextures[current].cend(), std::back_inserter(result));
-        std::copy(m_openglTextures[next].cbegin(), m_openglTextures[next].cend(), std::back_inserter(result));
+        std::ranges::copy(m_openglTextures.value(current), std::back_inserter(result));
+        std::ranges::copy(m_openglTextures.value(next), std::back_inserter(result));
         return result;
     }
     m_referenceFrames.clear();
@@ -422,7 +422,7 @@ void MythNVDECInterop::RotateReferenceFrames(CUdeviceptr Buffer)
         return;
 
     // don't retain twice for double rate
-    if (!m_referenceFrames.empty() && (m_referenceFrames[0] == Buffer))
+    if (!m_referenceFrames.empty() && (m_referenceFrames.at(0) == Buffer))
         return;
 
     m_referenceFrames.push_front(Buffer);

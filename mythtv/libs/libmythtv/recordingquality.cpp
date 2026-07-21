@@ -46,7 +46,7 @@ RecordingQuality::RecordingQuality(
     // trim start
     QDateTime start = get_start(*ri);
     while (!m_recordingGaps.empty() &&
-           m_recordingGaps.first().GetStart() < start)
+           m_recordingGaps.constFirst().GetStart() < start)
     {
         RecordingGap &firstGap = m_recordingGaps.first();
         if (start < firstGap.GetEnd())
@@ -58,7 +58,7 @@ RecordingQuality::RecordingQuality(
     // trim end
     QDateTime end = get_end(*ri).addSecs(-max_end);
     while (!m_recordingGaps.empty() &&
-           m_recordingGaps.back().GetEnd() > end)
+           m_recordingGaps.constLast().GetEnd() > end)
     {
         RecordingGap &back = m_recordingGaps.back();
         if (back.GetStart() < end)

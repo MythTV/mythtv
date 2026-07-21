@@ -125,7 +125,7 @@ bool HLSReader::Open(const QString & m3u, int bitrate_index)
             return false;
         }
 
-        auto it = m_streams.begin();
+        auto it = m_streams.constBegin();
         for (auto i = 0; i < m_bitrateIndex - 1; i++)
             it++;
         m_curstream = *it;
@@ -959,7 +959,7 @@ bool HLSReader::LoadSegments(MythSingleDownload& downloader)
             return false;
         }
 
-        m_curSeq = m_segments.front().Sequence();
+        m_curSeq = m_segments.constFirst().Sequence();
         m_segments.pop_front();
 
         m_seqLock.unlock();

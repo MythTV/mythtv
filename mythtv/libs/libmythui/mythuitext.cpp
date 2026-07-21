@@ -677,12 +677,12 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
              * "width"
              */
             QFontMetrics fmLeft(getFontAt(last_line));
-            int bearing = fmLeft.leftBearing(paragraph[last_line]);
+            int bearing = fmLeft.leftBearing(paragraph.at(last_line));
             m_leftBearing = std::min(m_leftBearing, bearing);
 
             int lastCharPos = last_line + line.textLength() - 1;
             QFontMetrics fmRight(getFontAt(lastCharPos));
-            bearing = fmRight.rightBearing(paragraph[lastCharPos]);
+            bearing = fmRight.rightBearing(paragraph.at(lastCharPos));
             m_rightBearing = std::min(m_rightBearing, bearing);
         }
     }
@@ -707,7 +707,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
     for (Ipara = paragraphs.begin(), idx = 0;
          Ipara != paragraphs.end(); ++Ipara, ++idx)
     {
-        QTextLayout *layout = m_layouts[idx];
+        QTextLayout *layout = m_layouts.at(idx);
         layout->setTextOption(textoption);
         layout->setFont(m_font->face());
 

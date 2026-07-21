@@ -444,9 +444,9 @@ void ExternIO::Fork(void)
     char **arguments = new char*[m_args.size() + 1];
     for (int i = 0; i < m_args.size(); ++i)
     {
-        int len = m_args[i].size() + 1;
+        int len = m_args.at(i).size() + 1;
         arguments[i] = new char[len];
-        memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
+        memcpy(arguments[i], m_args.at(i).toStdString().c_str(), len);
     }
     arguments[m_args.size()] = nullptr;
 
@@ -497,7 +497,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
     else
     {
         ++s_handlersRefCnt[majorid];
-        uint rcount = s_handlersRefCnt[majorid];
+        uint rcount = s_handlersRefCnt.value(majorid);
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1:%2]: Using existing stream handler for %3")
             .arg(inputid).arg(majorid).arg(devname) +
@@ -511,7 +511,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
         QString("ExternSH[%1:%2]: Used by %3")
         .arg(inputid).arg(majorid).arg(refs));
 
-    return s_handlers[majorid];
+    return s_handlers.value(majorid);
 }
 
 void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,

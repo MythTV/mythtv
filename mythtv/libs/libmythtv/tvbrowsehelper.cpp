@@ -409,7 +409,7 @@ void TVBrowseHelper::run()
         if (!m_browseRun)
             break;
 
-        BrowseInfo bi = m_browseList.front();
+        auto bi = m_browseList.constFirst();
         m_browseList.pop_front();
 
         std::vector<uint> chanids;
@@ -418,13 +418,13 @@ void TVBrowseHelper::run()
             if (!bi.m_chanId)
             {
                 std::vector<uint> chanids_extra;
-                uint sourceid = m_dbChanidToSourceid[m_browseChanId];
+                uint sourceid = m_dbChanidToSourceid.value(m_browseChanId);
                 QMultiMap<QString,uint>::iterator it;
                 it = m_dbChannumToChanids.lowerBound(bi.m_chanNum);
                 for ( ; (it != m_dbChannumToChanids.end()) &&
                           (it.key() == bi.m_chanNum); ++it)
                 {
-                    if (m_dbChanidToSourceid[*it] == sourceid)
+                    if (m_dbChanidToSourceid.value(*it) == sourceid)
                         chanids.push_back(*it);
                     else
                         chanids_extra.push_back(*it);

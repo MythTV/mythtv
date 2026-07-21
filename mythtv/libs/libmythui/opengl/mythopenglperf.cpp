@@ -79,7 +79,7 @@ void MythOpenGLPerf::LogSamples(void)
         for (int i = 0; i < m_timerData.size(); ++i)
         {
             results.append(m_timerNames[i] + QString::number((m_timerData[i] / 1000000000.0) / m_sampleCount, '0', 4));
-            total += m_timerData[i];
+            total += m_timerData.at(i);
             m_timerData[i] = 0;
         }
         LOG(VB_GPUVIDEO, LOG_INFO, m_name + results.join(" ") +

@@ -113,7 +113,7 @@ void RawSettingsEditor::Init(void)
         auto *item = new MythUIButtonListItem(m_settingsList, "",
                                               QVariant::fromValue(*it));
 
-        if (m_settings[*it].isEmpty())
+        if (m_settings.value(*it).isEmpty())
             item->SetText(*it);
         else
             item->SetText(m_settings[*it]);
@@ -194,18 +194,18 @@ void RawSettingsEditor::updatePrevNextTexts(void)
                 ((i > 0) && (((recs-1) - i) >= curPos)))
             {
                 if (m_prevNextShapes.contains(i))
-                    m_prevNextShapes[i]->Show();
+                    m_prevNextShapes.value(i)->Show();
 
                 auto *tmpitem = m_settingsList->GetItemAt(curPos + i);
-                m_prevNextTexts[i]->SetText(
+                m_prevNextTexts.value(i)->SetText(
                     m_settingValues[tmpitem->GetData().toString()]);
             }
             else
             {
                 if (m_prevNextShapes.contains(i))
-                    m_prevNextShapes[i]->Hide();
+                    m_prevNextShapes.value(i)->Hide();
 
-                m_prevNextTexts[i]->SetText(QString());
+                m_prevNextTexts.value(i)->SetText(QString());
             }
         }
     }

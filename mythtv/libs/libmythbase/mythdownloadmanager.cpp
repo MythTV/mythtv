@@ -273,7 +273,7 @@ void MythDownloadManager::run(void)
         m_infoLock->lock();
         if (!m_downloadQueue.isEmpty())
         {
-            MythDownloadInfo *dlInfo = m_downloadQueue.front();
+            MythDownloadInfo *dlInfo = m_downloadQueue.constFirst();
 
             m_downloadQueue.pop_front();
 
@@ -794,7 +794,7 @@ void MythDownloadManager::authCallback(QNetworkReply *reply,
     if (!reply)
         return;
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;
@@ -1051,7 +1051,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
 
         if (m_downloadInfos.contains(url))
         {
-            MythDownloadInfo *dlInfo = m_downloadInfos[url];
+            MythDownloadInfo *dlInfo = m_downloadInfos.value(url);
 
             if (!m_cancellationQueue.contains(dlInfo))
                 m_cancellationQueue.append(dlInfo);
@@ -1163,7 +1163,7 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
         return;
     }
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;
@@ -1203,7 +1203,7 @@ void MythDownloadManager::downloadFinished(QNetworkReply* reply)
         return;
     }
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo || !dlInfo->m_reply)
         return;
@@ -1457,7 +1457,7 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived,
     if (!m_downloadReplies.contains(reply))
         return;
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;

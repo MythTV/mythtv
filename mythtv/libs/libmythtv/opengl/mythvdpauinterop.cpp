@@ -96,7 +96,7 @@ void MythVDPAUInterop::RotateReferenceFrames(AVBufferRef* Buffer)
 
     // don't retain twice for double rate
     if (!m_referenceFrames.empty() &&
-            (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
+            (static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(m_referenceFrames.at(0)->data)) ==
              static_cast<VdpVideoSurface>(reinterpret_cast<uintptr_t>(Buffer->data))))
     {
         return;
@@ -365,7 +365,7 @@ MythVDPAUInterop::Acquire(MythRenderOpenGL* Context,
                           Frame->m_topFieldFirst), m_referenceFrames);
     m_mapNV(1, &m_outputSurfaceReg);
     m_mapped = true;
-    return m_openglTextures[DUMMY_INTEROP_ID];
+    return m_openglTextures.value(DUMMY_INTEROP_ID);
 }
 
 void MythVDPAUInterop::UpdateColourSpace(bool /*PrimariesChanged*/)

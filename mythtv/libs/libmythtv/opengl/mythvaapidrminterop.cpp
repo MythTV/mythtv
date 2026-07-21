@@ -129,7 +129,7 @@ void MythVAAPIInteropDRM::RotateReferenceFrames(AVBufferRef* Buffer)
 
     // don't retain twice for double rate
     if (!m_referenceFrames.empty() &&
-            (static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data)) ==
+            (static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames.at(0)->data)) ==
              static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Buffer->data))))
     {
         return;
@@ -152,9 +152,9 @@ std::vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::GetReferenceFrames()
     if (size < 1)
         return result;
 
-    auto next = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[0]->data));
-    auto current = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 1 ? 1 : 0]->data));
-    auto last = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames[size > 2 ? 2 : 0]->data));
+    auto next = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames.at(0)->data));
+    auto current = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames.at(size > 1 ? 1 : 0)->data));
+    auto last = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(m_referenceFrames.at(size > 2 ? 2 : 0)->data));
 
     if (!m_openglTextures.contains(next) || !m_openglTextures.contains(current) ||
         !m_openglTextures.contains(last))
@@ -163,9 +163,9 @@ std::vector<MythVideoTextureOpenGL*> MythVAAPIInteropDRM::GetReferenceFrames()
         return result;
     }
 
-    std::copy(m_openglTextures[last].cbegin(),    m_openglTextures[last].cend(),    std::back_inserter(result));
-    std::copy(m_openglTextures[current].cbegin(), m_openglTextures[current].cend(), std::back_inserter(result));
-    std::copy(m_openglTextures[next].cbegin(),    m_openglTextures[next].cend(),    std::back_inserter(result));
+    std::ranges::copy(m_openglTextures.value(last),    std::back_inserter(result));
+    std::ranges::copy(m_openglTextures.value(current), std::back_inserter(result));
+    std::ranges::copy(m_openglTextures.value(next),    std::back_inserter(result));
     return result;
 }
 
@@ -270,7 +270,7 @@ MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* Context,
     {
         if (needreferenceframes)
             return GetReferenceFrames();
-        return m_openglTextures[id];
+        return m_openglTextures.value(id);
     }
 
     OpenGLLocker locker(m_openglContext);
@@ -529,7 +529,7 @@ bool MythVAAPIInteropDRM::HandleDRMVideo(MythVideoColourSpace* ColourSpace, VASu
         {
             if (!m_drmFrames.contains(Id))
                 m_drmFrames.insert(Id, GetDRMFrameDescriptor(Id));
-            if (m_drm->RenderFrame(m_drmFrames[Id], Frame))
+            if (m_drm->RenderFrame(m_drmFrames.value(Id), Frame))
                 return true;
         }
 

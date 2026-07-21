@@ -240,16 +240,16 @@ int ThreadedFileWriter::Write(const void *data, uint count)
         TFWBuffer *buf = nullptr;
 
         if (!m_writeBuffers.empty() &&
-            (m_writeBuffers.back()->data.size() + towrite) < kMinWriteSize)
+            (m_writeBuffers.constLast()->data.size() + towrite) < kMinWriteSize)
         {
-            buf = m_writeBuffers.back();
+            buf = m_writeBuffers.constLast();
             m_writeBuffers.pop_back();
         }
         else
         {
             if (!m_emptyBuffers.empty())
             {
-                buf = m_emptyBuffers.front();
+                buf = m_emptyBuffers.constFirst();
                 m_emptyBuffers.pop_front();
                 buf->data.clear();
             }
@@ -460,7 +460,7 @@ void ThreadedFileWriter::DiskLoop(void)
             continue;
         }
 
-        TFWBuffer *buf = m_writeBuffers.front();
+        TFWBuffer *buf = m_writeBuffers.constFirst();
         m_writeBuffers.pop_front();
         m_totalBufferUse -= buf->data.size();
         m_bufferWasFreed.wakeAll();

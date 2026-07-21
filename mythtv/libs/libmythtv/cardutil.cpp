@@ -453,7 +453,7 @@ void CardUtil::ClearVideoDeviceCache()
 QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 {
     if (s_videoDeviceCache.contains(rawtype))
-        return s_videoDeviceCache[rawtype];
+        return s_videoDeviceCache.value(rawtype);
 
     QStringList devs;
 

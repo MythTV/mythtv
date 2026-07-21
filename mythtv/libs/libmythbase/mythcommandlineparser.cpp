@@ -846,9 +846,9 @@ void CommandLineArg::SetParentOf(CommandLineArg *other, bool forward)
 
     for (int i = 0; i < m_children.size(); i++)
     {
-        if (m_children[i]->m_name == other->m_name)
+        if (m_children.at(i)->m_name == other->m_name)
         {
-            m_children[i]->DecrRef();
+            m_children.at(i)->DecrRef();
             m_children.replace(i, other);
             replaced = true;
             break;
@@ -874,9 +874,9 @@ void CommandLineArg::SetChildOf(CommandLineArg *other, bool forward)
 
     for (int i = 0; i < m_parents.size(); i++)
     {
-        if (m_parents[i]->m_name == other->m_name)
+        if (m_parents.at(i)->m_name == other->m_name)
         {
-            m_parents[i]->DecrRef();
+            m_parents.at(i)->DecrRef();
             m_parents.replace(i, other);
             replaced = true;
             break;
@@ -902,9 +902,9 @@ void CommandLineArg::SetRequires(CommandLineArg *other, bool /*forward*/)
 
     for (int i = 0; i < m_requires.size(); i++)
     {
-        if (m_requires[i]->m_name == other->m_name)
+        if (m_requires.at(i)->m_name == other->m_name)
         {
-            m_requires[i]->DecrRef();
+            m_requires.at(i)->DecrRef();
             m_requires.replace(i, other);
             replaced = true;
             break;
@@ -931,9 +931,9 @@ void CommandLineArg::SetBlocks(CommandLineArg *other, bool forward)
 
     for (int i = 0; i < m_blocks.size(); i++)
     {
-        if (m_blocks[i]->m_name == other->m_name)
+        if (m_blocks.at(i)->m_name == other->m_name)
         {
-            m_blocks[i]->DecrRef();
+            m_blocks.at(i)->DecrRef();
             m_blocks.replace(i, other);
             replaced = true;
             break;
@@ -1364,7 +1364,7 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
 
     if (m_namedArgs.contains(name))
     {
-        arg = m_namedArgs[name];
+        arg = m_namedArgs.value(name);
     }
     else
     {
@@ -1628,7 +1628,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         // passthrough is active, so add the data to the stringlist
         if (m_passthroughActive)
         {
-            m_namedArgs["_passthrough"]->Set("", val);
+            m_namedArgs.value("_passthrough")->Set("", val);
             continue;
         }
 
@@ -1644,7 +1644,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
                 return false;
             }
 
-            m_namedArgs["_args"]->Set("", val);
+            m_namedArgs.value("_args")->Set("", val);
             continue;
         }
 
@@ -1670,7 +1670,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             if (m_namedArgs.contains("_extra"))
             {
                 // arbitrary allowed, specify general collection pool
-                argdef = m_namedArgs["_extra"];
+                argdef = m_namedArgs.value("_extra");
                 QByteArray tmp = opt.toLocal8Bit();
                 tmp += '=';
                 tmp += val;
@@ -1688,7 +1688,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
         }
         else
         {
-            argdef = m_optionedArgs[opt];
+            argdef = m_optionedArgs.value(opt);
         }
 
         // argument has been marked as removed, warn user and fail
@@ -1967,7 +1967,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                                  .toLocal8Bit().constData()
                           << '\n';
             }
-            (*args_it)->SetChildOf(m_namedArgs[(*links_it)->m_name]);
+            (*args_it)->SetChildOf(m_namedArgs.value((*links_it)->m_name));
         }
 
         links = (*args_it)->m_children;
@@ -1996,7 +1996,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                                  .toLocal8Bit().constData()
                      << '\n';
             }
-            (*args_it)->SetParentOf(m_namedArgs[(*links_it)->m_name]);
+            (*args_it)->SetParentOf(m_namedArgs.value((*links_it)->m_name));
         }
 
         links = (*args_it)->m_requires;
@@ -2025,7 +2025,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                                  .toLocal8Bit().constData()
                      << '\n';
             }
-            (*args_it)->SetRequires(m_namedArgs[(*links_it)->m_name]);
+            (*args_it)->SetRequires(m_namedArgs.value((*links_it)->m_name));
         }
 
         QList<CommandLineArg*>::iterator req_it =
@@ -2037,7 +2037,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                 // if its not an invalid, it shouldnt be here anyway
                 if (m_namedArgs.contains((*req_it)->m_name))
                 {
-                    m_namedArgs[(*req_it)->m_name]->SetRequires(*args_it);
+                    m_namedArgs.value((*req_it)->m_name)->SetRequires(*args_it);
                     if (m_verbose)
                     {
                         std::cerr << QString("  Setting %1 as blocking %2")
@@ -2078,7 +2078,7 @@ bool MythCommandLineParser::ReconcileLinks(void)
                                  .toLocal8Bit().constData()
                           << '\n';
             }
-            (*args_it)->SetBlocks(m_namedArgs[(*block_it)->m_name]);
+            (*args_it)->SetBlocks(m_namedArgs.value((*block_it)->m_name));
             ++block_it;
         }
     }
@@ -2095,7 +2095,7 @@ QVariant MythCommandLineParser::operator[](const QString &name)
     if (!m_namedArgs.contains(name))
         return var;
 
-    CommandLineArg *arg = m_namedArgs[name];
+    CommandLineArg *arg = m_namedArgs.value(name);
 
     if (arg->m_given)
         var = arg->m_stored;
@@ -2194,7 +2194,7 @@ QMap<QString,QString> MythCommandLineParser::GetSettingsOverride(void)
             for (auto it = smap.cbegin(); it != smap.cend(); ++it)
                 vmap[it.key()] = QVariant(it.value());
 
-            m_namedArgs["overridesettings"]->Set(QVariant(vmap));
+            m_namedArgs.value("overridesettings")->Set(QVariant(vmap));
         }
     }
 
@@ -2873,7 +2873,7 @@ bool MythCommandLineParser::SetValue(const QString &key, const QVariant& value)
     }
     else
     {
-        arg = m_namedArgs[key];
+        arg = m_namedArgs.value(key);
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
         auto type = static_cast<QMetaType::Type>(value.type());
 #else

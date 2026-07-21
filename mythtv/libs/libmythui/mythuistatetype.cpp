@@ -149,7 +149,7 @@ MythUIType *MythUIStateType::GetState(const QString &name)
     QString lcname = name.toLower();
 
     if (m_objectsByName.contains(lcname))
-        return m_objectsByName[lcname];
+        return m_objectsByName.value(lcname);
 
     return nullptr;
 }
@@ -157,7 +157,7 @@ MythUIType *MythUIStateType::GetState(const QString &name)
 MythUIType *MythUIStateType::GetState(StateType state)
 {
     if (m_objectsByState.contains(state))
-        return m_objectsByState[state];
+        return m_objectsByState.value(state);
 
     return nullptr;
 }

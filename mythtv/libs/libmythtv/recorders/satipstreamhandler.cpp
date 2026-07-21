@@ -49,7 +49,7 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
     else
     {
         s_handlersRefCnt[devname]++;
-        uint rcount = s_handlersRefCnt[devname];
+        uint rcount = s_handlersRefCnt.value(devname);
         (*it)->m_inputId = inputid;
 
         LOG(VB_RECORD, LOG_INFO,
@@ -57,7 +57,7 @@ SatIPStreamHandler *SatIPStreamHandler::Get(const QString &devname, int inputid)
             QString(" (%1 users)").arg(rcount));
     }
 
-    return s_handlers[devname];
+    return s_handlers.value(devname);
 }
 
 void SatIPStreamHandler::Return(SatIPStreamHandler * & ref, int inputid)
