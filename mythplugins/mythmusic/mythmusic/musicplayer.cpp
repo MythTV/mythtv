@@ -908,9 +908,9 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             if (!m_playedList.isEmpty() && m_currentTime > 0s)
             {
-                m_playedList.last()->setLength(m_currentTime);
+                m_playedList.constLast()->setLength(m_currentTime);
                 // this will update any track lengths displayed on screen
-                gPlayer->sendMetadataChangedEvent(m_playedList.last()->ID());
+                gPlayer->sendMetadataChangedEvent(m_playedList.constLast()->ID());
             }
         }
     }
@@ -1653,7 +1653,7 @@ int MusicPlayer::getNotificationID (const QString& hostname)
     if (!m_notificationMap.contains(hostname))
         m_notificationMap.insert(hostname, GetNotificationCenter()->Register(this));
 
-    return m_notificationMap[hostname];
+    return m_notificationMap.value(hostname);
 }
 
 void MusicPlayer::sendNotification(int notificationID, const QString &title, const QString &author, const QString &desc)

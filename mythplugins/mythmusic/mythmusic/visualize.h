@@ -331,7 +331,7 @@ class Squares : public Spectrum
     bool draw(QPainter *p, const QColor &back = Qt::black) override; // Spectrum
 
   private:
-    void drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h);
+    void drawRect(QPainter *p, const QRect *rect, int i, int c, int w, int h);
     QSize m_actualSize        {0,0};
     int   m_fakeHeight        {0};
     int   m_numberOfSquares   {16};
