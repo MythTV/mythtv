@@ -338,7 +338,7 @@ bool ThemeChooser::LoadVersion(const QString &version,
 
             if (themesSeen.contains(dirName))
             {
-                ThemeInfo *localTheme = m_themeNameInfos[dirName];
+                ThemeInfo *localTheme = m_themeNameInfos.value(dirName);
 
                 themeName = remoteTheme.GetName();
 

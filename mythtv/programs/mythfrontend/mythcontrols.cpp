@@ -311,7 +311,7 @@ void MythControls::UpdateRightList(void)
     switch(m_currentView)
     {
     case kActionsByContext:
-        SetListContents(m_rightList, m_contexts[rtstr]);
+        SetListContents(m_rightList, m_contexts.value(rtstr));
         break;
     case kKeysByContext:
         SetListContents(m_rightList, m_bindings->GetContextKeys(rtstr));

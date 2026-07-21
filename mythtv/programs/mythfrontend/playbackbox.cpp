@@ -718,7 +718,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     infoMap["title"] = grouplabel;
     infoMap["show"] =
         groupname.isEmpty() ? ProgramInfo::i18n("All Programs") : grouplabel;
-    int countInGroup = m_progLists[groupname].size();
+    int countInGroup = m_progLists.value(groupname).size();
 
     if (m_artImage[kArtworkFanart])
     {
@@ -749,7 +749,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
     if (countInGroup >= 1)
     {
-        ProgramList  group     = m_progLists[groupname];
+        ProgramList  group     = m_progLists.value(groupname);
         float        groupSize = 0.0;
 
         for (auto *info : group)
@@ -1501,7 +1501,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
             item->SetText(displayName, "name");
             item->SetText(displayName);
 
-            int count = m_progLists[groupname.toLower()].size();
+            int count = m_progLists.value(groupname.toLower()).size();
             item->SetText(QString::number(count), "reccount");
         }
 
@@ -1787,7 +1787,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (!m_progLists.isEmpty())
     {
-        for (auto & prog : m_progLists[""])
+        for (const auto & prog : m_progLists.value(""))
         {
             uint asRecordingID = prog->GetRecordingID();
             asCache[asRecordingID] = prog->GetAvailableStatus();
@@ -2023,7 +2023,7 @@ bool PlaybackBox::UpdateUILists(void)
     if (sortedList.empty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "SortedList is Empty");
-        m_progLists[""];
+        m_progLists.value("");
         m_titleList << "";
         m_playList.clear();
         if (!isAllProgsGroup)
@@ -2647,7 +2647,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     }
     else if (m_delList.size() >= 3)
     {
-        delItem = FindProgramInUILists(m_delList[0].toUInt());
+        delItem = FindProgramInUILists(m_delList.at(0).toUInt());
     }
 
     if (!delItem)
@@ -4345,13 +4345,13 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if ((message == "PLAY_PLAYLIST") && !m_playListPlay.empty())
         {
-            uint recordingID = m_playListPlay.front();
+            uint recordingID = m_playListPlay.constFirst();
             m_playListPlay.pop_front();
 
             if (!m_playListPlay.empty())
             {
                 const ProgramInfo *pginfo =
-                    FindProgramInUILists(m_playListPlay.front());
+                    FindProgramInUILists(m_playListPlay.constFirst());
                 if (pginfo)
                     m_helper.CheckAvailability(*pginfo, kCheckForCache);
             }

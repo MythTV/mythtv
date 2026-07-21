@@ -65,7 +65,7 @@ class NetworkCommand : public QObject
 
     QString               getCommand()    { return m_command; }
     NetworkControlClient *getClient()     { return m_client; }
-    QString               getArg(int arg) { return m_args[arg]; }
+    QString               getArg(int arg) { return m_args.at(arg); }
     int                   getArgCount()   { return m_args.size(); }
     QString               getFrom(int arg);
 

@@ -293,7 +293,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
     bool valid = m_servers.contains(usn);
     if (valid)
     {
-        MediaServerItem* item = m_servers[usn]->Find(object);
+        MediaServerItem* item = m_servers.value(usn)->Find(object);
         valid = item ? !item->m_scanned : false;
     }
     m_lock.unlock();
@@ -312,7 +312,7 @@ bool UPNPScanner::GetMetadata(QVariant &data)
         m_lock.lock();
         if (m_servers.contains(usn))
         {
-            MediaServerItem *item = m_servers[usn]->Find(object);
+            MediaServerItem *item = m_servers.value(usn)->Find(object);
             if (item)
             {
                 found = item->m_scanned;
@@ -653,9 +653,9 @@ void UPNPScanner::customEvent(QEvent *event)
             m_lock.lock();
             if (m_servers.contains(usn))
             {
-                url = m_servers[usn]->m_controlURL;
+                url = m_servers.value(usn)->m_controlURL;
                 LOG(VB_GENERAL, LOG_INFO, QString("UPNP_BROWSEOBJECT: %1->%2")
-                    .arg(m_servers[usn]->m_friendlyName, objectid));
+                    .arg(m_servers.value(usn)->m_friendlyName, objectid));
             }
             m_lock.unlock();
             if (!url.isEmpty())
@@ -680,9 +680,9 @@ void UPNPScanner::customEvent(QEvent *event)
         if (m_servers.contains(usn))
         {
             int newid = id.toInt();
-            if (m_servers[usn]->m_systemUpdateID != newid)
+            if (m_servers.value(usn)->m_systemUpdateID != newid)
             {
-                m_scanComplete &= m_servers[usn]->ResetContent(newid);
+                m_scanComplete &= m_servers.value(usn)->ResetContent(newid);
                 LOG(VB_GENERAL, LOG_INFO, LOC +
                     QString("New SystemUpdateID '%1' for %2").arg(id, usn));
                 Debug();
@@ -942,7 +942,7 @@ void UPNPScanner::RemoveServer(const QString &usn)
     if (m_servers.contains(usn))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Removing: %1").arg(usn));
-        UpnpMediaServer* old = m_servers[usn];
+        UpnpMediaServer* old = m_servers.value(usn);
         if (old->m_renewalTimerId)
             killTimer(old->m_renewalTimerId);
         m_servers.remove(usn);

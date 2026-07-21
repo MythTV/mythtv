@@ -172,7 +172,7 @@ void ProgramInfoCache::Refresh(void)
             {
                 // An entry using that key already exists in hash.
                 // Free allocated memory for the entry to be replaced.
-                delete m_cache[it->GetRecordingID()];
+                delete m_cache.value(it->GetRecordingID());
             }
 
             m_cache[it->GetRecordingID()] = it;

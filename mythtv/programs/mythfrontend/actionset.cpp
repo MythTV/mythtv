@@ -95,7 +95,7 @@ bool ActionSet::Remove(const ActionID &id, const QString &key)
     m_keyToActionMap[key].removeAll(id);
 
     // remove the key if there isn't anything bound to it.
-    if (m_keyToActionMap[key].isEmpty())
+    if (m_keyToActionMap.value(key).isEmpty())
         m_keyToActionMap.remove(key);
 
     SetModifiedFlag(id, true);

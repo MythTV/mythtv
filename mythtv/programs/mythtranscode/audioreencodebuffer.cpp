@@ -205,7 +205,7 @@ AudioBuffer *AudioReencodeBuffer::GetData(std::chrono::milliseconds time)
     if (m_bufferList.isEmpty())
         return nullptr;
 
-    AudioBuffer *ab = m_bufferList.front();
+    AudioBuffer *ab = m_bufferList.constFirst();
 
     if (ab->m_time <= time)
     {

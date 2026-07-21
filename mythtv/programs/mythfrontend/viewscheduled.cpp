@@ -343,7 +343,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     // Restore position after a list update
     if (!callsign.isEmpty())
     {
-        ProgramList plist = m_recgroupList[m_currentGroup];
+        ProgramList plist = m_recgroupList.value(m_currentGroup);
 
         int listPos = ((int) plist.size()) - 1;
         for (int i = listPos; i >= 0; --i)
@@ -584,7 +584,7 @@ void ViewScheduled::viewInputs()
     m_curinput++;
     while (m_curinput <= m_maxinput)
     {
-        if (m_inputref[m_curinput] > 0)
+        if (m_inputref.value(m_curinput) > 0)
             return;
         m_curinput++;
     }

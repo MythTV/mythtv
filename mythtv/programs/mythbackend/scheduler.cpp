@@ -1033,7 +1033,7 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == RecStatus::Unknown)
         {
             RecList *conflictlist =
-                m_sinputInfoMap[p->GetInputID()].m_conflictList;
+                m_sinputInfoMap.value(p->GetInputID()).m_conflictList;
             if (!conflictlist)
             {
                 ++badinputs[p->GetInputID()];
@@ -1904,7 +1904,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 
     auto * new_pi = new RecordingInfo(pi);
     new_pi->m_mplexId = new_pi->QueryMplexID();
-    new_pi->m_sgroupId = m_sinputInfoMap[new_pi->GetInputID()].m_sgroupId;
+    new_pi->m_sgroupId = m_sinputInfoMap.value(new_pi->GetInputID()).m_sgroupId;
     m_recList.push_back(new_pi);
     m_recListChanged = true;
 
@@ -2934,9 +2934,9 @@ void Scheduler::HandleRecordingStatusChange(
     bool doSchedAfterStart =
         ((recStatus != RecStatus::Tuning &&
           recStatus != RecStatus::Recording) ||
-         m_schedAfterStartMap[ri.GetRecordingRuleID()] ||
+         m_schedAfterStartMap.value(ri.GetRecordingRuleID()) ||
          ((ri.GetParentRecordingRuleID() != 0U) &&
-          m_schedAfterStartMap[ri.GetParentRecordingRuleID()]));
+          m_schedAfterStartMap.value(ri.GetParentRecordingRuleID())));
     ri.AddHistory(doSchedAfterStart);
 
     QString msg;
@@ -2979,7 +2979,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
     QDateTime now = MythDate::current();
 
     // Check each child input to find the best one to use.
-    std::vector<unsigned int> inputs = m_sinputInfoMap[ri.GetInputID()].m_groupInputs;
+    std::vector<unsigned int> inputs = m_sinputInfoMap.value(ri.GetInputID()).m_groupInputs;
     for (uint i = 0; !bestid && i < inputs.size(); ++i)
     {
         uint inputid = inputs[i];
@@ -5773,7 +5773,7 @@ void Scheduler::SchedLiveTV(void)
             dummy->SetRecordingEndTime(m_schedTime.addSecs(1800));
         dummy->SetInputID(enc->GetInputID());
         dummy->m_mplexId = dummy->QueryMplexID();
-        dummy->m_sgroupId = m_sinputInfoMap[dummy->GetInputID()].m_sgroupId;
+        dummy->m_sgroupId = m_sinputInfoMap.value(dummy->GetInputID()).m_sgroupId;
         dummy->SetRecordingStatus(RecStatus::Unknown);
 
         m_livetvList.push_front(dummy);
@@ -5872,7 +5872,7 @@ bool Scheduler::CreateConflictLists(void)
     for (mit = inputSets.begin(); mit != inputSets.end(); ++mit)
     {
         uint inputid = mit.key();
-        if (m_sinputInfoMap[inputid].m_conflictList)
+        if (m_sinputInfoMap.value(inputid).m_conflictList)
             continue;
 
         // Find the union of all inputs grouped with those already in
@@ -5956,7 +5956,7 @@ bool Scheduler::InitInputInfoMap(void)
         // in AddChildInput().
         SchedInputInfo &siinfo = m_sinputInfoMap[inputid];
         siinfo.m_inputId = inputid;
-        if (parentid && m_sinputInfoMap[parentid].m_schedGroup)
+        if (parentid && m_sinputInfoMap.value(parentid).m_schedGroup)
             siinfo.m_sgroupId = parentid;
         else
             siinfo.m_sgroupId = inputid;
@@ -5985,14 +5985,14 @@ void Scheduler::AddChildInput(uint parentid, uint childid)
     // InitInputInfoMap().
     SchedInputInfo &siinfo = m_sinputInfoMap[childid];
     siinfo.m_inputId = childid;
-    if (m_sinputInfoMap[parentid].m_schedGroup)
+    if (m_sinputInfoMap.value(parentid).m_schedGroup)
         siinfo.m_sgroupId = parentid;
     else
         siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
     siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
-    siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;
+    siinfo.m_conflictList = m_sinputInfoMap.value(parentid).m_conflictList;
 
     // Now, fixup the infos for the parent and conflicting inputs.
     m_sinputInfoMap[parentid].m_groupInputs.push_back(childid);
