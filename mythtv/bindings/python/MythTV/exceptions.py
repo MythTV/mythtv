@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 """Provides custom error codes"""
 
 from MythTV.static import ERRCODES
 
-class MythError( Exception, ERRCODES ):
+class MythError( Exception ):
     """
     MythError('Generic Error Message')
     MythError(SYSTEM, returncode, command, stderr)
@@ -12,6 +11,8 @@ class MythError( Exception, ERRCODES ):
     Error string will be available as obj.args[0].  Additional attributes
         may be available depending on the error code.
     """
+    locals().update(ERRCODES.__members__)
+
     ecode = None
 
     def __init__(self, *args):

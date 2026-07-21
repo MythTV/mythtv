@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Provides basic connection classes."""
 
-from MythTV.static import SCHEMA_VERSION, PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
+from MythTV.static import PROTO_VERSION, PROTO_TOKEN, BACKEND_SEP
 from MythTV.msearch import MSearch
 from MythTV.logging import MythLog
 from MythTV.exceptions import *
-from MythTV.altdict import OrdDict
 from MythTV.utility import deadlinesocket
 
 from time import sleep, time
@@ -18,7 +16,6 @@ import socket
 import queue
 import json
 import re
-from builtins import str
 
 # Note: Support for oursql was removed in MythTV v32
 try:
@@ -27,7 +24,7 @@ try:
 except:
     raise MythError("No viable database module found.")
 
-class _Connection_Pool( object ):
+class _Connection_Pool:
     """
     Provides a scaling connection pool to access a shared resource.
     """
@@ -171,7 +168,7 @@ class DBConnection( _Connection_Pool ):
             cursor.commit()
         cursor.close()
 
-class BEConnection( object ):
+class BEConnection:
     """
     This is the basic backend connection object.
     You probably don't want to use this directly.
@@ -196,7 +193,7 @@ class BEConnection( object ):
 
         try:
             self.connect()
-        except socket.error as e:
+        except OSError:
             self.log.logTB(MythLog.SOCKET)
             self.connected = False
             self.log(MythLog.GENERAL, MythLog.CRIT,
@@ -340,13 +337,13 @@ class BEEventConnection( BEConnection ):
         self.threadrunning = False
         self.eventqueue = queue.Queue()
 
-        super(BEEventConnection, self).__init__(backend, port, localname,
+        super().__init__(backend, port, localname,
                                                 False, deadline)
 
     def connect(self):
         if self.connected:
             return
-        super(BEEventConnection, self).connect()
+        super().connect()
         if len(self._regevents) and (not self.threadrunning):
             start_new_thread(self.eventloop, ())
 
@@ -435,9 +432,9 @@ class BEEventConnection( BEConnection ):
     def backendCommand(self, data, deadline=None):
         if self._announced:
             return ""
-        return super(BEEventConnection, self).backendCommand(data, deadline)
+        return super().backendCommand(data, deadline)
 
-class FEConnection( object ):
+class FEConnection:
     """
     This is the basic frontend connection object.
     You probably dont want to use this directly.
@@ -480,7 +477,7 @@ class FEConnection( object ):
             try:
                 t = time()
                 fe._test(t + 2.0)
-            except MythError as e:
+            except MythError:
                 continue
             yield fe
 
@@ -544,13 +541,13 @@ class FEConnection( object ):
         prompt = re.compile(b'([\r\n.]*)\r\n# ')
         try:
             res = self.socket.dlexpect(prompt, deadline=deadline)
-        except socket.error:
+        except OSError:
             raise MythFEError(MythError.FE_CONNECTION, self.host, self.port)
         except KeyboardInterrupt:
             raise
         return prompt.split(res)[0].decode('utf-8')
 
-class XMLConnection( object ):
+class XMLConnection:
     """
     XMLConnection(backend=None, db=None, port=None) -> Backend status object
 
@@ -615,7 +612,6 @@ class XMLConnection( object ):
 
     def getConnectionInfo(self, pin=0):
         """Return dbconn dict from backend connection info."""
-        dbconn = {'SecurityPin':pin}
         try:
             dat = self._request('Myth/GetConnectionInfo', \
                                         Pin='{0:0>4}'.format(pin)).readJSON()

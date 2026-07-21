@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides managed logging."""
 
 from MythTV.static import LOGLEVEL, LOGMASK, LOGFACILITY
@@ -13,7 +12,7 @@ try:
 except ImportError:
     # bail only when '--systemd-journal' is selected
     journal = None
-from sys import version_info, stdout, argv
+from sys import stdout, argv
 from datetime import datetime
 from _thread import allocate_lock
 from io import StringIO
@@ -22,13 +21,17 @@ from traceback import format_exc
 def _donothing(*args, **kwargs):
     pass
 
-class DummyLogger( LOGLEVEL, LOGMASK, LOGFACILITY ):
+class DummyLogger:
+    locals().update(LOGLEVEL.__members__)
+    locals().update(LOGMASK.__members__)
+    locals().update(LOGFACILITY.__members__)
+
     def __init__(self, module=None, db=None): pass
     def logTB(self, mask): pass
     def log(self, mask, level, message, detail=None): pass
     def __call__(self, mask, level, message, detail=None): pass
 
-class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
+class MythLog:
     """
     MythLog(module='pythonbindings', lstr=None, lbit=None, \
                     db=None) -> logging object
@@ -42,6 +45,9 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
     The filter level is global values, shared between all logging instances.
     The logging object is callable, and implements the MythLog.log() method.
     """
+    locals().update(LOGLEVEL.__members__)
+    locals().update(LOGMASK.__members__)
+    locals().update(LOGFACILITY.__members__)
 
     helptext = """Verbose debug levels.
  Accepts any combination (separated by comma) of:
@@ -250,7 +256,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         # abuse the __new__ constructor to set some immutable class attributes
         # before the class is instantiated
         cls._initlogger()
-        return super(MythLog, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, module='pythonbindings', db=None):
         self.module = module

@@ -1,4 +1,3 @@
-# coding: utf-8
 
 """
 Converts a Python dictionary or other native data type into a valid XML string.
@@ -12,10 +11,7 @@ __version__ = '1.7.4'
 version = __version__
 
 from random import randint
-try:
-    from collections.abc import Iterable
-except ImportError:
-    from collections import Iterable
+from collections.abc import Iterable
 import numbers
 import logging
 from xml.dom.minidom import parseString
@@ -114,7 +110,7 @@ def escape_xml(s):
 
 def make_attrstring(attr):
     """Returns an attribute string in the form key="val" """
-    attrstring = ' '.join(['%s="%s"' % (k, v) for k, v in attr.items()])
+    attrstring = ' '.join('%s="%s"' % (k, v) for k, v in attr.items())
     return '%s%s' % (' ' if attrstring != '' else '', attrstring)
 
 
@@ -202,7 +198,7 @@ def convert_dict(obj, ids, parent, attr_type, item_func, cdata):
     output = []
     addline = output.append
 
-    item_name = item_func(parent)
+    _item_name = item_func(parent)
 
     for key, val in obj.items():
         LOG.info('Looping inside convert_dict(): key="%s", val="%s", type(val)="%s"' % (
@@ -334,7 +330,7 @@ def convert_kv(key, val, attr_type, attr={}, cdata=False):
     attrstring = make_attrstring(attr)
     return '<%s%s>%s</%s>' % (
         key, attrstring,
-        wrap_cdata(val) if cdata == True else escape_xml(val),
+        wrap_cdata(val) if cdata else escape_xml(val),
         key
     )
 
@@ -386,7 +382,7 @@ def dicttoxml(obj, root=True, custom_root='root', ids=False, attr_type=True,
     LOG.info('Inside dicttoxml(): type(obj) is: "%s", obj="%s"' % (type(obj).__name__, unicode_me(obj)))
     output = []
     addline = output.append
-    if root == True:
+    if root:
         addline('<?xml version="1.0" encoding="UTF-8" ?>')
         addline('<%s>%s</%s>' % (
         custom_root,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides base classes for accessing MythTV
@@ -8,7 +7,7 @@ from MythTV.static import *
 from MythTV.exceptions import *
 from MythTV.logging import MythLog
 from MythTV.connections import FEConnection, XMLConnection, BEEventConnection
-from MythTV.utility import databaseSearch, datetime, check_ipv6, _donothing, resolve_ip
+from MythTV.utility import databaseSearch, datetime, _donothing, resolve_ip
 from MythTV.database import DBCache, DBData
 from MythTV.system import SystemEvent
 from MythTV.mythproto import BECache, FileOps, Program, FreeSpace, EventLock
@@ -425,7 +424,7 @@ class BEEventMonitor( BECache ):
     def __init__(self, backend=None, blockshutdown=False,
                        systemevents=False, db=None):
         self.systemevents = systemevents
-        super(BEEventMonitor, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
     def _listhandlers(self):
         return [self.eventMonitor]
@@ -440,7 +439,7 @@ class BEEventMonitor( BECache ):
         self.log(MythLog.ALL, MythLog.INFO, event)
 
 class MythSystemEvent( BECache ):
-    class systemeventhandler( object ):
+    class systemeventhandler:
         # decorator class for system events
         bs = BACKEND_SEP.replace('[',r'\[').replace(']',r'\]')
         re_process = re.compile(bs.join([
@@ -506,7 +505,7 @@ class MythSystemEvent( BECache ):
 
     def __init__(self, backend=None, blockshutdown=False, db=None,
                        enablehandler=True):
-        super(MythSystemEvent, self).__init__(backend, blockshutdown, True, db)
+        super().__init__(backend, blockshutdown, True, db)
 
         if enablehandler:
             self._events.append(self._generic_handler)
@@ -521,7 +520,7 @@ class MythSystemEvent( BECache ):
 
 class Frontend( FEConnection ):
     _db = None
-    class _Jump( object ):
+    class _Jump:
         def __str__(self):  return str(self.list())
         def __repr__(self): return str(self)
 
@@ -554,7 +553,7 @@ class Frontend( FEConnection ):
             self._populate()
             return self._points.items()
 
-    class _Key( object ):
+    class _Key:
         _keymap = { 9:'tab',        10:'enter',     27:'escape',
                     32:'space',     92:'backslash', 127:'backspace',
                     258:'down',     259:'up',       260:'left',
@@ -628,7 +627,7 @@ class Frontend( FEConnection ):
 
     def getLoad(self):
         """Returns tuple of 1/5/15 load averages."""
-        return tuple([float(l) for l in self.sendQuery('load').split()])
+        return tuple(float(l) for l in self.sendQuery('load').split())
 
     def getUptime(self):
         """Returns timedelta of uptime."""
@@ -729,7 +728,7 @@ class MythDB( DBCache ):
             return ('people.name', 'recordedcredits', 4, 1)
 
         if key == 'livetv':
-            if (value is None) or (value == False):
+            if (value is None) or (value is False):
                 return ('recorded.recgroup!=?', 'LiveTV', 0)
             return ()
 
@@ -1017,7 +1016,7 @@ class MythDB( DBCache ):
         """
         obj.scanVideo() --> list of new, moved, and deleted Videos
         """
-        startvids = dict([(vid.intid, vid) for vid in Video.getAllEntries(db=self)])
+        startvids = {vid.intid: vid for vid in Video.getAllEntries(db=self)}
 
         be = MythBE(db=self)
         r = re.compile(re.escape(BACKEND_SEP).\

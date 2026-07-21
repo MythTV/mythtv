@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides connection cache and data handlers for accessing the backend.
 """
 
-from MythTV.static import PROTO_VERSION, BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
+from MythTV.static import BACKEND_SEP, RECSTATUS, AUDIO_PROPS, \
                           VIDEO_PROPS, SUBTITLE_TYPES
 from MythTV.exceptions import MythError, MythDBError, MythBEError, MythFileError
 from MythTV.logging import MythLog
@@ -12,19 +11,17 @@ from MythTV.altdict import DictData
 from MythTV.connections import BEConnection, BEEventConnection
 from MythTV.database import DBCache
 from MythTV.utility import CMPRecord, datetime, ParseEnum, \
-                           CopyData, CopyData2, check_ipv6, resolve_ip
+                           CopyData, CopyData2, resolve_ip
 
 from datetime import date
-from time import sleep
 from _thread import allocate_lock
 from random import randint
-import socket
 import weakref
 import re
 import os
 
 
-class BECache( object ):
+class BECache:
     """
     BECache(backend=None, noshutdown=False, db=None)
                                             -> MythBackend connection object
@@ -44,7 +41,7 @@ class BECache( object ):
                               and returns the response.
     """
 
-    class _ConnHolder( object ):
+    class _ConnHolder:
         blockshutdown = 0
         command = None
         event = None
@@ -211,7 +208,6 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
         r'myth://((?P<group>.*)@)?(?P<host>[\[\]a-zA-Z0-9_\-\.]*)(:[0-9]*)?/(?P<file>.*)')
-    reip = re.compile(r'(?:\d{1,3}\.){3}\d{1,3}')
 
     if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
@@ -746,7 +742,7 @@ class FileOps( BECache ):
             regex = re.compile(regex)
         return EventLock(regex, self.hostname, self.db)
 
-    class _ProgramQuery( object ):
+    class _ProgramQuery:
         def __init__(self, query, header_length=0, sorted=False,
                      recstatus=None, handler=None):
             self.query = query
@@ -788,7 +784,6 @@ class FileOps( BECache ):
         def run(self, *args, **kwargs):
             pgfieldcount = len(Program._field_order)
             pgrecstatus = Program._field_order.index('recstatus')
-            pgrecordid = Program._field_order.index('recordid')
 
             res = self.inst.backendCommand(self.query).split(BACKEND_SEP)
             for i in range(self.header_length):
@@ -829,9 +824,12 @@ class FreeSpace( DictData ):
         DictData.__init__(self, raw)
         self.freespace = self.totalspace - self.usedspace
 
-class Program( CMPRecord, DictData, RECSTATUS, AUDIO_PROPS, \
-                         VIDEO_PROPS, SUBTITLE_TYPES ):
+class Program( CMPRecord, DictData ):
     """Represents a program with all detail returned by the backend."""
+    locals().update(RECSTATUS.__members__)
+    locals().update(AUDIO_PROPS.__members__)
+    locals().update(VIDEO_PROPS.__members__)
+    locals().update(SUBTITLE_TYPES.__members__)
 
     _field_order = [ 'title',        'subtitle',     'description',
                      'season',       'episode',      'totalepisodes',
@@ -1071,7 +1069,7 @@ class EventLock( BECache ):
         self.regex = regex
         self._lock = allocate_lock()
         self._lock.acquire()
-        super(EventLock, self).__init__(backend, False, True, db)
+        super().__init__(backend, False, True, db)
 
     def _listhandlers(self):
         return [self._unlock]

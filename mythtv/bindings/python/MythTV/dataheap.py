@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides data access classes for accessing and managing MythTV data
@@ -14,7 +13,6 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
-import xml.etree.ElementTree as etree
 from collections import UserString
 from datetime import date, time
 
@@ -67,7 +65,7 @@ class Artwork( UserString ):
             # return a dumb string
             return str.__new__(str, attr)
         else:
-            return super(Artwork, cls).__new__(cls)
+            return super().__new__(cls)
 
     def __init__(self, attr, parent=None, imagetype=None):
         self.attr = attr
@@ -120,15 +118,16 @@ class Artwork( UserString ):
     def open(self, mode='r'):
         return ftopen((self.hostname, self.imagetype, str(self)), mode)
 
-class Record( CMPRecord, DBDataWrite, RECTYPE ):
+class Record( CMPRecord, DBDataWrite ):
     """
     Record(id=None, db=None) -> Record object
     """
+    locals().update(RECTYPE.__members__)
 
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Record, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         defaults = cls._template('Default', db=db)
         for k,v in list(defaults.items()):
             cls._defaults[k] = v
@@ -319,11 +318,15 @@ class Recorded( CMPRecord, DBDataWrite ):
         _table = 'roles'
         _key = ['roleid']
 
-    class _Seek( DBDataRef, MARKUP ):
+    class _Seek( DBDataRef ):
+        locals().update(MARKUP.__members__)
+
         _table = 'recordedseek'
         _ref = ['chanid','starttime']
 
-    class _Markup( DBDataRef, MARKUP, MARKUPLIST ):
+    class _Markup( DBDataRef, MARKUPLIST ):
+        locals().update(MARKUP.__members__)
+
         _table = 'recordedmarkup'
         _ref = ['chanid','starttime']
         def getskiplist(self):
@@ -594,7 +597,7 @@ class Recorded( CMPRecord, DBDataWrite ):
             name = pitem.name
             if pitem.roleid:
                 character = self._InverseRole(pitem.roleid, self._db).name
-            role = ' '.join([word.capitalize() for word in pitem.role.split('_')])
+            role = ' '.join(word.capitalize() for word in pitem.role.split('_'))
             if role == 'Writer': role = 'Author'
             if character:
                 metadata.people.append(OrdDict((('name', name), ('job', role),
@@ -709,11 +712,12 @@ class RecordedProgram( CMPRecord, DBDataWrite ):
     def fromRecorded(cls, recorded):
         return cls((recorded.chanid, recorded.progstart), recorded._db)
 
-class OldRecorded( CMPRecord, DBDataWrite, RECSTATUS ):
+class OldRecorded( CMPRecord, DBDataWrite ):
     """
     OldRecorded(data=None, db=None) -> OldRecorded object
             'data' is a tuple containing (chanid, starttime)
     """
+    locals().update(RECSTATUS.__members__)
 
     _key   = ['chanid','starttime']
     _defaults = {'title':'',     'subtitle':'',
@@ -780,10 +784,15 @@ class RecordedArtwork( DBDataWrite ):
     fanart   = Artwork('fanart')
     banner   = Artwork('banner')
 
-class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
+class Job( DBDataWrite ):
     """
     Job(id=None, db=None) -> Job object
     """
+    locals().update(JOBTYPE.__members__)
+    locals().update(JOBCMD.__members__)
+    locals().update(JOBFLAG.__members__)
+    locals().update(JOBSTATUS.__members__)
+
     _table = 'jobqueue'
     _logmodule = 'Python Jobqueue'
     _defaults = {'id':None,     'inserttime':datetime.now(),
@@ -962,7 +971,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Video, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         cls._fill_cm(db)
 
     @classmethod
@@ -1074,7 +1083,9 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
         _ref = ['idvideo']
         _cref = ['idcountry','intid']
 
-    class _Markup( DBDataRef, MARKUP ):
+    class _Markup( DBDataRef ):
+        locals().update(MARKUP.__members__)
+
         _table = 'filemarkup'
         _ref = ['filename',]
 
@@ -1330,7 +1341,7 @@ class InetrefGrabber( Grabber ):
         self.grabber = inetref.split('_')[0]
         try:
             self.iref = inetref.split('_')[1]
-        except IndexError as e:
+        except IndexError:
             raise MythError("MythTV interef error: '%s' !" % inetref)
 
         self.season = season
@@ -1532,7 +1543,7 @@ class MusicPlaylist( MusicSchema, DBDataWrite ):
     def _pl_tostr(self):
         try:
             self.playlist_songs = \
-                    ','.join(['%d' % id for id in self.playlist_songs])
+                    ','.join('%d' % id for id in self.playlist_songs)
         except: pass
 
     def _pull(self):
