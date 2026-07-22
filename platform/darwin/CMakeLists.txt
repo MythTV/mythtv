@@ -518,9 +518,9 @@ if(DARWIN_GENERATE_DISTRIBUTION)
   set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
   set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
   set(CPACK_PACKAGE_VERSION_PATCH ${MYTHTV_BINARY_CHANGED})
-  set(CPACK_PACKAGE_DIRECTORY cpack_output)
+  set(CPACK_PACKAGE_DIRECTORY "cpack_output")
   set(CPACK_PACKAGE_EXECUTABLES "${APP_NAME};${APP_NAME}.app")
-  set(CPACK_INSTALL_PREFIX / )
+  set(CPACK_INSTALL_PREFIX ".")
   set(CPACK_PACKAGING_INSTALL_PREFIX "${APP_NAME}.app")
   set(CPACK_MONOLITHIC_INSTALL TRUE)
   set(CPACK_COMMAND_HDIUTIL "${CMAKE_CURRENT_LIST_DIR}/hdiutil_repeat.zsh")
@@ -528,27 +528,36 @@ if(DARWIN_GENERATE_DISTRIBUTION)
   # Custom Inputs to Bundle
   set(CPACK_BUNDLE_NAME ${APP_NAME})
   set(CPACK_APPLE_BUNDLE_ID ${MACOSX_BUNDLE_GUI_IDENTIFIER})
-  set(CPACK_BUNDLE_PLIST ${PLIST_FILE})
-  set(CPACK_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/${APP_NAME}.icns}")
+  set(CPACK_BUNDLE_PLIST "${CMAKE_INSTALL_PREFIX}/${APP_NAME}.app/Contents/Info.plist")
+  set(CPACK_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/${APP_NAME}.icns")
   set(CPACK_BUNDLE_ICON "${CMAKE_SOURCE_DIR}/${APP_NAME}.icns")
   set(CPACK_DMG_VOLUME_NAME "${APP_NAME}")
 
-  # Code signing is in PRE as it must occur before the dmg is built
+  # The application mst be Code signed and notarized in in PRE as it must
+  # occur before the dmg is built
   if(NOT DARWIN_SIGNING_ID STREQUAL "")
-    set(CPACK_PRE_BUILD_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DarwinSignAPP.cmake)
     set(CPACK_DARWIN_SIGNING_ID "${DARWIN_SIGNING_ID}")
-    set(CPACK_ENTITLEMENTS_PLIST "${CMAKE_SOURCE_DIR}/entitlement.plist")
+    set(CPACK_ENTITLEMENTS_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/entitlement.plist")
+    set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/DarwinSignAPP.cmake")
   endif()
 
-  # Notarization is in POST for the dmg as needs the dmg to be created
+  # DMG Signing and Notarization occurs in POST as CPack generates the dmg
   if(NOT DARWIN_NOTARIZATION_KEYCHAIN STREQUAL "")
-    set(CPACK_POST_BUILD_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/DarwinSignDMG.cmake)
     set(CPACK_DARWIN_NOTARIZATION_KEYCHAIN "${DARWIN_NOTARIZATION_KEYCHAIN}")
+    set(CPACK_POST_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/DarwinSignDMG.cmake")
   endif()
 
   set(CPACK_GENERATOR "Bundle")
 
   set_source_files_properties("${APP_NAME}.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/CPackOptions.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CPackOptions.cmake"
+    @ONLY
+  )
+  set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/CPackOptions.cmake")
+
 
   include(CPack)
 endif()
@@ -557,7 +566,7 @@ if(HOMEBREW OR NOT DARWIN_GENERATE_DISTRIBUTION)
   add_custom_command(
   TARGET ${APP_NAME} POST_BUILD
   COMMENT "  Ad Hoc Codesigning App Bundle post macdeployqt"
-  COMMAND zsh -c "${CMAKE_CURRENT_LIST_DIR}/codesignApp.zsh \"${BUILD_DIR}/${APP_NAME}.app\" \"${CMAKE_SOURCE_DIR}/entitlement.plist\""
+  COMMAND zsh -c "${CODESIGN_SCRIPT} ${APP_BUNDLE_PATH} ${ENTITLEMENTS_PLIST}"
   WORKING_DIRECTORY ${BUILD_DIR})
 endif()
 #

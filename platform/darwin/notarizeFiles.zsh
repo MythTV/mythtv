@@ -46,6 +46,7 @@ fi
 # sumbit file for notarization
 echo "Submitting file for notarization"
 notaOutput=$(xcrun notarytool submit ${NOTA_FILE} --keychain-profile ${KEYCHAIN_PROFILE} --wait)
+submission_id=$(echo "$notaOutput" | grep "id:" | sed 's/.*id: //')
 
 # if this is an App, delete the temp zip file and update the NOTA_FILE
 # variable to point back to the original App
@@ -67,6 +68,8 @@ case $STATUS in
   *)
     echo '\033[0;31m'"----- ${NOTA_FILE} Notarization Failed or Timeout"'\033[m'
     echo $notaOutput
+    echo '\033[0;31m'"-------------------------------------------------"'\033[m'
+    echo "Run the following command to debug\nxcrun notarytool log "$submission_id" --keychain-profile "${KEYCHAIN_PROFILE}""
     returnCode=1
 esac
 

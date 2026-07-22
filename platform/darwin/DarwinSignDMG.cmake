@@ -15,11 +15,11 @@ if(CPACK_APP_SIGN_FAILURE OR CPACK_APP_NOTARIZATION_FAILURE)
   return()
 endif()
 
-set(DMG_FILE ${CPACK_TEMPORARY_PACKAGE_FILE_NAME})
+set(DMG_PATH ${CPACK_TEMPORARY_PACKAGE_FILE_NAME})
 
 message(STATUS "Signing the DMG Distribution File")
 execute_process(
-  COMMAND zsh -c "codesign --force --deep --sign \"${CPACK_DARWIN_SIGNING_ID}\" ${DMG_FILE}"
+  COMMAND zsh -c "codesign --force --deep --sign \"${CPACK_DARWIN_SIGNING_ID}\" ${DMG_PATH}"
   RESULT_VARIABLE CS_OUT)
 
 if(NOT CS_OUT EQUAL 0)
@@ -30,7 +30,7 @@ endif()
 
 message(STATUS "Notarizing the DMG Distribution File")
 execute_process(
-  COMMAND zsh -c "${CMAKE_CURRENT_LIST_DIR}/notarizeFiles.zsh ${DMG_FILE} \"${CPACK_DARWIN_NOTARIZATION_KEYCHAIN}\""
+  COMMAND zsh -c "${NOTARIZE_SCRIPT} ${DMG_PATH} \"${CPACK_DARWIN_NOTARIZATION_KEYCHAIN}\""
   RESULT_VARIABLE NOTA_OUT)
 
 if(NOT NOTA_OUT EQUAL 0)
