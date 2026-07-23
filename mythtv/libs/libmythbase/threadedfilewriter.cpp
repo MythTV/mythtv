@@ -158,17 +158,10 @@ ThreadedFileWriter::~ThreadedFileWriter()
         m_writeThread = nullptr;
     }
 
-    while (!m_writeBuffers.empty())
-    {
-        delete m_writeBuffers.front();
-        m_writeBuffers.pop_front();
-    }
-
-    while (!m_emptyBuffers.empty())
-    {
-        delete m_emptyBuffers.front();
-        m_emptyBuffers.pop_front();
-    }
+    qDeleteAll(m_writeBuffers);
+    m_writeBuffers.clear();
+    qDeleteAll(m_emptyBuffers);
+    m_emptyBuffers.clear();
 
     if (m_syncThread)
     {
@@ -435,16 +428,10 @@ void ThreadedFileWriter::DiskLoop(void)
     {
         if (m_ignoreWrites)
         {
-            while (!m_writeBuffers.empty())
-            {
-                delete m_writeBuffers.front();
-                m_writeBuffers.pop_front();
-            }
-            while (!m_emptyBuffers.empty())
-            {
-                delete m_emptyBuffers.front();
-                m_emptyBuffers.pop_front();
-            }
+            qDeleteAll(m_writeBuffers);
+            m_writeBuffers.clear();
+            qDeleteAll(m_emptyBuffers);
+            m_emptyBuffers.clear();
             m_bufferEmpty.wakeAll();
             m_bufferHasData.wait(locker.mutex());
             continue;

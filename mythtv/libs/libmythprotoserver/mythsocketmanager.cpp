@@ -57,10 +57,7 @@ MythSocketManager::~MythSocketManager()
 
     QWriteLocker wlock(&m_handlerLock);
 
-    QMap<QString, SocketRequestHandler*>::iterator i;
-    for (i = m_handlerMap.begin(); i != m_handlerMap.end(); ++i)
-        delete *i;
-
+    qDeleteAll(m_handlerMap);
     m_handlerMap.clear();
 
     QMutexLocker locker(&m_socketListLock);

@@ -37,13 +37,7 @@ void LyricsData::clear(void)
 
 void LyricsData::clearLyrics(void)
 {
-    auto i = m_lyricsMap.begin();
-    while (i != m_lyricsMap.end()) 
-    {
-        delete i.value();
-        ++i;
-    }
-
+    qDeleteAll(m_lyricsMap);
     m_lyricsMap.clear();
 }
 

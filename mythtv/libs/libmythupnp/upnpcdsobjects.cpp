@@ -48,22 +48,15 @@ CDSObject::CDSObject( const QString &sId,
 
 CDSObject::~CDSObject()
 {
-    while (!m_resources.empty())
-    {
-        delete m_resources.takeLast();
-    }
+    qDeleteAll(m_resources);
+    m_resources.clear();
 
     while (!m_children.empty())
     {
         m_children.takeLast()->DecrRef();
     }
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_properties.begin(); it != m_properties.end(); ++it)
-    {
-        delete *it;
-        *it = nullptr;
-    }
+    qDeleteAll(m_properties);
     m_properties.clear();
 }
 

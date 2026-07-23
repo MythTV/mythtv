@@ -1442,17 +1442,11 @@ AllMusic::AllMusic(void)
 
 AllMusic::~AllMusic()
 {
-    while (!m_allMusic.empty())
-    {
-        delete m_allMusic.back();
-        m_allMusic.pop_back();
-    }
+    qDeleteAll(m_allMusic);
+    m_allMusic.clear();
 
-    while (!m_cdData.empty())
-    {
-        delete m_cdData.back();
-        m_cdData.pop_back();
-    }
+    qDeleteAll(m_cdData);
+    m_cdData.clear();
 
     m_metadataLoader->wait();
     delete m_metadataLoader;
@@ -1742,11 +1736,8 @@ AllStream::AllStream(void)
 
 AllStream::~AllStream(void)
 {
-    while (!m_streamList.empty())
-    {
-        delete m_streamList.back();
-        m_streamList.pop_back();
-    }
+    qDeleteAll(m_streamList);
+    m_streamList.clear();
 }
 
 bool AllStream::isValidID(MusicMetadata::IdType an_id)
@@ -1773,11 +1764,8 @@ MusicMetadata *AllStream::getMetadata(MusicMetadata::IdType an_id)
 
 void AllStream::loadStreams(void)
 {
-    while (!m_streamList.empty())
-    {
-        delete m_streamList.back();
-        m_streamList.pop_back();
-    }
+    qDeleteAll(m_streamList);
+    m_streamList.clear();
 
     QString aquery = "SELECT intid, broadcaster, channel, description, url1, url2, url3, url4, url5,"
                      "logourl, genre, metaformat, country, language, format "
@@ -1929,20 +1917,14 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &ot
 
 AlbumArtImages::~AlbumArtImages()
 {
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 }
 
 void AlbumArtImages::findImages(void)
 {
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 
     if (m_parent == nullptr)
         return;
@@ -2090,11 +2072,8 @@ void AlbumArtImages::scanForImages()
     if (busy)
         busy->Close();
 
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 
     for (int x = 2; x < strList.count(); x += 6)
     {

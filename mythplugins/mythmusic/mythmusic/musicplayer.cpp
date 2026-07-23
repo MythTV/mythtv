@@ -115,11 +115,8 @@ MusicPlayer::~MusicPlayer()
         m_oneshotMetadata = nullptr;
     }
 
-    while (!m_playedList.empty())
-    {
-        delete m_playedList.back();
-        m_playedList.pop_back();
-    }
+    qDeleteAll(m_playedList);
+    m_playedList.clear();
 
     if (m_shuffleMode == SHUFFLE_INTELLIGENT)
         gCoreContext->SaveSetting("PlayMode", "intelligent");

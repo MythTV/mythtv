@@ -32,18 +32,12 @@ const QString ActionSet::kGlobalContext = "Global";
 
 ActionSet::~ActionSet()
 {
-    for (auto iter1 = m_contexts.begin();
-         iter1 != m_contexts.end();
-         iter1 = m_contexts.erase(iter1))
+    for (auto ctx : std::as_const(m_contexts))
     {
-        ActionContext &ctx = iter1.value();
-        for (auto iter2 = ctx.begin();
-             iter2 != ctx.end();
-             iter2 = ctx.erase(iter2))
-        {
-            delete iter2.value();
-        }
+        qDeleteAll(ctx);
+        ctx.clear();
     }
+    m_contexts.clear();
 }
 
 /** \fn ActionSet::Add(const ActionID&, const QString&)

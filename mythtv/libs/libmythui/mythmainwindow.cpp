@@ -233,13 +233,8 @@ MythMainWindow::~MythMainWindow()
 
     delete m_themeBase;
 
-    for (auto iter = m_priv->m_keyContexts.begin();
-         iter != m_priv->m_keyContexts.end();
-         iter = m_priv->m_keyContexts.erase(iter))
-    {
-        KeyContext *context = *iter;
-        delete context;
-    }
+    qDeleteAll(m_priv->m_keyContexts);
+    m_priv->m_keyContexts.clear();
 
     delete m_deviceHandler;
     delete m_priv->m_nc;

@@ -48,13 +48,12 @@ PlaylistContainer::~PlaylistContainer()
 
     delete m_activePlaylist;
     delete m_streamPlaylist;
+
     if (m_allPlaylists)
     {
-        while (!m_allPlaylists->empty())
-        {
-            delete m_allPlaylists->front();
-            m_allPlaylists->pop_front();
-        }
+        qDeleteAll(*m_allPlaylists);
+        m_allPlaylists->clear();
+
         delete m_allPlaylists;
     }
 }

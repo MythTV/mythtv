@@ -134,10 +134,7 @@ void StandardSetting::clearTargetedSettings(const QString &value)
 {
     if (m_targets.contains(value))
     {
-        for (auto *setting : std::as_const(m_targets[value]))
-        {
-            delete setting;
-        }
+        qDeleteAll(m_targets.value(value));
         m_targets[value].clear();
     }
 }

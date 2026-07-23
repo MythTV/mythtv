@@ -1326,24 +1326,11 @@ void MythBDBuffer::ClearOverlays(void)
 {
     QMutexLocker lock(&m_overlayLock);
 
-    while (!m_overlayImages.isEmpty())
-    {
-        MythBDOverlay *overlay = m_overlayImages.takeFirst();
-        delete overlay;
-        overlay = nullptr;
-    }
+    qDeleteAll(m_overlayImages);
+    m_overlayImages.clear();
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_overlayPlanes.size(); i++)
-    {
-        MythBDOverlay*& osd = m_overlayPlanes[i];
-
-        if (osd)
-        {
-            delete osd;
-            osd = nullptr;
-        }
-    }
+    qDeleteAll(m_overlayPlanes);
+    m_overlayPlanes.fill(nullptr);
 }
 
 MythBDOverlay* MythBDBuffer::GetOverlay(void)

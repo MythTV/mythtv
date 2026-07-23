@@ -68,11 +68,8 @@ std::chrono::milliseconds VideoVisual::SetLastUpdate(void)
 // caller holds lock
 void VideoVisual::DeleteNodes(void)
 {
-    while (!m_nodes.empty())
-    {
-        delete m_nodes.back();
-        m_nodes.pop_back();
-    }
+    qDeleteAll(m_nodes);
+    m_nodes.clear();
 }
 
 // caller holds lock
