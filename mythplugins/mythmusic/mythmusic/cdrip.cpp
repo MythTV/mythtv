@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <ranges>
 
 // Qt includes
 #include <QtGlobal>
@@ -1421,10 +1422,8 @@ void Ripper::updateTrackLengths()
 {
     std::chrono::milliseconds length = 0ms;
 
-    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-    for (auto it = m_tracks->end() - 1; it == m_tracks->begin(); --it)
+    for (auto* track : std::views::reverse(std::as_const(*m_tracks)))
     {
-        RipTrack *track = *it;
         if (track->active)
         {
             track->length = length + track->metadata->Length();

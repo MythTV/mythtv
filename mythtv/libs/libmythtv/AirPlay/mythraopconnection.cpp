@@ -778,8 +778,8 @@ void MythRAOPConnection::ProcessAudio()
     int i              = 0;
     std::chrono::milliseconds timestamp = 0ms;
 
-    for (auto packet_it = m_audioQueue.begin();
-         packet_it != m_audioQueue.end() && i <= max_packets;
+    for (auto packet_it = m_audioQueue.constBegin();
+         packet_it != m_audioQueue.constEnd() && i <= max_packets;
          ++packet_it)
     {
         timestamp = packet_it.key();

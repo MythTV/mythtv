@@ -163,9 +163,8 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList slist;
             {
                 QMutexLocker locker(&m_pbh.m_lock);
-                QHash<uint, QStringList>::iterator it =
-                    m_checkAvailability.begin();
-                if (it != m_checkAvailability.end())
+                auto it = m_checkAvailability.constBegin();
+                if (it != m_checkAvailability.constEnd())
                     slist = *it;
             }
 

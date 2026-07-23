@@ -724,6 +724,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 {
     // Process (DVB) subtitle streams.
     int subtitleStreamCount = 0;
+    // clazy:exclude-next-line=detaching-member (modifies entries)
     for (auto subit = m_dvbsubInfo.begin(); subit != m_dvbsubInfo.end(); ++subit)
     {
         int langCode = 0;

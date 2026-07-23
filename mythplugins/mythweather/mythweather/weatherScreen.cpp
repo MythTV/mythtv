@@ -94,10 +94,10 @@ QString WeatherScreen::getTemperatureUnit()
 
 bool WeatherScreen::prepareScreen(bool checkOnly)
 {
-    QMap<QString, QString>::iterator itr = m_dataValueMap.begin();
-    while (itr != m_dataValueMap.end())
+    for (auto itr = m_dataValueMap.constBegin();
+         itr != m_dataValueMap.constEnd(); itr++)
     {
-        QString name = itr.key();
+        const QString& name = itr.key();
         MythUIType *widget = GetChild(name);
 
         if (!widget)
@@ -121,10 +121,7 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
         }
 
         if( !widget || checkOnly )
-        {
-            ++itr;
             continue;
-        }
 
         if (auto *w2 = dynamic_cast<MythUIText *>(widget))
         {
@@ -137,7 +134,6 @@ bool WeatherScreen::prepareScreen(bool checkOnly)
         }
 
         prepareWidget(widget);
-        ++itr;
     }
 
     m_prepared = true;
