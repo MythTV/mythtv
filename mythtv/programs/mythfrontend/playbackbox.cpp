@@ -1151,16 +1151,9 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
     const QString& message      = list[2];
 
     bool found = false;
+
     for (uint i = 4; i < (uint) list.size(); i++)
-    {
-        const QString& token = list[i];
-        QSet<QString>::iterator it = m_previewTokens.find(token);
-        if (it != m_previewTokens.end())
-        {
-            found = true;
-            m_previewTokens.erase(it);
-        }
-    }
+        found |= m_previewTokens.remove(list[i]);
 
     if (!found)
     {
@@ -4269,12 +4262,7 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
         {
             for (uint i = 4; i < (uint) me->ExtraDataCount(); i++)
-            {
-                const QString& token = me->ExtraData(i);
-                QSet<QString>::iterator it = m_previewTokens.find(token);
-                if (it != m_previewTokens.end())
-                    m_previewTokens.erase(it);
-            }
+                m_previewTokens.remove(me->ExtraData(i));
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {

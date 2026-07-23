@@ -940,14 +940,7 @@ void WebSocketWorker::DeregisterExtension(WebSocketExtension* extension)
     if (!extension)
         return;
 
-    for (auto it = m_extensions.begin(); it != m_extensions.end(); ++it)
-    {
-        if ((*it) == extension)
-        {
-            it = m_extensions.erase(it);
-            break;
-        }
-    }
+    m_extensions.removeAll(extension);
 }
 
 #include "moc_websocket.cpp"

@@ -542,13 +542,8 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         QString GameName = query.value(2).toString();
         if (!RomName.isEmpty())
         {
-            auto iter = m_gameMap.find(RomName);
-            if (iter != m_gameMap.end())
-            {
-                // If it's both on disk and in the database we're done with it.
-                m_gameMap.erase(iter);
-            }
-            else
+            // If it's both on disk and in the database we're done with it.
+            if (!m_gameMap.remove(RomName))
             {
                 // If it's only in the database add it to our list and mark it for
                 // removal.

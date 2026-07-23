@@ -930,17 +930,9 @@ void MythDB::ClearOverrideSettingForSession(const QString &key)
 
     d->m_settingsCacheLock.lockForWrite();
 
-    SettingsMap::iterator oit = d->m_overriddenSettings.find(mk);
-    if (oit != d->m_overriddenSettings.end())
-        d->m_overriddenSettings.erase(oit);
-
-    SettingsMap::iterator sit = d->m_settingsCache.find(mk);
-    if (sit != d->m_settingsCache.end())
-        d->m_settingsCache.erase(sit);
-
-    sit = d->m_settingsCache.find(mk2);
-    if (sit != d->m_settingsCache.end())
-        d->m_settingsCache.erase(sit);
+    d->m_overriddenSettings.remove(mk);
+    d->m_settingsCache.remove(mk);
+    d->m_settingsCache.remove(mk2);
 
     d->m_settingsCacheLock.unlock();
 }

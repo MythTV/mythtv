@@ -2061,10 +2061,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
             {
                 if (m_sceneMap.contains(f))
                 {
-                    frm_dir_map_t::iterator dit =  m_sceneCommBreakMap.find(f);
-                    if (dit != m_sceneCommBreakMap.end())
-                        m_sceneCommBreakMap.erase(dit);
-                    else
+                    if (0 == m_sceneCommBreakMap.remove(f))
                         m_sceneCommBreakMap[f] = MARK_COMM_END;
                     i = (int)(m_fps) + 1;
                     found_end = true;

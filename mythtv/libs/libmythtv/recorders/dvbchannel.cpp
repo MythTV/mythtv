@@ -149,11 +149,8 @@ void DVBChannel::Close(DVBChannel *who)
 
     QMutexLocker locker(&m_hwLock);
 
-    IsOpenMap::iterator it = m_isOpen.find(who);
-    if (it == m_isOpen.end())
+    if (!m_isOpen.remove(who))
         return; // This caller didn't have it open in the first place..
-
-    m_isOpen.erase(it);
 
     DVBChannel *master = GetMasterLock();
     if (master != nullptr && master != this)

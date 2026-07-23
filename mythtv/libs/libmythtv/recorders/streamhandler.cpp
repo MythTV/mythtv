@@ -415,10 +415,8 @@ void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
 #ifndef Q_OS_WINDOWS
     QMutexLocker lk(&m_mptsLock);
 
-    QSet<QString>::iterator it = m_mptsFiles.find(file);
-    if (it != m_mptsFiles.end())
+    if(m_mptsFiles.remove(file))
     {
-        m_mptsFiles.erase(it);
         if (m_mptsFiles.isEmpty())
         {
             delete m_mptsTfw;

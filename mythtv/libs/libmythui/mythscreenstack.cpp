@@ -318,17 +318,7 @@ void MythScreenStack::CheckDeletes(bool force)
 
         if (deleteit)
         {
-            // NOLINTNEXTLINE(readability-qualified-auto) for Qt6
-            for (auto test = m_children.begin();
-                 test != m_children.end();
-                 ++test)
-            {
-                if (*test == *it)
-                {
-                    m_children.erase(test);
-                    break;
-                }
-            }
+            m_children.removeAll(*it);
 
             if (*it == m_newTop)
                 m_newTop = nullptr;

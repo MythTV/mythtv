@@ -79,10 +79,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     {
         QMutexLocker locker(&m_pbh.m_lock);
-        QHash<uint, QStringList>::iterator cit =
-            m_checkAvailability.find(evinfo.GetRecordingID());
-        if (cit != m_checkAvailability.end())
-            m_checkAvailability.erase(cit);
+        m_checkAvailability.remove(evinfo.GetRecordingID());
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
         {
             killTimer(m_checkAvailabilityTimerId);
