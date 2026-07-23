@@ -1433,11 +1433,10 @@ void PlaybackBox::UpdateUIRecGroupList(void)
 
     m_recgroupList->Reset();
 
-    int idx = 0;
-    QStringList::iterator it = m_recGroups.begin();
-    for (; it != m_recGroups.end(); (++it), (++idx))
+    int idx = -1;
+    for (const auto& key : std::as_const(m_recGroups))
     {
-        const QString& key = (*it);
+        idx++;
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
 

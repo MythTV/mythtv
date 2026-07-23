@@ -117,9 +117,8 @@ void PlaylistContainer::load()
 // resync all the playlists after a rescan just in case some tracks were removed
 void PlaylistContainer::resync(void)
 {
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_allPlaylists->begin(); it != m_allPlaylists->end(); ++it)
-        (*it)->resync();
+    for (auto* list : std::as_const(*m_allPlaylists))
+        list->resync();
 
     m_activePlaylist->resync();
 }
@@ -169,11 +168,10 @@ Playlist *PlaylistContainer::getPlaylist(const QString &name)
 
 void PlaylistContainer::save(void)
 {
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_allPlaylists->begin(); it != m_allPlaylists->end(); ++it)
+    for (auto* list : std::as_const(*m_allPlaylists))
     {
-        if ((*it)->hasChanged())
-            (*it)->savePlaylist((*it)->getName(), m_myHost);
+        if (list->hasChanged())
+            list->savePlaylist(list->getName(), m_myHost);
     }
 
     m_activePlaylist->savePlaylist(DEFAULT_PLAYLIST_NAME, m_myHost);

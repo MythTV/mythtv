@@ -162,14 +162,11 @@ QString LyricsData::createLyricsXML(void)
     grabber.appendChild(doc.createTextNode(m_grabber));
 
     // lyrics
-    auto i = m_lyricsMap.begin();
-    while (i != m_lyricsMap.end())
+    for (const auto* line : std::as_const(m_lyricsMap))
     {
-        LyricsLine *line = (*i);
         QDomElement lyric = doc.createElement("lyric");
         root.appendChild(lyric);
         lyric.appendChild(doc.createTextNode(line->toString(m_syncronized)));
-        ++i;
     }
 
     return doc.toString(4);

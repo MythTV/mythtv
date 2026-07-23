@@ -1119,28 +1119,22 @@ void MythDownloadManager::removeListener(QObject *caller)
 {
     QMutexLocker locker(m_infoLock);
 
-    QList <MythDownloadInfo*>::iterator lit = m_downloadQueue.begin();
-    for (; lit != m_downloadQueue.end(); ++lit)
+    for (auto* dlInfo : std::as_const(m_downloadQueue))
     {
-        MythDownloadInfo *dlInfo = *lit;
-        if (dlInfo->m_caller == caller)
-        {
-            dlInfo->m_caller  = nullptr;
-            dlInfo->m_outFile = QString();
-            dlInfo->m_data    = nullptr;
-        }
+        if (dlInfo->m_caller != caller)
+            continue;
+        dlInfo->m_caller  = nullptr;
+        dlInfo->m_outFile = QString();
+        dlInfo->m_data    = nullptr;
     }
 
-    QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
-    for (; mit != m_downloadInfos.end(); ++mit)
+    for (auto* dlInfo : std::as_const(m_downloadInfos))
     {
-        MythDownloadInfo *dlInfo = mit.value();
-        if (dlInfo->m_caller == caller)
-        {
-            dlInfo->m_caller  = nullptr;
-            dlInfo->m_outFile = QString();
-            dlInfo->m_data    = nullptr;
-        }
+        if (dlInfo->m_caller != caller)
+            continue;
+        dlInfo->m_caller  = nullptr;
+        dlInfo->m_outFile = QString();
+        dlInfo->m_data    = nullptr;
     }
 }
 

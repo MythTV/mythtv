@@ -270,9 +270,8 @@ void MusicPlayer::stop(bool stopAll)
         // remove any listeners from the decoder
         {
             QMutexLocker locker(m_lock);
-            // NOLINTNEXTLINE(modernize-loop-convert)
-            for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
-                getDecoder()->removeListener(*it);
+            for (auto* listener : std::as_const(m_listeners))
+                getDecoder()->removeListener(listener);
         }
     }
 
@@ -400,15 +399,13 @@ bool MusicPlayer::openOutputDevice(void)
     m_output->addListener(this);
 
     // add any visuals to the audio output
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
-        m_output->addVisual((Visualization*)(*it));
+    for (auto* visualiser : std::as_const(m_visualisers))
+        m_output->addVisual((Visualization*)visualiser);
 
     // add any listeners to the audio output
     QMutexLocker locker(m_lock);
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
-        m_output->addListener(*it);
+    for (auto* listener : std::as_const(m_listeners))
+        m_output->addListener(listener);
 
     return true;
 }
@@ -1530,9 +1527,8 @@ void MusicPlayer::setupDecoderHandler(void)
     // add any listeners to the decoderHandler
     {
         QMutexLocker locker(m_lock);
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
-            m_decoderHandler->addListener(*it);
+        for (auto* listener : std::as_const(m_listeners))
+            m_decoderHandler->addListener(listener);
     }
 }
 
@@ -1565,21 +1561,21 @@ void MusicPlayer::decoderHandlerReady(void)
     // add any listeners to the decoder
     {
         QMutexLocker locker(m_lock);
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto it = m_listeners.begin(); it != m_listeners.end() ; ++it)
-            decoder->addListener(*it);
+        for (auto* listener : std::as_const(m_listeners))
+            decoder->addListener(listener);
     }
 
     m_currentTime = 0s;
     m_lastTrackStart = 0s;
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_visualisers.begin(); it != m_visualisers.end() ; ++it)
+#ifdef ADD_VISUALIZERS
+    for (auto* visualiser : std::as_const(m_visualisers))
     {
-        //m_output->addVisual((Visualization*)(*it));
-        //(*it)->setDecoder(decoder);
+        //m_output->addVisual((Visualization*)(visualiser));
+        //visualiser->setDecoder(decoder);
         //m_visual->setOutput(m_output);
     }
+#endif
 
     if (decoder->initialize())
     {

@@ -477,14 +477,14 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         // Look for a CDS Extension that knows how to handle this ObjectID
         // ------------------------------------------------------------------
 
-        UPnpCDSExtensionList::iterator it = m_extensions.begin();
-        for (; (it != m_extensions.end()) && !pResult; ++it)
+        for (auto* ext : std::as_const(m_extensions))
         {
             LOG(VB_UPNP, LOG_INFO,
                 QString("UPNP Browse : Searching for : %1  / ObjectID : %2")
-                    .arg((*it)->m_sExtensionId, request.m_sObjectId));
+                    .arg(ext->m_sExtensionId, request.m_sObjectId));
 
-            pResult = (*it)->Browse(&request);
+            pResult = ext->Browse(&request);
+            if (pResult) break;
         }
 
         if (pResult != nullptr)
@@ -586,13 +586,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     //          Just focus on the "upnp:class derivedfrom" expression
     // ----------------------------------------------------------------------
 
-    for ( QStringList::Iterator it  = request.m_sSearchList.begin();
-                                it != request.m_sSearchList.end();
-                              ++it )
+    for ( const auto& expr : std::as_const(request.m_sSearchList))
     {
-        if ((*it).contains("upnp:class derivedfrom", Qt::CaseInsensitive))
+        if (expr.contains("upnp:class derivedfrom", Qt::CaseInsensitive))
         {
-            QStringList sParts = (*it).split(' ', Qt::SkipEmptyParts);
+            QStringList sParts = expr.split(' ', Qt::SkipEmptyParts);
             if (sParts.count() > 2)
             {
                 request.m_sSearchClass = sParts[2].trimmed();
@@ -630,9 +628,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     bool bSearchDone = false;
 #endif
 
-    UPnpCDSExtensionList::iterator it = m_extensions.begin();
-    for (; (it != m_extensions.end()) && !pResult; ++it)
-        pResult = (*it)->Search(&request);
+    for (auto* ext : std::as_const(m_extensions))
+    {
+        pResult = ext->Search(&request);
+        if (pResult) break;
+    }
 
     if (pResult != nullptr)
     {

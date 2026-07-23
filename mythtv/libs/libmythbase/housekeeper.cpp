@@ -631,12 +631,9 @@ HouseKeeper::~HouseKeeper(void)
     {
         // unload any registered tasks
         QMutexLocker mapLock(&m_mapLock);
-        QMap<QString,HouseKeeperTask*>::iterator it = m_taskMap.begin();
-        while (it != m_taskMap.end())
-        {
-            (*it)->DecrRef();
-            it = m_taskMap.erase(it);
-        }
+        for (auto* task : std::as_const(m_taskMap))
+            task->DecrRef();
+        m_taskMap.clear();
     }
 }
 

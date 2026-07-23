@@ -823,33 +823,32 @@ void LCDProcClient::outputText(QList<LCDTextItem> *textItems)
     // Do the definable scrolling in here.
     // Use asignScrollingWidgets(curItem->getText(), "textWidget" + num);
     // When scrolling is set, alignment has no effect
-    for (auto it = textItems->begin(); it != textItems->end(); it++)
+    for (const auto& curItem : std::as_const(*textItems))
     {
         if (counter >= m_lcdHeight)
             break;
-        LCDTextItem *curItem = &(*it);
-        num.setNum(curItem->getRow());
+        num.setNum(curItem.getRow());
 
-        if (curItem->getScroll())
+        if (curItem.getScroll())
         {
-            assignScrollingWidgets(curItem->getText(), curItem->getScreen(),
-                                "textWidget" + num, curItem->getRow());
+            assignScrollingWidgets(curItem.getText(), curItem.getScreen(),
+                                "textWidget" + num, curItem.getRow());
         }
         else
         {
-            switch (curItem->getAlignment())
+            switch (curItem.getAlignment())
             {
                 case ALIGN_LEFT:
-                    outputLeftText(curItem->getScreen(), curItem->getText(),
-                                   "textWidget" + num, curItem->getRow());
+                    outputLeftText(curItem.getScreen(), curItem.getText(),
+                                   "textWidget" + num, curItem.getRow());
                     break;
                 case ALIGN_RIGHT:
-                    outputRightText(curItem->getScreen(), curItem->getText(),
-                                    "textWidget" + num, curItem->getRow());
+                    outputRightText(curItem.getScreen(), curItem.getText(),
+                                    "textWidget" + num, curItem.getRow());
                     break;
                 case ALIGN_CENTERED:
-                    outputCenteredText(curItem->getScreen(), curItem->getText(),
-                                       "textWidget" + num, curItem->getRow());
+                    outputCenteredText(curItem.getScreen(), curItem.getText(),
+                                       "textWidget" + num, curItem.getRow());
                     break;
                 default: break;
             }
@@ -1197,10 +1196,9 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     unsigned int counter = 0;
     bool oneSelected = false;
 
-    for (auto it = menuItems->begin(); it != menuItems->end(); it++)
+    for (const auto& curItem : std::as_const(*menuItems))
     {
-        LCDMenuItem *curItem = &(*it);
-        if (curItem->isSelected() && !oneSelected)
+        if (curItem.isSelected() && !oneSelected)
         {
             selectedItem = counter + 1;
             oneSelected  = true;
@@ -1415,10 +1413,9 @@ void LCDProcClient::scrollMenuText()
     unsigned int selectedItem = 0;
     unsigned int counter = 0;
 
-    for (auto it = m_lcdMenuItems->begin(); it != m_lcdMenuItems->end(); it++)
+    for (const auto& curItem : std::as_const(*m_lcdMenuItems))
     {
-        LCDMenuItem *curItem = &(*it);
-        if (curItem->isSelected())
+        if (curItem.isSelected())
         {
             selectedItem = counter + 1;
             break;
@@ -1505,19 +1502,17 @@ void LCDProcClient::scrollMenuText()
     int longest_line = 0;
     int max_scroll_pos = 0;
 
-    for (auto it = m_lcdMenuItems->begin(); it != m_lcdMenuItems->end(); it++)
+    for (const auto& curItem : std::as_const(*m_lcdMenuItems))
     {
-        LCDMenuItem *curItem = &(*it);
         longest_line = std::max(
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-            curItem->ItemName().length(),
+            curItem.ItemName().length(),
 #else
-            static_cast<int>(curItem->ItemName().length()),
+            static_cast<int>(curItem.ItemName().length()),
 #endif
             longest_line);
 
-        if ((int)curItem->getScrollPos() > max_scroll_pos)
-            max_scroll_pos = curItem->getScrollPos();
+        max_scroll_pos = std::max(max_scroll_pos, (int)curItem.getScrollPos());
     }
 
     // If max_scroll_pos > longest_line then reset

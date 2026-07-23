@@ -435,13 +435,11 @@ void MediaMonitor::CheckDevices(void)
 
     QMutexLocker locker(&m_devicesLock);
 
-    QList<MythMediaDevice*>::iterator itr = m_devices.begin();
-    while (itr != m_devices.end())
+    for  (auto* pDev : std::as_const(m_devices))
     {
-        MythMediaDevice* pDev = *itr;
-        if (pDev)
-            pDev->checkMedia();
-        ++itr;
+        if (nullptr == pDev)
+            continue;
+        pDev->checkMedia();
     }
 }
 
@@ -824,14 +822,11 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
         {
             // We don't want to jump around in the menus, but should
             // call each plugin's callback so it can track this change.
-
-            QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
-            while (itr != m_handlerMap.end())
+            for (const auto& handler : std::as_const(m_handlerMap))
             {
-                if ((*itr).MythMediaType & (int)pDev->getMediaType() ||
+                if (handler.MythMediaType & (int)pDev->getMediaType() ||
                     pDev->getStatus() == MEDIASTAT_OPEN)
-                    (*itr).callback(pDev, false);
-                itr++;
+                    handler.callback(pDev, false);
             }
         }
 

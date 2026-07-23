@@ -2342,17 +2342,14 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
 
     bool found_it = false;
     int selectedPosition = 0;
-    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin();
-
-    while (it != m_itemList.end())
+    for (const auto* item : std::as_const(m_itemList))
     {
-        if ((*it)->GetText() == position_name)
+        if (item->GetText() == position_name)
         {
             found_it = true;
             break;
         }
 
-        ++it;
         ++selectedPosition;
     }
 

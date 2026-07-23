@@ -369,13 +369,12 @@ SubtitleFormat::GetFont(const QString &family,
 
 SubtitleFormat::~SubtitleFormat(void)
 {
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_cleanup.size(); ++i)
+    for (const auto& cleanup : std::as_const(m_cleanup))
     {
-        m_cleanup[i]->DeleteAllChildren();
-        m_cleanup[i]->deleteLater();
-        m_cleanup[i] = nullptr; // just to be safe
+        cleanup->DeleteAllChildren();
+        cleanup->deleteLater();
     }
+    m_cleanup.clear();
     qDeleteAll(m_dynamAllocated);
     m_dynamAllocated.clear();
     m_fontMap.clear();
@@ -855,34 +854,33 @@ void FormattedTextSubtitle::Layout(void)
 
     // Fill in missing coordinates
     int y = anchor_y;
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_lines.size(); i++)
+    for (auto& line : m_lines)
     {
-        if (m_lines[i].m_xIndent < 0)
-            m_lines[i].m_xIndent = anchor_x;
-        if (m_lines[i].m_yIndent < 0)
-            m_lines[i].m_yIndent = y;
-        y += m_lines[i].CalcSize(LINE_SPACING).height();
+        if (line.m_xIndent < 0)
+            line.m_xIndent = anchor_x;
+        if (line.m_yIndent < 0)
+            line.m_yIndent = y;
+        y += line.CalcSize(LINE_SPACING).height();
         // Prune leading all-whitespace chunks.
-        while (!m_lines[i].chunks.isEmpty() &&
-               m_lines[i].chunks.constFirst().m_text.trimmed().isEmpty())
+        while (!line.chunks.isEmpty() &&
+               line.chunks.constFirst().m_text.trimmed().isEmpty())
         {
-            m_lines[i].m_xIndent +=
-                m_lines[i].chunks.constFirst().CalcSize().width();
-            m_lines[i].chunks.removeFirst();
+            line.m_xIndent +=
+                line.chunks.constFirst().CalcSize().width();
+            line.chunks.removeFirst();
         }
         // Prune trailing all-whitespace chunks.
-        while (!m_lines[i].chunks.isEmpty() &&
-               m_lines[i].chunks.constLast().m_text.trimmed().isEmpty())
+        while (!line.chunks.isEmpty() &&
+               line.chunks.constLast().m_text.trimmed().isEmpty())
         {
-            m_lines[i].chunks.removeLast();
+            line.chunks.removeLast();
         }
         // Trim trailing whitespace from last chunk.  (Trimming
         // leading whitespace from all chunks is handled in the Draw()
         // routine.)
-        if (!m_lines[i].chunks.isEmpty())
+        if (!line.chunks.isEmpty())
         {
-            QString *str = &m_lines[i].chunks.last().m_text;
+            QString *str = &line.chunks.last().m_text;
             int idx = str->length() - 1;
             while (idx >= 0 && str->at(idx) == ' ')
                 --idx;

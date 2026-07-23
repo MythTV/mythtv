@@ -99,11 +99,11 @@ void MythBDBuffer::Close(void)
     if (m_bdnav)
     {
         m_infoLock.lock();
-        for (auto it = m_cachedTitleInfo.begin(); it !=m_cachedTitleInfo.end(); ++it)
-            bd_free_title_info(it.value());
+        for (auto *info : std::as_const(m_cachedTitleInfo))
+            bd_free_title_info(info);
         m_cachedTitleInfo.clear();
-        for (auto it = m_cachedPlaylistInfo.begin(); it !=m_cachedPlaylistInfo.end(); ++it)
-            bd_free_title_info(it.value());
+        for (auto *info : std::as_const(m_cachedPlaylistInfo))
+            bd_free_title_info(info);
         m_cachedPlaylistInfo.clear();
         m_infoLock.unlock();
         bd_close(m_bdnav);

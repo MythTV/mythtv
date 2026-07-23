@@ -1305,22 +1305,16 @@ MythCommandLineParser::~MythCommandLineParser()
         QFile::remove(pidfile);
     }
 
-    QMap<QString, CommandLineArg*>::iterator i;
-
-    i = m_namedArgs.begin();
-    while (i != m_namedArgs.end())
+    for (auto *arg : std::as_const(m_namedArgs))
     {
-        (*i)->CleanupLinks();
-        (*i)->DecrRef();
-        i = m_namedArgs.erase(i);
+        arg->CleanupLinks();
+        arg->DecrRef();
     }
+    m_namedArgs.clear();
 
-    i = m_optionedArgs.begin();
-    while (i != m_optionedArgs.end())
-    {
-        (*i)->DecrRef();
-        i = m_optionedArgs.erase(i);
-    }
+    for (auto *arg : std::as_const(m_optionedArgs))
+        arg->DecrRef();
+    m_optionedArgs.clear();
 }
 
 /** \brief Add a new command line argument

@@ -546,13 +546,13 @@ void MythCCExtractorPlayer::IngestTeletext(void)
         if (updatedPages.isEmpty())
             continue;
 
-        for (auto it = updatedPages.constBegin(); it != updatedPages.constEnd(); ++it)
+        for (auto [first, second] : std::as_const(updatedPages))
         {
-            (*ttxit).m_reader->SetPage((*it).first, (*it).second);
+            (*ttxit).m_reader->SetPage(first, second);
             TeletextSubPage *subpage = (*ttxit).m_reader->FindSubPage();
             if (subpage && subpage->subtitle)
             {
-                IngestSubtitle((*ttxit).m_subs[(*it).first],
+                IngestSubtitle((*ttxit).m_subs[first],
                                to_string_list(*subpage));
             }
         }

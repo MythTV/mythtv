@@ -464,25 +464,25 @@ class AudioCompressionSettings : public GroupSetting
                     }
                 }
 
-                for (auto Icodec = m_v4l2codecs.begin(); Icodec < m_v4l2codecs.end(); ++Icodec)
+                for (const auto& codec : std::as_const(m_v4l2codecs))
                 {
                     for (const auto & option : std::as_const(options))
                     {
                         if (option.m_category == DriverOption::AUDIO_BITRATE_MODE)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                  new BitrateMode(m_parent, "audbitratemode"));
                         }
                         else if (option.m_category ==
                                  DriverOption::AUDIO_SAMPLERATE)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                              new SampleRate(m_parent, false));
                         }
                         else if (option.m_category ==
                                  DriverOption::AUDIO_LANGUAGE)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                              new MPEG2Language(m_parent));
                         }
                         else if (option.m_category == DriverOption::AUDIO_BITRATE)
@@ -503,7 +503,7 @@ class AudioCompressionSettings : public GroupSetting
 
                             if (layer1 || layer2 || layer3)
                             {
-                                m_codecName->addTargetedChild(*Icodec,
+                                m_codecName->addTargetedChild(codec,
                                        new MPEG2AudioBitrateSettings(m_parent,
                                                                      layer1,
                                                                      layer2,
@@ -512,7 +512,7 @@ class AudioCompressionSettings : public GroupSetting
                         }
                         else if (option.m_category == DriverOption::VOLUME)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                                 new MPEG2audVolume(m_parent));
                         }
                     }
@@ -999,7 +999,7 @@ class VideoCompressionSettings : public GroupSetting
                     }
                 }
 
-                for (auto Icodec = m_v4l2codecs.begin(); Icodec < m_v4l2codecs.end(); ++Icodec)
+                for (const auto& codec :std::as_const(m_v4l2codecs))
                 {
                     auto* bit_low    = new GroupSetting();
                     auto* bit_medium = new GroupSetting();
@@ -1010,7 +1010,7 @@ class VideoCompressionSettings : public GroupSetting
                     {
                         if (option.m_category == DriverOption::STREAM_TYPE)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                              new MPEG2streamType(m_parent,
                                                      option.m_minimum,
                                                      option.m_maximum,
@@ -1018,7 +1018,7 @@ class VideoCompressionSettings : public GroupSetting
                         }
                         else if (option.m_category == DriverOption::VIDEO_ASPECT)
                         {
-                            m_codecName->addTargetedChild(*Icodec,
+                            m_codecName->addTargetedChild(codec,
                                              new MPEG2aspectRatio(m_parent,
                                              option.m_minimum,
                                              option.m_maximum,
@@ -1118,11 +1118,11 @@ class VideoCompressionSettings : public GroupSetting
                         }
                     }
 
-                    m_codecName->addTargetedChild(*Icodec, bit_low);
+                    m_codecName->addTargetedChild(codec, bit_low);
                     if (dynamic_res)
                     {
-                        m_codecName->addTargetedChild(*Icodec, bit_medium);
-                        m_codecName->addTargetedChild(*Icodec, bit_high);
+                        m_codecName->addTargetedChild(codec, bit_medium);
+                        m_codecName->addTargetedChild(codec, bit_high);
                     }
                     else
                     {

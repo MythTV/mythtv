@@ -851,10 +851,8 @@ void Ripper::scanCD(void)
 
 void Ripper::deleteAllExistingTracks(void)
 {
-    // NOLINTNEXTLINE(readability-qualified-auto) // qt6
-    for (auto it = m_tracks->begin(); it < m_tracks->end(); ++it)
+    for (auto* track : std::as_const(*m_tracks))
     {
-        RipTrack *track = (*it);
         if (track && !track->isNew)
         {
             if (deleteExistingTrack(track))

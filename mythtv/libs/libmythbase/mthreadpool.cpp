@@ -259,12 +259,10 @@ void MThreadPool::Stop(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
     m_priv->m_running = false;
-    QSet<MPoolThread*>::iterator it = m_priv->m_availThreads.begin();
-    for (; it != m_priv->m_availThreads.end(); ++it)
-        (*it)->Shutdown();
-    it = m_priv->m_runningThreads.begin();
-    for (; it != m_priv->m_runningThreads.end(); ++it)
-        (*it)->Shutdown();
+    for (auto *const thread : std::as_const(m_priv->m_availThreads))
+        thread->Shutdown();
+    for (auto *const thread : std::as_const(m_priv->m_runningThreads))
+        thread->Shutdown();
     m_priv->m_wait.wakeAll();
 }
 

@@ -5366,10 +5366,8 @@ int Scheduler::FillRecordingDir(
             if (recDir == "_UNKNOWN_")
                 continue;
 
-            for (fslistit = fsInfoList.begin();
-                 fslistit != fsInfoList.end(); ++fslistit)
+            for (const auto* fs : fsInfoList)
             {
-                FileSystemInfo *fs = *fslistit;
                 if ((recHost == fs->getHostname()) &&
                     (recDir == fs->getPath()))
                 {
@@ -5448,10 +5446,8 @@ int Scheduler::FillRecordingDir(
             (thispg->GetPathname().isEmpty()))
             continue;
 
-        for (fslistit = fsInfoList.begin();
-             fslistit != fsInfoList.end(); ++fslistit)
+        for (const auto* fs : fsInfoList)
         {
-            FileSystemInfo *fs = *fslistit;
             if ((fs->getHostname() == thispg->GetHostname()) &&
                 (fs->getPath() == thispg->GetPathname()))
             {
@@ -5501,10 +5497,8 @@ int Scheduler::FillRecordingDir(
     {
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
             "--- FillRecordingDir Sorted fsInfoList start ---");
-        for (fslistit = fsInfoList.begin();fslistit != fsInfoList.end();
-             ++fslistit)
+        for (const auto *fs : fsInfoList)
         {
-            FileSystemInfo *fs = *fslistit;
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("%1:%2")
                 .arg(fs->getHostname(), fs->getPath()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    Location    : %1")
@@ -5552,12 +5546,8 @@ int Scheduler::FillRecordingDir(
         {
             // setup a container of remaining space for all the file systems
             QMap <int , long long> remainingSpaceKB;
-            for (fslistit = fsInfoList.begin();
-                fslistit != fsInfoList.end(); ++fslistit)
-            {
-                remainingSpaceKB[(*fslistit)->getFSysID()] =
-                    (*fslistit)->getFreeSpace();
-            }
+            for (const auto* fs : fsInfoList)
+                remainingSpaceKB[fs->getFSysID()] = fs->getFreeSpace();
 
             // get list of expirable programs
             pginfolist_t expiring;
@@ -5566,20 +5556,19 @@ int Scheduler::FillRecordingDir(
             for (auto & expire : expiring)
             {
                 // find the filesystem its on
-                FileSystemInfo *fs = nullptr;
-                for (fslistit = fsInfoList.begin();
-                    fslistit != fsInfoList.end(); ++fslistit)
+                const FileSystemInfo *found = nullptr;
+                for (const auto* fs : fsInfoList)
                 {
                     // recording is not on this filesystem's host
-                    if (expire->GetHostname() != (*fslistit)->getHostname())
+                    if (expire->GetHostname() != fs->getHostname())
                         continue;
 
                     // directory is not in the Storage Group dir list
-                    if (!dirlist.contains((*fslistit)->getPath()))
+                    if (!dirlist.contains(fs->getPath()))
                         continue;
 
                     QString filename =
-                        (*fslistit)->getPath() + "/" + expire->GetPathname();
+                        fs->getPath() + "/" + expire->GetPathname();
 
                     // recording is local
                     if (expire->GetHostname() == gCoreContext->GetHostName())
@@ -5588,7 +5577,7 @@ int Scheduler::FillRecordingDir(
 
                         if (checkFile.exists())
                         {
-                            fs = *fslistit;
+                            found = fs;
                             break;
                         }
                     }
@@ -5611,7 +5600,7 @@ int Scheduler::FillRecordingDir(
                         if (foundSlave &&
                             programinfo->GetPathname() == filename)
                         {
-                            fs = *fslistit;
+                            found = fs;
                             programinfo->SetPathname(backuppath);
                             break;
                         }
@@ -5619,7 +5608,7 @@ int Scheduler::FillRecordingDir(
                     }
                 }
 
-                if (!fs)
+                if (!found)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to match '%1' "
@@ -5629,18 +5618,18 @@ int Scheduler::FillRecordingDir(
                 }
 
                 // add this files size to the remaining free space
-                remainingSpaceKB[fs->getFSysID()] +=
+                remainingSpaceKB[found->getFSysID()] +=
                     expire->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
                 long long desiredSpaceKB =
-                    m_expirer->GetDesiredSpace(fs->getFSysID());
+                    m_expirer->GetDesiredSpace(found->getFSysID());
 
-                if (remainingSpaceKB[fs->getFSysID()] >
+                if (remainingSpaceKB[found->getFSysID()] >
                         (desiredSpaceKB + maxSizeKB))
                 {
-                    recording_dir = fs->getPath();
-                    fsID = fs->getFSysID();
+                    recording_dir = found->getPath();
+                    fsID = found->getFSysID();
 
                     LOG(VB_FILE, LOG_INFO,
                         QString("pass 2: '%1' will record in '%2' "
@@ -5651,7 +5640,7 @@ int Scheduler::FillRecordingDir(
                                 "there are enough that the Expirer should "
                                 "be able to free up space for this recording.")
                             .arg(title, recording_dir)
-                            .arg(fs->getFreeSpace() / 1024)
+                            .arg(found->getFreeSpace() / 1024)
                             .arg(desiredSpaceKB / 1024));
 
                     foundDir = true;
@@ -5663,11 +5652,9 @@ int Scheduler::FillRecordingDir(
         }
         else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
         {
-            for (fslistit = fsInfoList.begin();
-                fslistit != fsInfoList.end(); ++fslistit)
+            for (const auto* fs : fsInfoList)
             {
                 long long desiredSpaceKB = 0;
-                FileSystemInfo *fs = *fslistit;
                 if (m_expirer)
                     desiredSpaceKB =
                         m_expirer->GetDesiredSpace(fs->getFSysID());

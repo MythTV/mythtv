@@ -35,14 +35,13 @@ MythUIThemeCache::~MythUIThemeCache()
     PruneCacheDir(GetRemoteCacheDir());
     PruneCacheDir(GetThumbnailDir());
 
-    for (auto i = m_imageCache.begin();
-          i != m_imageCache.end();
-         /* no inc */)
+    for (auto *image : std::as_const(m_imageCache))
     {
-        i.value()->SetIsInCache(false);
-        i.value()->DecrRef();
-        i = m_imageCache.erase(i);
+        image->SetIsInCache(false);
+        image->DecrRef();
     }
+    m_imageCache.clear();
+
     m_cacheTrack.clear();
 
     delete m_imageThreadPool;
@@ -62,14 +61,12 @@ void MythUIThemeCache::UpdateImageCache()
 {
     QMutexLocker locker(&m_cacheLock);
 
-    for (auto i = m_imageCache.begin();
-          i != m_imageCache.end();
-         /* no inc */)
+    for (auto *image : std::as_const(m_imageCache))
     {
-        i.value()->SetIsInCache(false);
-        i.value()->DecrRef();
-        i = m_imageCache.erase(i);
+        image->SetIsInCache(false);
+        image->DecrRef();
     }
+    m_imageCache.clear();
 
     m_cacheTrack.clear();
     m_cacheSize.fetchAndStoreOrdered(0);

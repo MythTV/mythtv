@@ -61,12 +61,9 @@ MythSocketManager::~MythSocketManager()
     m_handlerMap.clear();
 
     QMutexLocker locker(&m_socketListLock);
-    for (auto iter = m_socketList.begin();
-         iter != m_socketList.end();
-         iter = m_socketList.erase(iter))
-    {
-        (*iter)->DecrRef();
-    }
+    for (auto* sock : std::as_const(m_socketList))
+        sock->DecrRef();
+    m_socketList.clear();
 }
 
 bool MythSocketManager::Listen(int port)

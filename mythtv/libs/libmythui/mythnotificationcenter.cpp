@@ -1194,22 +1194,19 @@ int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
  */
 void NCPrivate::RefreshScreenPosition(int /*from*/)
 {
-    QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
-    QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
-
     int position = 0;
 
-    for (; it != itend; ++it)
+    for (auto* screen : std::as_const(m_screens))
     {
-        if ((*it)->IsVisible())
+        if (screen->IsVisible())
         {
-            (*it)->AdjustIndex(position++, true);
+            screen->AdjustIndex(position++, true);
         }
         else
         {
-            (*it)->AdjustIndex(position, true);
+            screen->AdjustIndex(position, true);
         }
-        if ((*it)->m_fullscreen)
+        if (screen->m_fullscreen)
         {
             position = 0;
             continue;
