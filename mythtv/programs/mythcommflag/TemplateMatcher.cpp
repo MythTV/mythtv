@@ -814,12 +814,17 @@ int
 TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
 {
     breaks->clear();
-    for (auto bb = m_breakMap.begin();
-            bb != m_breakMap.end();
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto bb = m_breakMap.constBegin();
+              bb != m_breakMap.constEnd();
             ++bb)
     {
         breaks->insert(bb.key(), *bb);
     }
+#else
+    for (auto [key, value] : std::as_const(m_breakMap).asKeyValueRange())
+        breaks->insert(key, value);
+#endif
     return 0;
 }
 

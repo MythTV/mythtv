@@ -129,6 +129,7 @@ void MythSystemLegacyIOHandler::run(void)
             }
             else if( retval > 0 )
             {
+                // HandleRead/HandleWrite can modify m_pMap!!!
                 auto it = m_pMap.keyValueBegin();
                 while (it != m_pMap.keyValueEnd())
                 {
@@ -382,17 +383,20 @@ void MythSystemLegacyManager::run(void)
 
 
         // loop through running processes for any that require action
-        MSMap_t::iterator   i;
-        MSMap_t::iterator   next;
         auto now = SystemClock::now();
 
         m_mapLock.lock();
         m_jumpLock.lock();
-        auto it = m_pMap.keyValueBegin();
-        while (it != m_pMap.keyValueEnd())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_pMap.constBegin();
+             it != m_pMap.constEnd(); it++)
         {
-            auto [pid2, ms] = *it;
-            ++it;
+            auto pid2 = it.key();
+            const auto& ms = it.value();
+#else
+        for (auto [pid2, ms] : std::as_const(m_pMap).asKeyValueRange())
+        {
+#endif
             if (!ms)
                 continue;
 

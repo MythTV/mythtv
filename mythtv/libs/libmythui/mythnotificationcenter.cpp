@@ -1101,10 +1101,15 @@ void NCPrivate::DeleteUnregistered(void)
 {
     bool needdelete = false;
 
-    for (auto it = m_unregistered.begin(); it != m_unregistered.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_unregistered.constBegin(); it != m_unregistered.constEnd(); it++)
     {
         int id = it.key();
         bool closeimemdiately = it.value();
+#else
+    for (auto [id, closeimemdiately] : std::as_const(m_unregistered).asKeyValueRange())
+    {
+#endif
         MythNotificationScreen *screen = nullptr;
 
         if (m_registrations.contains(id))

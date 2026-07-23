@@ -770,10 +770,16 @@ void HouseKeeper::Run(void)
     }
 
     // check if any tasks are ready to run, and add to queue
-    for (auto it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_taskMap.constBegin();
+         it != m_taskMap.constEnd(); ++it)
     {
         const auto& name = it.key();
         auto* task = it.value();
+#else
+    for (auto [name, task] : std::as_const(m_taskMap).asKeyValueRange())
+    {
+#endif
         if (task->CheckRun(now))
         {
             LOG(VB_GENERAL, LOG_INFO,

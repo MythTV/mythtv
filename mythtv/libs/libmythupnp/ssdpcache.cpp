@@ -511,10 +511,15 @@ int SSDPCache::RemoveStale()
     // Iterate through all Type URI's and build list of stale entries keys
     // ----------------------------------------------------------------------
 
-    for (auto it = m_cache.begin(); it != m_cache.end(); ++it )
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_cache.constBegin(); it != m_cache.constEnd(); ++it )
     {
         const QString& key = it.key();
         SSDPCacheEntries *pEntries = *it;
+#else
+    for (auto [key, pEntries] : std::as_const(m_cache).asKeyValueRange())
+    {
+#endif
 
         if (pEntries != nullptr)
         {

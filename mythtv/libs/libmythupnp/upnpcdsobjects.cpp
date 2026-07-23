@@ -86,7 +86,7 @@ Property *CDSObject::AddProperty( Property *pProp )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QList<Property*> CDSObject::GetProperties( const QString &sName )
+QList<Property*> CDSObject::GetProperties( const QString &sName ) const
 {
     QList<Property*> props;
     auto it = m_properties.constFind(sName);

@@ -577,8 +577,9 @@ int V4L2util::GetOptionValue(DriverOption::category_t cat, const QString& desc)
     }
 
     DriverOption drv_opt = m_options.value(cat);
-    DriverOption::menu_t::iterator Imenu = drv_opt.m_menu.begin();
-    for ( ; Imenu != drv_opt.m_menu.end(); ++Imenu)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    auto Imenu = drv_opt.m_menu.constBegin();
+    for ( ; Imenu != drv_opt.m_menu.constEnd(); ++Imenu)
     {
         if ((*Imenu) == desc)
         {
@@ -587,6 +588,16 @@ int V4L2util::GetOptionValue(DriverOption::category_t cat, const QString& desc)
             return Imenu.key();
         }
     }
+#else
+    for (const auto& [key, value] : std::as_const(drv_opt.m_menu).asKeyValueRange())
+    {
+        if (value != desc)
+            continue;
+        LOG(VB_CHANNEL, LOG_INFO, LOC + QString("GetOptionValue '%1' = %2")
+            .arg(desc).arg(key));
+        return key;
+    }
+#endif
 
     LOG(VB_CHANNEL, LOG_WARNING, LOC +
         QString("'%1' not found in driver options menu.").arg(desc));

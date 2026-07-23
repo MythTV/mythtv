@@ -179,7 +179,7 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetResponseStatus   ( void ) const;
         QString         GetResponseType     ( void ) const;
-        QString         GetResponseHeaders  ( void );
+        QString         GetResponseHeaders  ( void ) const;
 
         bool            ParseRange          ( QString sRange,
                                               long long   llSize,

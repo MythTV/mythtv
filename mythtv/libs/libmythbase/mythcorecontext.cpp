@@ -2018,11 +2018,16 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     // connections for any clients in the same thread as non-blocking connection
     QThread *currentThread = QThread::currentThread();
 
-    QMap<QObject *, PlaybackStartCb>::iterator it = d->m_playbackClients.begin();
-    for (; it != d->m_playbackClients.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = d->m_playbackClients.constBegin();
+         it != d->m_playbackClients.constEnd(); ++it)
     {
         auto* object = it.key();
         auto callback = it.value();
+#else
+    for (auto [object, callback] : std::as_const(d->m_playbackClients).asKeyValueRange())
+    {
+#endif
         if (object == sender)
             continue;   // will be done separately, no need to do it again
 
@@ -2053,11 +2058,16 @@ void MythCoreContext::WantingPlayback(QObject *sender)
                 Qt::BlockingQueuedConnection);
     }
     // Restore blocking connections
-    it = d->m_playbackClients.begin();
-    for (; it != d->m_playbackClients.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = d->m_playbackClients.constBegin();
+         it != d->m_playbackClients.constEnd(); ++it)
     {
         auto* object = it.key();
         auto callback = it.value();
+#else
+    for (auto [object, callback] : std::as_const(d->m_playbackClients).asKeyValueRange())
+    {
+#endif
         if (object == sender)
             continue;   // already done above, no need to do it again
 

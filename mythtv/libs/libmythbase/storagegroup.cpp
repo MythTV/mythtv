@@ -73,11 +73,16 @@ void StorageGroup::StaticInit(void)
     m_builtinGroups["Streaming"] = GetConfDir() + "/tmp/hls";
     m_builtinGroups["3rdParty"] = GetConfDir() + "/3rdParty";
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_builtinGroups.begin(); it != m_builtinGroups.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_builtinGroups.constBegin();
+         it != m_builtinGroups.constEnd(); ++it)
     {
         const auto& name = it.key();
         const auto& path = it.value();
+#else
+        for (const auto [name, path] : std::as_const(m_builtinGroups).asKeyValueRange())
+    {
+#endif
         QDir qdir(path);
         if (!qdir.exists())
             qdir.mkpath(path);

@@ -73,11 +73,17 @@ void ProgramInfoUpdater::run(void)
 
         // Send updates in any old order, we just need
         // one per updated ProgramInfo.
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
         // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto itu = m_needsUpdate.begin(); itu != m_needsUpdate.end(); ++itu)
+        for (auto itu = m_needsUpdate.constBegin();
+             itu != m_needsUpdate.constEnd(); ++itu)
         {
             auto key = itu.key();
             auto data = itu.value();
+#else
+        for (auto [key, data] : std::as_const(m_needsUpdate).asKeyValueRange())
+        {
+#endif
             QString msg;
 
             if (kPIUpdateFileSize == data.m_action)

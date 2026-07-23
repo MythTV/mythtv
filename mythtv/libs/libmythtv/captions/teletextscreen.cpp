@@ -135,10 +135,15 @@ QImage* TeletextScreen::GetRowImage(int row, QRect &rect)
 
 void TeletextScreen::OptimiseDisplayedArea()
 {
-    for (auto it = m_rowImages.begin(); it != m_rowImages.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_rowImages.constBegin(); it != m_rowImages.constEnd(); ++it)
     {
         int row = it.key();
         QImage *value = it.value();
+#else
+    for (auto [row, value] : std::as_const(m_rowImages).asKeyValueRange())
+    {
+#endif
         MythImage *image = m_painter->GetFormatImage();
         if (!image || !value)
             continue;

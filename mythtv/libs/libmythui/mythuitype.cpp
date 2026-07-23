@@ -1433,10 +1433,16 @@ void MythUIType::ConnectDependants(bool recurse)
 {
     QStringList dependees;
     QList<int> operators;
-    for (auto it = m_dependsMap.begin(); it != m_dependsMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_dependsMap.constBegin();
+         it != m_dependsMap.constEnd(); ++it)
     {
         const QString& key = it.key();
         const QString& name = it.value();
+#else
+    for (const auto [key, name] : std::as_const(m_dependsMap).asKeyValueRange())
+    {
+#endif
         // build list of operators and dependeees.
         dependees.clear();
         operators.clear();

@@ -266,15 +266,23 @@ void DVBCam::HandlePMT(void)
     if (m_pmtSent && m_pmtAdded && !m_pmtUpdated)
     {
         // Send added PMT
-        while (!m_pmtAddList.empty())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_pmtAddList.constBegin();
+             it != m_pmtAddList.constEnd(); it++)
         {
-            pmt_list_t::iterator it = m_pmtAddList.begin();
             const ChannelBase *chan = it.key();
             ProgramMapTable *pmt = (*it);
             m_pmtList[chan] = pmt;
-            m_pmtAddList.erase(it);
             SendPMT(*pmt, CPLM_ADD);
         }
+#else
+        for (auto [chan, pmt] : std::as_const(m_pmtAddList).asKeyValueRange())
+        {
+            m_pmtList[chan] = pmt;
+            SendPMT(*pmt, CPLM_ADD);
+        }
+#endif
+        m_pmtAddList.clear();
 
         m_pmtUpdated = false;
         m_pmtAdded   = false;
@@ -282,14 +290,19 @@ void DVBCam::HandlePMT(void)
     }
 
     // Grab any added PMT
-    while (!m_pmtAddList.empty())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_pmtAddList.constBegin();
+         it != m_pmtAddList.constEnd(); it++)
     {
-        pmt_list_t::iterator it = m_pmtAddList.begin();
         const ChannelBase *chan = it.key();
         ProgramMapTable *pmt = (*it);
         m_pmtList[chan] = pmt;
-        m_pmtAddList.erase(it);
     }
+#else
+    for (auto [chan, pmt] : std::as_const(m_pmtAddList).asKeyValueRange())
+        m_pmtList[chan] = pmt;
+#endif
+    m_pmtAddList.clear();
 
     uint length = m_pmtList.size();
     uint count  = 0;

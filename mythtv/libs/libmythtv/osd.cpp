@@ -548,10 +548,15 @@ void OSD::CheckExpiry()
     bool quitDialog = false;
     QStringList hideWindows {};
 
-    for (auto it = m_expireTimes.begin(); it != m_expireTimes.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_expireTimes.constBegin(); it != m_expireTimes.constEnd(); ++it)
     {
         auto *dialog = it.key();
         const auto& time = it.value();
+#else
+        for (auto [dialog, time] : std::as_const(m_expireTimes).asKeyValueRange())
+    {
+#endif
         // Both DialogQuit and HideWindow alter m_expireTimes.  Do
         // them after running the list is finished.
         if (time < now)

@@ -1872,7 +1872,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 
     m_blankCommMap.clear();
 
-    for (auto it = m_blankFrameMap.begin(); it != m_blankFrameMap.end(); ++it)
+    for (auto it = m_blankFrameMap.cbegin(); it != m_blankFrameMap.cend(); ++it)
         bframes[frames++] = it.key();
 
     // detect individual commercials from blank frames
@@ -2002,17 +2002,29 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     delete[] c_end;
     delete[] bframes;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
     LOG(VB_COMMFLAG, LOG_INFO, "Blank-Frame Commercial Map" );
-    for(auto it = m_blankCommMap.begin(); it != m_blankCommMap.end(); ++it)
+    for(auto it = m_blankCommMap.constBegin(); it != m_blankCommMap.constEnd(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
 
     MergeBlankCommList();
 
     LOG(VB_COMMFLAG, LOG_INFO, "Merged Blank-Frame Commercial Break Map" );
-    for(auto it = m_blankCommBreakMap.begin(); it != m_blankCommBreakMap.end(); ++it)
+    for(auto it = m_blankCommBreakMap.constBegin(); it != m_blankCommBreakMap.constEnd(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
+#else
+    LOG(VB_COMMFLAG, LOG_INFO, "Blank-Frame Commercial Map" );
+    for (auto [key, value] : std::as_const(m_blankCommMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+
+    MergeBlankCommList();
+
+    LOG(VB_COMMFLAG, LOG_INFO, "Merged Blank-Frame Commercial Break Map" );
+    for (auto [key, value] : std::as_const(m_blankCommBreakMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+#endif
 }
 
 
@@ -2105,11 +2117,17 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
     }
 
     LOG(VB_COMMFLAG, LOG_INFO, "Scene-Change Commercial Break Map" );
-    for (it = m_sceneCommBreakMap.begin(); it != m_sceneCommBreakMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it2 = m_sceneCommBreakMap.constBegin();
+         it2 != m_sceneCommBreakMap.constEnd(); ++it2)
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
-            .arg(it.key()).arg(*it));
+            .arg(it2.key()).arg(*it2));
     }
+#else
+    for (auto [key, value] : std::as_const(m_sceneCommBreakMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+#endif
 }
 
 

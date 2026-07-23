@@ -235,8 +235,9 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
     if (deleteMap && !deleteMap->isEmpty())
     {
         /* convert MythTV cutlist to mpeg2fix cutlist */
-        frm_dir_map_t::iterator it = deleteMap->begin();
-        for (; it != deleteMap->end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = deleteMap->constBegin();
+             it != deleteMap->constEnd(); it++)
         {
             uint64_t mark = it.key();
             if (mark > 0)
@@ -248,13 +249,27 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
             }
             m_delMap.insert (mark, it.value());
         }
+#else
+        for (auto [cmark, value] : std::as_const(deleteMap)->asKeyValueRange())
+        {
+            uint64_t mark = cmark;
+            if (mark > 0)
+            {
+                if (value == MARK_CUT_START) // NOLINT(bugprone-branch-clone)
+                    mark += 1; // +2 looks good, but keyframes are hit with +1
+                else
+                    mark += 1;
+            }
+            m_delMap.insert (mark, value);
+        }
+#endif
 
         if (m_delMap.contains(0))
         {
             m_discard = true;
             m_delMap.remove(0);
         }
-        if (m_delMap.begin().value() == MARK_CUT_END)
+        if (m_delMap.first() == MARK_CUT_END)
             m_discard = true;
         m_useSecondary = true;
     }

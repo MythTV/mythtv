@@ -2162,11 +2162,15 @@ void ChannelScanSM::HandleActiveScan(void)
     else if (!m_extendTransports.isEmpty())
     {
         --m_current;
-        QMap<uint32_t,DTVMultiplex>::iterator it = m_extendTransports.begin();
-        while (it != m_extendTransports.end())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_extendTransports.constBegin(); it != m_extendTransports.constEnd(); it++)
         {
             uint32_t index = it.key();
             const DTVMultiplex& mplex = it.value();
+#else
+        for (auto [index, mplex] : std::as_const(m_extendTransports).asKeyValueRange())
+        {
+#endif
             if (!m_tsScanned.contains(index))
             {
                 QString name = QString("TransportID %1").arg(index & 0xffff);
@@ -2175,7 +2179,6 @@ void ChannelScanSM::HandleActiveScan(void)
                 m_scanTransports.push_back(item);
                 m_tsScanned.insert(index);
             }
-            ++it;
         }
         m_extendTransports.clear();
         m_nextIt = m_current;

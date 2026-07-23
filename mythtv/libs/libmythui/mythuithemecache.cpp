@@ -447,16 +447,21 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     while ((m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes()) >=
            m_maxCacheSize.fetchAndAddOrdered(0) && !m_imageCache.empty())
     {
-        QMap<QString, MythImage *>::iterator it = m_imageCache.begin();
         auto oldestTime = SystemClock::now();
-        QString oldestKey = it.key();
+        QString oldestKey = m_imageCache.firstKey();
 
         int count = 0;
 
-        for (; it != m_imageCache.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_imageCache.constBegin();
+             it != m_imageCache.constEnd(); ++it)
         {
             const QString& key = it.key();
             MythImage* value = it.value();
+#else
+        for (auto [key, value] : std::as_const(m_imageCache).asKeyValueRange())
+        {
+#endif
             if (m_cacheTrack[key] < oldestTime)
             {
                 if ((2 == value->IncrRef()) && (value != Image))

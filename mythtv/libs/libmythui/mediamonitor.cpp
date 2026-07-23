@@ -683,12 +683,17 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
 void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia, bool forcePlayback)
 {
     QVector<MHData>                  handlers;
-    QMap<QString, MHData>::Iterator  itr = m_handlerMap.begin();
 
-    while (itr != m_handlerMap.end())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto  itr = m_handlerMap.constBegin();
+         itr != m_handlerMap.constEnd(); itr++)
     {
         const auto& name = itr.key();
         const auto& handler = itr.value();
+#else
+    for (auto [name, handler] : std::as_const(m_handlerMap).asKeyValueRange())
+    {
+#endif
         if ((handler.MythMediaType & (int)pMedia->getMediaType()))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
@@ -696,7 +701,6 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia, bool forcePlaybac
                 .arg(pMedia->MediaTypeString(), name));
             handlers.append(handler);
         }
-        itr++;
     }
 
     if (handlers.empty())
