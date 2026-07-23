@@ -118,12 +118,8 @@ SignalHandler::~SignalHandler()
     }
 
     QMutexLocker locker(&m_sigMapLock);
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_sigMap.begin(); it != m_sigMap.end(); ++it)
-    {
-        int signum = it.key();
-        signal(signum, SIG_DFL);
-    }
+    for (auto it = m_sigMap.keyBegin(); it != m_sigMap.keyEnd(); ++it)
+        signal(*it, SIG_DFL);
 
     m_sigMap.clear();
 

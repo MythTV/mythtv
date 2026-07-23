@@ -910,10 +910,10 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
     item.m_port = -1;
     item.m_node = -1;
-    for (auto it = m_priv->m_devices.begin(); it != m_priv->m_devices.end(); ++it)
+    for (auto it = m_priv->m_devices.keyBegin(); it != m_priv->m_devices.keyEnd(); ++it)
     {
-        if (!guid_online[it.key()])
-            UpdateDeviceListItem(it.key(), &item);
+        if (!guid_online[*it])
+            UpdateDeviceListItem(*it, &item);
     }
 
     return true;

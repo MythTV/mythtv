@@ -1508,12 +1508,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
         if (m_groupAlphaList)
         {
-            for (auto Iqs = m_groupAlphabet.keyValueBegin();
-                 Iqs != m_groupAlphabet.keyValueEnd(); ++Iqs)
+            for (auto Iqs = m_groupAlphabet.keyBegin();
+                 Iqs != m_groupAlphabet.keyEnd(); ++Iqs)
             {
                 auto *item = new MythUIButtonListItem(m_groupAlphaList, "",
-                                               QVariant::fromValue(Iqs->first));
-                item->SetText(Iqs->first);
+                                               QVariant::fromValue(*Iqs));
+                item->SetText(*Iqs);
             }
         }
     }

@@ -253,8 +253,9 @@ bool StreamHandler::RemoveAllPIDFilters(void)
 #endif // DEBUG_PID_FILTERS
 
     std::vector<int> del_pids;
-    for (auto it = m_pidInfo.begin(); it != m_pidInfo.end(); ++it)
-        del_pids.push_back(it.key());
+    del_pids.reserve(m_pidInfo.size());
+    for (auto it = m_pidInfo.keyBegin(); it != m_pidInfo.keyEnd(); ++it)
+        del_pids.push_back(*it);
 
     bool ok = true;
     for (int & pid : del_pids)

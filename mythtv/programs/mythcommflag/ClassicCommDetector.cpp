@@ -2100,9 +2100,8 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
                 ++it;
         }
 
-        frm_dir_map_t::iterator dit;
-        for (dit = deleteMap.begin(); dit != deleteMap.end(); ++dit)
-            m_sceneCommBreakMap.remove(dit.key());
+        for (auto dit = deleteMap.keyBegin(); dit != deleteMap.keyEnd(); ++dit)
+            m_sceneCommBreakMap.remove(*dit);
     }
 
     LOG(VB_COMMFLAG, LOG_INFO, "Scene-Change Commercial Break Map" );

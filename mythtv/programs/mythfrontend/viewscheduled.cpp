@@ -315,18 +315,17 @@ void ViewScheduled::LoadList(bool useExistingData)
     if (m_groupList)
     {
         QString label;
-        QMap<QDate,ProgramList>::iterator dateit = m_recgroupList.begin();
-        while (dateit != m_recgroupList.end())
+        for (auto dateit = m_recgroupList.keyBegin();
+             dateit != m_recgroupList.keyEnd(); dateit++)
         {
-            if (dateit.key().isNull())
+            if (dateit->isNull())
                 label = tr("All");
             else
                 label = MythDate::toString(
-                    dateit.key(), MythDate::kDateFull | MythDate::kSimplify);
+                    *dateit, MythDate::kDateFull | MythDate::kSimplify);
 
             new MythUIButtonListItem(m_groupList, label,
-                                     QVariant::fromValue(dateit.key()));
-            ++dateit;
+                                     QVariant::fromValue(*dateit));
         }
 
         // Restore group

@@ -104,10 +104,10 @@ void MythTranslation::reload()
     {
         QStringList keys;
         keys.reserve(d.m_translators.size());
-        for (TransMap::Iterator it = d.m_translators.begin();
-             it != d.m_translators.end();
+        for (auto it = d.m_translators.keyBegin();
+             it != d.m_translators.keyEnd();
              ++it)
-            keys.append(it.key());
+            keys.append(*it);
 
         for (const auto& key : std::as_const(keys))
             load_real(key);

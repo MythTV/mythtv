@@ -486,11 +486,10 @@ void V4L2util::SetDefaultOptions(DriverOption::Options& options)
             int minimum = INT_MAX;
             int maximum = -1;
 
-            DriverOption::menu_t::iterator Imenu = (*Iopt).m_menu.begin();
-            for ( ; Imenu != (*Iopt).m_menu.end(); ++Imenu)
+            for (auto it = (*Iopt).m_menu.keyBegin(); it != (*Iopt).m_menu.keyEnd(); it++)
             {
-                minimum = std::min(Imenu.key(), minimum);
-                maximum = std::max(Imenu.key(), maximum);
+                minimum = std::min(*it, minimum);
+                maximum = std::max(*it, maximum);
             }
             if ((*Iopt).m_minimum != minimum)
             {
