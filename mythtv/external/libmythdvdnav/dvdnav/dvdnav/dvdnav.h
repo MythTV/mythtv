@@ -738,11 +738,6 @@ DVDNAV_API dvdnav_status_t dvdnav_get_spu_attr(dvdnav_t *self, uint8_t audio_mum
 DVDNAV_API int8_t dvdnav_get_active_audio_stream(dvdnav_t *self);
 
 /*
- * Set active audio stream
- */
-int8_t dvdnav_set_active_audio_stream(dvdnav_t *self, int8_t stream);
-
-/*
  * Get active spu stream.
  */
 DVDNAV_API int8_t dvdnav_get_active_spu_stream(dvdnav_t *self);
