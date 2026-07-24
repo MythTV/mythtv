@@ -1899,7 +1899,7 @@ void MythDVDBuffer::SetTrack(uint Type, int TrackNo)
     else if (Type == kTrackTypeAudio)
     {
         m_curAudioTrack = TrackNo;
-        dvdnav_set_active_audio_stream(m_dvdnav, static_cast<int8_t>(TrackNo));
+        dvdnav_set_active_stream(m_dvdnav, static_cast<int8_t>(TrackNo), DVD_AUDIO_STREAM);
     }
 }
 
