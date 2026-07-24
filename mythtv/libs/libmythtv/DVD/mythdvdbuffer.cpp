@@ -21,6 +21,7 @@
 
 #include "mythdvdbuffer.h"
 #include "mythdvdplayer.h"
+#include "mythdvdvfs.h"
 #include "tv_actions.h"
 
 #define LOC QString("DVDRB: ")
@@ -271,7 +272,19 @@ bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds 
 
     m_safeFilename = Filename;
     m_filename = Filename;
-    dvdnav_status_t res = dvdnav_open(&m_dvdnav, m_filename.toLocal8Bit().constData());
+    dvdnav_status_t res = DVDNAV_STATUS_ERR;
+    if (!m_filename.startsWith("myth://"))
+    {
+        res = dvdnav_open(&m_dvdnav, m_filename.toLocal8Bit().constData());
+    }
+    else
+    {
+        res = dvdnav_open_files(&m_dvdnav,
+                                                nullptr,
+                                                nullptr /* TODO: dvdnav logger */,
+                                                m_filename.toLocal8Bit().constData(),
+                                                &s_vfs);
+    }
     if (res == DVDNAV_STATUS_ERR)
     {
         m_lastError = tr("Failed to open DVD device at %1").arg(m_filename);

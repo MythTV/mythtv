@@ -20,9 +20,17 @@
 #define LIBDVDREAD_IFO_PRINT_H
 
 #include <inttypes.h>
-#include "ifo_types.h"
 
-void ifo_print(dvd_reader_t *dvd, int title);
-void dvdread_print_time(dvd_time_t *dtime);
+#include <dvdread/attributes.h>
+#include <dvdread/ifo_types.h>
+
+DVDREAD_API void ifo_print(dvd_reader_t *dvd, int title);
+DVDREAD_API void dvdread_print_time(dvd_time_t *dtime);
+
+/* DVD-Audio ifo prints */
+DVDREAD_API void ifoPrint_AMGI_MAT(amgi_mat_t *amgi_mat);
+DVDREAD_API void ifoPrint_TIF(tracks_info_table_t *tracks_info_table);
+DVDREAD_API void ifoPrint_ATSI_MAT(atsi_mat_t *atsi_mat);
+DVDREAD_API void ifoPrint_TT(atsi_title_table_t *atsi_title_table);
 
 #endif /* LIBDVDREAD_IFO_PRINT_H */

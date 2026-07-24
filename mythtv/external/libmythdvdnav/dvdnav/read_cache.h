@@ -30,17 +30,17 @@
 #define _MULTITHREAD_ 0
 
 /* Constructor/destructors */
-read_cache_t *dvdnav_read_cache_new(dvdnav_t* dvd_self);
-void dvdnav_read_cache_free(read_cache_t* self);
+DVDNAV_API read_cache_t *dvdnav_read_cache_new(dvdnav_t* dvd_self);
+DVDNAV_API void dvdnav_read_cache_free(read_cache_t* self);
 
 /* This function MUST be called whenever self->file changes. */
-void dvdnav_read_cache_clear(read_cache_t *self);
+DVDNAV_API void dvdnav_read_cache_clear(read_cache_t *self);
 /* This function is called just after reading the NAV packet. */
-void dvdnav_pre_cache_blocks(read_cache_t *self, int sector, size_t block_count);
+DVDNAV_API void dvdnav_pre_cache_blocks(read_cache_t *self, int sector, size_t block_count);
 /* This function will do the cache read.
  * The buffer handed in must be malloced to take one dvd block.
  * On a cache hit, a different buffer will be returned though.
  * Those buffers must _never_ be freed. */
-int dvdnav_read_cache_block(read_cache_t *self, int sector, size_t block_count, uint8_t **buf);
+DVDNAV_API int dvdnav_read_cache_block(read_cache_t *self, int sector, size_t block_count, uint8_t **buf);
 
 #endif /* LIBDVDNAV_READ_CACHE_H */

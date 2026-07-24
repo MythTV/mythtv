@@ -1,7 +1,6 @@
 /* MythDVDStream
  * Copyright 2011 Lawrence Rust <lvr at softsystem dot co dot uk>
  */
-
 // Qt
 #include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
@@ -11,6 +10,7 @@
 // MythTV
 #include "libmythbase/mythlogging.h"
 #include "mythdvdstream.h"
+#include "mythdvdvfs.h"
 
 // Std
 #include <algorithm>
@@ -99,7 +99,21 @@ bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds 
     if (m_reader)
         DVDClose(m_reader);
 
-    m_reader = DVDOpen(qPrintable(root));
+    // CSS isn't possible over the myth:// protocol nor when using libdvdread's
+    // virtual filesystem, so only use the virtual filesystem if necessary.
+    if (!root.startsWith("myth://"))
+    {
+        m_reader = DVDOpen2(nullptr,
+                            nullptr /* TODO: implement logging callbacks */,
+                            qPrintable(root));
+    }
+    else
+    {
+        m_reader = DVDOpenFiles(nullptr,
+                                nullptr /* TODO: implement logging callbacks */,
+                                qPrintable(root),
+                                &s_vfs);
+    }
     if (!m_reader)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + QString("DVDOpen(%1) failed").arg(Filename));

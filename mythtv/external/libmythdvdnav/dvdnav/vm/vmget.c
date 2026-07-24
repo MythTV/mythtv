@@ -25,26 +25,26 @@
 #include "config.h"
 #endif
 
+#include <dvdread/nav_types.h>
+#include <dvdread/ifo_read.h>
+#include "dvdnav/dvdnav.h"
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <dvdread/nav_types.h>
-#include <dvdread/ifo_types.h>
-#include <dvdread/ifo_read.h>
-#include "dvdnav/dvdnav.h"
-
 #include "decoder.h"
 #include "vm.h"
 #include "getset.h"
 #include "dvdnav_internal.h"
+#include "logger.h"
 
 /* getting information */
 
 int vm_get_current_menu(vm_t *vm, int *menuid) {
-  pgcit_t* pgcit;
+  const pgcit_t* pgcit;
   int pgcn;
   pgcn = (vm->state).pgcN;
   pgcit = get_PGCIT(vm);
@@ -85,7 +85,7 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result) {
   part++;
 
   if (!found) {
-    fprintf(MSG_OUT, "libdvdnav: chapter NOT FOUND!\n");
+    Log1(vm, "chapter NOT FOUND!");
     return 0;
   }
 
@@ -93,8 +93,8 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result) {
 
 #ifdef TRACE
   if (title) {
-    fprintf(MSG_OUT, "libdvdnav: ************ this chapter FOUND!\n");
-    fprintf(MSG_OUT, "libdvdnav: VTS_PTT_SRPT - Title %3i part %3i: PGC: %3i PG: %3i\n",
+    Log3(vm, "************ this chapter FOUND!");
+    Log3(vm, "VTS_PTT_SRPT - Title %3i part %3i: PGC: %3i PG: %3i",
              title, part,
              vts_ptt_srpt->title[vts_ttn-1].ptt[part-1].pgcn ,
              vts_ptt_srpt->title[vts_ttn-1].ptt[part-1].pgn );
@@ -144,7 +144,7 @@ int vm_get_subp_stream(vm_t *vm, int subpN, int mode) {
 
   if(subpN < 32) { /* a valid logical stream */
     /* Is this logical stream present */
-    if((vm->state).pgc->subp_control[subpN] & (1<<31)) {
+    if((vm->state).pgc->subp_control[subpN] & (1u<<31)) {
       if(source_aspect == 0) /* 4:3 */
         streamN = ((vm->state).pgc->subp_control[subpN] >> 24) & 0x1f;
       if(source_aspect == 3) /* 16:9 */
@@ -228,8 +228,8 @@ void vm_get_angle_info(vm_t *vm, int *current, int *num_avail) {
   *current = 1;
 
   if((vm->state).domain == DVD_DOMAIN_VTSTitle) {
-    title_info_t *title;
-    /* TTN_REG does not allways point to the correct title.. */
+    const title_info_t *title;
+    /* TTN_REG does not always point to the correct title.. */
     if((vm->state).TTN_REG > vm->vmgi->tt_srpt->nr_of_srpts)
       return;
     title = &vm->vmgi->tt_srpt->title[(vm->state).TTN_REG - 1];
@@ -309,7 +309,7 @@ int vm_get_video_aspect(vm_t *vm) {
   int aspect = vm_get_video_attr(vm).display_aspect_ratio;
 
   if(aspect != 0 && aspect != 3) {
-    fprintf(MSG_OUT, "libdvdnav: display aspect ratio is unexpected: %d!\n", aspect);
+    Log1(vm, "display aspect ratio is unexpected: %d!", aspect);
     return -1;
   }
 

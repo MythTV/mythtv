@@ -2,7 +2,7 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythdvdnav-$$LIBVERSION
-CONFIG += thread staticlib warn_off
+CONFIG += thread staticlib warn_off object_parallel_to_source
 CONFIG -= qt
 target.path = $${LIBDIR}
 
@@ -42,6 +42,7 @@ using_dvdcss_dvdcss_h {
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # dvdnav
+#DEFINES += DVDNAV_API_EXPORT # only for shared library
 HEADERS += dvdnav/dvdnav/dvd_types.h
 HEADERS += dvdnav/dvdnav/dvdnav.h
 HEADERS += dvdnav/dvdnav/dvdnav_events.h
@@ -53,6 +54,7 @@ HEADERS += dvdnav/vm/vm.h
 HEADERS += dvdnav/vm/vm_serialize.h
 HEADERS += dvdnav/vm/vmcmd.h
 HEADERS += dvdnav/dvdnav_internal.h
+HEADERS += dvdnav/logger.h
 HEADERS += dvdnav/read_cache.h
 
 SOURCES += dvdnav/vm/decoder.c
@@ -64,28 +66,34 @@ SOURCES += dvdnav/vm/vmcmd.c
 SOURCES += dvdnav/vm/vmget.c
 SOURCES += dvdnav/dvdnav.c
 SOURCES += dvdnav/highlight.c
+SOURCES += dvdnav/logger.c
 SOURCES += dvdnav/navigation.c
 SOURCES += dvdnav/read_cache.c
 SOURCES += dvdnav/searching.c
 SOURCES += dvdnav/settings.c
 
 # dvdread
+#DEFINES += DVDREAD_API_EXPORT # only for shared library
+
+HEADERS += dvdread/dvdread/attributes.h
 HEADERS += dvdread/dvdread/bitreader.h
+HEADERS += dvdread/dvdread/dvd_filesystem.h
 HEADERS += dvdread/dvdread/dvd_reader.h
 HEADERS += dvdread/dvdread/dvd_udf.h
 HEADERS += dvdread/dvdread/ifo_print.h
 HEADERS += dvdread/dvdread/ifo_read.h
 HEADERS += dvdread/dvdread/ifo_types.h
-HEADERS += dvdread/dvdread/mythdvdio.h
 HEADERS += dvdread/dvdread/nav_print.h
 HEADERS += dvdread/dvdread/nav_read.h
 HEADERS += dvdread/dvdread/nav_types.h
 HEADERS += dvdread/dvdread/version.h
+HEADERS += dvdread/file/filesystem.h
 HEADERS += dvdread/bitreader.h
 HEADERS += dvdread/bswap.h
 HEADERS += dvdread/dvd_input.h
 HEADERS += dvdread/dvd_udf.h
 HEADERS += dvdread/dvdread_internal.h
+HEADERS += dvdread/logger.h
 HEADERS += dvdread/md5.h
 
 SOURCES += dvdread/bitreader.c
@@ -94,12 +102,19 @@ SOURCES += dvdread/dvd_reader.c
 SOURCES += dvdread/dvd_udf.c
 SOURCES += dvdread/ifo_print.c
 SOURCES += dvdread/ifo_read.c
+SOURCES += dvdread/logger.c
 SOURCES += dvdread/md5.c
 SOURCES += dvdread/nav_print.c
 SOURCES += dvdread/nav_read.c
 
 win32 {
-    HEADERS += dvdread/win32_dlfcn.h
+    HEADERS += msvc/contrib/win32_cs.h
+
+    SOURCES += dvdread/file/file_win32.c
+
+}
+!win32 {
+    SOURCES += dvdread/file/file_posix.c
 }
 
 inc_dvdnav.path = $${PREFIX}/include/mythtv/dvdnav
@@ -109,13 +124,14 @@ inc_dvdnav.files += dvdnav/dvdnav/dvd_types.h
 inc_dvdnav.files += dvdnav/dvdnav/version.h
 
 inc_dvdread.path = $${PREFIX}/include/mythtv/dvdread
+inc_dvdread.files += dvdread/dvdread/attributes.h
 inc_dvdread.files += dvdread/dvdread/bitreader.h
+inc_dvdread.files += dvdread/dvdread/dvd_filesystem.h
 inc_dvdread.files += dvdread/dvdread/dvd_reader.h
 inc_dvdread.files += dvdread/dvdread/dvd_udf.h
 inc_dvdread.files += dvdread/dvdread/ifo_print.h
 inc_dvdread.files += dvdread/dvdread/ifo_read.h
 inc_dvdread.files += dvdread/dvdread/ifo_types.h
-inc_dvdread.files += dvdread/dvdread/mythdvdio.h
 inc_dvdread.files += dvdread/dvdread/nav_print.h
 inc_dvdread.files += dvdread/dvdread/nav_read.h
 inc_dvdread.files += dvdread/dvdread/nav_types.h
