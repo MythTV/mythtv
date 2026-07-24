@@ -2051,6 +2051,7 @@ void MythCoreContext::WantingPlayback(QObject *sender)
                 Qt::BlockingQueuedConnection);
     }
     // Restore blocking connections
+    it = d->m_playbackClients.begin();
     for (; it != d->m_playbackClients.end(); ++it)
     {
         if (it.key() == sender)
