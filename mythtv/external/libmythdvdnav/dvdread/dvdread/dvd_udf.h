@@ -33,7 +33,8 @@
 
 #include <inttypes.h>
 
-#include "dvdread/dvd_reader.h"
+#include <dvdread/attributes.h>
+#include <dvdread/dvd_reader.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,11 +47,11 @@ extern "C" {
  * '/VIDEO_TS/VTS_01_1.IFO'.  On success, filesize will be set to the size of
  * the file in bytes.
  */
-uint32_t UDFFindFile( dvd_reader_t *device, const char *filename, uint32_t *size );
+DVDREAD_API uint32_t UDFFindFile( dvd_reader_t *, const char *filename, uint32_t *size );
 
-int UDFGetVolumeIdentifier(dvd_reader_t *device,
+DVDREAD_API int UDFGetVolumeIdentifier(dvd_reader_t *,
                            char *volid, unsigned int volid_size);
-int UDFGetVolumeSetIdentifier(dvd_reader_t *device,
+DVDREAD_API int UDFGetVolumeSetIdentifier(dvd_reader_t *,
                               uint8_t *volsetid, unsigned int volsetid_size);
 
 #ifdef __cplusplus

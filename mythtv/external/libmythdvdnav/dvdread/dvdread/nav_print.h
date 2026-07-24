@@ -22,7 +22,9 @@
 #ifndef LIBDVDREAD_NAV_PRINT_H
 #define LIBDVDREAD_NAV_PRINT_H
 
-#include "nav_types.h"
+
+#include <dvdread/attributes.h>
+#include <dvdread/nav_types.h>
 
 /**
  * Pretty printing of the NAV packets, PCI and DSI structs.
@@ -37,14 +39,14 @@ extern "C" {
  *
  * @param pci Pointer to the PCI data structure to be printed.
  */
-void navPrint_PCI(pci_t *);
+DVDREAD_API void navPrint_PCI(pci_t *);
 
 /**
  * Prints information contained in the DSI to stdout.
  *
  * @param dsi Pointer to the DSI data structure to be printed.
  */
-void navPrint_DSI(dsi_t *);
+DVDREAD_API void navPrint_DSI(dsi_t *);
 
 #ifdef __cplusplus
 };

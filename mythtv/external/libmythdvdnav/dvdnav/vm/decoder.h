@@ -94,7 +94,7 @@ typedef struct {
 /* the big VM function, executing the given commands and writing
  * the link where to continue, the return value indicates if a jump
  * has been performed */
-int32_t vmEval_CMD(vm_cmd_t commands[], int32_t num_commands,
+int32_t vmEval_CMD(const vm_cmd_t commands[], int32_t num_commands,
                registers_t *registers, link_t *return_values);
 
 /* extracts some bits from the command */

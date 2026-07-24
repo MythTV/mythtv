@@ -25,49 +25,25 @@
 /**
  * Defines and flags.  Make sure they fit the libdvdcss API!
  */
+#include "dvdread_internal.h"
 #define DVDINPUT_NOFLAGS         0
 
 #define DVDINPUT_READ_DECRYPT    (1 << 0)
 #define DVDCSS_SEEK_KEY          (1 << 1)
 
-typedef struct dvd_input_s *dvd_input_t;
-
-#include <sys/stat.h>
-
-#if defined( __MINGW32__ )
-#   undef  lseek
-#   define lseek  _lseeki64
-#   undef  off_t
-#   define off_t off64_t
-#   undef  stat
-#   define stat  _stati64
-#   undef  fstat
-#   define fstat _fstati64
-#   undef  wstat
-#   define wstat _wstati64
-#endif
-
-#ifdef __ANDROID__
-# undef  lseek
-# define lseek lseek64
-# undef  off_t
-# define off_t off64_t
-#endif
-
-/**
- * Function pointers that will be filled in by the input implementation.
- * These functions provide the main API.
- */
-extern dvd_input_t (*dvdinput_open)  (const char *,
-                                      void *, dvd_reader_stream_cb *);
-extern int         (*dvdinput_close) (dvd_input_t);
-extern int         (*dvdinput_seek)  (dvd_input_t, int, int);
-extern int         (*dvdinput_title) (dvd_input_t, int);
-extern int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
-
+extern void        dvdinput_set_stream(dvd_input_t, dvd_type_t);
 /**
  * Setup function accessed by dvd_reader.c.  Returns 1 if there is CSS support.
+ * Otherwise it fallsback to the internal dvdread implementation (without css support)
+ * which is basically the same as calling dvdinput_setup_builtin.
  */
-int dvdinput_setup(const char *);
+/* dvda flag enabled cpxm */
+int dvdinput_setup(dvd_reader_t *, dvd_logger_cb *, dvd_type_t dvda_flag);
+
+/**
+ * Setup function accessed by dvd_reader.c using the builtin libdvdread implementation
+ * (without css support)
+ */
+void dvdinput_setup_builtin(dvd_reader_t *, dvd_logger_cb *);
 
 #endif /* LIBDVDREAD_DVD_INPUT_H */
