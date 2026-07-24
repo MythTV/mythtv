@@ -22,13 +22,13 @@
 #include "config.h"
 #endif
 
+#include "dvdnav/dvdnav.h"
+#include <dvdread/nav_types.h>
+
 #include <inttypes.h>
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
-#include "dvdnav/dvdnav.h"
-#include <dvdread/nav_types.h>
-#include <dvdread/ifo_types.h>
 #include "vm/decoder.h"
 #include "vm/vm.h"
 #include "dvdnav_internal.h"

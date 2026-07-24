@@ -13,6 +13,7 @@
 
 #include "io/mythiowrapper.h"
 #include "mythdvdinfo.h"
+#include "mythdvdvfs.h"
 
 MythDVDInfo::MythDVDInfo(const QString &Filename)
 {
@@ -26,7 +27,20 @@ MythDVDInfo::MythDVDInfo(const QString &Filename)
     }
 
     QByteArray fname = name.toLocal8Bit();
-    dvdnav_status_t res = dvdnav_open(&m_nav, fname.constData());
+    dvdnav_status_t res = DVDNAV_STATUS_ERR;
+    if (!fname.startsWith("myth://"))
+    {
+        res = dvdnav_open(&m_nav, fname.constData());
+    }
+    else
+    {
+        res = dvdnav_open_files(&m_nav,
+                                                nullptr,
+                                                nullptr /* TODO: dvdnav logger */,
+                                                fname.constData(),
+                                                &s_vfs);
+    }
+
     if (res == DVDNAV_STATUS_ERR)
     {
         m_lastError = tr("Failed to open device at %1").arg(fname.constData());
