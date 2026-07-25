@@ -20,6 +20,7 @@
 #include "libmythui/mythuiactions.h"
 
 #include "mythdvdbuffer.h"
+#include "mythdvdlogger.h"
 #include "mythdvdplayer.h"
 #include "mythdvdvfs.h"
 #include "tv_actions.h"
@@ -275,15 +276,18 @@ bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds 
     dvdnav_status_t res = DVDNAV_STATUS_ERR;
     if (!m_filename.startsWith("myth://"))
     {
-        res = dvdnav_open(&m_dvdnav, m_filename.toLocal8Bit().constData());
+        res = dvdnav_open2(&m_dvdnav,
+                           nullptr,
+                           &s_dvdnav_logger,
+                           m_filename.toLocal8Bit().constData());
     }
     else
     {
         res = dvdnav_open_files(&m_dvdnav,
-                                                nullptr,
-                                                nullptr /* TODO: dvdnav logger */,
-                                                m_filename.toLocal8Bit().constData(),
-                                                &s_vfs);
+                                nullptr,
+                                &s_dvdnav_logger,
+                                m_filename.toLocal8Bit().constData(),
+                                &s_vfs);
     }
     if (res == DVDNAV_STATUS_ERR)
     {
