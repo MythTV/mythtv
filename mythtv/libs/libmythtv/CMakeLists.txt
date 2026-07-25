@@ -274,6 +274,8 @@ add_library(
   DVD/mythdvdcontext.h
   DVD/mythdvdinfo.cpp
   DVD/mythdvdinfo.h
+  DVD/mythdvdlogger.cpp
+  DVD/mythdvdlogger.h
   DVD/mythdvdstream.cpp
   DVD/mythdvdstream.h
   DVD/mythdvdvfs.cpp
