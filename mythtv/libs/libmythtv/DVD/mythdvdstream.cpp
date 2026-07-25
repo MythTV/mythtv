@@ -8,6 +8,7 @@
 
 // MythTV
 #include "libmythbase/mythlogging.h"
+#include "mythdvdlogger.h"
 #include "mythdvdstream.h"
 #include "mythdvdvfs.h"
 
@@ -103,13 +104,13 @@ bool MythDVDStream::OpenFile(const QString &Filename, std::chrono::milliseconds 
     if (!root.startsWith("myth://"))
     {
         m_reader = DVDOpen2(nullptr,
-                            nullptr /* TODO: implement logging callbacks */,
+                            &s_dvdread_logger,
                             qPrintable(root));
     }
     else
     {
         m_reader = DVDOpenFiles(nullptr,
-                                nullptr /* TODO: implement logging callbacks */,
+                                &s_dvdread_logger,
                                 qPrintable(root),
                                 &s_vfs);
     }
