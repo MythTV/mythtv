@@ -45,7 +45,7 @@
     "karma-coverage": "~2.0.3",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.7.0",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.23",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.8.3"
   }
