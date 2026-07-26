@@ -26,7 +26,7 @@ class META_PUBLIC LyricsLine
     std::chrono::milliseconds m_time {0ms};
     QString m_lyric;
 
-    QString toString(bool syncronized)
+    QString toString(bool syncronized) const
     {
         if (syncronized)
             return formatTime() + m_lyric;

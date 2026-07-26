@@ -568,17 +568,10 @@ bool EditLyricsDialog::keyPressEvent(QKeyEvent *event)
 void EditLyricsDialog::loadLyrics(void)
 {
     QString lyrics;
-    LyricsLineMap::iterator i = m_sourceData->lyrics()->begin();
-    while (i != m_sourceData->lyrics()->end())
-    {
-        LyricsLine *line = (*i);
-        ++i;
-
-        lyrics += line->toString(m_syncronizedCheck->GetBooleanCheckState());
-
-        if (i != m_sourceData->lyrics()->end())
-            lyrics += '\n';
-    }
+    bool sync = m_syncronizedCheck->GetBooleanCheckState();
+    for (const auto* line : std::as_const(*m_sourceData->lyrics()))
+        lyrics += line->toString(sync) + '\n';
+    lyrics.chop(1); // Remove the final LF
 
     m_lyricsEdit->SetText(lyrics);
 }
