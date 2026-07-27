@@ -144,6 +144,7 @@ MythUIType *MythUIType::GetChild(const QString &name) const
  */
 void MythUIType::DeleteChild(const QString &name)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc*/)
     {
         MythUIType *type = *it;
@@ -155,6 +156,14 @@ void MythUIType::DeleteChild(const QString &name)
         }
         ++it;
     }
+#else
+    m_childrenList.removeIf( [name](auto* type){
+        if (type->objectName() != name)
+            return false;
+        delete type;
+        return true;
+    } );
+#endif
 }
 
 /**
@@ -168,6 +177,7 @@ void MythUIType::DeleteChild(MythUIType *child)
     if (!child)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc */)
     {
         MythUIType *type = *it;
@@ -180,6 +190,15 @@ void MythUIType::DeleteChild(MythUIType *child)
         }
         ++it;
     }
+#else
+    m_childrenList.removeIf( [&child](auto* type){
+        if (type != child)
+            return false;
+        delete type;
+        child = nullptr;
+        return true;
+    } );
+#endif
 }
 
 /**

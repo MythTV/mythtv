@@ -245,12 +245,22 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         pInfo = new SubscriberInfo( sCallBack, nDuration );
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         Subscribers::iterator it = m_subscribers.find(pInfo->m_sUUID);
         if (it != m_subscribers.end())
         {
             delete *it;
             m_subscribers.erase(it);
         }
+#else
+        m_subscribers.removeIf( [pInfo](auto it) {
+            if (it.key() != pInfo->m_sUUID)
+                return false;
+            delete *it;
+            return true;
+        } );
+#endif
+
         m_subscribers[pInfo->m_sUUID] = pInfo;
 
         // Use PostProcess Hook to Send Initial FULL Notification...
@@ -309,6 +319,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 
     sSID = sSID.mid( 5 );
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     Subscribers::iterator it = m_subscribers.find(sSID);
     if (it != m_subscribers.end())
     {
@@ -316,6 +327,15 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
         m_subscribers.erase(it);
         pRequest->m_nResponseStatus = 200;
     }
+#else
+    m_subscribers.removeIf( [sSID,&pRequest](auto it) {
+        if (it.key() != sSID)
+            return false;
+        delete *it;
+        pRequest->m_nResponseStatus = 200;
+        return true;
+    } );
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -328,6 +348,7 @@ void Eventing::Notify()
 
     m_mutex.lock();
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     Subscribers::iterator it = m_subscribers.begin();
     while (it != m_subscribers.end())
     { 
@@ -350,6 +371,21 @@ void Eventing::Notify()
             it = m_subscribers.erase(it);
         }
     }
+#else
+    m_subscribers.removeIf( [tt,this](auto it) {
+        if (!(*it))
+            return false; // This should never happen, but if someone inserted bad data...
+        if (tt < (*it)->m_ttExpires)
+        {
+            // Subscription not expired yet. Send event notification.
+            NotifySubscriber(*it);
+            return false;
+        }
+        // Time to expire this subscription. Remove subscriber from list.
+        delete *it;
+        return true;
+    } );
+#endif
 
     m_mutex.unlock();
 }

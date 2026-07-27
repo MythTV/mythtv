@@ -75,6 +75,7 @@ void MythTranslation::load_real(const QString &module_name)
 
 void MythTranslation::unload(const QString &module_name)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     TransMap::Iterator it = d.m_translators.find(module_name);
     if (it != d.m_translators.end())
     {
@@ -83,6 +84,16 @@ void MythTranslation::unload(const QString &module_name)
         delete *it;
         d.m_translators.erase(it);
     }
+#else
+    d.m_translators.removeIf( [&module_name](auto it) {
+        if (it.key() != module_name)
+            return false;
+        // found translator, remove it from qApp and our map
+        QCoreApplication::removeTranslator(*it);
+        delete *it;
+        return true;
+    } );
+#endif
 }
 
 bool MythTranslation::LanguageChanged(void)

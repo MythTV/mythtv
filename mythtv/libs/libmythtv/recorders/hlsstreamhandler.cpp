@@ -73,6 +73,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devname);
     if ((it != s_hlshandlers.end()) && (*it == ref))
     {
@@ -90,6 +91,25 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
             QString("HLSSH[%1] Error: Couldn't find handler for %2")
             .arg(inputid).arg(devname));
     }
+#else
+    int count = s_hlshandlers.removeIf( [devname,inputid,ref](auto it) {
+        if (*it != ref)
+            return false;
+        LOG(VB_RECORD, LOG_INFO, QString("HLSSH[%1]: Closing handler for %2")
+                           .arg(inputid).arg(devname));
+        ref->Stop();
+        LOG(VB_RECORD, LOG_DEBUG, QString("HLSSH[%1]: handler for %2 stopped")
+            .arg(inputid).arg(devname));
+        delete *it;
+        return true;
+    } );
+    if (count == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HLSSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
+    }
+#endif
 
     s_hlshandlers_refcnt.erase(rit);
     ref = nullptr;

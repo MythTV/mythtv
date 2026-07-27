@@ -499,6 +499,7 @@ void MythRAOPConnection::ExpireResendRequests(std::chrono::milliseconds timestam
     if (m_resends.isEmpty())
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_resends.begin(); it != m_resends.end(); /* no inc */)
     {
         if (it.value() < timestamp && m_streamingStarted)
@@ -512,6 +513,17 @@ void MythRAOPConnection::ExpireResendRequests(std::chrono::milliseconds timestam
             ++it;
         }
     }
+#else
+    if (!m_streamingStarted)
+        return;
+    m_resends.removeIf( [timestamp](auto it) {
+        if (it.value() >= timestamp)
+            return false;
+        LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+            QString("Never received resend packet %1").arg(it.key()));
+        return true;
+    } );
+#endif
 }
 
 /**
@@ -842,6 +854,7 @@ void MythRAOPConnection::ProcessAudio()
 
 int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     int res = 0;
     for (auto packet_it = m_audioQueue.begin();
          packet_it != m_audioQueue.end();
@@ -863,6 +876,20 @@ int MythRAOPConnection::ExpireAudio(std::chrono::milliseconds timestamp)
         res++;
     }
     return res;
+#else
+    return m_audioQueue.removeIf( [timestamp](auto packet_it) {
+        if (packet_it.key() >= timestamp)
+            return false;
+        AudioPacket frames = packet_it.value();
+        if (frames.data)
+        {
+            for (const auto & data : std::as_const(*frames.data))
+                av_free(data.data);
+            delete frames.data;
+        }
+        return true;
+    } );
+#endif
 }
 
 void MythRAOPConnection::ResetAudio(void)

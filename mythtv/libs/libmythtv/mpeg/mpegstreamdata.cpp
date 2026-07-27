@@ -171,6 +171,7 @@ void MPEGStreamData::Reset(int desiredProgram)
 
 void MPEGStreamData::DeletePartialPSIP(uint pid)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
     if (it != m_partialPsipPacketCache.end())
     {
@@ -178,6 +179,14 @@ void MPEGStreamData::DeletePartialPSIP(uint pid)
         m_partialPsipPacketCache.erase(it);
         delete pkt;
     }
+#else
+    m_partialPsipPacketCache.removeIf( [pid] (auto it) {
+        if (pid != it.key())
+            return false;
+        delete it.value();
+        return true;
+    } );
+#endif
 }
 
 /**

@@ -1642,12 +1642,21 @@ void TV::AskAllowRecording(const QStringList &Msg, int Timeuntil, bool HasRec, b
         // remove program from list
         LOG(VB_GENERAL, LOG_INFO, LOC + "-- " +
             QString("removing '%1'").arg(info->GetTitle()));
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.find(key);
         if (it != m_askAllowPrograms.end())
         {
             delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
+#else
+        m_askAllowPrograms.removeIf( [key](auto it){
+            if (key != it.key())
+                return false;
+            delete (*it).m_info;
+            return true;
+        } );
+#endif
         delete info;
     }
 
@@ -1674,6 +1683,7 @@ void TV::ShowOSDAskAllow()
 
     // eliminate timed out programs
     QDateTime timeNow = MythDate::current();
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QMap<QString,AskProgramInfo>::iterator it2 = m_askAllowPrograms.begin();
     while (it2 != m_askAllowPrograms.end())
     {
@@ -1691,6 +1701,18 @@ void TV::ShowOSDAskAllow()
             it2++;
         }
     }
+#else
+    m_askAllowPrograms.removeIf( [timeNow](auto it2) {
+        if ((*it2).m_expiry > timeNow)
+            return false;
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
+            QString("removing '%1'").arg((*it2).m_info->m_title));
+#endif
+        delete (*it2).m_info;
+        return true;
+    } );
+#endif
     std::chrono::milliseconds timeuntil = 0ms;
     QString      message;
     uint conflict_count = static_cast<uint>(m_askAllowPrograms.size());

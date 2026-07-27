@@ -239,7 +239,6 @@ void MythRAOPDevice::deleteClient(void)
 {
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Entering DeleteClient.");
     QMutexLocker locker(m_lock);
-    QList<MythRAOPConnection *>::iterator it = m_clients.begin();
 
     MythNotification n(tr("Client disconnected"), tr("AirTunes"));
     gCoreContext->SendSystemEvent(QString("AIRTUNES_DELETE_CONNECTION"));
@@ -247,6 +246,8 @@ void MythRAOPDevice::deleteClient(void)
     n.SetVisibility(n.GetVisibility() & ~MythNotification::kPlayback);
     GetNotificationCenter()->Queue(n);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    QList<MythRAOPConnection *>::iterator it = m_clients.begin();
     while (it != m_clients.end())
     {
         if ((*it)->GetSocket()->state() == QTcpSocket::UnconnectedState)
@@ -258,6 +259,15 @@ void MythRAOPDevice::deleteClient(void)
         }
         ++it;
     }
+#else
+    m_clients.removeIf( [](auto* conn) {
+        if (conn->GetSocket()->state() != QTcpSocket::UnconnectedState)
+            return false;
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Removing client connection.");
+        delete conn;
+        return true;
+    } );
+#endif
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Exiting DeleteClient.");
 }
 
@@ -266,6 +276,7 @@ void MythRAOPDevice::DeleteAllClients(MythRAOPConnection *keep)
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Entering DeleteAllClients.");
     QMutexLocker locker(m_lock);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QList<MythRAOPConnection*>::iterator it = m_clients.begin();
 
     while (it != m_clients.end())
@@ -283,6 +294,18 @@ void MythRAOPDevice::DeleteAllClients(MythRAOPConnection *keep)
         delete *it;
         it = m_clients.erase(it);
     }
+#else
+    m_clients.removeIf( [keep](auto *client) {
+        if (client == keep)
+            return false;
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Removing client connection %1:%2")
+            .arg(client->GetSocket()->peerAddress().toString())
+            .arg(client->GetSocket()->peerPort()));
+        delete client;
+        return true;
+    } );
+#endif
     LOG(VB_GENERAL, LOG_DEBUG, LOC + "Exiting DeleteAllClients.");
 }
 

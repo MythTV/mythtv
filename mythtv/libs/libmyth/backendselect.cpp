@@ -290,6 +290,7 @@ void BackendSelection::RemoveItem(const QString& USN_)
 {
     m_mutex.lock();
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     ItemMap::iterator it = m_devices.find(USN_);
 
     if (it != m_devices.end())
@@ -298,6 +299,14 @@ void BackendSelection::RemoveItem(const QString& USN_)
             (*it)->DecrRef();
         m_devices.erase(it);
     }
+#else
+    m_devices.removeIf( [USN_](auto it) {
+        if (it.key() != USN_)
+            return false;
+        (*it)->DecrRef();
+        return true;
+    } );
+#endif
 
     m_mutex.unlock();
 }

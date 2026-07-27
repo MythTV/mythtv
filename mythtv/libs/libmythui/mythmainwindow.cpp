@@ -1194,6 +1194,7 @@ void MythMainWindow::ClearKey(const QString& Context, const QString& Action)
     if (keycontext == nullptr)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = keycontext->m_actionMap.begin();
          it != keycontext->m_actionMap.end();
          /* no inc */)
@@ -1205,6 +1206,13 @@ void MythMainWindow::ClearKey(const QString& Context, const QString& Action)
         else
             ++it;
     }
+#else
+    keycontext->m_actionMap.removeIf( [Action](auto it) {
+        QStringList list = it.value();
+        list.removeAll(Action);
+        return list.isEmpty();
+    } );
+#endif
 }
 
 void MythMainWindow::ClearKeyContext(const QString& Context)
@@ -1363,6 +1371,7 @@ void MythMainWindow::ClearJump(const QString& Destination)
        return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_priv->m_jumpMap.begin();
          it != m_priv->m_jumpMap.end();
          /* no inc */)
@@ -1373,6 +1382,12 @@ void MythMainWindow::ClearJump(const QString& Destination)
         else
             ++it;
     }
+#else
+    m_priv->m_jumpMap.removeIf( [Destination](auto it){
+        JumpData *jd = it.value();
+        return jd->m_destination == Destination;
+    } );
+#endif
 }
 
 

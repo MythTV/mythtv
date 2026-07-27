@@ -581,6 +581,7 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
     QDateTime cur = MythDate::current();
     QDateTime cur_m_60 = cur.addSecs(-60);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QList<TFWBuffer*>::iterator it = m_emptyBuffers.begin();
     while (it != m_emptyBuffers.end())
     {
@@ -594,6 +595,16 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
         }
         ++it;
     }
+#else
+    m_emptyBuffers.removeIf( [&cur_m_60](auto *buf) {
+        bool deleteit = (buf->lastUsed < cur_m_60);
+        deleteit |= (buf->data.capacity() > 3 * buf->data.size() &&
+                     buf->data.capacity() > 64 * 1024LL);
+        if (deleteit)
+            delete buf;
+        return deleteit;
+    } );
+#endif
 }
 
 /**

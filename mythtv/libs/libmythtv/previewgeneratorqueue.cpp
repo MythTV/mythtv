@@ -105,6 +105,7 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
 {
     // disconnect preview generators
     QMutexLocker locker(&m_lock);
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_previewMap.begin(); it != m_previewMap.end(); ++it)
     {
@@ -112,6 +113,14 @@ PreviewGeneratorQueue::~PreviewGeneratorQueue()
             (*it).m_gen->deleteLater();
         (*it).m_gen = nullptr;
     }
+#else
+    m_previewMap.removeIf( [](auto it) {
+        if ((*it).m_gen)
+            (*it).m_gen->deleteLater();
+        (*it).m_gen = nullptr;
+        return true;
+    } );
+#endif
     locker.unlock();
     wait();
 }

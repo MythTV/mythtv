@@ -1190,12 +1190,21 @@ void MainServer::customEvent(QEvent *e)
                 {
                     const QString& token = me->ExtraData(i);
                     extra.push_back(token);
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
                     RequestedBy::iterator it = m_previewRequestedBy.find(token);
                     if (it != m_previewRequestedBy.end())
                     {
                         receivers.insert(*it);
                         m_previewRequestedBy.erase(it);
                     }
+#else
+                    m_previewRequestedBy.removeIf( [token,&receivers](auto it) {
+                        if (it.key() != token)
+                            return false;
+                        receivers.insert(*it);
+                        return true;
+                    } );
+#endif
                 }
 
                 if (receivers.empty())
@@ -1230,12 +1239,21 @@ void MainServer::customEvent(QEvent *e)
             {
                 const QString& token = me->ExtraData(i);
                 extra.push_back(token);
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
                 RequestedBy::iterator it = m_previewRequestedBy.find(token);
                 if (it != m_previewRequestedBy.end())
                 {
                     receivers.insert(*it);
                     m_previewRequestedBy.erase(it);
                 }
+#else
+                m_previewRequestedBy.removeIf( [token,&receivers](auto it) {
+                    if (it.key() != token)
+                        return false;
+                    receivers.insert(*it);
+                    return true;
+                } );
+#endif
             }
 
             if (receivers.empty())
@@ -7778,6 +7796,8 @@ void MainServer::connectionClosed(MythSocket *socket)
         }
     }
 
+    bool found {false};
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QSet<MythSocket*>::iterator cs = m_controlSocketList.find(socket);
     if (cs != m_controlSocketList.end())
     {
@@ -7785,14 +7805,23 @@ void MainServer::connectionClosed(MythSocket *socket)
             .arg(quintptr(socket),0,16) );
         (*cs)->DecrRef();
         m_controlSocketList.erase(cs);
-        m_sockListLock.unlock();
-        UpdateSystemdStatus();
-        return;
+        found = true;
     }
+#else
+    found = m_controlSocketList.removeIf( [socket](auto lsock) {
+        if (lsock != socket)
+            return false;
+        LOG(VB_GENERAL, LOG_INFO, QString("Control sock(%1) disconnected")
+            .arg(quintptr(socket),0,16) );
+        lsock->DecrRef();
+        return true;
+    } );
+#endif
 
     m_sockListLock.unlock();
 
-    LOG(VB_GENERAL, LOG_WARNING, LOC +
+    if (!found)
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
         QString("Unknown socket closing MythSocket(0x%1)")
             .arg((intptr_t)socket,0,16));
     UpdateSystemdStatus();

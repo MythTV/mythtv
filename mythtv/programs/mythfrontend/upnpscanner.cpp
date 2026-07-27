@@ -544,6 +544,7 @@ void UPNPScanner::CheckStatus(void)
     // Remove stale servers - the SSDP cache code does not send out removal
     // notifications for expired (rather than explicitly closed) connections
     m_lock.lock();
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_servers.begin(); it != m_servers.end(); /* no inc */)
     {
         // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
@@ -560,6 +561,18 @@ void UPNPScanner::CheckStatus(void)
             ++it;
         }
     }
+#else
+    m_servers.removeIf ([](auto it)
+        {
+        // FIXME UPNP version comparision done wrong, we are using urn:schemas-upnp-org:device:MediaServer:4 ourselves
+        if (SSDPCache::Instance()->Find("urn:schemas-upnp-org:device:MediaServer:1", it.key()))
+            return false;
+        LOG(VB_UPNP, LOG_INFO, LOC + QString("%1 no longer in SSDP cache. Removing")
+            .arg(it.value()->m_serverURL.toString()));
+        delete it.value();
+        return true;
+        } );
+#endif
     m_lock.unlock();
 }
 

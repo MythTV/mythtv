@@ -1063,6 +1063,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
 // Remove any pending requests from the queue.
 void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QList<MHExternContent *>::iterator it = m_externContentTable.begin();
 
     while (it != m_externContentTable.end())
@@ -1079,6 +1080,16 @@ void MHEngine::CancelExternalContentRequest(MHIngredient *pRequester)
         }
         ++it;
     }
+#else
+    m_externContentTable.removeIf( [pRequester](auto pContent) {
+        if (pContent->m_pRequester != pRequester)
+            return false;
+        MHLOG(MHLogNotifications, QString("Cancelled wait for %1")
+              .arg(pRequester->m_ObjectReference.Printable()) );
+        delete pContent;
+        return true;
+    } );
+#endif
 }
 
 // See if we can satisfy any of the outstanding requests.

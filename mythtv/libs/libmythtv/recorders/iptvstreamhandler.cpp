@@ -89,6 +89,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
     if ((it != s_iptvhandlers.end()) && (*it == ref))
     {
@@ -104,6 +105,23 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
             QString("IPTVSH[%1] Error: Couldn't find handler for %2")
             .arg(QString::number(inputid), devname));
     }
+#else
+    int count = s_iptvhandlers.removeIf( [devname,inputid,ref](auto it){
+        if (*it != ref)
+            return false;
+        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Closing handler for %2")
+            .arg(QString::number(inputid), devname));
+        ref->Stop();
+        delete *it;
+        return true;
+    } );
+    if (count == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("IPTVSH[%1] Error: Couldn't find handler for %2")
+            .arg(QString::number(inputid), devname));
+    }
+#endif
 
     s_iptvhandlers_refcnt.erase(rit);
     ref = nullptr;

@@ -2613,6 +2613,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
             keys.insert("something");
         }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         QSet<QString>::iterator sit = m_sysEvents[i].begin();
         while (sit != m_sysEvents[i].end())
         {
@@ -2621,6 +2622,10 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
             else
                 ++sit;
         }
+#else
+        m_sysEvents[i].removeIf( [&keys](const auto& key)
+            { return !keys.contains(key); } );
+#endif
     }
 
     EncoderLink *nexttv = *tvit;

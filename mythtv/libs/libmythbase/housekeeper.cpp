@@ -754,6 +754,7 @@ void HouseKeeper::Run(void)
 
     QMutexLocker mapLock(&m_mapLock);
     // Remove any tasks that have finished
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_taskMap.begin(); it != m_taskMap.end(); )
     {
         if ((*it)->IsFinished())
@@ -768,6 +769,16 @@ void HouseKeeper::Run(void)
             it++;
         }
     }
+#else
+    m_taskMap.removeIf( [](const auto it){
+        if (!(*it)->IsFinished())
+            return false;
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Removing finished  HouseKeeperTask '%1'.")
+            .arg(it.key()));
+        return true;
+    } );
+#endif
 
     // check if any tasks are ready to run, and add to queue
 #if QT_VERSION < QT_VERSION_CHECK(6,4,0)
@@ -800,6 +811,7 @@ void HouseKeeper::Run(void)
         QMutexLocker threadLock(&m_threadLock);
         int count1 = m_threadList.size();
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         auto it = m_threadList.begin();
         ++it; // skip the primary thread
         while (it != m_threadList.end())
@@ -814,6 +826,17 @@ void HouseKeeper::Run(void)
                 it = m_threadList.erase(it);
             }
         }
+#else
+        int index { 0 };
+        m_threadList.removeIf( [&index](auto thread){
+            if (index++ == 0) // skip the primary thread
+                return false;
+            if (thread->isRunning())
+                return false;
+            delete thread;
+            return true;
+        } );
+#endif
 
         int count2 = m_threadList.size();
         if (count1 > count2)

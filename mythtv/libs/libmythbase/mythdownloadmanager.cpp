@@ -1032,6 +1032,7 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
     m_infoLock->lock();
     for (const auto& url : std::as_const(urls))
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         for (auto lit = m_downloadQueue.begin();
              lit != m_downloadQueue.end();
              /* no inc */)
@@ -1048,6 +1049,15 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
                 ++lit;
             }
         }
+#else
+        m_downloadQueue.removeIf( [this,url](MythDownloadInfo *dlInfo) {
+            if (dlInfo->m_url != url)
+                return false;
+            if (!m_cancellationQueue.contains(dlInfo))
+                m_cancellationQueue.append(dlInfo);
+            return true;
+        } );
+#endif
 
         if (m_downloadInfos.contains(url))
         {

@@ -1536,6 +1536,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     if (curIndex == -1)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     QMap<int, MythUIButtonListItem*>::iterator it = m_buttonToItem.begin();
     while (it != m_buttonToItem.end())
     {
@@ -1546,6 +1547,9 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         }
         ++it;
     }
+#else
+    m_buttonToItem.removeIf( [&item](auto it){return *it==item;} );
+#endif
 
     if (curIndex < m_topPosition &&
         m_topPosition > 0)

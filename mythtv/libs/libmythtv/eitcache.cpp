@@ -330,6 +330,7 @@ void EITCache::WriteToDB(void)
     QMutexLocker locker(&m_eventMapLock);
 
     QStringList value_clauses;
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     key_map_t::iterator it = m_channelMap.begin();
     while (it != m_channelMap.end())
     {
@@ -338,6 +339,11 @@ void EITCache::WriteToDB(void)
         else
             ++it;
     }
+#else
+    m_channelMap.removeIf( [this,&value_clauses](auto it) {
+        return !WriteChannelToDB(value_clauses, it.key());
+    } );
+#endif
 
     if (m_persistent)
     {

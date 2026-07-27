@@ -103,6 +103,7 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- locked")
                 .arg((uint64_t)data,0,16));
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     StreamDataList::iterator it = m_streamDataList.find(data);
 
     if (it != m_streamDataList.end())
@@ -111,6 +112,15 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
             RemoveNamedOutputFile(*it);
         m_streamDataList.erase(it);
     }
+#else
+    m_streamDataList.removeIf( [this,data](auto it) {
+        if (it.key() != data)
+            return false;
+        if (!(*it).isEmpty())
+            RemoveNamedOutputFile(*it);
+        return true;
+    } );
+#endif
 
     m_listenerLock.unlock();
 

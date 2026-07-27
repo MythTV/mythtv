@@ -1700,6 +1700,7 @@ void TVRec::HandlePendingRecordings(void)
 {
     QMutexLocker pendlock(&m_pendingRecLock);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
     {
         if (MythDate::current() > (*it).m_recordingStart.addSecs(30))
@@ -1717,6 +1718,18 @@ void TVRec::HandlePendingRecordings(void)
             it++;
         }
     }
+#else
+    m_pendingRecordings.removeIf( [this](const auto it) {
+        if (MythDate::current() <= (*it).m_recordingStart.addSecs(30))
+            return false;
+        LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
+            QString("[%1] '%2'")
+            .arg((*it).m_info->GetInputID())
+            .arg((*it).m_info->GetTitle()));
+        delete (*it).m_info;
+        return true;
+    } );
+#endif
 
     if (m_pendingRecordings.empty())
         return;

@@ -124,6 +124,7 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
     QMutexLocker locker(&m_mutex);
 
     QString usn = GetNormalizedUSN(sUSN);
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     EntryMap::iterator it = m_mapEntries.find(usn);
     if (it != m_mapEntries.end())
     {
@@ -139,6 +140,24 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 
         m_mapEntries.erase(it);
     }
+#else
+    m_mapEntries.removeIf( [usn](auto it) {
+        if (it.key() != usn)
+            return false;
+
+        if (*it)
+        {
+            LOG(VB_UPNP, LOG_INFO,
+                QString("SSDP Cache removing USN: %1 Location %2")
+                    .arg((*it)->m_sUSN, (*it)->m_sLocation));
+            (*it)->DecrRef();
+        }
+
+        // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
+
+        return true;
+    });
+#endif
 }
 
 /// Removes expired cache entries, returning the number removed.
@@ -147,6 +166,7 @@ uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
     QMutexLocker locker(&m_mutex);
     uint nCount = 0;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     EntryMap::iterator it = m_mapEntries.begin();
     while (it != m_mapEntries.end())
     {
@@ -170,6 +190,21 @@ uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
             ++it;
         }
     }
+#else
+    nCount = m_mapEntries.removeIf( [ttNow](auto it) {
+        if (*it == nullptr)
+            return true;
+        if ((*it)->m_ttExpires >= ttNow)
+            return false;
+        // Note: locking is not required above since we hold
+        // one reference to each entry and are holding m_mutex.
+        (*it)->DecrRef();
+
+        // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
+
+        return true;
+    } );
+#endif
 
     return nCount;
 }
@@ -543,6 +578,7 @@ int SSDPCache::RemoveStale()
 
     for (const auto & key : std::as_const(lstKeys))
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
         SSDPCacheEntriesMap::iterator it = m_cache.find( key );
         if (it == m_cache.end())
             continue;
@@ -552,6 +588,16 @@ int SSDPCache::RemoveStale()
             (*it)->DecrRef();
             m_cache.erase(it);
         }
+#else
+        m_cache.removeIf( [key](auto it) {
+            if (it.key() != key)
+                return false;
+            if (!*it)
+                return false;
+            (*it)->DecrRef();
+            return true;
+        } );
+#endif
     }
 
     Unlock();
