@@ -33,6 +33,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
+#include <QByteArray>
+
 #include "lirc_client.h"
 
 // clazy:excludeall=raw-environment-function
@@ -555,16 +562,16 @@ static std::string lirc_getfilename(const struct lirc_state *state,
 				    const std::string& current_file)
 {
 	std::string filename;
+	std::string home {"/"};
 
 	if(file.empty())
 	{
-		const char *home=getenv("HOME");
-		if(home==nullptr)
+		if (qEnvironmentVariableIsSet("HOME"))
 		{
-			home="/";
+			home = qgetenv("HOME").toStdString();
 		}
 		filename = home;
-		if(strlen(home)>0 && filename.back()!='/')
+		if(!home.empty() && filename.back()!='/')
 		{
 			filename += "/";
 		}
@@ -572,10 +579,9 @@ static std::string lirc_getfilename(const struct lirc_state *state,
 	}
 	else if(file.starts_with("~/"))
 	{
-		const char *home=getenv("HOME");
-		if(home==nullptr)
+		if (qEnvironmentVariableIsSet("HOME"))
 		{
-			home="/";
+			home = qgetenv("HOME").toStdString();
 		}
 		filename = home;
 		filename += file.substr(1);

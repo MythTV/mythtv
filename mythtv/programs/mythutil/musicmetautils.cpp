@@ -1,4 +1,8 @@
 // qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
 #include <QDir>
 #include <QDomDocument>
 #include <QProcess>
@@ -363,12 +367,12 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 
 #ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
-    setenv("PYTHONPATH",
+    qputenv("PYTHONPATH",
            QString("%1/../Resources/lib/%2:%1/../Resources/lib/%2/site-packages:%1/../Resources/lib/%2/lib-dynload:%3")
            .arg(path)
            .arg(QFileInfo(PYTHON_EXE).fileName())
            .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
-           .toUtf8().constData(), 1);
+           .toUtf8().constData());
     QString PYTHON_LOCAL_EXE = path + QFileInfo(PYTHON_EXE).fileName();
 #else
     QString PYTHON_LOCAL_EXE = QString(PYTHON_EXE);

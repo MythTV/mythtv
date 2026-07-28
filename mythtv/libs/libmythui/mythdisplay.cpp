@@ -5,6 +5,7 @@
 //Qt
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 #include <QTimer>
@@ -1259,7 +1260,10 @@ void MythDisplay::ConfigureQtGUI(int SwapInterval, const MythCommandLineParser& 
         else if (!vendor.isEmpty() || force)
         {
             LOG(VB_GENERAL, LOG_INFO, LOC + QString("Requesting EGL for vendor '%1'").arg(vendor));
-            setenv("QT_XCB_GL_INTEGRATION", "xcb_egl", 0);
+            if (!qEnvironmentVariableIsSet("QT_XCB_GL_INTEGRATION"))
+            {
+                qputenv("QT_XCB_GL_INTEGRATION", "xcb_egl");
+            }
         }
     }
 #endif
