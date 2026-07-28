@@ -14,6 +14,11 @@ if(NOT CMAKE_CROSSCOMPILING)
     ALWAYS TRUE
     EXCLUDE_FROM_MAIN TRUE)
   ExternalProject_Add_StepTargets(MythTV tests)
+
+  add_custom_target(
+    tests
+    COMMAND cmake --build . -t MythTV-tests
+    USES_TERMINAL)
 endif()
 
 ExternalProject_Add_Step(
