@@ -22,6 +22,7 @@
 
 #pragma shader_stage(compute)
 #extension GL_GOOGLE_include_directive : require
+#extension GL_KHR_shader_subgroup_arithmetic : require
 
 #define ENCODE
 #define SB_QUALI
@@ -94,21 +95,28 @@ uint get_dist(ivec3 cur)
 shared uint score_cols[gl_WorkGroupSize.y] = { };
 shared uint score_mode[16] = { };
 
-void process(ivec2 pos)
+/* One scoring step: publish this lane's tx_pix to shared, then read the
+ * neighbours' to compute the prediction error. `valid` selects whether
+ * this lane has a real pixel; invalid lanes write zero into pix_buf so
+ * the cache stays well-defined while still participating in the barrier. */
+void process(ivec2 pos, bool valid, int i)
 {
-    ivec3 pix = load_components(pos);
+    ivec3 pix = valid ? load_components(pos) : ivec3(0);
+    ivec3 tx_pix = transform_sample(pix, rct_y_coeff[i]);
+    pix_buf[gl_LocalInvocationID.x + 1][gl_LocalInvocationID.y + 1] =
+        valid ? tx_pix : ivec3(0);
+    barrier();
 
-    for (int i = 0; i < NUM_CHECKS; i++) {
-        ivec3 tx_pix = transform_sample(pix, rct_y_coeff[i]);
-        pix_buf[gl_LocalInvocationID.x + 1][gl_LocalInvocationID.y + 1] = tx_pix;
-        memoryBarrierShared();
+    uint dist = 0u;
+    if (valid)
+        dist = get_dist(tx_pix);
 
-        uint dist = get_dist(tx_pix);
-        atomicAdd(score_mode[i], dist);
-    }
+    uint sum = subgroupAdd(dist);
+    if (subgroupElect())
+        atomicAdd(score_mode[i], sum);
 }
 
-void coeff_search(inout SliceContext sc)
+void coeff_search(uint slice_idx)
 {
     uvec2 img_size = imageSize(src[0]);
     uint sxs = slice_coord(img_size.x, gl_WorkGroupID.x + 0,
@@ -120,11 +128,29 @@ void coeff_search(inout SliceContext sc)
     uint sye = slice_coord(img_size.y, gl_WorkGroupID.y + 1,
                            gl_NumWorkGroups.y, 0);
 
-    for (uint y = sys + gl_LocalInvocationID.y; y < sye; y += gl_WorkGroupSize.y) {
-        for (uint x = sxs + gl_LocalInvocationID.x; x < sxe; x += gl_WorkGroupSize.x) {
-            process(ivec2(x, y));
+    /* Uniform iteration: every lane in the workgroup runs the same number
+     * of tile iterations so that the in-process barrier is always reached
+     * by all lanes. Lanes outside the slice extents pass valid=false. */
+    uint sw = sxe - sxs;
+    uint sh = sye - sys;
+    uint n_xi = (sw + gl_WorkGroupSize.x - 1u) / gl_WorkGroupSize.x;
+    uint n_yi = (sh + gl_WorkGroupSize.y - 1u) / gl_WorkGroupSize.y;
+
+    for (uint yi = 0u; yi < n_yi; yi++) {
+        uint y = sys + yi*gl_WorkGroupSize.y + gl_LocalInvocationID.y;
+        for (uint xi = 0u; xi < n_xi; xi++) {
+            uint x = sxs + xi*gl_WorkGroupSize.x + gl_LocalInvocationID.x;
+            bool valid = (x < sxe) && (y < sye);
+            for (int i = 0; i < NUM_CHECKS; i++) {
+                process(ivec2(x, y), valid, i);
+                barrier();
+            }
         }
     }
+
+    /* All lanes must have finished accumulating into score_mode before
+     * lane (0,0) inspects it for the argmin. */
+    barrier();
 
     if (gl_LocalInvocationID.x == 0 && gl_LocalInvocationID.y == 0) {
         uint min_score = 0xFFFFFFFF;
@@ -135,7 +161,7 @@ void coeff_search(inout SliceContext sc)
                 min_idx = i;
             }
         }
-        sc.slice_rct_coef = rct_y_coeff[min_idx];
+        slice_ctx[slice_idx].slice_rct_coef = rct_y_coeff[min_idx];
     }
 }
 
@@ -145,5 +171,5 @@ void main(void)
         return;
 
     const uint slice_idx = gl_WorkGroupID.y*gl_NumWorkGroups.x + gl_WorkGroupID.x;
-    coeff_search(slice_ctx[slice_idx]);
+    coeff_search(slice_idx);
 }

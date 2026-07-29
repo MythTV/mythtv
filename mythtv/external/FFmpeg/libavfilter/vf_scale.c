@@ -658,7 +658,8 @@ static int config_props(AVFilterLink *outlink)
     if (scale->reset_sar)
         outlink->sample_aspect_ratio = (AVRational){1, 1};
     else if (inlink0->sample_aspect_ratio.num){
-        outlink->sample_aspect_ratio = av_mul_q((AVRational){outlink->h * inlink0->w, outlink->w * inlink0->h}, inlink0->sample_aspect_ratio);
+        AVRational q = av_div_q((AVRational){inlink0->w, inlink0->h}, (AVRational){outlink->w, outlink->h});
+        outlink->sample_aspect_ratio = av_mul_q(q, inlink0->sample_aspect_ratio);
     } else
         outlink->sample_aspect_ratio = inlink0->sample_aspect_ratio;
 
@@ -799,14 +800,12 @@ static int scale_frame(AVFilterLink *link, AVFrame **frame_in,
             scale->var_values[VAR_T] = TS2T(in->pts, link->time_base);
         }
 
-        link->dst->inputs[0]->format        = in->format;
-        link->dst->inputs[0]->w             = in->width;
-        link->dst->inputs[0]->h             = in->height;
-        link->dst->inputs[0]->colorspace    = in->colorspace;
-        link->dst->inputs[0]->color_range   = in->color_range;
-
-        link->dst->inputs[0]->sample_aspect_ratio.den = in->sample_aspect_ratio.den;
-        link->dst->inputs[0]->sample_aspect_ratio.num = in->sample_aspect_ratio.num;
+        link->format              = in->format;
+        link->w                   = in->width;
+        link->h                   = in->height;
+        link->colorspace          = in->colorspace;
+        link->color_range         = in->color_range;
+        link->sample_aspect_ratio = in->sample_aspect_ratio;
 
         if ((ret = config_props(outlink)) < 0)
             goto err;

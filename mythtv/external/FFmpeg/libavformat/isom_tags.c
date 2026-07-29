@@ -63,11 +63,6 @@ const AVCodecTag ff_codec_movvideo_tags[] = {
     { AV_CODEC_ID_AVRP,   MKTAG('S', 'U', 'D', 'S') }, /* Avid DS Uncompressed */
     { AV_CODEC_ID_V210,   MKTAG('v', '2', '1', '0') }, /* uncompressed 10-bit 4:2:2 */
     { AV_CODEC_ID_V210,   MKTAG('b', 'x', 'y', '2') }, /* BOXX 10-bit 4:2:2 */
-#if FF_API_V408_CODECID
-    { AV_CODEC_ID_V308,   MKTAG('v', '3', '0', '8') }, /* uncompressed  8-bit 4:4:4 */
-    { AV_CODEC_ID_V408,   MKTAG('v', '4', '0', '8') }, /* uncompressed  8-bit 4:4:4:4 */
-    { AV_CODEC_ID_V410,   MKTAG('v', '4', '1', '0') }, /* uncompressed 10-bit 4:4:4 */
-#endif
     { AV_CODEC_ID_Y41P,   MKTAG('Y', '4', '1', 'P') }, /* uncompressed 12-bit 4:1:1 */
     { AV_CODEC_ID_YUV4,   MKTAG('y', 'u', 'v', '4') }, /* libquicktime packed yuv420p */
     { AV_CODEC_ID_TARGA_Y216, MKTAG('Y', '2', '1', '6') },
@@ -310,6 +305,7 @@ const AVCodecTag ff_codec_movvideo_tags[] = {
 
 const AVCodecTag ff_codec_movaudio_tags[] = {
     { AV_CODEC_ID_AAC,             MKTAG('m', 'p', '4', 'a') },
+    { AV_CODEC_ID_APPLE_APAC,      MKTAG('a', 'p', 'a', 'c') },
     { AV_CODEC_ID_AC3,             MKTAG('a', 'c', '-', '3') }, /* ETSI TS 102 366 Annex F */
     { AV_CODEC_ID_AC3,             MKTAG('s', 'a', 'c', '3') }, /* Nero Recode */
     { AV_CODEC_ID_AC4,             MKTAG('a', 'c', '-', '4') },

@@ -225,6 +225,25 @@ AVStream *stream;
 AVStream* stream;
 @end example
 
+@item
+When sensible, prefer a narrow variable scope, especially in for loops:
+
+@example c, good
+// Good
+for (unsigned i = 0; i < submix->nb_elements; i++) @{
+    // Do something...
+@}
+@end example
+
+@example c, bad
+// Bad style
+unsigned i;
+//...
+for (i = 0; i < submix->nb_elements; i++) @{
+    // Do something...
+@}
+@end example
+
 @end itemize
 
 If you work on a file that does not follow these guidelines consistently,
@@ -368,7 +387,7 @@ symbols. If in doubt, just avoid names starting with @code{_} altogether.
 Casts should be used only when necessary. Unneeded parentheses
 should also be avoided if they don't make the code easier to understand.
 @item
-Where applicable, SI units shall be used. For example timeouts should use seconds as the fundamental unit not micro seconds.
+Where applicable, SI units shall be used. For example timeouts should use seconds as the fundamental unit not microseconds.
 That means a bare value like @samp{1.0} must mean 1 second, @samp{50m} means 50 milliseconds. For weight, gram shall be used.
 @end itemize
 
@@ -469,15 +488,25 @@ later on.
 Also if you have doubts about splitting or not splitting, do not hesitate to
 ask/discuss it on the developer mailing list.
 
+@subheading Bug fixes intended for backporting should stay focused.
+Keep bug fixes as small as possible while fully fixing the reported issue.
+Changes not needed for correctness or robustness should be submitted separately,
+especially if they increase complexity or affect backporting.
+
 @subheading Cosmetic changes should be kept in separate patches.
 We refuse source indentation and other cosmetic changes if they are mixed
-with functional changes, such commits will be rejected and removed. Every
+with functional changes, such commits will be rejected and removed. However,
+indentation changes that can be ignored by @code{git diff --ignore-all-space}
+(e.g. changes in whitespace amount, leading/trailing spaces) may be mixed with
+functional changes, since reviewers can use @code{git diff -w} or
+@code{git log -p --ignore-all-space} to review only the functional parts of
+the change. Forgejo's pull request interface also provides a
+``Hide whitespace changes'' option for this purpose. Every
 developer has his own indentation style, you should not change it. Of course
 if you (re)write something, you can use your own style, even though we would
 prefer if the indentation throughout FFmpeg was consistent (Many projects
 force a given indentation style - we do not.). If you really need to make
-indentation changes (try to avoid this), separate them strictly from real
-changes.
+non-whitespace cosmetic changes, separate them strictly from real changes.
 
 NOTE: If you had to put if()@{ .. @} over a large (> 5 lines) chunk of code,
 then either do NOT change the indentation of the inner part within (do not
@@ -759,11 +788,16 @@ Now you'll just need to open the eml file with the email application
 and execute 'Send'.
 
 @subheading Reviews
-Your patch will be reviewed on the mailing list. You will likely be asked
+Your patch or pull request will be reviewed on the mailing list or on
+code.ffmpeg.org. You will likely be asked
 to make some changes and are expected to send in an improved version that
 incorporates the requests from the review. This process may go through
 several iterations. Once your patch is deemed good enough, some developer
 will pick it up and commit it to the official FFmpeg tree.
+If you want an LLM-based review, add
+@url{https://code.ffmpeg.org/Forgejo_Fairy, Forgejo Fairy} as a reviewer
+to your pull request. Issues with Fairy herself can be reported at her
+@url{https://code.ffmpeg.org/michaelni/Fairies, repository}.
 
 Give us a few days to react. But if some time passes without reaction,
 send a reminder by email. Your patch should eventually be dealt with.

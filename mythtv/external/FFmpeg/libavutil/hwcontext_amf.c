@@ -16,12 +16,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "mem.h"
 #include "buffer.h"
-#include "common.h"
+#include "pixfmt.h"
+#include "pixdesc.h"
+#include "imgutils.h"
 #include "hwcontext.h"
 #include "hwcontext_amf.h"
 #include "hwcontext_internal.h"
 #include "hwcontext_amf_internal.h"
+
+#include "libavutil/thread.h"
+#include "libavutil/avassert.h"
+
+#include <AMF/core/Surface.h>
+#include <AMF/core/Trace.h>
+
 #if CONFIG_VULKAN
 #include "hwcontext_vulkan.h"
 #endif
@@ -35,14 +45,6 @@
 #define COBJMACROS
 #include "libavutil/hwcontext_dxva2.h"
 #endif
-#include "mem.h"
-#include "pixdesc.h"
-#include "pixfmt.h"
-#include "imgutils.h"
-#include "thread.h"
-#include "libavutil/avassert.h"
-#include <AMF/core/Surface.h>
-#include <AMF/core/Trace.h>
 #ifdef _WIN32
 #include "compat/w32dlfcn.h"
 #else
@@ -148,6 +150,164 @@ enum AVPixelFormat av_amf_to_av_format(enum AMF_SURFACE_FORMAT fmt)
         }
     }
     return AV_PIX_FMT_NONE;
+}
+
+enum AMF_VIDEO_CONVERTER_COLOR_PROFILE_ENUM av_amf_get_color_profile(enum AVColorRange color_range, enum AVColorSpace color_space)
+{
+    switch (color_space) {
+    case AVCOL_SPC_SMPTE170M:
+        if (color_range == AVCOL_RANGE_JPEG) {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_601;
+        } else {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_601;
+        }
+        break;
+    case AVCOL_SPC_BT709:
+        if (color_range == AVCOL_RANGE_JPEG) {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_709;
+        } else {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_709;
+        }
+        break;
+    case AVCOL_SPC_BT2020_NCL:
+    case AVCOL_SPC_BT2020_CL:
+        if (color_range == AVCOL_RANGE_JPEG) {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_FULL_2020;
+        } else {
+            return AMF_VIDEO_CONVERTER_COLOR_PROFILE_2020;
+        }
+        break;
+
+    default:
+        return AMF_VIDEO_CONVERTER_COLOR_PROFILE_UNKNOWN;
+    }
+}
+
+int av_amf_display_mastering_meta_to_hdrmeta(const AVMasteringDisplayMetadata *display_meta, AMFHDRMetadata *hdrmeta)
+{
+    if (!display_meta || !hdrmeta)
+        return AVERROR(EINVAL);
+
+    if (display_meta->has_luminance) {
+        const unsigned int luma_den = 10000;
+        hdrmeta->maxMasteringLuminance =
+            (amf_uint32)(luma_den * av_q2d(display_meta->max_luminance));
+        hdrmeta->minMasteringLuminance =
+            FFMIN((amf_uint32)(luma_den * av_q2d(display_meta->min_luminance)), hdrmeta->maxMasteringLuminance);
+    }
+
+    if (display_meta->has_primaries) {
+        const unsigned int chroma_den = 50000;
+        hdrmeta->redPrimary[0] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][0])), chroma_den);
+        hdrmeta->redPrimary[1] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[0][1])), chroma_den);
+        hdrmeta->greenPrimary[0] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][0])), chroma_den);
+        hdrmeta->greenPrimary[1] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[1][1])), chroma_den);
+        hdrmeta->bluePrimary[0] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][0])), chroma_den);
+        hdrmeta->bluePrimary[1] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->display_primaries[2][1])), chroma_den);
+        hdrmeta->whitePoint[0] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[0])), chroma_den);
+        hdrmeta->whitePoint[1] =
+            FFMIN((amf_uint16)(chroma_den * av_q2d(display_meta->white_point[1])), chroma_den);
+    }
+
+    return 0;
+}
+
+int av_amf_light_metadata_to_hdrmeta(const AVContentLightMetadata *light_meta, AMFHDRMetadata *hdrmeta)
+{
+    if (!light_meta || !hdrmeta)
+        return AVERROR(EINVAL);
+
+    hdrmeta->maxContentLightLevel = (amf_uint16)light_meta->MaxCLL;
+    hdrmeta->maxFrameAverageLightLevel = (amf_uint16)light_meta->MaxFALL;
+
+    return 0;
+}
+
+int av_amf_extract_hdr_metadata(const AVFrame *frame, AMFHDRMetadata *hdrmeta)
+{
+    AVFrameSideData *sidedata;
+    AVContentLightMetadata *content_light = NULL;
+    AVMasteringDisplayMetadata *mastering_display = NULL;
+
+    if (!frame || !hdrmeta)
+        return AVERROR(EINVAL);
+
+    sidedata = av_frame_get_side_data(frame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+    if (sidedata) {
+        mastering_display = (AVMasteringDisplayMetadata *)sidedata->data;
+        if (av_amf_display_mastering_meta_to_hdrmeta(mastering_display, hdrmeta) != 0)
+            mastering_display = NULL;
+    }
+
+    sidedata = av_frame_get_side_data(frame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+    if (sidedata) {
+        content_light = (AVContentLightMetadata *)sidedata->data;
+        if (av_amf_light_metadata_to_hdrmeta(content_light, hdrmeta) != 0)
+            content_light = NULL;
+    }
+
+    if (!mastering_display && !content_light)
+        return AVERROR(ENODATA);
+
+    return 0;
+}
+
+int av_amf_attach_hdr_metadata(AVFrame *frame, const AMFHDRMetadata *hdrmeta) {
+    if (!hdrmeta || !frame)
+        return AVERROR(EINVAL);
+
+    AVMasteringDisplayMetadata *mastering =
+        av_mastering_display_metadata_create_side_data(frame);
+    const int chroma_den = 50000;
+    const int luma_den = 10000;
+
+    if (!mastering)
+      return AVERROR(ENOMEM);
+
+    mastering->display_primaries[0][0] =
+        av_make_q(hdrmeta->redPrimary[0], chroma_den);
+    mastering->display_primaries[0][1] =
+        av_make_q(hdrmeta->redPrimary[1], chroma_den);
+
+    mastering->display_primaries[1][0] =
+        av_make_q(hdrmeta->greenPrimary[0], chroma_den);
+    mastering->display_primaries[1][1] =
+        av_make_q(hdrmeta->greenPrimary[1], chroma_den);
+
+    mastering->display_primaries[2][0] =
+        av_make_q(hdrmeta->bluePrimary[0], chroma_den);
+    mastering->display_primaries[2][1] =
+        av_make_q(hdrmeta->bluePrimary[1], chroma_den);
+
+    mastering->white_point[0] = av_make_q(hdrmeta->whitePoint[0], chroma_den);
+    mastering->white_point[1] = av_make_q(hdrmeta->whitePoint[1], chroma_den);
+
+    mastering->max_luminance =
+        av_make_q(hdrmeta->maxMasteringLuminance, luma_den);
+    mastering->min_luminance =
+        av_make_q(hdrmeta->maxMasteringLuminance, luma_den);
+
+    mastering->has_luminance = 1;
+    mastering->has_primaries = 1;
+    if (hdrmeta->maxContentLightLevel) {
+      AVContentLightMetadata *light =
+          av_content_light_metadata_create_side_data(frame);
+
+      if (!light)
+        return AVERROR(ENOMEM);
+
+      light->MaxCLL = hdrmeta->maxContentLightLevel;
+      light->MaxFALL = hdrmeta->maxFrameAverageLightLevel;
+    }
+
+    return 0;
 }
 
 static const enum AVPixelFormat supported_formats[] = {
@@ -433,7 +593,7 @@ static int amf_device_init(AVHWDeviceContext *ctx)
             if (res != AMF_OK && res != AMF_ALREADY_INITIALIZED) {
                 if (res == AMF_NOT_SUPPORTED)
                     av_log(ctx, AV_LOG_ERROR, "AMF via Vulkan is not supported on the given device.\n");
-                 else
+                else
                     av_log(ctx, AV_LOG_ERROR, "AMF failed to initialise on the given Vulkan device: %d.\n", res);
                  return AVERROR(ENOSYS);
             }
@@ -462,8 +622,10 @@ static int amf_load_library(AVAMFDeviceContext* amf_ctx,  void* avcl)
     version_fun = (AMFQueryVersion_Fn)dlsym(amf_ctx->library, AMF_QUERY_VERSION_FUNCTION_NAME);
     AMF_RETURN_IF_FALSE(avcl, version_fun != NULL, AVERROR_UNKNOWN, "DLL %s failed to find function %s\n", AMF_DLL_NAMEA, AMF_QUERY_VERSION_FUNCTION_NAME);
 
-    res = version_fun(&amf_ctx->version);
+    amf_uint64 version;
+    res = version_fun(&version);
     AMF_RETURN_IF_FALSE(avcl, res == AMF_OK, AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_QUERY_VERSION_FUNCTION_NAME, res);
+    amf_ctx->version = version;
     res = init_fun(AMF_FULL_VERSION, &amf_ctx->factory);
     AMF_RETURN_IF_FALSE(avcl, res == AMF_OK, AVERROR_UNKNOWN, "%s failed with error %d\n", AMF_INIT_FUNCTION_NAME, res);
     return 0;
@@ -657,6 +819,77 @@ static int amf_device_derive(AVHWDeviceContext *device_ctx,
     }
 }
 
+static void amf_unmap_frame(av_unused AVHWFramesContext *unused, HWMapDescriptor *hwmap)
+{
+    AMFSurface1 *surface1 = hwmap->priv;
+    AMF_IFACE_CALL(surface1, Unmap);
+    AMF_IFACE_CALL(surface1, Release);
+}
+
+static int amf_map_frame(AVHWFramesContext *device_ctx, AVFrame *dst, const AVFrame *src, int flags)
+{
+    AMFSurface *surface = (AMFSurface *)src->data[0];
+    AMFSurface1 *surface1 = NULL;
+    size_t *linesizes = NULL;
+    uint8_t **map = NULL;
+    int amf_mem_flags = AMF_MEMORY_CPU_NONE;
+    const AMFGuid guid = IID_AMFSurface1();
+    AMF_RESULT res = AMF_FAIL;
+    size_t plane_count = 0;
+    int ret = -1;
+
+    AMF_RETURN_IF_FALSE(device_ctx, surface != NULL, AVERROR(EINVAL) , "Source surface is null");
+
+    res = AMF_IFACE_CALL(surface, QueryInterface, &guid, (void**)&surface1);
+    AMF_RETURN_IF_FALSE(device_ctx, res == AMF_OK, AVERROR_UNKNOWN, "QueryInterface(AMFSurface1) failed with error %d\n", res);
+
+    if (flags & AV_HWFRAME_MAP_READ)
+        amf_mem_flags |= AMF_MEMORY_CPU_READ;
+
+    if (flags & AV_HWFRAME_MAP_WRITE)
+        amf_mem_flags |= AMF_MEMORY_CPU_WRITE;
+
+    plane_count = AMF_IFACE_CALL(surface, GetPlanesCount);
+    linesizes = av_malloc_array(sizeof(size_t), plane_count);
+    AMF_GOTO_FAIL_IF_FALSE(device_ctx, linesizes, AVERROR(ENOMEM), "Unable to allocate line sizes array\n");
+
+    map = av_malloc_array(sizeof(uint8_t *), plane_count);
+    AMF_GOTO_FAIL_IF_FALSE(device_ctx, map, AVERROR(ENOMEM), "Unable to allocate mapping buffer\n");
+
+    dst->format = av_amf_to_av_format(AMF_IFACE_CALL(surface, GetFormat));
+
+    res = AMF_IFACE_CALL(surface1, Map, amf_mem_flags, plane_count, linesizes, (void**)map);
+    AMF_GOTO_FAIL_IF_FALSE(device_ctx, res == AMF_OK, AVERROR_UNKNOWN, "AMFSurface1->Map() failed with error %d\n", res);
+
+    ret = ff_hwframe_map_create(src->hw_frames_ctx, dst, src, &amf_unmap_frame, surface1);
+    AMF_GOTO_FAIL_IF_FALSE(device_ctx, ret >= 0, ret, "ff_hwframe_map_create failed with error %d\n", ret);
+
+    dst->width  = src->width;
+    dst->height = src->height;
+    av_frame_copy_props(dst, src);
+
+    // The dst frame is no longer a hardware frame, from the perspective of any dst frame consumer.
+    av_buffer_unref(&dst->hw_frames_ctx);
+
+    for (int plane = 0; plane < plane_count; ++plane)
+    {
+        dst->data[plane] = map[plane];
+        dst->linesize[plane] = linesizes[plane];
+    }
+
+fail:
+    if (map)
+        av_free(map);
+
+    if (linesizes)
+        av_free(linesizes);
+
+    if (ret < 0 && surface1 != NULL)
+        AMF_IFACE_CALL(surface1, Release);
+
+    return ret;
+}
+
 const HWContextType ff_hwcontext_type_amf = {
     .type                 = AV_HWDEVICE_TYPE_AMF,
     .name                 = "AMF",
@@ -674,6 +907,7 @@ const HWContextType ff_hwcontext_type_amf = {
     .transfer_get_formats = amf_transfer_get_formats,
     .transfer_data_to     = amf_transfer_data_to,
     .transfer_data_from   = amf_transfer_data_from,
+    .map_from             = amf_map_frame,
 
     .pix_fmts             = (const enum AVPixelFormat[]){ AV_PIX_FMT_AMF_SURFACE, AV_PIX_FMT_NONE },
 };

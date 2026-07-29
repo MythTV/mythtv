@@ -72,7 +72,7 @@ static int decompress(uint8_t *scanline, int w, GetByteContext *gb, const uint8_
             for (int i = run << rshift; i > 0 && w > 0 && scanline >= start + 4; i--) {
                 memcpy(scanline, scanline - 4, 4);
                 scanline += 4;
-                w -= 4;
+                w--;
             }
             rshift += 8;
             if (rshift > 16)
@@ -98,7 +98,7 @@ static int hdr_decode_frame(AVCodecContext *avctx, AVFrame *p,
 
     bytestream2_init(&gb, avpkt->data, avpkt->size);
     hdr_get_line(&gb, line, sizeof(line));
-    if (memcmp("#?RADIANCE\n", line, 11))
+    if (memcmp("#?RADIANCE\n", line, 11) && memcmp("#?RGBE\n", line, 7))
         return AVERROR_INVALIDDATA;
 
     do {

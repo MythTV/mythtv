@@ -106,8 +106,7 @@ static av_cold int pcm_dvd_encode_init(AVCodecContext *avctx)
     s->header[1] = (quant << 6) | (freq << 4) | (avctx->ch_layout.nb_channels - 1);
     s->header[2] = 0x80;
 
-    if (!avctx->frame_size)
-        avctx->frame_size = frame_size;
+    avctx->frame_size = frame_size;
 
     return 0;
 }

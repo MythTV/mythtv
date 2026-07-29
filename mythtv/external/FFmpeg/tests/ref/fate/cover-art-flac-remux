@@ -1,6 +1,6 @@
-2535b1a3c759250e7f470ece217971a4 *tests/data/fate/cover-art-flac-remux.flac
-964234 tests/data/fate/cover-art-flac-remux.flac
-#extradata 0:       34, 0x8d830abd
+f41881b70a18d8405c1dd43ee8502349 *tests/data/fate/cover-art-flac-remux.flac
+964331 tests/data/fate/cover-art-flac-remux.flac
+#extradata 0:       34, 0x8f1f0acf
 #tb 0: 1/44100
 #media_type 0: audio
 #codec_id 0: flac
@@ -36,19 +36,21 @@
 #codec_id 6: pcm_s16le
 #sample_rate 6: 44100
 #channel_layout_name 6: 2 channels (FL+FC)
-0,          0,          0,     4608,       14, 0x242b036d
+0,          0,          0,     4096,       14, 0x2e2e0540
 1,          0,          0,        0,    66888, 0x1fd72743
 2,          0,          0,        0,   304403, 0xaf7c7667
 3,          0,          0,        0,    21671, 0x7d1c6030
 4,          0,          0,        0,   522758, 0x7a63572f
 5,          0,          0,        0,    21671, 0x7d1c6030
-6,          0,          0,     4608,    18432, 0x00000000
-0,       4608,       4608,     4608,     7636, 0xc3775d85
-6,       4608,       4608,     4608,    18432, 0xaaab4d62
-0,       9216,       9216,     4608,     5700, 0x8b9a3cc7
-6,       9216,       9216,     4608,    18432, 0x49410f52
-0,      13824,      13824,     3816,     4512, 0x0ded5f71
-6,      13824,      13824,     3816,    15264, 0x155b5c95
+6,          0,          0,     4096,    16384, 0x00000000
+0,       4096,       4096,     4096,     6128, 0x2072ccde
+6,       4096,       4096,     4096,    16384, 0x29cd639d
+0,       8192,       8192,     4096,     5361, 0xe7316a81
+6,       8192,       8192,     4096,    16384, 0xd52066e5
+0,      12288,      12288,     4096,     5015, 0x366ffd34
+6,      12288,      12288,     4096,    16384, 0x0c933408
+0,      16384,      16384,     1256,     1441, 0x44376426
+6,      16384,      16384,     1256,     5024, 0xde7bbab0
 [STREAM]
 index=0
 codec_name=flac
