@@ -455,9 +455,6 @@ static int cbs_lcevc_read_nal_unit(CodedBitstreamContext *ctx,
                      return AVERROR(ENOMEM);
                 slice->data = unit->data + slice->header_size;
             }
-
-            if (err < 0)
-                return err;
         }
         break;
     default:
@@ -673,6 +670,9 @@ int ff_cbs_lcevc_find_process_block(CodedBitstreamContext *ctx,
     for (int i = 0; i < au->nb_units; i++) {
         CodedBitstreamUnit *unit = &au->units[i];
         LCEVCRawProcessBlockList *list;
+
+        if (!unit->content)
+            continue;
 
         err = cbs_lcevc_get_process_block_list(ctx, unit, &list);
         if (err < 0)

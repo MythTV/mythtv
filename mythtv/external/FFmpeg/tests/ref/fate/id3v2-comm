@@ -1,0 +1,4 @@
+ID3v2 frame TXXX (14 bytes):|.comment.test.|
+ID3v2 frame TXXX (19 bytes):|.comment-eng.test2.|
+comment=test
+comment-eng=test2

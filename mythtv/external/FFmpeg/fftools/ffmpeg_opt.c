@@ -56,9 +56,6 @@ char *vstats_filename;
 float dts_delta_threshold   = 10;
 float dts_error_threshold   = 3600*30;
 
-#if FFMPEG_OPT_VSYNC
-enum VideoSyncMethod video_sync_method = VSYNC_AUTO;
-#endif
 float frame_drop_threshold = 0;
 int do_benchmark      = 0;
 int do_benchmark_all  = 0;
@@ -359,37 +356,16 @@ int view_specifier_parse(const char **pspec, ViewSpecifier *vs)
     return 0;
 }
 
-int parse_and_set_vsync(const char *arg, enum VideoSyncMethod *vsync_var, int file_idx, int st_idx, int is_global)
+int parse_and_set_vsync(const char *arg, enum VideoSyncMethod *vsync_var, int file_idx, int st_idx)
 {
     if      (!av_strcasecmp(arg, "cfr"))         *vsync_var = VSYNC_CFR;
     else if (!av_strcasecmp(arg, "vfr"))         *vsync_var = VSYNC_VFR;
     else if (!av_strcasecmp(arg, "passthrough")) *vsync_var = VSYNC_PASSTHROUGH;
-#if FFMPEG_OPT_VSYNC_DROP
-    else if (!av_strcasecmp(arg, "drop")) {
-        av_log(NULL, AV_LOG_WARNING, "-vsync/fps_mode drop is deprecated\n");
-        *vsync_var = VSYNC_DROP;
-    }
-#endif
-    else if (!is_global && !av_strcasecmp(arg, "auto"))  *vsync_var = VSYNC_AUTO;
-    else if (!is_global) {
+    else if (!av_strcasecmp(arg, "auto"))        *vsync_var = VSYNC_AUTO;
+    else {
         av_log(NULL, AV_LOG_FATAL, "Invalid value %s specified for fps_mode of #%d:%d.\n", arg, file_idx, st_idx);
         return AVERROR(EINVAL);
     }
-
-#if FFMPEG_OPT_VSYNC
-    if (is_global && *vsync_var == VSYNC_AUTO) {
-        int ret;
-        double num;
-
-        ret = parse_number("vsync", arg, OPT_TYPE_INT, VSYNC_AUTO, VSYNC_VFR, &num);
-        if (ret < 0)
-            return ret;
-
-        video_sync_method = num;
-        av_log(NULL, AV_LOG_WARNING, "Passing a number to -vsync is deprecated,"
-               " use a string argument as described in the manual.\n");
-    }
-#endif
 
     return 0;
 }
@@ -645,6 +621,9 @@ static int opt_map(void *optctx, const char *opt, const char *arg)
             for (i = 0; i < o->nb_stream_maps; i++) {
                 m = &o->stream_maps[i];
                 if (file_idx == m->file_index &&
+                    !m->linklabel &&
+                    m->stream_index >= 0 &&
+                    m->stream_index < input_files[m->file_index]->nb_streams &&
                     stream_specifier_match(&ss,
                                            input_files[m->file_index]->ctx,
                                            input_files[m->file_index]->ctx->streams[m->stream_index],
@@ -1231,14 +1210,6 @@ static int opt_audio_filters(void *optctx, const char *opt, const char *arg)
     return parse_option(o, "filter:a", arg, options);
 }
 
-#if FFMPEG_OPT_VSYNC
-static int opt_vsync(void *optctx, const char *opt, const char *arg)
-{
-    av_log(NULL, AV_LOG_WARNING, "-vsync is deprecated. Use -fps_mode\n");
-    return parse_and_set_vsync(arg, &video_sync_method, -1, -1, 1);
-}
-#endif
-
 static int opt_timecode(void *optctx, const char *opt, const char *arg)
 {
     OptionsContext *o = optctx;
@@ -1278,31 +1249,6 @@ static int opt_filter_complex(void *optctx, const char *opt, const char *arg)
 
     return 0;
 }
-
-#if FFMPEG_OPT_FILTER_SCRIPT
-static int opt_filter_complex_script(void *optctx, const char *opt, const char *arg)
-{
-    GlobalOptionsContext *go = optctx;
-    char *graph_desc;
-    int ret;
-
-    graph_desc = read_file_to_string(arg);
-    if (!graph_desc)
-        return AVERROR(EINVAL);
-
-    av_log(NULL, AV_LOG_WARNING, "-%s is deprecated, use -/filter_complex %s instead\n",
-           opt, arg);
-
-    ret = GROW_ARRAY(go->filtergraphs, go->nb_filtergraphs);
-    if (ret < 0) {
-        av_freep(&graph_desc);
-        return ret;
-    }
-    go->filtergraphs[go->nb_filtergraphs - 1] = graph_desc;
-
-    return 0;
-}
-#endif
 
 void show_help_default(const char *opt, const char *arg)
 {
@@ -1594,22 +1540,6 @@ int opt_timelimit(void *optctx, const char *opt, const char *arg)
     return 0;
 }
 
-#if FFMPEG_OPT_QPHIST
-static int opt_qphist(void *optctx, const char *opt, const char *arg)
-{
-    av_log(NULL, AV_LOG_WARNING, "Option -%s is deprecated and has no effect\n", opt);
-    return 0;
-}
-#endif
-
-#if FFMPEG_OPT_ADRIFT_THRESHOLD
-static int opt_adrift_threshold(void *optctx, const char *opt, const char *arg)
-{
-    av_log(NULL, AV_LOG_WARNING, "Option -%s is deprecated and has no effect\n", opt);
-    return 0;
-}
-#endif
-
 static const char *const alt_channel_layout[] = { "ch_layout", NULL};
 static const char *const alt_codec[]          = { "c", "acodec", "vcodec", "scodec", "dcodec", NULL };
 static const char *const alt_filter[]         = { "af", "vf", NULL };
@@ -1816,11 +1746,6 @@ const OptionDef options[] = {
     { "filter_buffered_frames", OPT_TYPE_INT, OPT_EXPERT,
         { &filter_buffered_frames },
         "maximum number of buffered frames in a filter graph" },
-#if FFMPEG_OPT_FILTER_SCRIPT
-    { "filter_script",          OPT_TYPE_STRING, OPT_PERSTREAM | OPT_EXPERT | OPT_OUTPUT,
-        { .off = OFFSET(filter_scripts) },
-        "deprecated, use -/filter", "filename" },
-#endif
     { "reinit_filter",          OPT_TYPE_INT, OPT_PERSTREAM | OPT_INPUT | OPT_EXPERT,
         { .off = OFFSET(reinit_filters) },
         "reinit filtergraph on input parameter changes", "" },
@@ -1836,11 +1761,6 @@ const OptionDef options[] = {
     { "lavfi",               OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
         { .func_arg = opt_filter_complex },
         "create a complex filtergraph", "graph_description" },
-#if FFMPEG_OPT_FILTER_SCRIPT
-    { "filter_complex_script", OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
-        { .func_arg = opt_filter_complex_script },
-        "deprecated, use -/filter_complex instead", "filename" },
-#endif
     { "print_graphs",   OPT_TYPE_BOOL, 0,
         { &print_graphs },
         "print execution graph data to stderr" },
@@ -1940,6 +1860,12 @@ const OptionDef options[] = {
         { .off = OFFSET(display_vflips) },
         "set display vertical flip for stream(s) "
         "(overrides any display rotation if it is not set)"},
+    { "mastering_display",          OPT_TYPE_STRING, OPT_VIDEO | OPT_PERSTREAM | OPT_INPUT | OPT_EXPERT,
+        { .off = OFFSET(mastering_displays) },
+        "set SMPTE2084 mastering display color volume info" },
+    { "content_light",              OPT_TYPE_STRING, OPT_VIDEO | OPT_PERSTREAM | OPT_INPUT | OPT_EXPERT,
+        { .off = OFFSET(content_lights) },
+        "set SMPTE2084 Max CLL and Max FALL values" },
     { "vn",                         OPT_TYPE_BOOL,   OPT_VIDEO | OPT_OFFSET | OPT_INPUT | OPT_OUTPUT,
         { .off = OFFSET(video_disable) },
         "disable video" },
@@ -1987,7 +1913,7 @@ const OptionDef options[] = {
         .u1.name_canon = "tag", },
     { "fps_mode",                   OPT_TYPE_STRING, OPT_VIDEO | OPT_EXPERT | OPT_PERSTREAM | OPT_OUTPUT,
         { .off = OFFSET(fps_mode) },
-        "set framerate mode for matching video streams; overrides vsync" },
+        "set framerate mode for matching video streams" },
     { "force_fps",                  OPT_TYPE_BOOL,   OPT_VIDEO | OPT_EXPERT  | OPT_PERSTREAM | OPT_OUTPUT,
         { .off = OFFSET(force_fps) },
         "force the selected framerate, disable the best supported framerate selection" },
@@ -2171,28 +2097,6 @@ const OptionDef options[] = {
     { "filter_hw_device", OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
         { .func_arg = opt_filter_hw_device },
         "set hardware device used when filtering", "device" },
-
-    // deprecated options
-#if FFMPEG_OPT_ADRIFT_THRESHOLD
-    { "adrift_threshold", OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
-        { .func_arg = opt_adrift_threshold },
-        "deprecated, does nothing", "threshold" },
-#endif
-#if FFMPEG_OPT_TOP
-    { "top", OPT_TYPE_INT,     OPT_VIDEO | OPT_EXPERT | OPT_PERSTREAM | OPT_INPUT | OPT_OUTPUT,
-        { .off = OFFSET(top_field_first) },
-        "deprecated, use the setfield video filter", "" },
-#endif
-#if FFMPEG_OPT_QPHIST
-    { "qphist", OPT_TYPE_FUNC, OPT_VIDEO | OPT_EXPERT,
-        { .func_arg = opt_qphist },
-        "deprecated, does nothing" },
-#endif
-#if FFMPEG_OPT_VSYNC
-    { "vsync",                  OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
-        { .func_arg = opt_vsync },
-        "set video sync method globally; deprecated, use -fps_mode", "" },
-#endif
 
     { NULL, },
 };

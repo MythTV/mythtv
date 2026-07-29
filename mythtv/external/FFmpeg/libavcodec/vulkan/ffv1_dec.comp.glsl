@@ -35,6 +35,12 @@ layout (set = 1, binding = 2, scalar) writeonly buffer slice_status_buf {
 };
 layout (set = 1, binding = 4) uniform uimage2D dec[];
 
+#ifdef FLOAT
+layout(set = 1, binding = 6) readonly buffer fltmap_buf {
+    uint fltmap[][4][65536];
+};
+#endif
+
 #ifndef GOLOMB
 
 layout (set = 1, binding = 3, scalar) buffer slice_state_buf {
@@ -62,7 +68,7 @@ int get_isymbol(void)
     sym_e = e + 10;
     rc_dec[sym_e] = true;
 
-    if (bits > 10 && e == 11) {
+    if (c_bits > 10 && e == 11) {
         do {
             rc_state[10] = zero_one_state[rc_state[10] + 256];
             e++;
@@ -112,7 +118,7 @@ void decode_line_pcm(ivec2 sp, int w, int y, int p)
 }
 
 void decode_line(ivec2 sp, int w,
-                 int y, int p, uint state_off,
+                 int y, int p, int bits, uint state_off,
                  uint8_t quant_table_idx, int run_index)
 {
 #ifndef RGB
@@ -164,15 +170,15 @@ GetBitContext gb;
 void golomb_init(void)
 {
     if (version == 3 && micro_version > 1 || version > 3)
-        get_rac_internal(rc.range * 129 >> 8);
+        get_rac_internal((rc.range * 129) >> 8);
 
     uint64_t ac_byte_count = rc.bs_off - rc.bs_start - 1;
-    init_get_bits(gb, u8buf(rc.bs_start + ac_byte_count),
+    init_get_bits(gb, u8buf(slice_data + rc.bs_start + ac_byte_count),
                   int(rc.bs_end - rc.bs_start - ac_byte_count));
 }
 
 void decode_line(ivec2 sp, int w,
-                 int y, int p, uint state_off,
+                 int y, int p, int bits, uint state_off,
                  uint8_t quant_table_idx, inout int run_index)
 {
 #ifndef RGB
@@ -241,19 +247,56 @@ void decode_line(ivec2 sp, int w,
 }
 #endif
 
-#ifdef RGB
-ivec4 transform_sample(ivec4 pix, ivec2 rct_coef)
+#ifdef BAYER
+void writeout_bayer(uint slice_idx, in SliceContext sc, ivec2 sp, int w, int y)
 {
-    pix.b -= rct_offset;
-    pix.r -= rct_offset;
+    memoryBarrierImage();
+    barrier();
+
+    int offset = rct_offset;
+
+    for (uint x = gl_LocalInvocationID.x; x < w; x += gl_WorkGroupSize.x) {
+        ivec2 lpos = sp + LADDR(ivec2(x, y));
+        ivec2 pos  = sc.slice_pos + ivec2(int(x) << 1, y << 1);
+
+        int g_r = int(imageLoad(dec[0], lpos)[0]);
+        int g_b = int(imageLoad(dec[1], lpos)[0]);
+        int b   = int(imageLoad(dec[2], lpos)[0]);
+        int r   = int(imageLoad(dec[3], lpos)[0]);
+
+        if (sc.slice_coding_mode != 1) {
+            b -= offset;
+            r -= offset;
+            g_r -= (b*sc.slice_rct_coef.g + r*sc.slice_rct_coef.r) >> 2;
+            b += g_r;
+            r += g_r;
+
+            int gd = g_b - offset;
+            g_b = g_r - (gd >> 1);
+            g_r = g_b + gd;
+        }
+
+        imageStore(dst[0], pos + ivec2(0, 0), uvec4(r));
+        imageStore(dst[0], pos + ivec2(1, 0), uvec4(g_r));
+        imageStore(dst[0], pos + ivec2(0, 1), uvec4(g_b));
+        imageStore(dst[0], pos + ivec2(1, 1), uvec4(b));
+    }
+}
+#endif
+
+#ifdef RGB
+ivec4 transform_sample(ivec4 pix, ivec2 rct_coef, int offset)
+{
+    pix.b -= offset;
+    pix.r -= offset;
     pix.g -= (pix.b*rct_coef.g + pix.r*rct_coef.r) >> 2;
     pix.b += pix.g;
     pix.r += pix.g;
-    return ivec4(pix[fmt_lut[0]], pix[fmt_lut[1]],
-                 pix[fmt_lut[2]], pix[fmt_lut[3]]);
+    return pix;
 }
 
-void writeout_rgb(in SliceContext sc, ivec2 sp, int w, int y, bool apply_rct)
+void writeout_rgb(uint slice_idx, in SliceContext sc, ivec2 sp, int w, int y,
+                  bool apply_rct)
 {
     memoryBarrierImage();
     barrier();
@@ -270,15 +313,38 @@ void writeout_rgb(in SliceContext sc, ivec2 sp, int w, int y, bool apply_rct)
             pix.a = int(imageLoad(dec[3], lpos)[0]);
 
         if (apply_rct)
-            pix = transform_sample(pix, sc.slice_rct_coef);
-        else
-            pix = ivec4(pix[fmt_lut[0]], pix[fmt_lut[1]],
-                        pix[fmt_lut[2]], pix[fmt_lut[3]]);
+#ifdef FLOAT
+            pix = transform_sample(pix, sc.slice_rct_coef, sc.remap_count[0]);
+#else
+            pix = transform_sample(pix, sc.slice_rct_coef, rct_offset);
+#endif
 
-        imageStore(dst[0], pos, pix);
+#ifdef FLOAT
+        pix = pix.gbra;
+        vec4 pd;
+        for (int i = 0; i < color_planes; i++) {
+            uint mask = (1u << ceil_log2(sc.remap_count[i])) - 1u;
+            uint v = fltmap[slice_idx][i][uint(pix[i]) & mask];
+            if (c_bits >= 32)
+                pd[i] = uintBitsToFloat(v);
+            else
+                pd[i] = float(uint16BitsToFloat16(uint16_t(v)));
+        }
+        pd = pd.brga;
+
+        pd = vec4(pd[fmt_lut[0]], pd[fmt_lut[1]],
+                  pd[fmt_lut[2]], pd[fmt_lut[3]]);
+#define CAST(x) vec4(x)
+#else
+#define CAST(x) ivec4(x)
+        ivec4 pd = ivec4(pix[fmt_lut[0]], pix[fmt_lut[1]],
+                         pix[fmt_lut[2]], pix[fmt_lut[3]]);
+#endif
+
+        imageStore(dst[0], pos, pd);
         if (planar_rgb) {
             for (int i = 1; i < color_planes; i++)
-                imageStore(dst[i], pos, ivec4(pix[i]));
+                imageStore(dst[i], pos, CAST(pd[i]));
         }
     }
 }
@@ -288,20 +354,39 @@ void decode_slice(in SliceContext sc, uint slice_idx)
 {
     int w = sc.slice_dim.x;
     ivec2 sp = sc.slice_pos;
+    u16vec4 bits = get_slice_bits(sc);
 
-#ifdef RGB
+#ifdef BAYER
+    /* Bayer logical dims: 2x2 blocks at half resolution */
+    w >>= 1;
+    int bayer_h = sc.slice_dim.y >> 1;
+    sp.x >>= 1;
+    sp.y = int(gl_WorkGroupID.y)*rgb_linecache;
+    /* c_bits = bps + 1 (the +1 is for is_rgb). For PCM mode, all planes use
+     * raw bps. For non-PCM, gm uses bps; gd/b-gm/r-gm use bps+1. */
+    if (sc.slice_coding_mode == 0)
+        bits = u16vec4(c_bits - 1, c_bits, c_bits, c_bits);
+    else
+        bits = u16vec4(c_bits - 1, c_bits - 1, c_bits - 1, c_bits - 1);
+#elif defined(RGB)
     sp.y = int(gl_WorkGroupID.y)*rgb_linecache;
 #endif
 
 #ifndef GOLOMB
     /* PCM coding */
     if (sc.slice_coding_mode == 1) {
-#ifdef RGB
+#ifdef BAYER
+        for (int y = 0; y < bayer_h; y++) {
+            for (int p = 0; p < 4; p++)
+                decode_line_pcm(sp, w, y, p);
+            writeout_bayer(slice_idx, sc, sp, w, y);
+        }
+#elif defined(RGB)
         for (int y = 0; y < sc.slice_dim.y; y++) {
             for (int p = 0; p < color_planes; p++)
                 decode_line_pcm(sp, w, y, p);
 
-            writeout_rgb(sc, sp, w, y, false);
+            writeout_rgb(slice_idx, sc, sp, w, y, false);
         }
 #else
         for (int p = 0; p < planes; p++) {
@@ -317,23 +402,38 @@ void decode_slice(in SliceContext sc, uint slice_idx)
     }
 #endif
 
+#ifdef BAYER
+    u8vec4 quant_table_idx = sc.quant_table_idx.xzyy;
+    u32vec4 slice_state_off = (slice_idx*codec_planes +
+                               uvec4(0, 2, 1, 1))*plane_state_size;
+#else
     u8vec4 quant_table_idx = sc.quant_table_idx.xyyz;
     u32vec4 slice_state_off = (slice_idx*codec_planes +
                                uvec4(0, 1, 1, 2))*plane_state_size;
+#endif
 
 #ifdef GOLOMB
     slice_state_off >>= 3; // division by VLC_STATE_SIZE
     golomb_init();
 #endif
 
-#ifdef RGB
+#ifdef BAYER
+    int run_index = 0;
+    for (int y = 0; y < bayer_h; y++) {
+        for (int p = 0; p < 4; p++)
+            decode_line(sp, w, y, p, bits[p],
+                        slice_state_off[p], quant_table_idx[p], run_index);
+
+        writeout_bayer(slice_idx, sc, sp, w, y);
+    }
+#elif defined(RGB)
     int run_index = 0;
     for (int y = 0; y < sc.slice_dim.y; y++) {
         for (int p = 0; p < color_planes; p++)
-            decode_line(sp, w, y, p,
+            decode_line(sp, w, y, p, bits[p],
                         slice_state_off[p], quant_table_idx[p], run_index);
 
-        writeout_rgb(sc, sp, w, y, true);
+        writeout_rgb(slice_idx, sc, sp, w, y, true);
     }
 #else
     for (int p = 0; p < planes; p++) {
@@ -343,7 +443,7 @@ void decode_slice(in SliceContext sc, uint slice_idx)
 
         int run_index = 0;
         for (int y = 0; y < h; y++)
-            decode_line(sp, w, y, p,
+            decode_line(sp, w, y, p, bits[p],
                         slice_state_off[p], quant_table_idx[p], run_index);
     }
 #endif

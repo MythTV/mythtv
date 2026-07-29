@@ -16,8 +16,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "checkasm.h"
 #include "libavutil/intreadwrite.h"
@@ -25,38 +25,120 @@
 #include "libavutil/mem_internal.h"
 #include "libavcodec/vp3dsp.h"
 
-enum {
-    MAX_STRIDE          = 64,
-    MIN_STRIDE          = 8,
-    /// Horizontal tests operate on 4x8 blocks
-    HORIZONTAL_BUF_SIZE = ((8 /* lines */ - 1) * MAX_STRIDE + 4 /* width */ + 7 /* misalignment */),
-    /// Vertical tests operate on 8x4 blocks
-    VERTICAL_BUF_SIZE   = ((4 /* lines */ - 1) * MAX_STRIDE + 8 /* width */ + 7 /* misalignment */),
-};
-
 #define randomize_buffers(buf0, buf1, size)                \
     do {                                                   \
-        static_assert(sizeof(buf0[0]) == 1 && sizeof(buf1[0]) == 1, \
-                      "Pointer arithmetic needs to be adapted"); \
+        char *b0 = (char*)buf0, *b1 = (char*)buf1;         \
         for (size_t k = 0; k < (size & ~3); k += 4) {      \
             uint32_t r = rnd();                            \
-            AV_WN32A(buf0 + k, r);                         \
-            AV_WN32A(buf1 + k, r);                         \
+            AV_WN32A(b0 + k, r);                           \
+            AV_WN32A(b1 + k, r);                           \
         }                                                  \
         for (size_t k = size & ~3; k < size; ++k)          \
-            buf0[k] = buf1[k] = rnd();                     \
+            b0[k] = b1[k] = rnd();                         \
     } while (0)
 
-
-static void vp3_check_loop_filter(void)
+static void vp3_check_put_no_rnd_pixels_l2(const VP3DSPContext *const vp3dsp)
 {
+    enum {
+        MAX_STRIDE   = 64,
+        HEIGHT       = 8, ///< only used height, so only tested height
+        WIDTH        = 8,
+        BUF_SIZE     = MAX_STRIDE * (HEIGHT - 1) + WIDTH,
+        SRC_BUF_SIZE = BUF_SIZE + (WIDTH - 1), ///< WIDTH-1 to use misaligned input
+    };
+    declare_func(void, uint8_t *dst,
+                 const uint8_t *a, const uint8_t *b,
+                 ptrdiff_t stride, int h);
+
+    if (!check_func(vp3dsp->put_no_rnd_pixels_l2, "put_no_rnd_pixels_l2"))
+        return;
+
+    DECLARE_ALIGNED(8, uint8_t, dstbuf_new)[BUF_SIZE];
+    DECLARE_ALIGNED(8, uint8_t, dstbuf_ref)[BUF_SIZE];
+    DECLARE_ALIGNED(4, uint8_t, src0_buf)[SRC_BUF_SIZE];
+    DECLARE_ALIGNED(4, uint8_t, src1_buf)[SRC_BUF_SIZE];
+
+    size_t src0_offset = rnd() % WIDTH, src1_offset = rnd() % WIDTH;
+    ptrdiff_t stride  = (rnd() % (MAX_STRIDE / WIDTH) + 1) * WIDTH;
+    const uint8_t *src0 = src0_buf + src0_offset, *src1 = src1_buf + src1_offset;
+    uint8_t *dst_new = dstbuf_new, *dst_ref = dstbuf_ref;
+    const int h = HEIGHT;
+
+    if (rnd() & 1) {
+        // Flip stride.
+        dst_new  += (h - 1) * stride;
+        dst_ref  += (h - 1) * stride;
+        src0     += (h - 1) * stride;
+        src1     += (h - 1) * stride;
+        stride = -stride;
+    }
+
+    randomize_buffers(src0_buf, src1_buf, sizeof(src0_buf));
+    randomize_buffers(dstbuf_new, dstbuf_ref, sizeof(dstbuf_new));
+    call_ref(dst_ref, src0, src1, stride, h);
+    call_new(dst_new, src0, src1, stride, h);
+    if (memcmp(dstbuf_new, dstbuf_ref, sizeof(dstbuf_new)))
+        fail();
+    bench_new(dst_new, src1, src1, stride, h);
+}
+
+static void vp3_check_idct(int nb_bits)
+{
+    enum {
+        MAX_STRIDE   = 64,
+        MIN_STRIDE   = 16,
+        NB_LINES     = 8,
+        WIDTH        = 8,
+        BUF_SIZE     = MAX_STRIDE * (NB_LINES - 1) + WIDTH,
+    };
+
+    declare_func(void, uint8_t *dest, ptrdiff_t stride, int16_t *block);
+
+    DECLARE_ALIGNED(16, int16_t, block_new)[64];
+    DECLARE_ALIGNED(16, int16_t, block_ref)[64];
+    DECLARE_ALIGNED(8, uint8_t, dstbuf_new)[BUF_SIZE];
+    DECLARE_ALIGNED(8, uint8_t, dstbuf_ref)[BUF_SIZE];
+
+    ptrdiff_t stride = (rnd() % (MAX_STRIDE / MIN_STRIDE) + 1) * MIN_STRIDE;
+    uint8_t *dst_new = dstbuf_new, *dst_ref = dstbuf_ref;
+
+    if (rnd() & 1) {
+        // Flip stride.
+        dst_new += (NB_LINES - 1) * stride;
+        dst_ref += (NB_LINES - 1) * stride;
+        stride   = -stride;
+    }
+
+    randomize_buffers(dstbuf_new, dstbuf_ref, sizeof(dstbuf_ref));
+    for (size_t k = 0; k < FF_ARRAY_ELEMS(block_new); ++k) {
+        int32_t r = (int32_t)rnd() >> (32 - nb_bits);
+        block_new[k] = block_ref[k] = r;
+    }
+
+    call_ref(dst_ref, stride, block_ref);
+    call_new(dst_new, stride, block_new);
+    if (memcmp(dstbuf_new, dstbuf_ref, sizeof(dstbuf_new)) ||
+        memcmp(block_new, block_ref, sizeof(block_new)))
+        fail();
+    bench_new(dst_new, stride, block_new);
+}
+
+static void vp3_check_loop_filter(const VP3DSPContext *const vp3dsp)
+{
+    enum {
+        MAX_STRIDE          = 64,
+        MIN_STRIDE          = 8,
+        /// Horizontal tests operate on 4x8 blocks
+        HORIZONTAL_BUF_SIZE = ((8 /* lines */ - 1) * MAX_STRIDE + 4 /* width */ + 7 /* misalignment */),
+        /// Vertical tests operate on 8x4 blocks
+        VERTICAL_BUF_SIZE   = ((4 /* lines */ - 1) * MAX_STRIDE + 8 /* width */ + 7 /* misalignment */),
+    };
     DECLARE_ALIGNED(8, uint8_t, hor_buf0)[HORIZONTAL_BUF_SIZE];
     DECLARE_ALIGNED(8, uint8_t, hor_buf1)[HORIZONTAL_BUF_SIZE];
     DECLARE_ALIGNED(8, uint8_t, ver_buf0)[VERTICAL_BUF_SIZE];
     DECLARE_ALIGNED(8, uint8_t, ver_buf1)[VERTICAL_BUF_SIZE];
     DECLARE_ALIGNED(16, int, bounding_values_array)[256 + 4];
     int *const bounding_values = bounding_values_array + 127;
-    VP3DSPContext vp3dsp;
     static const struct {
         const char *name;
         size_t offset;
@@ -73,14 +155,12 @@ static void vp3_check_loop_filter(void)
     };
     declare_func(void, uint8_t *src, ptrdiff_t stride, int *bounding_values);
 
-    ff_vp3dsp_init(&vp3dsp);
-
     int filter_limit = rnd() % 128;
 
     ff_vp3dsp_set_bounding_values(bounding_values_array, filter_limit);
 
     for (size_t i = 0; i < FF_ARRAY_ELEMS(tests); ++i) {
-        void (*loop_filter)(uint8_t *, ptrdiff_t, int*) = *(void(**)(uint8_t *, ptrdiff_t, int*))((char*)&vp3dsp + tests[i].offset);
+        void (*loop_filter)(uint8_t *, ptrdiff_t, int*) = *(void(**)(uint8_t *, ptrdiff_t, int*))((const char*)vp3dsp + tests[i].offset);
 
         if (check_func(loop_filter, "%s", tests[i].name)) {
             uint8_t  *buf0 = tests[i].horizontal ? hor_buf0 : ver_buf0;
@@ -112,6 +192,26 @@ static void vp3_check_loop_filter(void)
 
 void checkasm_check_vp3dsp(void)
 {
-    vp3_check_loop_filter();
+    VP3DSPContext vp3dsp;
+
+    ff_vp3dsp_init(&vp3dsp);
+
+    vp3_check_put_no_rnd_pixels_l2(&vp3dsp);
+    report("put_no_rnd_pixels_l2");
+
+#define IDCT_TEST(func, mask)           \
+    if (check_func(vp3dsp.func, #func)) \
+        vp3_check_idct(mask);           \
+    report(#func)
+    IDCT_TEST(idct_dc_add, 16);
+    // FIXME: The Theora specification actually requires using unsaturated
+    // 16-bit arithmetic for its idct. Yet the SSE2 version uses saturated
+    // arithmetic and even the C version seems to forget truncating
+    // intermediate values to 16 bit. For the time being, use a range
+    // that does not trigger overflow.
+    IDCT_TEST(idct_put, 8);
+    IDCT_TEST(idct_add, 8);
+
+    vp3_check_loop_filter(&vp3dsp);
     report("loop_filter");
 }

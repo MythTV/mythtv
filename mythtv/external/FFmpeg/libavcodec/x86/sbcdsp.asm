@@ -26,10 +26,6 @@
 
 %include "libavutil/x86/x86util.asm"
 
-SECTION_RODATA
-
-scale_mask: times 2 dd 0x8000    ; 1 << (SBC_PROTO_FIXED_SCALE - 1)
-
 SECTION .text
 
 %macro NIDN 3
@@ -38,43 +34,44 @@ SECTION .text
 %endif
 %endmacro
 
-%macro ANALYZE_MAC 9 ; out1, out2, in1, in2, tmp1, tmp2, add1, add2, offset
-    NIDN movq,    %5, %3
-    NIDN movq,    %6, %4
-    pmaddwd       %5, [constsq+%9]
-    pmaddwd       %6, [constsq+%9+8]
-    NIDN paddd,   %1, %7
-    NIDN paddd,   %2, %8
-%endmacro
-
-%macro ANALYZE_MAC_IN 7 ; out1, out2, tmp1, tmp2, add1, add2, offset
-    ANALYZE_MAC   %1, %2, [inq+%7], [inq+%7+8], %3, %4, %5, %6, %7
-%endmacro
-
-%macro ANALYZE_MAC_REG 7 ; out1, out2, in, tmp1, tmp2, offset, pack
-%ifidn %7, pack
-    psrad         %3, 16    ; SBC_PROTO_FIXED_SCALE
-    packssdw      %3, %3
+%macro ANALYZE_MAC 6 ; out1, out2, tmp1, tmp2, offset, aligned
+    mov%6             %3, [inq+%5]
+    mov%6             %4, [inq+%5+mmsize]
+%if %5 == 0
+    pcmpeqd           m0, m0
+    psrld             m0, 31
 %endif
-    ANALYZE_MAC   %1, %2, %3, %3, %4, %5, %4, %5, %6
+    pmaddwd           %3, [constsq+%5]
+    pmaddwd           %4, [constsq+%5+mmsize]
+%if %5 == 0
+    pslld             m0, 15         ; 1 << (SBC_PROTO_FIXED_SCALE - 1) as dword
+%endif
+    NIDN paddd,       %1, %3
+    NIDN paddd,       %2, %4
 %endmacro
 
 ;*******************************************************************
 ;void ff_sbc_analyze_4(const int16_t *in, int32_t *out, const int16_t *consts);
 ;*******************************************************************
-INIT_MMX mmx
-cglobal sbc_analyze_4, 3, 3, 4, in, out, consts
-    ANALYZE_MAC_IN   m0, m1, m0, m1, [scale_mask], [scale_mask], 0
-    ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 16
-    ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 32
-    ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 48
-    ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 64
+INIT_XMM sse2
+cglobal sbc_analyze_4, 3, 3, 5, in, out, consts
+    ANALYZE_MAC       m1, m2, m1, m2,  0, u
+    ANALYZE_MAC       m1, m2, m3, m4, 32, u
+    movu              m3, [inq+64]
+    paddd             m1, m0
+    pmaddwd           m3, [constsq+64]
+    paddd             m1, m2
+    paddd             m1, m3
 
-    ANALYZE_MAC_REG  m0, m2, m0, m0, m2, 80, pack
-    ANALYZE_MAC_REG  m0, m2, m1, m1, m3, 96, pack
+    psrad             m1, 16
+    packssdw          m1, m1
+    pshufd            m2, m1, q0000
+    pmaddwd           m2, [constsq+80]
+    pshufd            m1, m1, q1111
+    pmaddwd           m1, [constsq+96]
+    paddd             m1, m2
 
-    movq          [outq  ], m0
-    movq          [outq+8], m2
+    mova          [outq], m1
 
     RET
 
@@ -82,87 +79,89 @@ cglobal sbc_analyze_4, 3, 3, 4, in, out, consts
 ;*******************************************************************
 ;void ff_sbc_analyze_8(const int16_t *in, int32_t *out, const int16_t *consts);
 ;*******************************************************************
-INIT_MMX mmx
-cglobal sbc_analyze_8, 3, 3, 4, in, out, consts
-    ANALYZE_MAC_IN   m0, m1, m0, m1, [scale_mask], [scale_mask],  0
-    ANALYZE_MAC_IN   m2, m3, m2, m3, [scale_mask], [scale_mask], 16
-    ANALYZE_MAC_IN   m0, m1, m4, m5, m4, m5,  32
-    ANALYZE_MAC_IN   m2, m3, m6, m7, m6, m7,  48
-    ANALYZE_MAC_IN   m0, m1, m4, m5, m4, m5,  64
-    ANALYZE_MAC_IN   m2, m3, m6, m7, m6, m7,  80
-    ANALYZE_MAC_IN   m0, m1, m4, m5, m4, m5,  96
-    ANALYZE_MAC_IN   m2, m3, m6, m7, m6, m7, 112
-    ANALYZE_MAC_IN   m0, m1, m4, m5, m4, m5, 128
-    ANALYZE_MAC_IN   m2, m3, m6, m7, m6, m7, 144
+INIT_XMM sse2
+cglobal sbc_analyze_8, 3, 3, 6, in, out, consts
+    ANALYZE_MAC       m1, m2, m1, m2,   0, a
+    ANALYZE_MAC       m1, m2, m3, m4,  32, a
+    paddd             m1, m0
+    ANALYZE_MAC       m1, m2, m3, m4,  64, a
+    ANALYZE_MAC       m1, m2, m3, m4,  96, a
+    paddd             m2, m0
+    ANALYZE_MAC       m1, m2, m3, m4, 128, a
 
-    ANALYZE_MAC_REG  m4, m5, m0, m4, m5, 160, pack
-    ANALYZE_MAC_REG  m4, m5, m1, m6, m7, 192, pack
-    ANALYZE_MAC_REG  m4, m5, m2, m6, m7, 224, pack
-    ANALYZE_MAC_REG  m4, m5, m3, m6, m7, 256, pack
+    psrad             m1, 16
+    psrad             m2, 16
+    packssdw          m1, m2
 
-    movq          [outq  ], m4
-    movq          [outq+8], m5
+    pshufd            m2, m1, q0000
+    pmaddwd           m0, m2, [constsq+160]
+    pshufd            m3, m1, q1111
+    pmaddwd           m2, [constsq+176]
+    pmaddwd           m4, m3, [constsq+192]
+    pshufd            m5, m1, q2222
+    pmaddwd           m3, [constsq+208]
+    paddd             m0, m4
+    pmaddwd           m4, m5, [constsq+224]
+    pshufd            m1, m1, q3333
+    pmaddwd           m5, [constsq+240]
+    paddd             m2, m3
+    pmaddwd           m3, m1, [constsq+256]
+    paddd             m0, m4
+    pmaddwd           m1, [constsq+272]
+    paddd             m0, m3
+    paddd             m2, m5
 
-    ANALYZE_MAC_REG  m0, m5, m0, m0, m5, 176, no
-    ANALYZE_MAC_REG  m0, m5, m1, m1, m7, 208, no
-    ANALYZE_MAC_REG  m0, m5, m2, m2, m7, 240, no
-    ANALYZE_MAC_REG  m0, m5, m3, m3, m7, 272, no
-
-    movq          [outq+16], m0
-    movq          [outq+24], m5
+    mova          [outq], m0
+    paddd             m2, m1
+    mova       [outq+16], m2
 
     RET
 
 
 ;*******************************************************************
-;void ff_sbc_calc_scalefactors(int32_t sb_sample_f[16][2][8],
+;void ff_sbc_calc_scalefactors(const int32_t sb_sample_f[16][2][8],
 ;                              uint32_t scale_factor[2][8],
 ;                              int blocks, int channels, int subbands)
 ;*******************************************************************
-INIT_MMX mmx
-cglobal sbc_calc_scalefactors, 5, 7, 4, sb_sample_f, scale_factor, blocks, channels, subbands, ptr, blk
-    ; subbands = 4 * subbands * channels
-    movq          m3, [scale_mask]
-    shl           subbandsd, 2
-    cmp           channelsd, 2
-    jl            .loop_1
-    shl           subbandsd, 1
+INIT_XMM sse4
+cglobal sbc_calc_scalefactors, 5, 6, 5, sb_sample_f, scale_factor, blocks, channels, subbands, step
+    shl          blocksd, 6
+    pcmpeqd           m3, m3
+    shl        subbandsd, 2
+    mov            stepd, 48
+    add     sb_sample_fq, blocksq
+    psrld             m4, m3, 25      ; pd_127
+    neg          blocksq
+    shl        channelsd, 5
+    sub            stepd, subbandsd   ; step = subbands == 4 ? 32 : 16
+    pxor              m2, m2
 
 .loop_1:
-    sub           subbandsq, 8
-    lea           ptrq, [sb_sample_fq + subbandsq]
+    lea        subbandsq, [blocksq+64]
 
-    ; blk = (blocks - 1) * 64;
-    lea           blkq, [blocksq - 1]
-    shl           blkd, 6
-
-    movq          m0, m3
+    pabsd             m0, [sb_sample_fq+blocksq]
 .loop_2:
-    movq          m1, [ptrq+blkq]
-    pxor          m2, m2
-    pcmpgtd       m1, m2
-    paddd         m1, [ptrq+blkq]
-    pcmpgtd       m2, m1
-    pxor          m1, m2
+    pabsd             m1, [sb_sample_fq+subbandsq]
+    pmaxud            m0, m1
+    add        subbandsq, 64
+    js           .loop_2
 
-    por           m0, m1
+    paddd             m0, m3          ; max - 1, representable as signed value
+    pmaxsd            m0, m2
 
-    sub           blkq, 64
-    jns           .loop_2
+    ; We have to calculate log2(x|(1<<15))-15. This equals log2(x>>15) for x >= 2^15
+    ; and x>>15 is exactly representable as a float, so one can get the log2
+    ; by converting to float and subtracting 127 from the exponent.
+    ; For x < 2^15 the result is correct when using saturated subtraction.
+    psrld             m0, 15
+    cvtdq2ps          m0, m0
+    add     sb_sample_fq, stepq
+    psrld             m0, 23          ; exponent
+    psubusw           m0, m4          ; same as saturated dword subtraction
+    mova [scale_factorq], m0
 
-    movd          blkd, m0
-    psrlq         m0,   32
-    bsr           blkd, blkd
-    sub           blkd, 15    ; SCALE_OUT_BITS
-    mov           [scale_factorq + subbandsq], blkd
+    add    scale_factorq, stepq
+    sub        channelsd, stepd
+    jg           .loop_1
 
-    movd          blkd, m0
-    bsr           blkd, blkd
-    sub           blkd, 15    ; SCALE_OUT_BITS
-    mov           [scale_factorq + subbandsq + 4], blkd
-
-    cmp           subbandsq, 0
-    jg            .loop_1
-
-    emms
     RET

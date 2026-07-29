@@ -28,6 +28,7 @@
  * http://wiki.multimedia.cx/index.php?title=Electronic_Arts_TGQ
  */
 
+#include "libavutil/attributes.h"
 #define BITSTREAM_READER_LE
 
 #include "libavutil/mem_internal.h"
@@ -72,6 +73,7 @@ static int tgq_decode_block(TgqContext *s, int16_t block[64], GetBitContext *gb)
             if (i >= 63)
                 return AVERROR_INVALIDDATA;
             block[scantable[i++]] = 0;
+            av_fallthrough;
         case 0:
             block[scantable[i++]] = 0;
             skip_bits(gb, 3);
@@ -170,7 +172,7 @@ static int tgq_decode_mb(TgqContext *s, GetByteContext *gbyte,
             return ret;
 
         for (i = 0; i < 6; i++) {
-            int ret = tgq_decode_block(s, s->block[i], &gb);
+            ret = tgq_decode_block(s, s->block[i], &gb);
             if (ret < 0)
                 return ret;
         }

@@ -20,7 +20,7 @@ architecture-specific versions. It is recommended to look at older
 revisions of the interesting files (web frontends for the various FFmpeg
 branches are listed at http://ffmpeg.org/download.html).
 Alternatively, look into the other architecture-specific versions in
-the x86/, ppc/, alpha/ subdirectories. Even if you don't exactly
+the x86/, ppc/, aarch64/ subdirectories. Even if you don't exactly
 comprehend the instructions, it could help understanding the functions
 and how they can be optimized.
 
@@ -190,11 +190,6 @@ __asm__() block.
 
 Use external asm (nasm) or inline asm (__asm__()), do not use intrinsics.
 The latter requires a good optimizing compiler which gcc is not.
-
-When debugging a x86 external asm compilation issue, if lost in the macro
-expansions, add DBG=1 to your make command-line: the input file will be
-preprocessed, stripped of the debug/empty lines, then compiled, showing the
-actual lines causing issues.
 
 Inline asm vs. external asm
 ---------------------------

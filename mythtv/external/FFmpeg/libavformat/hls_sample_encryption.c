@@ -88,6 +88,7 @@ void ff_hls_senc_read_audio_setup_info(HLSAudioSetupInfo *info, const uint8_t *b
         return;
 
     memcpy(info->setup_data, buf, info->setup_data_length);
+    memset(info->setup_data + info->setup_data_length, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 }
 
 int ff_hls_senc_parse_audio_setup_info(AVStream *st, HLSAudioSetupInfo *info)
@@ -373,6 +374,13 @@ static int decrypt_audio_frame(enum AVCodecID codec_id, HLSCryptoContext *crypto
         ret = get_next_sync_frame(codec_id, &ctx, &frame);
         if (ret < 0)
             return ret;
+        if (frame.length < frame.header_length ||
+            frame.length > ctx.buf_end - frame.data) {
+            av_log(NULL, AV_LOG_ERROR,
+                   "Sample-AES: declared frame length %d exceeds packet data\n",
+                   frame.length);
+            return AVERROR_INVALIDDATA;
+        }
         if (frame.length - frame.header_length > 31) {
             ret = decrypt_sync_frame(codec_id, crypto_ctx, &frame);
             if (ret < 0)

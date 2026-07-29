@@ -39,45 +39,9 @@ typedef void ID3D11Device;
 #include "avcodec.h"
 
 #define MAX_REGISTERED_FRAMES 64
-#define RC_MODE_DEPRECATED 0x800000
-#define RCD(rc_mode) ((rc_mode) | RC_MODE_DEPRECATED)
 
 #define NVENCAPI_CHECK_VERSION(major, minor) \
     ((major) < NVENCAPI_MAJOR_VERSION || ((major) == NVENCAPI_MAJOR_VERSION && (minor) <= NVENCAPI_MINOR_VERSION))
-
-// SDK 8.1 compile time feature checks
-#if NVENCAPI_CHECK_VERSION(8, 1)
-#define NVENC_HAVE_BFRAME_REF_MODE
-#define NVENC_HAVE_QP_MAP_MODE
-#endif
-
-// SDK 9.0 compile time feature checks
-#if NVENCAPI_CHECK_VERSION(9, 0)
-#define NVENC_HAVE_HEVC_BFRAME_REF_MODE
-#endif
-
-// SDK 9.1 compile time feature checks
-#if NVENCAPI_CHECK_VERSION(9, 1)
-#define NVENC_HAVE_MULTIPLE_REF_FRAMES
-#define NVENC_HAVE_CUSTREAM_PTR
-#define NVENC_HAVE_GETLASTERRORSTRING
-#define NVENC_HAVE_FILLER_DATA
-#endif
-
-// SDK 10.0 compile time feature checks
-#if NVENCAPI_CHECK_VERSION(10, 0)
-#define NVENC_HAVE_NEW_PRESETS
-#define NVENC_HAVE_MULTIPASS
-#define NVENC_HAVE_LDKFS
-#define NVENC_HAVE_H264_LVL6
-#define NVENC_HAVE_HEVC_CONSTRAINED_ENCODING
-#endif
-
-// SDK 11.1 compile time feature checks
-#if NVENCAPI_CHECK_VERSION(11, 1)
-#define NVENC_HAVE_QP_CHROMA_OFFSETS
-#define NVENC_HAVE_SINGLE_SLICE_INTRA_REFRESH
-#endif
 
 // SDK 12.0 compile time feature checks
 #if NVENCAPI_CHECK_VERSION(12, 0)
@@ -86,7 +50,6 @@ typedef void ID3D11Device;
 
 // SDK 12.1 compile time feature checks
 #if NVENCAPI_CHECK_VERSION(12, 1)
-#define NVENC_NO_DEPRECATED_RC
 #define NVENC_HAVE_SPLIT_FRAME_ENCODING
 #endif
 
@@ -109,6 +72,12 @@ typedef void ID3D11Device;
 #define NVENC_HAVE_H264_AND_AV1_TEMPORAL_FILTER
 #define NVENC_HAVE_HEVC_AND_AV1_MASTERING_METADATA
 #define NVENC_HAVE_MVHEVC
+#endif
+
+// SDK 13.1 compile time feature checks
+#if NVENCAPI_CHECK_VERSION(13, 1)
+#define NVENC_NEW_COUNTING_TYPE
+#define NVENC_HAVE_AV1_HGOP_SUPPORT
 #endif
 
 typedef struct NvencSurface
@@ -142,19 +111,9 @@ typedef struct NvencDynLoadFunctions
 } NvencDynLoadFunctions;
 
 enum {
-    PRESET_DEFAULT = 0,
-    PRESET_SLOW,
+    PRESET_SLOW = 0,
     PRESET_MEDIUM,
     PRESET_FAST,
-    PRESET_HP,
-    PRESET_HQ,
-    PRESET_BD ,
-    PRESET_LOW_LATENCY_DEFAULT ,
-    PRESET_LOW_LATENCY_HQ ,
-    PRESET_LOW_LATENCY_HP,
-    PRESET_LOSSLESS_DEFAULT,
-    PRESET_LOSSLESS_HP,
-#ifdef NVENC_HAVE_NEW_PRESETS
     PRESET_P1,
     PRESET_P2,
     PRESET_P3,
@@ -162,7 +121,6 @@ enum {
     PRESET_P5,
     PRESET_P6,
     PRESET_P7,
-#endif
 };
 
 enum {
@@ -194,8 +152,6 @@ enum {
     NVENC_LOSSLESS   = 2,
     NVENC_ONE_PASS   = 4,
     NVENC_TWO_PASSES = 8,
-
-    NVENC_DEPRECATED_PRESET = 0x8000,
 };
 
 enum {
@@ -267,10 +223,8 @@ typedef struct NvencContext
     int level;
     int tier;
     int rc;
-    int cbr;
     int tile_rows;
     int tile_cols;
-    int twopass;
     int device;
     int flags;
     int async_depth;

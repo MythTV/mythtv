@@ -64,6 +64,22 @@
 #define DISABLE_I8MM
 #endif
 
+#if HAVE_AS_ARCHEXT_AES_DIRECTIVE
+#define ENABLE_PMULL  .arch_extension aes
+#define DISABLE_PMULL .arch_extension noaes
+#else
+#define ENABLE_PMULL
+#define DISABLE_PMULL
+#endif
+
+#if HAVE_AS_ARCHEXT_SHA3_DIRECTIVE
+#define ENABLE_EOR3  .arch_extension sha3
+#define DISABLE_EOR3 .arch_extension nosha3
+#else
+#define ENABLE_EOR3
+#define DISABLE_EOR3
+#endif
+
 #if HAVE_AS_ARCHEXT_SVE_DIRECTIVE
 #define ENABLE_SVE  .arch_extension sve
 #define DISABLE_SVE .arch_extension nosve
@@ -105,6 +121,8 @@
 #endif
 
 DISABLE_ARM_CRC
+DISABLE_PMULL
+DISABLE_EOR3
 DISABLE_DOTPROD
 DISABLE_I8MM
 DISABLE_SVE
@@ -113,26 +131,6 @@ DISABLE_SME
 DISABLE_SME_I16I64
 DISABLE_SME2
 
-#if HAVE_SME
-.macro sme_entry
-        stp             x29, x30, [sp, #-80]!
-        mov             x29, sp
-        stp             d8, d9, [sp, #16]
-        stp             d10, d11, [sp, #32]
-        stp             d12, d13, [sp, #48]
-        stp             d14, d15, [sp, #64]
-        smstart
-.endm
-
-.macro sme_exit
-        smstop
-        ldp             d8, d9, [sp, #16]
-        ldp             d10, d11, [sp, #32]
-        ldp             d12, d13, [sp, #48]
-        ldp             d14, d15, [sp, #64]
-        ldp             x29, x30, [sp], #80
-.endm
-#endif
 
 /* Support macros for
  *   - Armv8.3-A Pointer Authentication and
@@ -203,16 +201,18 @@ DISABLE_SME2
  *
  * References:
  * - "ELF for the Arm® 64-bit Architecture"
- *   https: *github.com/ARM-software/abi-aa/blob/master/aaelf64/aaelf64.rst
+ *   https://github.com/ARM-software/abi-aa/blob/master/aaelf64/aaelf64.rst
  * - "Providing protection for complex software"
  *   https://developer.arm.com/architectures/learn-the-architecture/providing-protection-for-complex-software
  */
 #if defined(__ARM_FEATURE_BTI_DEFAULT) && (__ARM_FEATURE_BTI_DEFAULT == 1)
 #   define GNU_PROPERTY_AARCH64_BTI (1 << 0)   // Has BTI
-#   define AARCH64_VALID_CALL_TARGET hint #34  // BTI 'c'
-#   define AARCH64_VALID_JUMP_TARGET hint #38  // BTI 'j'
+#   define AARCH64_VALID_JUMP_CALL_TARGET hint #38  // BTI 'jc'
+#   define AARCH64_VALID_CALL_TARGET      hint #34  // BTI 'c'
+#   define AARCH64_VALID_JUMP_TARGET      hint #38  // BTI 'j'
 #else
 #   define GNU_PROPERTY_AARCH64_BTI 0          // No BTI
+#   define AARCH64_VALID_JUMP_CALL_TARGET
 #   define AARCH64_VALID_CALL_TARGET
 #   define AARCH64_VALID_JUMP_TARGET
 #endif
@@ -237,8 +237,14 @@ DISABLE_SME2
 #   define AARCH64_VALIDATE_LINK_REGISTER
 #endif
 
+#if defined(__ARM_FEATURE_GCS_DEFAULT) && __ARM_FEATURE_GCS_DEFAULT == 1
+#define GNU_PROPERTY_AARCH64_GCS (1 << 2)
+#else
+#define GNU_PROPERTY_AARCH64_GCS 0 /* No GCS */
+#endif
 
-#if (GNU_PROPERTY_AARCH64_BTI != 0 || GNU_PROPERTY_AARCH64_PAC != 0) && defined(__ELF__)
+
+#if (GNU_PROPERTY_AARCH64_BTI != 0 || GNU_PROPERTY_AARCH64_PAC != 0 || GNU_PROPERTY_AARCH64_GCS != 0) && defined(__ELF__)
         .pushsection .note.gnu.property, "a"
         .balign 8
         .long 4
@@ -247,12 +253,12 @@ DISABLE_SME2
         .asciz "GNU"
         .long 0xc0000000 /* GNU_PROPERTY_AARCH64_FEATURE_1_AND */
         .long 4
-        .long (GNU_PROPERTY_AARCH64_BTI | GNU_PROPERTY_AARCH64_PAC)
+        .long (GNU_PROPERTY_AARCH64_BTI | GNU_PROPERTY_AARCH64_PAC | GNU_PROPERTY_AARCH64_GCS)
         .long 0
         .popsection
 #endif
 
-.macro  function name, export=0, align=4
+.macro  function name, export=0, jumpable=0, align=4
     .macro endfunc
 ELF     .size   \name, . - \name
 FUNC    .endfunc
@@ -265,7 +271,11 @@ FUNC    .endfunc
 ELF     .type   EXTERN_ASM\name, %function
 FUNC    .func   EXTERN_ASM\name
 EXTERN_ASM\name:
+    .if \jumpable
+        AARCH64_VALID_JUMP_TARGET
+    .else
         AARCH64_VALID_CALL_TARGET
+    .endif
     .else
 ELF     .type   \name, %function
 FUNC    .func   \name
@@ -332,3 +342,26 @@ ELF     .size   \name, . - \name
 
 #define x18 do_not_use_x18
 #define w18 do_not_use_w18
+
+#if HAVE_SME
+.macro sme_entry
+        AARCH64_SIGN_LINK_REGISTER
+        stp             x29, x30, [sp, #-80]!
+        mov             x29, sp
+        stp             d8,  d9,  [sp, #16]
+        stp             d10, d11, [sp, #32]
+        stp             d12, d13, [sp, #48]
+        stp             d14, d15, [sp, #64]
+        smstart
+.endm
+
+.macro sme_exit
+        smstop
+        ldp             d8,  d9,  [sp, #16]
+        ldp             d10, d11, [sp, #32]
+        ldp             d12, d13, [sp, #48]
+        ldp             d14, d15, [sp, #64]
+        ldp             x29, x30, [sp], #80
+        AARCH64_VALIDATE_LINK_REGISTER
+.endm
+#endif

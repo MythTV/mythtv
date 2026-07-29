@@ -8,6 +8,7 @@
 /celp_math
 /codec_desc
 /dct
+/encinfo
 /golomb
 /hashtable
 /h264_levels
@@ -16,7 +17,6 @@
 /jpeg2000dwt
 /mathops
 /mjpegenc_huffman
-/motion
 /mpeg12framerate
 /rangecoder
 /snowenc
