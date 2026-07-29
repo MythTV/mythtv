@@ -26,6 +26,7 @@
 
 #include <stddef.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
@@ -138,6 +139,8 @@ static int zmbv_decode_xor_8(ZmbvContext *c)
             }
 
             if (d) { /* apply XOR'ed difference */
+                if (c->decomp_len - (src - c->decomp_buf) < bw2 * bh2)
+                    return AVERROR_INVALIDDATA;
                 out = output + x;
                 for (j = 0; j < bh2; j++) {
                     for (i = 0; i < bw2; i++)
@@ -212,6 +215,8 @@ static int zmbv_decode_xor_16(ZmbvContext *c)
             }
 
             if (d) { /* apply XOR'ed difference */
+                if (c->decomp_len - (src - c->decomp_buf) < bw2 * bh2 * 2)
+                    return AVERROR_INVALIDDATA;
                 out = output + x;
                 for (j = 0; j < bh2; j++){
                     for (i = 0; i < bw2; i++) {
@@ -296,6 +301,8 @@ static int zmbv_decode_xor_24(ZmbvContext *c)
             }
 
             if (d) { /* apply XOR'ed difference */
+                if (c->decomp_len - (src - c->decomp_buf) < bw2 * bh2 * 3)
+                    return AVERROR_INVALIDDATA;
                 out = output + x * 3;
                 for (j = 0; j < bh2; j++) {
                     for (i = 0; i < bw2; i++) {
@@ -374,6 +381,8 @@ static int zmbv_decode_xor_32(ZmbvContext *c)
             }
 
             if (d) { /* apply XOR'ed difference */
+                if (c->decomp_len - (src - c->decomp_buf) < bw2 * bh2 * 4)
+                    return AVERROR_INVALIDDATA;
                 out = output + x;
                 for (j = 0; j < bh2; j++){
                     for (i = 0; i < bw2; i++) {
@@ -568,8 +577,10 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         frame->pict_type = AV_PICTURE_TYPE_P;
         if (c->decomp_len < 2LL * ((c->width + c->bw - 1) / c->bw) * ((c->height + c->bh - 1) / c->bh))
             return AVERROR_INVALIDDATA;
-        if (c->decomp_len)
-            c->decode_xor(c);
+        if (c->decomp_len) {
+            if ((ret = c->decode_xor(c)) < 0)
+                return ret;
+        }
     }
 
     /* update frames */
@@ -583,6 +594,7 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
         case ZMBV_FMT_8BPP:
             for (j = 0; j < 256; j++)
                 AV_WN32(&frame->data[1][j * 4], 0xFFU << 24 | AV_RB24(&c->pal[j * 3]));
+            av_fallthrough;
         case ZMBV_FMT_15BPP:
         case ZMBV_FMT_16BPP:
 #ifdef ZMBV_ENABLE_24BPP

@@ -61,7 +61,6 @@ static av_cold int s302m_encode_init(AVCodecContext *avctx)
         }
     }
 
-    avctx->frame_size = 0;
     avctx->bit_rate   = 48000 * avctx->ch_layout.nb_channels *
                        (avctx->bits_per_raw_sample + 4);
     s->framing_index  = 0;

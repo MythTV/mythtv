@@ -98,6 +98,12 @@ enum AACUSACLoudnessExt {
     UNIDRCLOUDEXT_EQ = 0x1,
 };
 
+enum AACUSACDRCExt {
+    UNIDRCCONFEXT_TERM = 0x0,
+    UNIDRCCONFEXT_PARAM_DRC = 0x1,
+    UNIDRCCONFEXT_V1 = 0x2,
+};
+
 // Supposed to be equal to AAC_RENAME() in case of USE_FIXED.
 #define RENAME_FIXED(name) name ## _fixed
 
@@ -302,6 +308,7 @@ typedef struct ChannelElement {
 
 typedef struct AACUSACLoudnessInfo {
     uint8_t drc_set_id : 6;
+    uint8_t eq_set_id : 6; /* loudnessInfoV1() only, 0 otherwise */
     uint8_t downmix_id : 7;
     struct {
         uint16_t lvl : 12;
@@ -377,6 +384,13 @@ typedef struct AACUsacElemConfig {
         uint32_t pl_data_offset;
         uint8_t *pl_buf;
     } ext;
+
+    struct {
+        struct {
+            int lower;
+            int upper;
+        } loudness;
+    } drc;
 } AACUsacElemConfig;
 
 typedef struct AACUSACConfig {
@@ -392,6 +406,13 @@ typedef struct AACUSACConfig {
         AACUSACLoudnessInfo album_info[64];
         uint8_t nb_info;
         AACUSACLoudnessInfo info[64];
+
+        /**
+         * Raw bsMethodValue (μ) of the program/anchor-loudness measurement
+         * selected for normalization at config time. -1 == none found.
+         * L_LKFS = -57.75 + 0.25 * input_method_val.
+         */
+        int input_method_val;
     } loudness;
 } AACUSACConfig;
 
@@ -433,9 +454,9 @@ typedef struct AACDecProc {
 
     int (*sbr_ctx_alloc_init)(AACDecContext *ac, ChannelElement **che, int id_aac);
     int (*sbr_decode_extension)(AACDecContext *ac, ChannelElement *che,
-                                GetBitContext *gb, int crc, int cnt, int id_aac);
-    void (*sbr_apply)(AACDecContext *ac, ChannelElement *che,
-                      int id_aac, void /* INTFLOAT */ *L, void /* INTFLOAT */ *R);
+                                GetBitContext *gb, int crc, int cnt, int id_aac, int fl960);
+    void (*sbr_apply)(AACDecContext *ac, ChannelElement *che, int id_aac, int fl960,
+                      void /* INTFLOAT */ *L, void /* INTFLOAT */ *R);
     void (*sbr_ctx_close)(ChannelElement *che);
 } AACDecProc;
 
@@ -555,9 +576,15 @@ struct AACDecContext {
 
     enum AACOutputChannelOrder output_channel_order;
 
+    /**
+     * Target output loudness in dBFS, used for xHE-AAC loudness normalization
+     * based on the parsed loudnessInfoSet() metadata. 0 disables normalization.
+     */
+    int target_level;
+    int warned_loudness_missing;
+
     OutputConfiguration oc[2];
     int warned_num_aac_frames;
-    int warned_960_sbr;
     unsigned warned_71_wide;
     int warned_gain_control;
     int warned_he_aac_mono;

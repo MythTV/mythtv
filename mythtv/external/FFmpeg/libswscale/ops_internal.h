@@ -26,9 +26,9 @@
 #include "ops.h"
 #include "ops_dispatch.h"
 
-#define Q(N) ((AVRational) { N, 1 })
+#define Q(N) ((AVRational64) { N, 1 })
 
-static inline AVRational ff_sws_pixel_expand(SwsPixelType from, SwsPixelType to)
+static inline AVRational64 ff_sws_pixel_expand(SwsPixelType from, SwsPixelType to)
 {
     const int src = ff_sws_pixel_type_size(from);
     const int dst = ff_sws_pixel_type_size(to);
@@ -51,43 +51,6 @@ static inline void ff_sws_pack_op_decode(const SwsOp *op, uint64_t mask[4], int 
         shift[i] = (i ? shift[i - 1] : size) - bits;
     }
 }
-
-typedef struct SwsOpBackend {
-    const char *name; /* Descriptive name for this backend */
-
-    /**
-     * Compile an operation list to an implementation chain. May modify `ops`
-     * freely; the original list will be freed automatically by the caller.
-     *
-     * Returns 0 or a negative error code.
-     */
-    int (*compile)(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out);
-
-    /**
-     * If NONE, backend only supports software frames.
-     * Otherwise, frame hardware format must match hw_format for the backend
-     * to be used.
-     */
-    enum AVPixelFormat hw_format;
-} SwsOpBackend;
-
-/* List of all backends, terminated by NULL */
-extern const SwsOpBackend *const ff_sws_op_backends[];
-
-/**
- * Attempt to compile a list of operations using a specific backend.
- *
- * Returns 0 on success, or a negative error code on failure.
- */
-int ff_sws_ops_compile_backend(SwsContext *ctx, const SwsOpBackend *backend,
-                               const SwsOpList *ops, SwsCompiledOp *out);
-
-/**
- * Compile a list of operations using the best available backend.
- *
- * Returns 0 on success, or a negative error code on failure.
- */
-int ff_sws_ops_compile(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out);
 
 /**
  * "Solve" an op list into a fixed shuffle mask, with an optional ability to
@@ -116,5 +79,35 @@ int ff_sws_ops_compile(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out
  */
 int ff_sws_solve_shuffle(const SwsOpList *ops, uint8_t shuffle[], int size,
                          uint8_t clear_val, int *read_bytes, int *write_bytes);
+
+/**
+ * Split an op list into two at the given index. The split will be mediated
+ * by a set of planar read/write operations, plus a swizzle (if necessary)
+ * to re-order only used components. If a split is performed, both output
+ * lists will be optimized before returning.
+ *
+ * @param ops1 The first part of the split op list. Will be modified in-place.
+ * @param ops2 The second part of the split op list will be returned here, or
+ *             NULL if no split was necessary.
+ * @param index The index of the operation to split before. The operation
+ *              itself will be absent from `ops1` and instead moved to the
+ *              start of `ops2`.
+ *
+ * Returnse 0 or a negative error code.
+ */
+int ff_sws_op_list_split_at(SwsOpList *ops1, SwsOpList **ops2, int index);
+
+/**
+ * Reduce an op list into a reduced subset that operates only on a given
+ * subset of planes. No effect if the output is not planar, or if the plane
+ * mask is empty or equal to all planes.
+ *
+ * @param ops1 Updated in-place to contain only the selected planes.
+ * @param ops2 The removed remainder is returned here, or NULL if no-op.
+ * @param planes A mask of the plane indices to keep.
+ *
+ * Returns 0 or a negative error code.
+ */
+int ff_sws_op_list_split_planes(SwsOpList *ops1, SwsOpList **ops2, SwsCompMask planes);
 
 #endif /* SWSCALE_OPS_INTERNAL_H */

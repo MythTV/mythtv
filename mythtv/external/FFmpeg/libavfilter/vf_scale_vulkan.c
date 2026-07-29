@@ -18,14 +18,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/random_seed.h"
 #include "libavutil/opt.h"
-#include "libavutil/vulkan_spirv.h"
 #include "vulkan_filter.h"
 #include "scale_eval.h"
 #include "filters.h"
 #include "colorspace.h"
 #include "video.h"
+#include "libswscale/swscale.h"
+
+extern const unsigned char ff_scale_comp_spv_data[];
+extern const unsigned int ff_scale_comp_spv_len;
 
 extern const unsigned char ff_debayer_comp_spv_data[];
 extern const unsigned int ff_debayer_comp_spv_len;
@@ -44,8 +46,17 @@ enum DebayerFunc {
     DB_NB,
 };
 
+/* Output modes, must match scale.comp.glsl */
+enum ScaleMode {
+    MODE_COPY = 0,
+    MODE_NV12,
+    MODE_YUV420,
+    MODE_YUV444,
+};
+
 typedef struct ScaleVulkanContext {
     FFVulkanContext vkctx;
+    SwsContext *sws;
 
     int initialized;
     FFVkExecPool e;
@@ -60,6 +71,7 @@ typedef struct ScaleVulkanContext {
         int crop_y;
         int crop_w;
         int crop_h;
+        float in_dims[2];
     } opts;
 
     char *out_format_string;
@@ -71,145 +83,17 @@ typedef struct ScaleVulkanContext {
     enum DebayerFunc debayer;
 } ScaleVulkanContext;
 
-static const char scale_bilinear[] = {
-    C(0, vec4 scale_bilinear(int idx, ivec2 pos, vec2 crop_range, vec2 crop_off))
-    C(0, {                                                                      )
-    C(1,     vec2 npos = (vec2(pos) + 0.5f) / imageSize(output_img[idx]);       )
-    C(1,     npos *= crop_range;    /* Reduce the range */                      )
-    C(1,     npos += crop_off;      /* Offset the start */                      )
-    C(1,     return texture(input_img[idx], npos);                              )
-    C(0, }                                                                      )
-};
-
-static const char rgb2yuv[] = {
-    C(0, vec4 rgb2yuv(vec4 src, int fullrange)                                  )
-    C(0, {                                                                      )
-    C(1,     src *= yuv_matrix;                                                 )
-    C(1,     if (fullrange == 1) {                                              )
-    C(2,         src += vec4(0.0, 0.5, 0.5, 0.0);                               )
-    C(1,     } else {                                                           )
-    C(2,         src *= vec4(219.0 / 255.0, 224.0 / 255.0, 224.0 / 255.0, 1.0); )
-    C(2,         src += vec4(16.0 / 255.0, 128.0 / 255.0, 128.0 / 255.0, 0.0);  )
-    C(1,     }                                                                  )
-    C(1,     return src;                                                        )
-    C(0, }                                                                      )
-};
-
-static const char write_nv12[] = {
-    C(0, void write_nv12(vec4 src, ivec2 pos)                                   )
-    C(0, {                                                                      )
-    C(1,     imageStore(output_img[0], pos, vec4(src.r, 0.0, 0.0, 0.0));        )
-    C(1,     pos /= ivec2(2);                                                   )
-    C(1,     imageStore(output_img[1], pos, vec4(src.g, src.b, 0.0, 0.0));      )
-    C(0, }                                                                      )
-};
-
-static const char write_420[] = {
-    C(0, void write_420(vec4 src, ivec2 pos)                                    )
-    C(0, {                                                                      )
-    C(1,     imageStore(output_img[0], pos, vec4(src.r, 0.0, 0.0, 0.0));        )
-    C(1,     pos /= ivec2(2);                                                   )
-    C(1,     imageStore(output_img[1], pos, vec4(src.g, 0.0, 0.0, 0.0));        )
-    C(1,     imageStore(output_img[2], pos, vec4(src.b, 0.0, 0.0, 0.0));        )
-    C(0, }                                                                      )
-};
-
-static const char write_444[] = {
-    C(0, void write_444(vec4 src, ivec2 pos)                                    )
-    C(0, {                                                                      )
-    C(1,     imageStore(output_img[0], pos, vec4(src.r, 0.0, 0.0, 0.0));        )
-    C(1,     imageStore(output_img[1], pos, vec4(src.g, 0.0, 0.0, 0.0));        )
-    C(1,     imageStore(output_img[2], pos, vec4(src.b, 0.0, 0.0, 0.0));        )
-    C(0, }                                                                      )
-};
-
-static int init_scale_shader(AVFilterContext *ctx, FFVulkanShader *shd,
-                             FFVulkanDescriptorSetBinding *desc, AVFrame *in)
-{
-    ScaleVulkanContext *s = ctx->priv;
-    GLSLD(   scale_bilinear                                                  );
-
-    if (s->vkctx.output_format != s->vkctx.input_format) {
-        GLSLD(   rgb2yuv                                                     );
-    }
-
-    switch (s->vkctx.output_format) {
-    case AV_PIX_FMT_NV12:    GLSLD(write_nv12); break;
-    case AV_PIX_FMT_YUV420P: GLSLD( write_420); break;
-    case AV_PIX_FMT_YUV444P: GLSLD( write_444); break;
-    default: break;
-    }
-
-    GLSLC(0, void main()                                                     );
-    GLSLC(0, {                                                               );
-    GLSLC(1,     ivec2 size;                                                 );
-    GLSLC(1,     ivec2 pos = ivec2(gl_GlobalInvocationID.xy);                );
-    GLSLF(1,     vec2 in_d = vec2(%i, %i);             ,in->width, in->height);
-    GLSLC(1,     vec2 c_r = vec2(crop_w, crop_h) / in_d;                     );
-    GLSLC(1,     vec2 c_o = vec2(crop_x, crop_y) / in_d;                     );
-    GLSLC(0,                                                                 );
-
-    if (s->vkctx.output_format == s->vkctx.input_format) {
-        for (int i = 0; i < desc[1].elems; i++) {
-            GLSLF(1,  size = imageSize(output_img[%i]);                    ,i);
-            GLSLC(1,  if (IS_WITHIN(pos, size)) {                            );
-            switch (s->scaler) {
-            case F_NEAREST:
-            case F_BILINEAR:
-                GLSLF(2, vec4 res = scale_bilinear(%i, pos, c_r, c_o);     ,i);
-                GLSLF(2, imageStore(output_img[%i], pos, res);             ,i);
-                break;
-            };
-            GLSLC(1, }                                                       );
-        }
-    } else {
-        GLSLC(1, vec4 res = scale_bilinear(0, pos, c_r, c_o);                );
-        GLSLF(1, res = rgb2yuv(res, %i);    ,s->out_range == AVCOL_RANGE_JPEG);
-        switch (s->vkctx.output_format) {
-        case AV_PIX_FMT_NV12:    GLSLC(1, write_nv12(res, pos); ); break;
-        case AV_PIX_FMT_YUV420P: GLSLC(1,  write_420(res, pos); ); break;
-        case AV_PIX_FMT_YUV444P: GLSLC(1,  write_444(res, pos); ); break;
-        default: return AVERROR(EINVAL);
-        }
-    }
-
-    GLSLC(0, }                                                               );
-
-    if (s->vkctx.output_format != s->vkctx.input_format) {
-        const AVLumaCoefficients *lcoeffs;
-        double tmp_mat[3][3];
-
-        lcoeffs = av_csp_luma_coeffs_from_avcsp(in->colorspace);
-        if (!lcoeffs) {
-            av_log(ctx, AV_LOG_ERROR, "Unsupported colorspace\n");
-            return AVERROR(EINVAL);
-        }
-
-        ff_fill_rgb2yuv_table(lcoeffs, tmp_mat);
-
-        for (int y = 0; y < 3; y++)
-            for (int x = 0; x < 3; x++)
-                s->opts.yuv_matrix[x][y] = tmp_mat[x][y];
-        s->opts.yuv_matrix[3][3] = 1.0;
-    }
-
-    return 0;
-}
-
 static av_cold int init_filter(AVFilterContext *ctx, AVFrame *in)
 {
     int err;
-    uint8_t *spv_data;
-    size_t spv_len;
-    void *spv_opaque = NULL;
     VkFilter sampler_mode;
+    enum ScaleMode mode;
     ScaleVulkanContext *s = ctx->priv;
     FFVulkanContext *vkctx = &s->vkctx;
     FFVulkanShader *shd = &s->shd;
-    FFVkSPIRVCompiler *spv;
-    FFVulkanDescriptorSetBinding *desc;
 
     int in_planes = av_pix_fmt_count_planes(s->vkctx.input_format);
+    int out_planes = av_pix_fmt_count_planes(s->vkctx.output_format);
 
     switch (s->scaler) {
     case F_NEAREST:
@@ -220,29 +104,33 @@ static av_cold int init_filter(AVFilterContext *ctx, AVFrame *in)
         break;
     };
 
-    spv = ff_vk_spirv_init();
-    if (!spv) {
-        av_log(ctx, AV_LOG_ERROR, "Unable to initialize SPIR-V compiler!\n");
-        return AVERROR_EXTERNAL;
+    if (s->vkctx.output_format == s->vkctx.input_format) {
+        mode = MODE_COPY;
+    } else {
+        switch (s->vkctx.output_format) {
+        case AV_PIX_FMT_NV12:    mode = MODE_NV12;   break;
+        case AV_PIX_FMT_YUV420P: mode = MODE_YUV420; break;
+        case AV_PIX_FMT_YUV444P: mode = MODE_YUV444; break;
+        default: return AVERROR(EINVAL);
+        }
     }
 
     RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, s->qf->num*4, 0, 0, 0, NULL));
 
     RET(ff_vk_init_sampler(vkctx, &s->sampler, 0, sampler_mode));
 
-    RET(ff_vk_shader_init(vkctx, &s->shd, "scale",
-                          VK_SHADER_STAGE_COMPUTE_BIT,
-                          NULL, 0,
-                          32, 32, 1,
-                          0));
+    SPEC_LIST_CREATE(sl, 3, 3*sizeof(int32_t))
+    SPEC_LIST_ADD(sl, 0, 32, out_planes);
+    SPEC_LIST_ADD(sl, 1, 32, mode);
+    SPEC_LIST_ADD(sl, 2, 32, s->out_range == AVCOL_RANGE_JPEG);
 
-    desc = (FFVulkanDescriptorSetBinding []) {
+    ff_vk_shader_load(&s->shd, VK_SHADER_STAGE_COMPUTE_BIT, sl,
+                      (uint32_t []) { 32, 32, 1 }, 0);
+
+    const FFVulkanDescriptorSetBinding desc[] = {
         {
             .name       = "input_img",
             .type       = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .mem_layout = NULL,
-            .mem_quali  = "readonly",
-            .dimensions = 2,
             .elems      = in_planes,
             .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
             .samplers   = DUP_SAMPLER(s->sampler),
@@ -250,46 +138,47 @@ static av_cold int init_filter(AVFilterContext *ctx, AVFrame *in)
         {
             .name       = "output_img",
             .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.output_format, FF_VK_REP_FLOAT),
-            .mem_quali  = "writeonly",
-            .dimensions = 2,
-            .elems      = av_pix_fmt_count_planes(s->vkctx.output_format),
+            .elems      = out_planes,
             .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
 
-    RET(ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0, 0));
-
-    GLSLC(0, layout(push_constant, std430) uniform pushConstants {        );
-    GLSLC(1,    mat4 yuv_matrix;                                          );
-    GLSLC(1,    int crop_x;                                               );
-    GLSLC(1,    int crop_y;                                               );
-    GLSLC(1,    int crop_w;                                               );
-    GLSLC(1,    int crop_h;                                               );
-    GLSLC(0, };                                                           );
-    GLSLC(0,                                                              );
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0);
 
     ff_vk_shader_add_push_const(&s->shd, 0, sizeof(s->opts),
                                 VK_SHADER_STAGE_COMPUTE_BIT);
 
-    err = init_scale_shader(ctx, shd, desc, in);
-    if (err < 0)
-        goto fail;
+    if (mode != MODE_COPY) {
+        const AVLumaCoefficients *lcoeffs;
+        double tmp_mat[3][3];
 
-    RET(spv->compile_shader(vkctx, spv, shd, &spv_data, &spv_len, "main",
-                            &spv_opaque));
-    RET(ff_vk_shader_link(vkctx, shd, spv_data, spv_len, "main"));
+        lcoeffs = av_csp_luma_coeffs_from_avcsp(in->colorspace);
+        if (!lcoeffs) {
+            av_log(ctx, AV_LOG_ERROR, "Unsupported colorspace\n");
+            err = AVERROR(EINVAL);
+            goto fail;
+        }
+
+        ff_fill_rgb2yuv_table(lcoeffs, tmp_mat);
+
+        for (int y = 0; y < 3; y++)
+            for (int x = 0; x < 3; x++)
+                s->opts.yuv_matrix[x][y] = tmp_mat[x][y];
+        s->opts.yuv_matrix[3][3] = 1.0;
+    }
+
+    s->opts.in_dims[0] = in->width;
+    s->opts.in_dims[1] = in->height;
+
+    RET(ff_vk_shader_link(vkctx, shd,
+                          ff_scale_comp_spv_data,
+                          ff_scale_comp_spv_len, "main"));
 
     RET(ff_vk_shader_register_exec(vkctx, &s->e, &s->shd));
 
     s->initialized = 1;
 
 fail:
-    if (spv_opaque)
-        spv->free_shader(spv, &spv_opaque);
-    if (spv)
-        spv->uninit(&spv);
-
     return err;
 }
 
@@ -322,7 +211,7 @@ static av_cold int init_debayer(AVFilterContext *ctx, AVFrame *in)
             .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0, 0);
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0);
 
     RET(ff_vk_shader_link(vkctx, shd,
                           ff_debayer_comp_spv_data,
@@ -352,27 +241,10 @@ static int scale_vulkan_filter_frame(AVFilterLink *link, AVFrame *in)
         goto fail;
     }
 
-    s->qf = ff_vk_qf_find(&s->vkctx, VK_QUEUE_COMPUTE_BIT, 0);
-    if (!s->qf) {
-        av_log(ctx, AV_LOG_ERROR, "Device has no compute queues\n");
-        err = AVERROR(ENOTSUP);
-        goto fail;
-    }
-
-    if (!s->initialized) {
-        if (s->vkctx.input_format == AV_PIX_FMT_BAYER_RGGB16)
-            RET(init_debayer(ctx, in));
-        else
-            RET(init_filter(ctx, in));
-    }
-
     s->opts.crop_x = in->crop_left;
     s->opts.crop_y = in->crop_top;
     s->opts.crop_w = in->width - (in->crop_left + in->crop_right);
     s->opts.crop_h = in->height - (in->crop_top + in->crop_bottom);
-
-    RET(ff_vk_filter_process_simple(&s->vkctx, &s->e, &s->shd, out, in,
-                                    s->sampler, &s->opts, sizeof(s->opts)));
 
     err = av_frame_copy_props(out, in);
     if (err < 0)
@@ -387,6 +259,29 @@ static int scale_vulkan_filter_frame(AVFilterLink *link, AVFrame *in)
         out->color_range = s->out_range;
     if (s->vkctx.output_format != s->vkctx.input_format)
         out->chroma_location = AVCHROMA_LOC_TOPLEFT;
+
+    if (!s->sws) {
+        if (!s->initialized) {
+            s->qf = ff_vk_qf_find(&s->vkctx, VK_QUEUE_COMPUTE_BIT, 0);
+            if (!s->qf) {
+                av_log(ctx, AV_LOG_ERROR, "Device has no compute queues\n");
+                err = AVERROR(ENOTSUP);
+                goto fail;
+            }
+
+            if (s->vkctx.input_format == AV_PIX_FMT_BAYER_RGGB16)
+                RET(init_debayer(ctx, in));
+            else
+                RET(init_filter(ctx, in));
+        }
+
+        RET(ff_vk_filter_process_simple(&s->vkctx, &s->e, &s->shd, out, in,
+                                        s->sampler, 1, &s->opts, sizeof(s->opts)));
+    } else {
+        err = sws_scale_frame(s->sws, out, in);
+        if (err < 0)
+            goto fail;
+    }
 
     av_frame_free(&in);
 
@@ -412,8 +307,10 @@ static int scale_vulkan_config_output(AVFilterLink *outlink)
     if (err < 0)
         return err;
 
-    ff_scale_adjust_dimensions(inlink, &vkctx->output_width, &vkctx->output_height,
-                               SCALE_FORCE_OAR_DISABLE, 1, 1.f);
+    err = ff_scale_adjust_dimensions(inlink, &vkctx->output_width, &vkctx->output_height,
+                                     SCALE_FORCE_OAR_DISABLE, 1, 1.f);
+    if (err < 0)
+        return err;
 
     outlink->w = vkctx->output_width;
     outlink->h = vkctx->output_height;
@@ -439,6 +336,14 @@ static int scale_vulkan_config_output(AVFilterLink *outlink)
             av_log(avctx, AV_LOG_ERROR, "Scaling is not supported with debayering\n");
             return AVERROR_PATCHWELCOME;
         }
+    } else if ((inlink->w == outlink->w || inlink->h == outlink->h) &&
+               (s->vkctx.input_format != s->vkctx.output_format)) {
+        s->sws = sws_alloc_context();
+        if (!s->sws)
+            return AVERROR(ENOMEM);
+        av_opt_set(s->sws, "sws_flags", "unstable", 0);
+        av_opt_set(s->sws, "scaler",
+                   s->scaler == F_NEAREST ? "point" : "bilinear", 0);
     } else if (s->vkctx.output_format != s->vkctx.input_format) {
         if (!ff_vk_mt_is_np_rgb(s->vkctx.input_format)) {
             av_log(avctx, AV_LOG_ERROR, "Unsupported input format for conversion\n");
@@ -466,6 +371,7 @@ static void scale_vulkan_uninit(AVFilterContext *avctx)
 
     ff_vk_exec_pool_free(vkctx, &s->e);
     ff_vk_shader_free(vkctx, &s->shd);
+    sws_free_context(&s->sws);
 
     if (s->sampler)
         vk->DestroySampler(vkctx->hwctx->act_dev, s->sampler,

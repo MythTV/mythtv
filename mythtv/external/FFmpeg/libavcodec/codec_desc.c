@@ -1146,15 +1146,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Dxtory"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
-#if FF_API_V408_CODECID
-    {
-        .id        = AV_CODEC_ID_V410,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "v410",
-        .long_name = NULL_IF_CONFIG_SMALL("Uncompressed 4:4:4 10-bit"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-#endif
     {
         .id        = AV_CODEC_ID_XWD,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -1479,22 +1470,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Pinnacle TARGA CineWave YUV16"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
-#if FF_API_V408_CODECID
-    {
-        .id        = AV_CODEC_ID_V308,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "v308",
-        .long_name = NULL_IF_CONFIG_SMALL("Uncompressed packed 4:4:4"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_V408,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "v408",
-        .long_name = NULL_IF_CONFIG_SMALL("Uncompressed packed QT 4:4:4:4"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-#endif
     {
         .id        = AV_CODEC_ID_YUV4,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -2008,6 +1983,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY |
                      AV_CODEC_PROP_LOSSLESS,
         .mime_types= MT("image/jxs"),
+    },
+    {
+        .id        = AV_CODEC_ID_WEBP_ANIM,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "webp_anim",
+        .long_name = NULL_IF_CONFIG_SMALL("Animated WebP"),
+        .props     = AV_CODEC_PROP_LOSSY | AV_CODEC_PROP_LOSSLESS,
+        .mime_types= MT("image/webp"),
     },
 
     /* various PCM "codecs" */
@@ -3566,6 +3549,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "ahx",
         .long_name = NULL_IF_CONFIG_SMALL("CRI AHX"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_APPLE_APAC,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "apple_apac",
+        .long_name = NULL_IF_CONFIG_SMALL("Apple Positional Audio Codec"),
+        .props     = AV_CODEC_PROP_LOSSY,
     },
 
     /* subtitle codecs */

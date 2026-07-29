@@ -73,6 +73,7 @@
 #define M2TS_PMT_PID                      0x0100
 #define M2TS_PCR_PID                      0x1001
 #define M2TS_VIDEO_PID                    0x1011
+#define M2TS_VIDEO_EL_PID                 0x1015
 #define M2TS_AUDIO_START_PID              0x1100
 #define M2TS_PGSSUB_START_PID             0x1200
 #define M2TS_TEXTSUB_PID                  0x1800
@@ -233,6 +234,7 @@ https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/
 /* DVB descriptor_tag_extension values from
    ETSI EN 300 468 Table 109: Possible locations of extended descriptors */
 #define SUPPLEMENTARY_AUDIO_DESCRIPTOR 0x06
+#define AC4_DESCRIPTOR 0x15
 
 /** see "Dolby Vision Streams Within the MPEG-2 Transport Stream Format"
 https://professional.dolby.com/siteassets/content-creation/dolby-vision-for-content-creators/dolby-vision-bitstreams-in-mpeg-2-transport-stream-multiplex-v1.2.pdf */

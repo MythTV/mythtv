@@ -19,14 +19,22 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/mem.h"
 
-#include "ops_backend.h"
+#include "ops_internal.h"
 
 typedef struct MemcpyPriv {
     int num_planes;
     int index[4]; /* or -1 to clear plane */
     uint8_t clear_value[4];
 } MemcpyPriv;
+
+/**
+ * Switch to loop if total padding exceeds this number of bytes. Chosen to
+ * align with the typical L1 cache size of modern CPUs, as this avoids the
+ * risk of the implementation loading one extra unnecessary cache line.
+ */
+#define SWS_MAX_PADDING 64
 
 /* Memcpy backend for trivial cases */
 
@@ -40,12 +48,18 @@ static void process(const SwsOpExec *exec, const void *priv,
     for (int i = 0; i < p->num_planes; i++) {
         uint8_t *out = exec->out[i];
         const int idx = p->index[i];
-        if (idx < 0) {
+        const int bytes = x_end * exec->block_size_out[i];
+        const int use_loop = exec->out_stride[i] > bytes + SWS_MAX_PADDING;
+        if (idx < 0 && !use_loop) {
             memset(out, p->clear_value[i], exec->out_stride[i] * lines);
-        } else if (exec->out_stride[i] == exec->in_stride[idx]) {
+        } else if (idx < 0) {
+            for (int y = y_start; y < y_end; y++) {
+                memset(out, p->clear_value[i], bytes);
+                out += exec->out_stride[i];
+            }
+        } else if (exec->out_stride[i] == exec->in_stride[idx] && !use_loop) {
             memcpy(out, exec->in[idx], exec->out_stride[i] * lines);
         } else {
-            const int bytes = x_end * exec->block_size_out;
             const uint8_t *in = exec->in[idx];
             for (int y = y_start; y < y_end; y++) {
                 memcpy(out, in, bytes);
@@ -56,7 +70,7 @@ static void process(const SwsOpExec *exec, const void *priv,
     }
 }
 
-static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
+static int compile(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out)
 {
     MemcpyPriv p = {0};
 
@@ -64,7 +78,7 @@ static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
         const SwsOp *op = &ops->ops[n];
         switch (op->op) {
         case SWS_OP_READ:
-            if ((op->rw.packed && op->rw.elems != 1) || op->rw.frac)
+            if (ff_sws_rw_op_planes(op) != op->rw.elems || op->rw.frac || op->rw.filter.op)
                 return AVERROR(ENOTSUP);
             for (int i = 0; i < op->rw.elems; i++)
                 p.index[i] = i;
@@ -86,20 +100,20 @@ static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
 
         case SWS_OP_CLEAR:
             for (int i = 0; i < 4; i++) {
-                if (!op->c.q4[i].den)
+                if (!SWS_COMP_TEST(op->clear.mask, i))
                     continue;
-                if (op->c.q4[i].den != 1)
+                if (op->clear.value[i].den != 1)
                     return AVERROR(ENOTSUP);
 
                 /* Ensure all bytes to be cleared are the same, because we
                  * can't memset on multi-byte sequences */
-                uint8_t val = op->c.q4[i].num & 0xFF;
+                uint8_t val = op->clear.value[i].num & 0xFF;
                 uint32_t ref = val;
                 switch (ff_sws_pixel_type_size(op->type)) {
                 case 2: ref *= 0x101; break;
                 case 4: ref *= 0x1010101; break;
                 }
-                if (ref != op->c.q4[i].num)
+                if (ref != op->clear.value[i].num)
                     return AVERROR(ENOTSUP);
                 p.clear_value[i] = val;
                 p.index[i] = -1;
@@ -107,7 +121,7 @@ static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
             break;
 
         case SWS_OP_WRITE:
-            if ((op->rw.packed && op->rw.elems != 1) || op->rw.frac)
+            if (ff_sws_rw_op_planes(op) != op->rw.elems || op->rw.frac || op->rw.filter.op)
                 return AVERROR(ENOTSUP);
             p.num_planes = op->rw.elems;
             break;
@@ -129,6 +143,7 @@ static int compile(SwsContext *ctx, SwsOpList *ops, SwsCompiledOp *out)
 
 const SwsOpBackend backend_murder = {
     .name       = "memcpy",
+    .flags      = SWS_BACKEND_MEMCPY,
     .compile    = compile,
     .hw_format  = AV_PIX_FMT_NONE,
 };
