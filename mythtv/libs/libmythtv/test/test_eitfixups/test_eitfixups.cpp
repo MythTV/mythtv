@@ -1547,7 +1547,7 @@ void TestEITFixups::testBellExpress_data()
                               << "" << (int)DishThemeType::kThemeNone
                               << "Title" << "Subtitle" << "Description." << "Category" << -1
                               << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN << false;
-    QTest::newRow("catbad")   << "Title (HD)" << "Subtitle\r\nCat(bad). Description."
+    QTest::newRow("catbad1")  << "Title (HD)" << "Subtitle\r\nCat(bad). Description."
                               << "" << (int)DishThemeType::kThemeNone
                               << "Title" << "Subtitle" << "Description." << "Unknown" << -1
                               << (int)VID_HDTV << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN << false;
@@ -1555,7 +1555,7 @@ void TestEITFixups::testBellExpress_data()
                               << "" << (int)DishThemeType::kThemeNone
                               << "Title" << "Subtitle" << "Too long for category. Description." << "Unknown" << -1
                               << (int)VID_HDTV << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN << false;
-    QTest::newRow("catbad")   << "Title" << "Subtitle\r\nCat(bad).Description. (HD)"
+    QTest::newRow("catbad2")  << "Title" << "Subtitle\r\nCat(bad).Description. (HD)"
                               << "" << (int)DishThemeType::kThemeNone
                               << "Title" << "Subtitle" << "Cat(bad).Description." << "Unknown" << -1
                               << (int)VID_HDTV << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN << false;
@@ -1940,7 +1940,7 @@ void TestEITFixups::testComHem3_data()
     QTest::newRow("rerun-date2")     << "Title" << "Subtitle" << "Subtitle2. Description. Repris från 2/12."
                                      << "Title" << "Subtitle2" << "Description. Repris från 2/12."
                                      << QDate(2019,12,2);
-    QTest::newRow("rerun-date2")     << "Title" << "Subtitle" << "Subtitle2. Description. Repris från 2/12 - 2011."
+    QTest::newRow("rerun-date3")     << "Title" << "Subtitle" << "Subtitle2. Description. Repris från 2/12 - 2011."
                                      << "Title" << "Subtitle2" << "Description. Repris från 2/12 - 2011."
                                      << QDate(2019,12,2); // not implemented
 }
@@ -2272,7 +2272,7 @@ void TestEITFixups::testMCA_data()
     QTest::newRow("cc1")      << "Title" << "Subtitle" << "This is the description. English Subtitles"
                               << "Title" << "" << "This is the description."
                               << 0 << 0 << (int)AUD_UNKNOWN << (int)SUB_HARDHEAR;
-    QTest::newRow("cc1")      << "Title" << "Subtitle" << "This is the description, HI Subtitles"
+    QTest::newRow("cc2")      << "Title" << "Subtitle" << "This is the description, HI Subtitles"
                               << "Title" << "" << "This is the description"
                               << 0 << 0 << (int)AUD_UNKNOWN << (int)SUB_HARDHEAR;
     QTest::newRow("boquet")   << "Title" << "Subtitle" << "This is the description. Only available on qwerty bouquet."
@@ -2780,12 +2780,12 @@ void TestEITFixups::testNL_data()
                                 << "Documentaire" << ProgramInfo::kCategoryNone
                                 << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
                                 << QDate() << QStringList() << QStringList() << QStringList();
-    QTest::newRow("category1") << "Title" << "Amusement. Description." << "Documentary"
+    QTest::newRow("category4")  << "Title" << "Amusement. Description." << "Documentary"
                                 << "Title" << "" << "Description."
                                 << "Documentaire" << ProgramInfo::kCategoryNone
                                 << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
                                 << QDate() << QStringList() << QStringList() << QStringList();
-    QTest::newRow("category2") << "Title" << "Nieuws/actualiteiten. Description." << "Documentary"
+    QTest::newRow("category5") << "Title" << "Nieuws/actualiteiten. Description." << "Documentary"
                                 << "Title" << "" << "Description."
                                 << "Documentaire" << ProgramInfo::kCategoryNone
                                 << (int)VID_UNKNOWN << (int)AUD_UNKNOWN << (int)SUB_UNKNOWN
@@ -2974,7 +2974,7 @@ void TestEITFixups::testNRK_data()
     QTest::newRow("subtitle4") << "Title: Subtitle" << "Subtitle" << "Description."
                                << "Title" << "Subtitle" << "Description."
                                << false;
-    QTest::newRow("subtitle4") << "Title: Subtitle2" << "Subtitle" << "Description."
+    QTest::newRow("subtitle5") << "Title: Subtitle2" << "Subtitle" << "Description."
                                << "Title: Subtitle2" << "Subtitle" << "Description."
                                << false;
 }
@@ -3637,15 +3637,15 @@ void TestEITFixups::testGreekCategories_data()
     QTest::newRow("sports11")    << "Title" << "Description. βόλεϊ" << "Αθλητικά";
     QTest::newRow("documentary1") << "Title" << "Description. ντοκιμαντερ" << "Ντοκιμαντέρ";
     QTest::newRow("documentary2") << "Title" << "Description. ντοκυμαντέρ" << "Ντοκιμαντέρ";
-    QTest::newRow("religion")    << "Title" << "Description. θρησκεια" << "Θρησκεία";
-    QTest::newRow("religion")    << "Title" << "Description. θρησκευτικ" << "Θρησκεία";
-    QTest::newRow("religion")    << "Title" << "Description. ναο" << "Θρησκεία";
-    QTest::newRow("religion")    << "Title" << "Description. ναός" << "Θρησκεία";
-    QTest::newRow("religion")    << "Title" << "Description. θεια λειτουργια)" << "Θρησκεία";
-    QTest::newRow("religion")    << "Title" << "Description. θεία λειτουργία)" << "Θρησκεία";
-    QTest::newRow("culture")     << "Title" << "Description. τεχνη" << "Τέχνες/Πολιτισμός";
-    QTest::newRow("culture")     << "Title" << "Description. τέχνες" << "Τέχνες/Πολιτισμός";
-    QTest::newRow("culture")     << "Title" << "Description. πολιτισμ)" << "Τέχνες/Πολιτισμός";
+    QTest::newRow("religion1")   << "Title" << "Description. θρησκεια" << "Θρησκεία";
+    QTest::newRow("religion2")   << "Title" << "Description. θρησκευτικ" << "Θρησκεία";
+    QTest::newRow("religion3")   << "Title" << "Description. ναο" << "Θρησκεία";
+    QTest::newRow("religion4")   << "Title" << "Description. ναός" << "Θρησκεία";
+    QTest::newRow("religion5")   << "Title" << "Description. θεια λειτουργια)" << "Θρησκεία";
+    QTest::newRow("religion6")   << "Title" << "Description. θεία λειτουργία)" << "Θρησκεία";
+    QTest::newRow("culture1")    << "Title" << "Description. τεχνη" << "Τέχνες/Πολιτισμός";
+    QTest::newRow("culture2")    << "Title" << "Description. τέχνες" << "Τέχνες/Πολιτισμός";
+    QTest::newRow("culture3")    << "Title" << "Description. πολιτισμ)" << "Τέχνες/Πολιτισμός";
     QTest::newRow("special")     << "Title" << "Description. αφιερωμα)" << "Αφιέρωμα";
 
     // test title too
