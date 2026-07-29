@@ -176,7 +176,8 @@ bool MSqlDatabase::OpenDatabase(bool skipdb)
             m_db.setHostName("localhost");
 
         // Default read timeout is 10 mins - set a better value 300 seconds
-        m_db.setConnectOptions(QString("MYSQL_OPT_READ_TIMEOUT=300"));
+        if (m_dbparms.m_dbType != "QSQLITE")
+            m_db.setConnectOptions(QString("MYSQL_OPT_READ_TIMEOUT=300"));
 
         connected = m_db.open();
 
