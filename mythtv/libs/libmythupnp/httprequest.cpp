@@ -1707,7 +1707,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
             QString( "Error parsing request at line: %1 column: %2 : %3" )
                 .arg(parseResult.errorLine).arg(parseResult.errorColumn)
                 .arg(parseResult.errorMessage));
-        return( false );
+        return false;
     }
 #endif
 
