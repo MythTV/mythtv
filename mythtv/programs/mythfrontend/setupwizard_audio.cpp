@@ -202,7 +202,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 #endif
     if (it != m_outputlist->cend())
     {
-        AudioOutput::AudioDeviceConfig ao = *it;
+        const AudioOutput::AudioDeviceConfig& ao = *it;
         settings = ao.m_settings;
     }
 
