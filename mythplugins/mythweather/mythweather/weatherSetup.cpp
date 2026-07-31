@@ -251,6 +251,8 @@ void ScreenSetup::loadData()
 
     ScreenListMap screenListMap = loadScreens();
 
+    QStringList type_strs;
+
     // Fill the inactive screen button list.
     ScreenListMap::const_iterator i = screenListMap.constBegin();
     while (i != screenListMap.constEnd())
@@ -259,7 +261,7 @@ void ScreenSetup::loadData()
         types = si->m_dataTypes;
         si->m_units = ENG_UNITS;
 
-        QStringList type_strs;
+        type_strs.clear();
         type_strs.reserve(types.size());
         for (const QString& type : std::as_const(types))
         {

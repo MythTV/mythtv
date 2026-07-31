@@ -6114,6 +6114,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
     strlist << "OK";
     strlist.append(QString("%1").arg(images->getImageCount()));
 
+    QStringList paramList;
     for (uint x = 0; x < images->getImageCount(); x++)
     {
         AlbumArtImage *image = images->getImageAt(x);
@@ -6127,7 +6128,7 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         // if this is an embedded image update the cached image
         if (image->m_embedded)
         {
-            QStringList paramList;
+            paramList.clear();
             paramList.reserve(2);
             paramList.append(QString("--songid='%1'").arg(mdata->ID()));           // clazy:exclude=reserve-candidates
             paramList.append(QString("--imagetype='%1'").arg(image->m_imageType)); // clazy:exclude=reserve-candidates

@@ -1161,10 +1161,11 @@ void MythDisplay::DebugModes() const
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK, LOG_INFO))
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "Available modes:");
+        QStringList rateslist;
         for (const auto & videoMode : std::ranges::reverse_view(m_videoModes))
         {
             auto rates = videoMode.RefreshRates();
-            QStringList rateslist;
+            rateslist.clear();
             rateslist.reserve(rates.size());
             for (double rate : std::ranges::reverse_view(rates))
                 rateslist.append(QString("%1").arg(rate, 2, 'f', 2, '0'));

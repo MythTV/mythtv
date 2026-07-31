@@ -142,11 +142,12 @@ bool GameScannerThread::buildFileList()
         SendProgressEvent(counter, (uint)m_handlers.size(),
                           GameScanner::tr("Searching for games..."));
 
+    QStringList filters;
     for (auto * handler : std::as_const(m_handlers))
     {
         QDir dir(handler->SystemRomPath());
         QStringList extensions = handler->ValidExtensions();
-        QStringList filters;
+        filters.clear();
         filters.reserve(extensions.size());
         for (const auto & ext : std::as_const(extensions))
             filters.append(QString("*.%1").arg(ext));

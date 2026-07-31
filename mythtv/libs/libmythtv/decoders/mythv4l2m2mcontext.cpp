@@ -303,6 +303,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
 
     const QString root("/dev/");
     QDir dir(root);
+    QStringList pixformats;
     QStringList namefilters;
     namefilters.append("video*");
     auto devices = dir.entryList(namefilters, QDir::Files |QDir::System);
@@ -359,7 +360,7 @@ V4L2Profiles MythV4L2M2MContext::GetProfiles(const std::vector<V4L2Mapping>& Pro
 
             if (found)
             {
-                QStringList pixformats;
+                pixformats.clear();
                 bool foundfmt = false;
                 // check capture
                 memset(&fdesc, 0, sizeof(fdesc));
