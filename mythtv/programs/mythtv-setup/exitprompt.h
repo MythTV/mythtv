@@ -16,6 +16,7 @@ class ExitPrompter : public QObject
 
   public:
     ExitPrompter(void);
+    ExitPrompter(const ExitPrompter &) = delete;
     ~ExitPrompter(void) override;
 
   protected:
@@ -26,9 +27,6 @@ class ExitPrompter : public QObject
     void handleExit(void);
     static void quit(void);
     
-  private:
-    ExitPrompter(const ExitPrompter &);
-
   private:
     struct ExitPrompterPrivate *m_d {nullptr};
 };
