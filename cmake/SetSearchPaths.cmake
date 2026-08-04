@@ -80,6 +80,11 @@ if(NOT LIBS_INSTALL_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
   list(APPEND PKG_CONFIG_PATH ${LIBS_INSTALL_PREFIX}/lib/pkgconfig
        ${LIBS_INSTALL_PREFIX}/lib64/pkgconfig)
 endif()
+if(MYTH_STAGING_PREFIX AND
+   NOT MYTH_STAGING_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
+  list(APPEND PKG_CONFIG_PATH ${MYTH_STAGING_PREFIX}/lib/pkgconfig
+       ${MYTH_STAGING_PREFIX}/lib64/pkgconfig)
+endif()
 
 #
 # Get any platform specfic customizations

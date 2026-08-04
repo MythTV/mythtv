@@ -207,6 +207,34 @@ option(MYTH_VERSIONED_EXTENSIONS
        ON)
 
 #
+# What to do with the outputs of the "build" stage.  Because the MythTV
+# build is an orchestration of a bunch of sub-builds, the "build" stage has
+# to store its results somewhere.  If this option is "OFF", the build stage
+# will place its outputs into CMAKE_INSTALL_PREFIX.  If this option is
+# "ON", the build stage will place its outputs into a temporary directory,
+# and then cmake will have to be invoked again to "install" everything into
+# CMAKE_INSTALL_PREFIX.
+#
+# This setting is meaningless on cross-compiled systems.  Unfortunately,
+# information about whether or not this is a cross-compile is not yet
+# available because the project() command hasn't yet been called.  After
+# that call there is a check of CMAKE_CROSSCOMPILING and if it is set then
+# this setting will be forcibly set to OFF.
+#
+# Setting this option to "ON" will override the LIBS options below.
+#
+if(UNIX AND NOT ANDROID)
+  set(_MYTH_USE_STAGING_DIR_DEFAULT ON)
+else()
+  set(_MYTH_USE_STAGING_DIR_DEFAULT OFF)
+endif()
+option(MYTH_USE_STAGING_DIR
+       "Use a temporary install directory to support a \"cmake --install\" command."
+       ${_MYTH_USE_STAGING_DIR_DEFAULT})
+unset(_MYTH_USE_STAGING_DIR_DEFAULT)
+
+
+#
 # Library build instructions
 #
 # The first option affect the cmake configuration stage, and the seconds affects

@@ -201,6 +201,7 @@ include(ProcessorCount)
 # Inject code from mythtv provided modules
 #
 include(GetLinuxInfo)
+include(ReadOnlyTests)
 
 #
 # Check compiler and set flags
@@ -221,12 +222,6 @@ if(NOT ${PROJECT_VERSION_MAJOR} EQUAL ${MYTHTV_SOURCE_VERSION_MAJOR})
     FATAL_ERROR "Major version number mismatch (cmake:${PROJECT_VERSION_MAJOR},"
                 " source:.${MYTHTV_SOURCE_VERSION_MAJOR})")
 endif()
-
-#
-# Is the install directory read-only
-#
-include(ReadOnlyTests)
-ensure_dir_writable("Install" ${CMAKE_INSTALL_PREFIX})
 
 #
 # Figure out the CPU count and parallel execution flags.  For a build of any
@@ -273,8 +268,15 @@ if(NOT CPU_COUNT EQUAL 0)
   endif()
 endif()
 
+# Install build results into a temporary directory instead of into
+# CMAKE_INSTALL_PREFIX.  A subsequent "cmake --install" command will
+# then copy from this temporary directory to CMAKE_INSTALL_PREFIX.
+if(MYTH_USE_STAGING_DIR)
+  set(MYTH_STAGING_PREFIX ${PROJECT_BINARY_DIR}/staging)
+endif()
+
 #
-# Setup default search path for pkg-config files.
+# Setup default search path for pkg-config files. Uses MYTH_STAGING_PREFIX.
 #
 include(SetSearchPaths)
 
@@ -331,10 +333,25 @@ include(platform/${CMAKE_SYSTEM_NAME}${_CROSS}BuildPkgConfigFiles OPTIONAL)
 list(REMOVE_DUPLICATES CMDLINE_ARGS)
 list(REMOVE_DUPLICATES PLATFORM_ARGS)
 set(CMDLINE_ARGS_LIBS ${CMDLINE_ARGS})
-list(APPEND CMDLINE_ARGS_LIBS
-     "-DCMAKE_INSTALL_PREFIX:PATH=${LIBS_INSTALL_PREFIX}")
-list(APPEND CMDLINE_ARGS "-DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}"
-     "-DLIBS_INSTALL_PREFIX:PATH=${LIBS_INSTALL_PREFIX}")
+if(MYTH_STAGING_PREFIX)
+  list(APPEND CMDLINE_ARGS_LIBS
+       "-DCMAKE_INSTALL_PREFIX:PATH=${MYTH_STAGING_PREFIX}")
+  list(APPEND CMDLINE_ARGS "-DCMAKE_INSTALL_PREFIX:PATH=${MYTH_STAGING_PREFIX}"
+       "-DLIBS_INSTALL_PREFIX:PATH=${LIBS_INSTALL_PREFIX}")
+else()
+  list(APPEND CMDLINE_ARGS_LIBS
+       "-DCMAKE_INSTALL_PREFIX:PATH=${LIBS_INSTALL_PREFIX}")
+  list(APPEND CMDLINE_ARGS "-DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}"
+       "-DLIBS_INSTALL_PREFIX:PATH=${LIBS_INSTALL_PREFIX}")
+endif()
+
+#
+# Is the install directory read-only.  No point in going any further
+# if the install is going to fail.
+#
+if(NOT MYTH_STAGING_PREFIX)
+  ensure_dir_writable("Install" ${CMAKE_INSTALL_PREFIX})
+endif()
 
 #
 # Create targets for building subsets of the needed libraries.
@@ -433,10 +450,12 @@ include(embeddedlibs/FindOrBuildFFmpeg)
 #
 # Is the libs install directory read-only
 #
-get_target_property(ext_needs_rw external_libs MANUALLY_ADDED_DEPENDENCIES)
-get_target_property(emb_needs_rw embedded_libs REQUIRES_RW)
-if(ext_needs_rw OR emb_needs_rw)
-  ensure_dir_writable("Libs install" ${LIBS_INSTALL_PREFIX})
+if(NOT MYTH_STAGING_PREFIX)
+  get_target_property(ext_needs_rw external_libs MANUALLY_ADDED_DEPENDENCIES)
+  get_target_property(emb_needs_rw embedded_libs REQUIRES_RW)
+  if(ext_needs_rw OR emb_needs_rw)
+    ensure_dir_writable("Libs install" ${LIBS_INSTALL_PREFIX})
+  endif()
 endif()
 
 #
@@ -532,3 +551,14 @@ endif()
 include(platform/${CMAKE_SYSTEM_NAME}${_CROSS}Packaging OPTIONAL)
 
 include(StaticAnalysis)
+
+# Install mythtv.  This does nothing more than copy everything from
+# the temporary install directory to CMAKE_INSTALL_PREFIX.
+if(MYTH_STAGING_PREFIX)
+  install(DIRECTORY ${MYTH_STAGING_PREFIX}/ DESTINATION . USE_SOURCE_PERMISSIONS
+          PATTERN "ffnvcodec.pc" EXCLUDE # these headers are not installed
+          PATTERN "*.pc" EXCLUDE # these point inside MYTH_STAGING_PREFIX
+          )
+else()
+  install(CODE "MESSAGE(\"Nothing to do.\")")
+endif()

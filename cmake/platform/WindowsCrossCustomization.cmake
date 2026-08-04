@@ -12,6 +12,11 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows" OR NOT CMAKE_CROSSCOMPILING)
 endif()
 
 #
+# There is no need for an extra install step when building for windows.
+#
+set(MYTH_USE_STAGING_DIR OFF)
+
+#
 # Validate variables
 #
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "")

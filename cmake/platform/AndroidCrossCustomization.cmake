@@ -13,6 +13,11 @@ if(NOT ANDROID OR NOT CMAKE_CROSSCOMPILING)
 endif()
 
 #
+# There is no need for an extra install step when building for android.
+#
+set(MYTH_USE_STAGING_DIR OFF)
+
+#
 # Validate variables
 #
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "")

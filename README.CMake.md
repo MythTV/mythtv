@@ -126,6 +126,7 @@
   ```
   $ cmake --preset qt5 -DCMAKE_INSTALL_PREFIX=<install_location>
   $ cmake --build build-qt5
+  $ cmake --install build-qt5
   ```
 
   The first line will create a new directory named "build-qt5", and
@@ -162,6 +163,7 @@
   ```
   $ cmake --preset qt6 -DCMAKE_INSTALL_PREFIX=<install_location>
   $ cmake --build build-qt6
+  $ cmake --install build-qt6
   ```
 
   If you want more control over the build process, look at the first
@@ -172,6 +174,7 @@
   ```
   $ cmake -S . -B build-qt5 -G Ninja -DCMAKE_INSTALL_PREFIX=<install_location>
   $ cmake --build build-qt5
+  $ cmake --install build-qt5
   ```
 
   This will use the current directory as the source (-S) directory,
