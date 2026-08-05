@@ -1914,4 +1914,4 @@ QString NetworkCommand::getFrom(int arg)
     return c;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_networkcontrol.cpp"

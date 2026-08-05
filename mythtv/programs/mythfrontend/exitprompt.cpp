@@ -310,3 +310,5 @@ void ExitPrompter::Confirm(MythPower::Feature Action)
         connect(dlg, &MythConfirmationDialog::haveResult, this, qOverload<bool>(&ExitPrompter::DoSuspend));
     ss->AddScreen(dlg);
 }
+
+#include "moc_exitprompt.cpp"

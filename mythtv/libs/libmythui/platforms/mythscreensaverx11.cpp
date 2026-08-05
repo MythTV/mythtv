@@ -12,10 +12,14 @@
 #include "platforms/mythscreensaverx11.h"
 
 // X11 headers
+#if defined(_X11_XLIB_H_) && !defined(Bool)
+#define Bool int
+#endif
 #include <X11/Xlib.h>
 extern "C" {
 #include <X11/extensions/dpms.h>
 }
+#undef Bool            // Interferes with moc file compilation
 
 #define LOC QString("ScreenSaverX11: ")
 
@@ -318,3 +322,5 @@ void MythScreenSaverX11::ResetSlot()
 {
     m_priv->ResetScreenSaver();
 }
+
+#include "moc_mythscreensaverx11.cpp"

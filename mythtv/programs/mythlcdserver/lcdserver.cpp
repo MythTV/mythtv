@@ -818,3 +818,5 @@ void LCDServer::updateLEDs(const QStringList &tokens, QTcpSocket *socket)
 
     sendMessage(socket, "OK");
 }
+
+#include "moc_lcdserver.cpp"

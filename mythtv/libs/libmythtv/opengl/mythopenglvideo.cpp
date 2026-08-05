@@ -1113,3 +1113,5 @@ void MythOpenGLVideo::SetupBicubic(VideoResizing& Resize)
         }
     }
 }
+
+#include "moc_mythopenglvideo.cpp"

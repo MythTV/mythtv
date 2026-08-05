@@ -246,3 +246,5 @@ void NetEditorBase::ToggleItem(MythUIButtonListItem *item)
         item->setChecked(MythUIButtonListItem::NotChecked);
     }
 }
+
+#include "moc_neteditorbase.cpp"

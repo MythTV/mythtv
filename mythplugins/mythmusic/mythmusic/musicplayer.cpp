@@ -1679,3 +1679,5 @@ void MusicPlayer::sendNotification(int notificationID, const QString &title, con
     GetNotificationCenter()->Queue(*n);
     delete n;
 }
+
+#include "moc_musicplayer.cpp"

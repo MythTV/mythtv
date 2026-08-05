@@ -405,3 +405,5 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
 }
 
 
+
+#include "moc_mythbrowser.cpp"

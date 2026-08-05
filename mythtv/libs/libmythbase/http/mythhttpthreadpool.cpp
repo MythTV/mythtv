@@ -100,3 +100,5 @@ void MythHTTPThreadPool::ThreadUpgraded(QThread* Thread)
             .arg(upgraded).arg(m_maxThreads));
     }
 }
+
+#include "moc_mythhttpthreadpool.cpp"

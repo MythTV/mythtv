@@ -1927,3 +1927,4 @@ QStringList V2Status::GetBackupsList()
 
 
 // vim:set shiftwidth=4 tabstop=4 expandtab:
+#include "moc_v2status.cpp"

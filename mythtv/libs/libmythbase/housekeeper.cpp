@@ -912,3 +912,5 @@ bool DBConnPurgeTask::DoRun()
     GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
     return true;
 }
+
+#include "moc_housekeeper.cpp"

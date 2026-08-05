@@ -712,3 +712,5 @@ void MythUIButtonTree::CopyFrom(MythUIType *base)
 
     m_initialized = false;
 }
+
+#include "moc_mythuibuttontree.cpp"

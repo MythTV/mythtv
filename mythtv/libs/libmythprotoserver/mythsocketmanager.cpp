@@ -373,3 +373,5 @@ void MythSocketManager::HandleDone(MythSocket *sock)
     sock->DisconnectFromHost();
 }
 
+#include "moc_mythsocketmanager.cpp"
+#include "moc_socketrequesthandler.cpp" // header only

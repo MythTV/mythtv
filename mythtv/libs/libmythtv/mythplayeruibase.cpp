@@ -29,3 +29,5 @@ MythRender* MythPlayerUIBase::GetRender() const
 {
     return m_render;
 }
+
+#include "moc_mythplayeruibase.cpp"

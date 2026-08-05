@@ -651,3 +651,5 @@ void MythHTTPSocket::NewBinaryMessage(const DataPayloads& Payloads)
     if (Payloads.empty())
         return;
 }
+
+#include "moc_mythhttpsocket.cpp"

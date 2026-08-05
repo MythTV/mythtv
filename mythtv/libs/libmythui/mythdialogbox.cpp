@@ -1059,3 +1059,5 @@ void MythTimeInputDialog::okClicked(void)
 
     Close();
 }
+
+#include "moc_mythdialogbox.cpp"

@@ -1354,3 +1354,5 @@ void MythAirplayServer::HideAllPhotos(void)
         ++it;
     }
 }
+
+#include "moc_mythairplayserver.cpp"

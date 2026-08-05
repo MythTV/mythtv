@@ -518,3 +518,5 @@ QString NewsSite::ReplaceHtmlChar(const QString &orig)
 
     return s;
 }
+
+#include "moc_newssite.cpp"

@@ -473,3 +473,5 @@ void ChannelRecPriority::customEvent(QEvent *event)
         }
     }
 }
+
+#include "moc_channelrecpriority.cpp"

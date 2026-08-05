@@ -9,7 +9,11 @@
 #include "libmythui/mythuiexp.h"
 
 // X11
+#if defined(_X11_XLIB_H_) && !defined(Bool)
+#define Bool int
+#endif
 #include <X11/Xlib.h>
+#undef Bool            // Interferes with moc file compilation
 
 class MUI_PUBLIC MythXDisplay
 {

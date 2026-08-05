@@ -77,3 +77,5 @@ void VisualizationSettings::slotSave(void)
 
     Close();
 }
+
+#include "moc_visualizationsettings.cpp"

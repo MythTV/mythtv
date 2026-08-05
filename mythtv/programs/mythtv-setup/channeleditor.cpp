@@ -916,3 +916,5 @@ void ChannelEditor::customEvent(QEvent *event)
         }
     }
 }
+
+#include "moc_channeleditor.cpp"

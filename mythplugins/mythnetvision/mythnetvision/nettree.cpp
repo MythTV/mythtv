@@ -1004,3 +1004,5 @@ void NetTree::SetSubfolderData(MythGenericTree *folder)
                     "childcount");
     folder->DisplayState("subfolder", "nodetype");
 }
+
+#include "moc_nettree.cpp"

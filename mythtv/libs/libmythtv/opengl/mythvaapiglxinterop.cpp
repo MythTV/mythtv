@@ -510,3 +510,5 @@ bool MythVAAPIInteropGLXPixmap::IsSupported(MythRenderOpenGL* Context)
     return extensions.contains("GLX_EXT_texture_from_pixmap");
 }
 #endif // CONFIG_VAAPI_X11
+
+#include "moc_mythvaapiglxinterop.cpp"

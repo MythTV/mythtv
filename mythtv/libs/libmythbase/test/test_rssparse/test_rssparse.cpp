@@ -120,3 +120,5 @@ void TestRSSParse::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestRSSParse)
+
+#include "moc_test_rssparse.cpp"

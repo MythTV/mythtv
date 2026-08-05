@@ -104,3 +104,4 @@ bool MessageHandler::HandleOutbound(SocketHandler */*sock*/, QStringList &slist)
     return true;
 }
 
+#include "moc_messagehandler.cpp"

@@ -736,3 +736,4 @@ void WelcomeDialog::shutdownNow(void)
     myth_system(command, kMSDontBlockInputDevs);
 }
 
+#include "moc_welcomedialog.cpp"

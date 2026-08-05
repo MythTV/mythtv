@@ -153,3 +153,5 @@ bool GrabberSettings::keyPressEvent(QKeyEvent *event)
 
     return MythScreenType::keyPressEvent(event);
 }
+
+#include "moc_grabbersettings.cpp"

@@ -463,3 +463,5 @@ bool Frontend::SendKey(const QString &sKey)
 
     return ret;
 }
+
+#include "moc_frontend.cpp"

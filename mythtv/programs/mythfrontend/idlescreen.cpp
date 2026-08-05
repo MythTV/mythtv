@@ -299,3 +299,5 @@ void IdleScreen::customEvent(QEvent* event)
 
     MythUIType::customEvent(event);
 }
+
+#include "moc_idlescreen.cpp"

@@ -151,3 +151,5 @@ void TestFrequencies::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestFrequencies)
+
+#include "moc_test_frequencies.cpp"

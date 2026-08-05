@@ -561,3 +561,5 @@ MythPainter* MythScreenType::GetPainter(void)
         return MythScreenStack::GetPainter();
     return GetMythPainter();
 }
+
+#include "moc_mythscreentype.cpp"

@@ -962,3 +962,5 @@ bool CustomEdit::keyPressEvent(QKeyEvent *event)
 
     return handled;
 }
+
+#include "moc_customedit.cpp"

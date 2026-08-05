@@ -178,3 +178,5 @@ void MythUIScrollBar::DoneFading(void)
     disconnect(this, &MythUIType::FinishedFading, nullptr, nullptr);
     Hide();
 }
+
+#include "moc_mythuiscrollbar.cpp"

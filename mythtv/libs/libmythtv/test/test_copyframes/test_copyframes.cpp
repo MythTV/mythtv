@@ -249,3 +249,5 @@ void TestCopyFrames::TestCopy()
 }
 
 QTEST_APPLESS_MAIN(TestCopyFrames)
+
+#include "moc_test_copyframes.cpp"

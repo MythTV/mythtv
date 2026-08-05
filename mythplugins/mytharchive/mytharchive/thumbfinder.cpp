@@ -962,3 +962,5 @@ int ThumbFinder::calcFinalDuration()
 
     return m_archiveItem->duration;
 }
+
+#include "moc_thumbfinder.cpp"

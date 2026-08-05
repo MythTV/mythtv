@@ -517,3 +517,5 @@ void RecordingSelector::updateSelectedList()
         }
     }
 }
+
+#include "moc_recordingselector.cpp"

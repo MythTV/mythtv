@@ -283,3 +283,5 @@ QString& MythHTTPService::Name()
 {
     return m_name;
 }
+
+#include "moc_mythhttpservice.cpp"

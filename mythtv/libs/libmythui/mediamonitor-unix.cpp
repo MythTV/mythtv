@@ -987,3 +987,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
     }
 }
 #endif //!CONFIG_QTDBUS
+
+#if CONFIG_QTDBUS
+#include "moc_mediamonitor-unix.cpp"
+#endif

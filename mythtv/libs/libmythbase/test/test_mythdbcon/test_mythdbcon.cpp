@@ -83,3 +83,5 @@ void TestDbCon::cleanupTestCase()
 }
 
 QTEST_GUILESS_MAIN(TestDbCon)
+
+#include "moc_test_mythdbcon.cpp"
