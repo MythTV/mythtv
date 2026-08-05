@@ -3,6 +3,10 @@
 #include <fcntl.h>
 #include <iostream>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
 #include <QTest>
 
 #include "lirc_client.cpp" // NOLINT(bugprone-suspicious-include)
@@ -388,9 +392,9 @@ void TestLirc::test_getfilename(void)
     QFETCH(const QString, qs_expected);
 
     if (qs_home.isEmpty())
-        unsetenv("HOME");
+        qunsetenv("HOME");
     else
-        setenv("HOME", qs_home.toUtf8().data(), 1);
+        qputenv("HOME", qs_home.toUtf8().data());
 
     m_state = lirc_init("/etc/lircrc", qs_user_file.toUtf8().data(),
                         "test_lirc", nullptr, 0);

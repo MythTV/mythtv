@@ -3,6 +3,7 @@
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 #include <QDir>
@@ -33,8 +34,8 @@ static QString thumbnaildir;
 
 void InitializeMythDirs(void)
 {
-    installprefix = qgetenv( "MYTHTVDIR"   );
-    confdir       = qgetenv( "MYTHCONFDIR" );
+    installprefix = qEnvironmentVariable( "MYTHTVDIR"   );
+    confdir       = qEnvironmentVariable( "MYTHCONFDIR" );
 
     if (!confdir.isEmpty())
     {
@@ -52,7 +53,7 @@ void InitializeMythDirs(void)
 
     // Turn into Canonical Path for consistent compares
 
-    QDir sDir(qgetenv("ProgramData") + "/mythtv/");
+    QDir sDir(qEnvironmentVariable("ProgramData") + "/mythtv/");
     if (sDir.exists())
         sharedir = sDir.canonicalPath() + "/";
 
@@ -62,7 +63,7 @@ void InitializeMythDirs(void)
     }
     if (confdir.isEmpty())
     {
-        confdir  = qgetenv( "LOCALAPPDATA" ) + "/mythtv";
+        confdir  = qEnvironmentVariable( "LOCALAPPDATA" ) + "/mythtv";
         confdir = QDir(confdir).canonicalPath() + "/";
     }
 

@@ -22,6 +22,7 @@
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 
@@ -3022,7 +3023,7 @@ static bool setUser(const QString &username)
     }
     else if (!user_id && user_info)
     {
-        if (setenv("HOME", user_info->pw_dir,1) == -1)
+        if (!qputenv("HOME", user_info->pw_dir))
         {
             std::cerr << "Error setting home directory.\n";
             return false;

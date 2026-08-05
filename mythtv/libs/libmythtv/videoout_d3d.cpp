@@ -7,6 +7,11 @@
 #include <iostream>
 #include <algorithm>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
+
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythlogging.h"
 #include "libmythui/mythmainwindow.h"
@@ -435,7 +440,7 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
 {
     QStringList list;
     if (codec_is_std(myth_codec_id) || (codec_is_dxva2_hw(myth_codec_id) &&
-        !getenv("NO_DXVA2")))
+        !qEnvironmentVariableIsSet("NO_DXVA2")))
     {
         list += "direct3d";
     }
@@ -449,7 +454,7 @@ MythCodecID VideoOutputD3D::GetSupportedCodec(
 #if CONFIG_DXVA2
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_DXVA2 + (stream_type - 1));
     bool use_cpu = !codec_is_dxva2_hw(test_cid);
-    if ((decoder == "dxva2") && !getenv("NO_DXVA2") && !use_cpu)
+    if ((decoder == "dxva2") && !qEnvironmentVariableIsSet("NO_DXVA2") && !use_cpu)
         return test_cid;
 #endif
     return (MythCodecID)(kCodec_MPEG1 + (stream_type - 1));

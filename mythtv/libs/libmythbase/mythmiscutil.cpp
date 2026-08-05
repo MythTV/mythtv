@@ -17,6 +17,7 @@
 #include "compat.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtProcessorDetection>
 #include <QtSystemDetection>
 #endif
@@ -949,8 +950,11 @@ void setHttpProxy(void)
         }
 
         url = url.arg(p.hostName()).arg(p.port());
-        setenv("HTTP_PROXY", url.toLatin1().constData(), 1);
-        setenv("http_proxy", url.toLatin1().constData(), 0);
+        qputenv("HTTP_PROXY", url.toLocal8Bit().constData());
+        if (!qEnvironmentVariableIsSet("http_proxy"))
+        {
+            qputenv("http_proxy", url.toLocal8Bit().constData());
+        }
 
         return;
     }
