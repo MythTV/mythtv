@@ -1,33 +1,14 @@
-# -*- coding: UTF-8 -*-
-#----------------------
-
-try:
-    from urllib import urlopen
-except ImportError:
-    from urllib.request import urlopen
-from time import time
-try:
-    from thread import start_new_thread, allocate_lock
-except ImportError:
-    from _thread import start_new_thread, allocate_lock
+from urllib.request import urlopen
 from time import sleep, time
 import threading
-try:
-    import cPickle as pickle
-except:
-    import pickle
+import pickle
 from MythTV import OrdDict
-try:
-    import Queue
-except ImportError:
-    import queue as Queue
+import queue as Queue
 import lxml
 import lxml.html
 import os
-import sys
 import stat
 
-from builtins import input
 
 BASEURL = 'https://www.mythtv.org/wiki'
 
@@ -36,7 +17,7 @@ def getScripts():
 
 def getPage(**kwargs):
     url = "{0}?{1}".format(BASEURL,
-            '&'.join(['{0}={1}'.format(k,v) for k,v in list(kwargs.items())]))
+            '&'.join('{0}={1}'.format(k,v) for k,v in list(kwargs.items())))
     return lxml.html.parse(urlopen(url)).getroot()
 
 def getWhatLinksHere(page):
@@ -47,7 +28,7 @@ def getWhatLinksHere(page):
         links.append('_'.join(link.find('a').text.split(' ')))
     return links
 
-class Script( object ):
+class Script:
     _cache   = None
     _queue   = Queue.Queue()
     _pool    = []
@@ -141,7 +122,7 @@ class Script( object ):
         for i in reversed(list(range(len(text)))):
             if '=' not in text[i]:
                 text[i-1] += text.pop(i)
-        self.info = OrdDict([a.split('=') for a in text])
+        self.info = OrdDict(a.split('=') for a in text)
         if self.info.webpage == 'none':
             self.info.webpage = self.url
 
@@ -202,12 +183,8 @@ class Script( object ):
         if refresh:
             cls._cache = {}
             return
-        if (sys.version_info[0] == 2):
-            path = '/tmp/mythwikiscripts.pickle'
-            fmode = 'r'
-        else:
-            path = '/tmp/mythwikiscripts.pickle3'
-            fmode = 'rb'
+        path = '/tmp/mythwikiscripts.pickle3'
+        fmode = 'rb'
         if os.access(path, os.F_OK):
             try:
                 fd = open(path, fmode)
@@ -223,14 +200,9 @@ class Script( object ):
     def _dumpCache(cls):
         ### XXX ToDo allign pickle protocol versions
         try:
-            if (sys.version_info[0] == 2):
-                path = '/tmp/mythwikiscripts.pickle'
-                fd = open(path,'w')
-                cls._cache = pickle.dump(cls._cache,fd)
-            else:
-                path = '/tmp/mythwikiscripts.pickle3'
-                fd = open(path,'wb')
-                cls._cache = pickle.dump(cls._cache,fd,  protocol=1)
+            path = '/tmp/mythwikiscripts.pickle3'
+            fd = open(path,'wb')
+            cls._cache = pickle.dump(cls._cache,fd,  protocol=1)
             fd.close()
         except:
             os.remove(path)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides base classes for managing system calls.
@@ -11,7 +10,6 @@ from MythTV.utility import levenshtein, DequeBuffer
 from MythTV.database import DBCache
 
 from subprocess import Popen
-from select import select
 from lxml import etree
 from time import sleep
 import shlex
@@ -26,7 +24,7 @@ class System( DBCache ):
     """
     logmodule = 'Python system call handler'
 
-    class Process( object ):
+    class Process:
         def __init__(self, cmd, useshell, log):
             self.cmd = cmd
             self.log = log
@@ -43,7 +41,7 @@ class System( DBCache ):
             return self._fd.poll()
 
         def wait(self):
-            res = self._fd.wait()
+            self._fd.wait()
             while True:
                 # wait until pipes have been closed
                 if self.stdout._closed and self.stderr._closed:
@@ -133,7 +131,7 @@ class System( DBCache ):
         """
         if self.path == '':
             return ''
-        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        cmd = '%s %s' % (self.path, ' '.join('%s' % a for a in args))
         return self._runcmd(cmd)
 
     def _runcmd(self, cmd):
@@ -162,12 +160,12 @@ class System( DBCache ):
         Permenantly appends one or more strings to the command
             path, separated by spaces.
         """
-        self.path += ' '+' '.join(['%s' % a for a in args])
+        self.path += ' '+' '.join('%s' % a for a in args)
 
     def _runasync(self, *args):
         if self.path == '':
             return ''
-        cmd = '%s %s' % (self.path, ' '.join(['%s' % a for a in args]))
+        cmd = '%s %s' % (self.path, ' '.join('%s' % a for a in args))
         return self.Process(cmd, self.useshell, self.log)
 
 class Metadata( DictData ):
@@ -348,7 +346,7 @@ class Grabber( System ):
             yield self.cls(item)
 
     def command(self, *args):
-        return self._processMetadata(super(Grabber, self).command(*args))
+        return self._processMetadata(super().command(*args))
 
     def search(self, phrase, subtitle=None, tolerance=None, func=None):
         """
