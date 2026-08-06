@@ -217,6 +217,45 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 endif()
 
+# Setting ENABLE_VALGRIND=ON does NOT mean that we're going to pull Valgrind
+# into MythTv. It means that we're going to make a few small changes to
+# MythTv apps which will make them easier to test with a tool like Valgrind.
+# Even with these changes, apps run 10 - 50 times slower under Valgrind.
+if(ENABLE_VALGRIND)
+    add_compile_definitions(CONFIG_VALGRIND=1)
+    # Disabling frame pointer omission makes it
+    # easier to understand reported call stacks.
+    if(MSVC)
+        add_compile_options(/Oy-)
+    else()
+        add_compile_options(-fno-omit-frame-pointer)
+    endif()
+endif()
+
+# Set ENABLE_ASAN=ON to build the apps with Address Sanitizer. Upon exit,
+# they will report memory corruption issues by printing to stdout. The
+# added memory tracking will cause the apps to run 1.5 - 2 times slower.
+if(ENABLE_ASAN)
+    if(MSVC)
+        add_compile_options(/fsanitize=address /Oy-)
+    else()
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address)
+    endif()
+endif()
+
+# Set ENABLE_TSAN=ON to build the apps with Thread Sanitizer. Upon exit,
+# they will report data race issues by printing to stdout. The added
+# memory tracking will cause the apps to run 5 - 10 times slower.
+if(ENABLE_TSAN)
+    if(MSVC)
+        add_compile_options(/fsanitize=thread /Oy-)
+    else()
+        add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=thread)
+    endif()
+endif()
+
 #
 # Check for Interprocedural Optimization, aka Link Time Optimization.
 #
