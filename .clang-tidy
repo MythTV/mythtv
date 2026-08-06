@@ -35,7 +35,7 @@
 # file name instead of directory name, because the latter doesn't work
 # properly in various different build cases.
 #,
-ExcludeHeaderFilterRegex: 'external|include|idle_inhibit_unstable|\.moc$|mpeg2.*\.h$'
+ExcludeHeaderFilterRegex: 'external|include|idle_inhibit_unstable|moc_[[:alnum:]_-]+\.cpp|\.moc$|mpeg2[[:alnum:]_-]+\.h$'
 UseColor: true
 
 Checks: '-*,
