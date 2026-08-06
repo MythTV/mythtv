@@ -157,7 +157,6 @@ target_link_libraries(
          mythmetadata
          mythprotoserver
          mythupnp
-         $<TARGET_NAME_IF_EXISTS:PkgConfig::VALGRIND>
          $<TARGET_NAME_IF_EXISTS:Qt${QT_VERSION_MAJOR}::DBus>)
 
 install(TARGETS mythbackend RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
