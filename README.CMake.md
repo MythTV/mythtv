@@ -383,6 +383,28 @@
   command are booleans, and should be set to "ON" or "OFF".  The rest
   of the entries are strings.
 
+  To build applications which will be easier to debug using Valgrind,
+  turn on the ENABLE_VALGRIND option.
+
+```
+$ cmake --preset <qt5|qt6> -DENABLE_VALGRIND=ON -DCMAKE_INSTALL_PREFIX=<install_location>
+$ cmake --build build-<qt5|qt6>
+```
+
+  To build applications with Address Sanitizer, turn on the ENABLE_ASAN option.
+
+```
+$ cmake --preset <qt5|qt6> -DENABLE_ASAN=ON -DCMAKE_INSTALL_PREFIX=<install_location>
+$ cmake --build build-<qt5|qt6>
+```
+
+  To build applications with Thread Sanitizer, turn on the ENABLE_TSAN option.
+
+```
+$ cmake --preset <qt5|qt6> -DENABLE_TSAN=ON -DCMAKE_INSTALL_PREFIX=<install_location>
+$ cmake --build build-<qt5|qt6>
+```
+
   The build also loads two per-user options files (by default named
   `.config/MythTV/BuildOverridesPre.cmake` and
   `.config/MythTV/BuildOverridesPost.cmake`) so that you can
