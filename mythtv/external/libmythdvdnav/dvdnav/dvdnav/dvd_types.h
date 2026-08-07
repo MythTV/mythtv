@@ -44,6 +44,15 @@ typedef enum {
   DVD_MENU_Part       = 7
 } DVDMenuID_t;
 
+/*
+ * Stream Types
+ * (see dvdnav_get_number_of_streams())
+ */
+typedef enum {
+  DVD_SUBTITLE_STREAM = 0,
+  DVD_AUDIO_STREAM    = 1
+} dvdnav_stream_type_t;
+
 /* Domain */
 typedef enum {
   DVD_DOMAIN_FirstPlay = 1,  /* First Play Domain */
