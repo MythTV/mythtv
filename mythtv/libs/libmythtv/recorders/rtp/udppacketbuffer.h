@@ -17,7 +17,7 @@ class UDPPacketBuffer : public PacketBuffer
     /// Adds Raw UDP data packet
     void PushDataPacket(const UDPPacket &packet) override // PacketBuffer
     {
-        m_available_packets.push_back(packet);
+        m_availablePackets.push_back(packet);
     }
 
     /// Frees the packet, there is no FEC used by Raw UDP

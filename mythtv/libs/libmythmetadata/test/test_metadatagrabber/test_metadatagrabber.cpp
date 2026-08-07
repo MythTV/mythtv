@@ -62,3 +62,5 @@ void TestMetadataGrabber::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestMetadataGrabber)
+
+#include "moc_test_metadatagrabber.cpp"

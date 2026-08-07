@@ -12,9 +12,8 @@
 
 #include "mythscreentype.h"
 #include "mythuitextedit.h"
+#include "mythuibuttonlist.h"
 
-class MythUIButtonListItem;
-class MythUIButtonList;
 class MythUIButton;
 class MythUITextEdit;
 class MythUIImage;

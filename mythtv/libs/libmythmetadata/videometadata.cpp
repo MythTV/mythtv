@@ -392,6 +392,10 @@ class VideoMetadataImp
 /////////////////////////////
 /////////
 /////////////////////////////
+
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
+
 /** \fn VideoMetadataImp::sortBefore(const VideoMetadataImp *)
  *  \brief Returns true if the object should appear before the argument.
  */
@@ -404,6 +408,7 @@ bool VideoMetadataImp::sortBefore(const VideoMetadataImp *rhs) const
         cmp = m_id <=> rhs->m_id;
     return cmp < 0;
 }
+// NOLINTEND(modernize-use-nullptr)
 
 bool VideoMetadataImp::removeDir(const QString &dirName)
 {

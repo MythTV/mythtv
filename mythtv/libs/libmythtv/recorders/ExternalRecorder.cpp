@@ -156,7 +156,9 @@ bool ExternalRecorder::Open(void)
     if (m_streamHandler)
     {
         if (m_streamHandler->IsAppOpen())
+        {
             LOG(VB_RECORD, LOG_INFO, LOC + "Opened successfully");
+        }
         else
         {
             ExternalStreamHandler::Return(m_streamHandler,

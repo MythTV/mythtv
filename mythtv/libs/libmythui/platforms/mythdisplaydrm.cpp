@@ -191,3 +191,5 @@ bool MythDisplayDRM::SwitchToVideoMode(QSize Size, double DesiredRate)
 
     return m_device->SwitchMode(m_modeMap.value(mode));
 }
+
+#include "moc_mythdisplaydrm.cpp"

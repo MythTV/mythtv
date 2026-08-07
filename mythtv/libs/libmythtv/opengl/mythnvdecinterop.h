@@ -29,10 +29,10 @@ class MythNVDECInterop : public MythOpenGLInterop
   protected:
     MythNVDECInterop(MythPlayerUI* Player, MythRenderOpenGL* Context);
    ~MythNVDECInterop() override;
+    void           DeleteTextures() override;
 
   private:
     bool           InitialiseCuda();
-    void           DeleteTextures() override;
     void           RotateReferenceFrames(CUdeviceptr Buffer);
     static bool    CreateCUDAPriv(MythRenderOpenGL* GLContext, CudaFunctions*& CudaFuncs,
                                   CUcontext& CudaContext, bool& Retry);

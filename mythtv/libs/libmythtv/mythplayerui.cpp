@@ -501,7 +501,9 @@ bool MythPlayerUI::VideoLoop()
     ProcessCallbacks();
 
     if (m_videoPaused || m_isDummy)
+    {
         DisplayPauseFrame();
+    }
     else if (DisplayNormalFrame())
     {
         if (FlagIsSet(kVideoIsNull) && m_decoder)
@@ -1256,3 +1258,5 @@ void MythPlayerUI::JumpToProgram()
     m_playerCtx->SetPlayerChangingBuffers(false);
     LOG(VB_PLAYBACK, LOG_INFO, LOC + "JumpToProgram - end");
 }
+
+#include "moc_mythplayerui.cpp"

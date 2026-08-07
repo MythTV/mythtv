@@ -56,7 +56,7 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
             LOG(VB_RECORD, LOG_DEBUG, QString("Popping %1 as %2")
                 .arg((*it).GetSequenceNumber()).arg(it.key()));
 */
-            m_available_packets.push_back(*it);
+            m_availablePackets.push_back(*it);
             m_unorderedPackets.erase(it);
         }
     }

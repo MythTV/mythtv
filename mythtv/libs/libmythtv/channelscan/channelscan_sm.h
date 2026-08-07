@@ -41,6 +41,9 @@
 #include <QString>
 
 // MythTV includes
+#ifndef __cpp_size_t_suffix
+#include "libmythbase/sizetliteral.h"
+#endif
 #include "dtvconfparserhelpers.h" // for DTVTunerType
 #include "frequencytables.h"
 #include "iptvchannelfetcher.h"
@@ -97,6 +100,8 @@ class ChannelScanSM : public MPEGStreamListener,
                   std::chrono::milliseconds signal_timeout, std::chrono::milliseconds channel_timeout,
                   QString inputname, bool test_decryption);
     ~ChannelScanSM() override;
+
+    void run(void) override; // QRunnable
 
     void StartScanner(void);
     void StopScanner(void);
@@ -165,8 +170,6 @@ class ChannelScanSM : public MPEGStreamListener,
     HDHRChannel      *GetHDHRChannel(void);
     DVBChannel       *GetDVBChannel(void);
     const DVBChannel *GetDVBChannel(void) const;
-
-    void run(void) override; // QRunnable
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
@@ -267,8 +270,13 @@ class ChannelScanSM : public MPEGStreamListener,
 
 inline void ChannelScanSM::UpdateScanPercentCompleted(void)
 {
-    int tmp = (m_transportsScanned * 100) /
+#ifdef __cpp_size_t_suffix
+    int tmp = (m_transportsScanned * 100Z) /
               (m_scanTransports.size() + m_extendTransports.size());
+#else
+    int tmp = (m_transportsScanned * 100_Z) /
+              (m_scanTransports.size() + m_extendTransports.size());
+#endif
     m_scanMonitor->ScanPercentComplete(tmp);
 }
 

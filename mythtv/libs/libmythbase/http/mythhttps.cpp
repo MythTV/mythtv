@@ -46,28 +46,6 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
         configdir.chop(1);
     configdir.append(QStringLiteral("/certificates/"));
 
-    auto hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
-    if (hostKeyPath.isEmpty())
-        hostKeyPath = configdir + "key.pem";
-    LOG(VB_HTTP, LOG_DEBUG, LOC + "key " + hostKeyPath);
-
-    QFile hostKeyFile(hostKeyPath);
-    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_WARNING, LOC +
-            QString("SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
-        return false;
-    }
-
-    auto rawHostKey = hostKeyFile.readAll();
-    auto hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-    if (hostKey.isNull())
-    {
-        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load host key from file (%1)").arg(hostKeyPath));
-        return false;
-    }
-    Config.setPrivateKey(hostKey);
-
     auto hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
     if (hostCertPath.isEmpty())
         hostCertPath = configdir + "cert.pem";
@@ -95,6 +73,28 @@ bool MythHTTPS::InitSSLServer(QSslConfiguration& Config)
     }
 
     Config.setLocalCertificate(hostCert);
+
+    auto hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
+    if (hostKeyPath.isEmpty())
+        hostKeyPath = configdir + "key.pem";
+    LOG(VB_HTTP, LOG_DEBUG, LOC + "key " + hostKeyPath);
+
+    QFile hostKeyFile(hostKeyPath);
+    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_WARNING, LOC +
+            QString("SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
+        return false;
+    }
+
+    auto rawHostKey = hostKeyFile.readAll();
+    auto hostKey = QSslKey(rawHostKey, hostCert.publicKey().algorithm(), QSsl::Pem, QSsl::PrivateKey);
+    if (hostKey.isNull())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + QString("Unable to load host key from file (%1)").arg(hostKeyPath));
+        return false;
+    }
+    Config.setPrivateKey(hostKey);
 
     auto caCertPath = gCoreContext->GetSetting("caSSLCertificate", "");
     bool caCertPathDefault {false};

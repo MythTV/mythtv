@@ -115,7 +115,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
     m_requestPause  = false;
     m_paused        = false;
 
-    m_readQuanta   = (readQuanta) ? readQuanta : m_readQuanta;
+    m_readQuanta   = readQuanta ? readQuanta : m_readQuanta;
     m_devBufferCount = deviceBufferCount;
 #ifdef __cpp_size_t_suffix
     m_size          = gCoreContext->GetNumSetting(
@@ -126,7 +126,7 @@ bool DeviceReadBuffer::Setup(const QString &streamName, int streamfd,
 #endif
     m_used          = 0;
     m_devReadSize = m_readQuanta * (m_usingPoll ? 256 : 48);
-    m_devReadSize = (deviceBufferSize) ?
+    m_devReadSize = deviceBufferSize ?
         std::min(m_devReadSize, (size_t)deviceBufferSize) : m_devReadSize;
     m_readThreshold = m_readQuanta * 128;
 
@@ -236,7 +236,7 @@ void DeviceReadBuffer::SetPaused(bool val)
 // The WakePoll code is copied from MythSocketThread::WakeReadyReadThread()
 void DeviceReadBuffer::WakePoll(void) const
 {
-    std::string buf(1,'\0');
+    std::array<char,1> buf {};
     ssize_t wret = 0;
     while (isRunning() && (wret <= 0) && (m_wakePipe[1] >= 0))
     {

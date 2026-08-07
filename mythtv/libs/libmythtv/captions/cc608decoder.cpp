@@ -818,7 +818,9 @@ size_t CC608Decoder::NewRowCC(size_t mode, size_t len)
         if (m_row[mode] == 0)
         {
             if (len == 0)
+            {
                 m_row[mode] = m_newRow[mode];
+            }
             else
             {
                 // previous line was missing a row address
@@ -900,12 +902,12 @@ size_t CC608Decoder::NewRowCC(size_t mode, size_t len)
 
 static bool IsPrintable(uint8_t c)
 {
-    return ((c) & 0x7F) >= 0x20 && ((c) & 0x7F) <= 0x7E;
+    return (c & 0x7F) >= 0x20 && (c & 0x7F) <= 0x7E;
 }
 
 static int8_t Printable(uint8_t c)
 {
-    return IsPrintable(c) ? ((c) & 0x7F) : '.';
+    return IsPrintable(c) ? (c & 0x7F) : '.';
 }
 
 #if 0
@@ -928,7 +930,7 @@ static void DumpPIL(int pil)
     int day  = (pil >> 15);
     int mon  = (pil >> 11) & 0xF;
     int hour = (pil >> 6 ) & 0x1F;
-    int min  = (pil      ) & 0x3F;
+    int min  =  pil        & 0x3F;
 
     if (pil == PIL_TIME(0, 15, 31, 63))
         LOG(VB_VBI, LOG_INFO, " PDC: Timer-control (no PDC)");
@@ -1071,13 +1073,13 @@ static bool is_better(const QString &newStr, const QString &oldStr)
 uint CC608Decoder::GetRatingSystems(bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
-    return m_xdsRatingSystems[(future) ? 1 : 0];
+    return m_xdsRatingSystems[future ? 1 : 0];
 }
 
 uint CC608Decoder::GetRating(uint i, bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
-    return m_xdsRating[(future) ? 1 : 0][i & 0x3] & 0x7;
+    return m_xdsRating[future ? 1 : 0][i & 0x3] & 0x7;
 }
 
 QString CC608Decoder::GetRatingString(uint i, bool future) const
@@ -1097,7 +1099,7 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
 
     if (kRatingTPG == i)
     {
-        uint cf = (future) ? 1 : 0;
+        uint cf = future ? 1 : 0;
         if (!(m_xdsRating[cf][i]&0xF0))
             return main;
 
@@ -1119,13 +1121,13 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
 QString CC608Decoder::GetProgramName(bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
-    return m_xdsProgramName[(future) ? 1 : 0];
+    return m_xdsProgramName[future ? 1 : 0];
 }
 
 QString CC608Decoder::GetProgramType(bool future) const
 {
     QMutexLocker locker(&m_xdsLock);
-    const std::vector<uint> &program_type = m_xdsProgramType[(future) ? 1 : 0];
+    const std::vector<uint> &program_type = m_xdsProgramType[future ? 1 : 0];
     QString tmp = "";
 
     for (size_t i = 0; i < program_type.size(); i++)
@@ -1316,8 +1318,8 @@ bool CC608Decoder::XDSPacketParseProgram(
 {
     bool handled = true;
     int b2 = xds_buf[1];
-    int cf = (future) ? 1 : 0;
-    QString loc = (future) ? "XDS: Future " : "XDS: Current ";
+    int cf = future ? 1 : 0;
+    QString loc = future ? "XDS: Future " : "XDS: Current ";
 
     if ((b2 == 0x01) && (xds_buf.size() >= 6))
     {

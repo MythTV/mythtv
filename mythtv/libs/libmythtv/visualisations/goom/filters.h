@@ -25,17 +25,18 @@ struct ZoomFilterData
 	char    noisify;		/* ajoute un bruit a la transformation */
 };
 
-
-#define NORMAL_MODE 0
-#define WAVE_MODE 1
-#define CRYSTAL_BALL_MODE 2
-#define SCRUNCH_MODE 3
-#define AMULETTE_MODE 4
-#define WATER_MODE 5
-#define HYPERCOS1_MODE 6
-#define HYPERCOS2_MODE 7
-#define YONLY_MODE 8
-#define SPEEDWAY_MODE 9
+enum FILTER_MODE : uint8_t {
+    NORMAL_MODE       = 0,
+    WAVE_MODE         = 1,
+    CRYSTAL_BALL_MODE = 2,
+    SCRUNCH_MODE      = 3,
+    AMULETTE_MODE     = 4,
+    WATER_MODE        = 5,
+    HYPERCOS1_MODE    = 6,
+    HYPERCOS2_MODE    = 7,
+    YONLY_MODE        = 8,
+    SPEEDWAY_MODE     = 9,
+};
 
 void    pointFilter (uint32_t * pix1, Color c, float t1, float t2, float t3, float t4, uint32_t cycle);
 
@@ -46,8 +47,5 @@ void    pointFilter (uint32_t * pix1, Color c, float t1, float t2, float t3, flo
  */
 
 void    zoomFilterFastRGB (uint32_t * pix1, uint32_t * pix2, ZoomFilterData * zf, uint32_t resx, uint32_t resy, int switchIncr, float switchMult);
-
-#define SIN_MUL 1
-#define SIN_ADD 2
 
 #endif

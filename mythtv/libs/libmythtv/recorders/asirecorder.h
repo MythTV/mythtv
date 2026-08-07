@@ -67,6 +67,8 @@ class ASIRecorder : public DTVRecorder
     bool Open(void);
     bool IsOpen(void) const;
     void Close(void);
+
+  protected:
     void StartNewFile(void) override; // RecorderBase
 
   private:

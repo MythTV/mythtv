@@ -69,6 +69,10 @@ class HDHRStreamHandler : public StreamHandler
     bool TuneProgram(uint mpeg_prog_num);
     bool TuneVChannel(const QString &vchn);
 
+  protected:
+    void run(void) override; // MThread
+    bool UpdateFilters(void) override; // StreamHandler
+
   private:
     explicit HDHRStreamHandler(const QString &device, int inputid, int majorid);
 
@@ -79,10 +83,6 @@ class HDHRStreamHandler : public StreamHandler
 
     bool Open(void);
     void Close(void);
-
-    void run(void) override; // MThread
-
-    bool UpdateFilters(void) override; // StreamHandler
 
   private:
     hdhomerun_device_t          *m_hdhomerunDevice  {nullptr};

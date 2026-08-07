@@ -3,8 +3,7 @@
 
 MythRender::MythRender(RenderType type)
   : ReferenceCounter(QString("MythRender:%1").arg(type)),
-    m_type(type),
-    m_errored(false)
+    m_type(type)
 {
 }
 

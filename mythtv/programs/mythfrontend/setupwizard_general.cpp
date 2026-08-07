@@ -293,3 +293,5 @@ void GeneralSetupWizard::CreateBusyDialog(const QString& message)
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
 }
+
+#include "moc_setupwizard_general.cpp"

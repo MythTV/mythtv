@@ -65,7 +65,6 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
    ~MythDownloadManager() override;
 
     // Methods for starting the queue manager thread
-    void run(void) override; // MThread
     void setRunThread(void) { m_runThread = true; }
     QThread *getQueueThread(void) { return m_queueThread; }
     bool isRunning(void) const { return m_isRunning; }
@@ -115,6 +114,9 @@ class MBASE_PUBLIC MythDownloadManager : public QObject, public MThread
 
     QString getHeader(const QUrl &url, const QString &header);
     static QString getHeader(const QNetworkCacheMetaData &cacheData, const QString &header);
+
+  protected:
+    void run(void) override; // MThread
 
   private slots:
     // QNetworkAccessManager signals

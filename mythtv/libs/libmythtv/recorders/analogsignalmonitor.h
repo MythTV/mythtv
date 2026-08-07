@@ -16,6 +16,7 @@ class AnalogSignalMonitor : public SignalMonitor
                         bool _release_stream,
                         uint64_t _flags = kSigMon_WaitForSig);
 
+  protected:
     void UpdateValues(void) override; // SignalMonitor
 
   private:

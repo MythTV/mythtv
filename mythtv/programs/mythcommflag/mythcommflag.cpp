@@ -336,7 +336,7 @@ static void incomingCustomEvent(QEvent* e)
         LOG(VB_COMMFLAG, LOG_INFO,
             QString("mythcommflag: Received Event: '%1'") .arg(message));
 
-        if ((watchingRecording) && (tokens.size() >= 3) &&
+        if (watchingRecording && (tokens.size() >= 3) &&
             (tokens[0] == "DONE_RECORDING"))
         {
             int cardnum = tokens[1].toInt();

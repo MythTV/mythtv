@@ -109,8 +109,10 @@ class VisFactory
 };
 
 
-#define RUBBERBAND 0 // NOLINT(cppcoreguidelines-macro-usage)
-#define TWOCOLOUR 1 // NOLINT(cppcoreguidelines-macro-usage)
+// NOLINTBEGIN(cppcoreguidelines-macro-usage,modernize-macro-to-enum)
+#define RUBBERBAND 0
+#define TWOCOLOUR 1
+// NOLINTEND(cppcoreguidelines-macro-usage,modernize-macro-to-enum)
 
 class StereoScope : public VisualBase
 {

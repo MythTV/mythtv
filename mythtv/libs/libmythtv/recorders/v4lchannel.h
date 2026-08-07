@@ -14,7 +14,8 @@
 #include <linux/videodev2.h>
 #endif
 
-#define FAKE_VIDEO 0 // NOLINT(cppcoreguidelines-macro-usage)
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage,modernize-macro-to-enum)
+#define FAKE_VIDEO 0
 
 class TVRec;
 
@@ -50,6 +51,7 @@ class V4LChannel : public DTVChannel
 
     // Sets
     void SetFd(int fd) override; // ChannelBase
+    int  SetFreqTable(const QString &name) override; // ChannelBase
     void SetFormat(const QString &format) override; // DTVChannel
     int  SetDefaultFreqTable(const QString &name);
 
@@ -76,7 +78,6 @@ class V4LChannel : public DTVChannel
   private:
     // Helper Sets
     void SetFreqTable(int index);
-    int  SetFreqTable(const QString &name) override; // ChannelBase
     bool SetInputAndFormat(int inputNum, const QString& newFmt);
 
     // Helper Gets

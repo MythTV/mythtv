@@ -86,7 +86,7 @@ private:
                                       void* refcon, void* sender);
     void        _queueCallbackFunction(IOReturn result,
                                        void* refcon, void* sender);
-    void        _handleEventWithCookieString(std::string cookieString,
+    void        _handleEventWithCookieString(const std::string& cookieString,
                                              SInt32 sumOfValues);
 };
 

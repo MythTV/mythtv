@@ -584,9 +584,13 @@ int DBEvent::GetMatch(const std::vector<DBEvent> &programs, int &bestmatch) cons
          * we don't know which one starts first */
         int overlap = 0;
         if (m_starttime < programs[i].m_starttime)
+        {
             overlap = programs[i].m_starttime.secsTo(m_endtime);
+        }
         else if (m_starttime > programs[i].m_starttime)
+        {
             overlap = m_starttime.secsTo(programs[i].m_endtime);
+        }
         else
         {
             if (m_endtime <= programs[i].m_endtime)

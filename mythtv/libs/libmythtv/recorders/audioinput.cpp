@@ -31,13 +31,13 @@ AudioInput *AudioInput::CreateDevice(const QByteArray &device)
 {
     AudioInput *audio = nullptr;
     if (CONFIG_AUDIO_OSS && device.startsWith("/"))
-    {
+    { //NOLINT(bugprone-branch-clone)
 #if defined( CONFIG_AUDIO_OSS ) && (CONFIG_AUDIO_OSS==1)
         audio = new AudioInputOSS(device);
 #endif
     }
     else if (CONFIG_AUDIO_ALSA && device.startsWith("ALSA:"))
-    {
+    { //NOLINT(bugprone-branch-clone)
 #if defined( CONFIG_AUDIO_ALSA ) && (CONFIG_AUDIO_ALSA==1)
         audio = new AudioInputALSA(device);
 #endif

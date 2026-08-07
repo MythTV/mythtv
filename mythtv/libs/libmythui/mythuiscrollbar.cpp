@@ -84,7 +84,9 @@ void MythUIScrollBar::SetSliderPosition(int value)
 void MythUIScrollBar::CalculatePosition(void)
 {
     if (m_maximum > 0)
+    {
         Show();
+    }
     else
     {
         Hide();
@@ -176,3 +178,5 @@ void MythUIScrollBar::DoneFading(void)
     disconnect(this, &MythUIType::FinishedFading, nullptr, nullptr);
     Hide();
 }
+
+#include "moc_mythuiscrollbar.cpp"

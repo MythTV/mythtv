@@ -950,10 +950,10 @@ BackendSettings::BackendSettings()
     connect(m_ipAddressSettings, &HostCheckBoxSetting::valueChanged,
             this, &BackendSettings::listenChanged);
     connect(m_ipAddressSettings->m_localServerIP,
-            static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
+            qOverload<const QString&>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
     connect(m_ipAddressSettings->m_localServerIP6,
-            static_cast<void (StandardSetting::*)(const QString&)>(&StandardSetting::valueChanged),
+            qOverload<const QString&>(&StandardSetting::valueChanged),
             this, &BackendSettings::listenChanged);
     server->addChild(m_backendServerAddr);
     //++ Master Backend ++
@@ -1222,3 +1222,5 @@ BackendSettings::~BackendSettings()
     delete m_masterServerPort;
     m_masterServerPort=nullptr;
 }
+
+#include "moc_backendsettings.cpp"

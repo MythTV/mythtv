@@ -152,11 +152,12 @@ class LoggerThread : public QObject, public MThread
   public:
     LoggerThread(QString filename, bool progress, bool quiet, int facility, bool loglong);
     ~LoggerThread() override;
-    void run(void) override; // MThread
     void stop(void);
     bool flush(int timeoutMS = 200000);
     static void handleItem(LoggingItem *item);
     void fillItem(LoggingItem *item);
+  protected:
+    void run(void) override; // MThread
   private:
     Q_DISABLE_COPY(LoggerThread);
     QWaitCondition *m_waitNotEmpty {nullptr};

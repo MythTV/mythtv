@@ -61,7 +61,9 @@ void NetBase::InitProgressDialog()
         m_popupStack, "videodownloadprogressdialog");
 
     if (m_progressDialog->Create())
+    {
         m_popupStack->AddScreen(m_progressDialog, false);
+    }
     else
     {
         delete m_progressDialog;
@@ -216,7 +218,9 @@ void NetBase::DoDeleteVideo(bool remove)
                                            item->GetMediaURL());
 
     if (filename.startsWith("myth://"))
+    {
         RemoteFile::DeleteFile(filename);
+    }
     else
     {
         QFile file(filename);
@@ -330,3 +334,5 @@ void NetBase::DoPlayVideo(void)
 
     DoPlayVideo(filename);
 }
+
+#include "moc_netbase.cpp"

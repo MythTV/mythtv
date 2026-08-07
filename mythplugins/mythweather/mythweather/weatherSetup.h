@@ -70,6 +70,8 @@ class ScreenSetup : public MythScreenType
 
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
   protected slots:

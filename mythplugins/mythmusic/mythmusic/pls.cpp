@@ -56,9 +56,13 @@ int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
     QStringList groups = settings.childGroups();
 
     if (groups.contains("playlist"))
+    {
         settings.beginGroup("playlist");
+    }
     else if (groups.contains("Playlist"))
+    {
         settings.beginGroup("Playlist");
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler: parsePLS - playlist group not found"));
@@ -71,9 +75,13 @@ int PlayListFile::parsePLS(PlayListFile *pls, const QString &filename)
     QStringList keys = settings.childKeys();
 
     if (keys.contains("numberofentries"))
+    {
         num_entries = settings.value("numberofentries", -1).toInt();
+    }
     else if (keys.contains("NumberOfEntries"))
+    {
         num_entries = settings.value("NumberOfEntries", -1).toInt();
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("DecoderHandler: parsePLS - NumberOfEntries key not found"));

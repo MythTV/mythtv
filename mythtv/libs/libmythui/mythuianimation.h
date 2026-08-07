@@ -59,8 +59,6 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     QVariant Value() const { return m_value; }
     bool IsActive() const { return m_active; }
 
-    void updateCurrentValue(const QVariant& value) override; // QVariantAnimation
-
     void IncrementCurrentTime(void);
     void SetEasingCurve(const QString &curve);
     void SetCentre(const QString &centre);
@@ -68,6 +66,9 @@ class MythUIAnimation : public QVariantAnimation, XMLParseBase
     void SetReversible(bool rev) { m_reversible = rev; }
 
     static void ParseElement(const QDomElement& element, MythUIType* parent);
+
+  protected:
+    void updateCurrentValue(const QVariant& value) override; // QVariantAnimation
 
   private:
     static void ParseSection(const QDomElement &element,

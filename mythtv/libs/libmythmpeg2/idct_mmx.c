@@ -709,8 +709,9 @@ do {					\
     if (cpu != CPU_MMXEXT) {		\
 	punpcklwd_r2r (reg, reg);	\
 	punpckldq_r2r (reg, reg);	\
-    } else				\
+    } else {				\
 	pshufw_r2r (reg, reg, 0x00);	\
+    }					\
 } while (0)
 
 /* NOLINTNEXTLINE(readability-non-const-parameter) */

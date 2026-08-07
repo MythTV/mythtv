@@ -142,7 +142,7 @@
             "speedup_label": "商業檢測的實驗加速",
             "strict_desc": "啟用更嚴格的商業檢測代碼。如果未偵測到某些廣告，請停用。",
             "strict_label": "嚴格商業檢測",
-            "subtitle": "商業檢測a和轉碼作業設置"
+            "subtitle": "商業檢測和轉碼作業設置"
         },
         "playgroup": {
             "delete_details": "這將刪除播放組 {{ Name }}。",
@@ -230,6 +230,7 @@
             "damaged": "損壞的",
             "delete_details": "這將刪除記錄規則",
             "delete_rule": "刪除錄音規則",
+            "deletewarning": "這將永久刪除該錄音檔案。它無法撤消。此外，如果您選擇了多行，則「已刪除」群組和「LiveTV」群組中的所有選定錄製內容都將永久刪除。您不會針對每一項都收到警告。你確定嗎？",
             "description": "描述",
             "dont_rec": "不記錄",
             "download": "下載錄音",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "標記為未損壞",
             "mnu_markunwatched": "標記為未觀看",
             "mnu_markwatched": "標記為已觀看",
+            "mnu_permdelete": "永久刪除",
             "mnu_rerec": "允許重新錄製",
             "mnu_runjobs": "運行作業",
             "mnu_stoprec": "停止錄音",
@@ -395,6 +397,8 @@
             "backends_detail": "後端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "無後端",
             "backends_title": "後端",
+            "dbbackups_none": "沒有資料庫備份。",
+            "dbbackups_title": "資料庫備份",
             "encoder_text": "{{ DisplayName }}、{{ CardDetails }} 位於主機 {{ HostName }} 上。州：{{ State }}。",
             "encoder_title": "編碼器狀態",
             "endtime_text": "該錄製計劃於 {{ EndTime }} 結束。",

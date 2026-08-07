@@ -92,7 +92,7 @@ void Synaesthesia::setupPalette(void)
             if (blue > 255) { excess += blue - 255; blue = 255; }
         }
 
-        double scale2 = (0.5 + (red + green + blue) / 768.0) / 1.5;
+        double scale2 = (0.5 + ((red + green + blue) / 768.0)) / 1.5;
         red *= scale2;
         green *= scale2;
         blue *= scale2;
@@ -415,7 +415,9 @@ void Synaesthesia::fadeHeat(void)
                               int(lastOutput[i2 + step])) >> 2) +
                 lastOutput[i2];
             if (!j2)
+            {
                 output[i2] = 0;
+            }
             else
             {
                 j2 = j2 - lastLastOutput[i2] +
@@ -486,7 +488,7 @@ bool Synaesthesia::process(VisualNode *node)
         b[i] = sqrt(bb);
         if (aa + bb != 0.0)
         {
-            clarity[i] = (int)(((x1 + x2) * (x1 - x2) + (y1 + y2) * (y1 - y2)) /
+            clarity[i] = (int)((((x1 + x2) * (x1 - x2)) + ((y1 + y2) * (y1 - y2))) /
                          (aa + bb) * 256);
         }
         else
@@ -612,12 +614,12 @@ bool Synaesthesia::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             *(ptrTop++) = v | (((r2 & 0x000000f0UL) << 12) |
                                ((r2 & 0x0000f000UL) << 8) |
                                ((r2 & 0x00f00000UL) << 4) |
-                               ((r2 & 0xf0000000UL)));
+                               ( r2 & 0xf0000000UL));
 
             *(ptrBot++) = v | (((r2 & 0x000000f0UL) << 12) |
                                ((r2 & 0x0000f000UL) << 8) |
                                ((r2 & 0x00f00000UL) << 4) |
-                               ((r2 & 0xf0000000UL)));
+                               ( r2 & 0xf0000000UL));
         }
     }
 

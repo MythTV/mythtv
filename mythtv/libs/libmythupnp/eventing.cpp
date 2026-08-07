@@ -168,7 +168,7 @@ bool Eventing::ProcessRequest( HTTPRequest *pRequest )
         }       
     }
 
-    return( true );
+    return true;
 
 }
 

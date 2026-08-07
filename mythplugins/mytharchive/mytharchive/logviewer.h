@@ -25,9 +25,13 @@ class LogViewer : public MythScreenType
    ~LogViewer(void) override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
 
     void setFilenames(const QString &progressLog, const QString &fullLog);
+
+  protected:
+    void Init(void) override; // MythScreenType
 
   protected slots:
     static void cancelClicked(void);
@@ -37,11 +41,9 @@ class LogViewer : public MythScreenType
     static bool loadFile(const QString& filename, QStringList &list, int startline);
     void showProgressLog(void);
     void showFullLog(void);
-    void ShowMenu(void) override; // MythScreenType
     void updateLogItem(MythUIButtonListItem *item);
 
   private:
-    void Init(void) override; // MythScreenType
     static QString getSetting(const QString &key);
 
     bool                m_autoUpdate   {false};

@@ -142,7 +142,7 @@
             "speedup_label": "Experimentele versnelling van commerciële detectie",
             "strict_desc": "Schakel strengere commerciële detectiecode in. Schakel uit als bepaalde reclames niet worden gedetecteerd.",
             "strict_label": "Strikte commerciële detectie",
-            "subtitle": "Commerciële detectiea en transcodeeropdrachtinstellingen"
+            "subtitle": "Commerciële detectie en transcoderingstaakinstellingen"
         },
         "playgroup": {
             "delete_details": "Hierdoor wordt de afspeelgroep {{ Name }} verwijderd.",
@@ -230,6 +230,7 @@
             "damaged": "Beschadigd",
             "delete_details": "Hiermee wordt de opnameregel verwijderd",
             "delete_rule": "Opnameregel verwijderen",
+            "deletewarning": "Hierdoor wordt dit opnamebestand definitief verwijderd. Het kan niet ongedaan worden gemaakt. Als u meerdere rijen heeft geselecteerd, worden bovendien alle geselecteerde opnamen in de groepen Verwijderd en LiveTV permanent verwijderd. U wordt niet voor iedereen gewaarschuwd. Weet je het zeker?",
             "description": "Beschrijving",
             "dont_rec": "Niet opnemen",
             "download": "Opname downloaden",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Markeer als onbeschadigd",
             "mnu_markunwatched": "Markeren als niet bekeken",
             "mnu_markwatched": "Markeren als bekeken",
+            "mnu_permdelete": "Permanent verwijderen",
             "mnu_rerec": "Opnieuw opnemen toestaan",
             "mnu_runjobs": "Taken uitvoeren",
             "mnu_stoprec": "Stop met opnemen",
@@ -395,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} is een {{ Type }} op IP {{ IP }}",
             "backends_none": "Geen back-ends",
             "backends_title": "Back-ends",
+            "dbbackups_none": "Geen databaseback-ups.",
+            "dbbackups_title": "Database-back-ups",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} bevindt zich op host {{ HostName }}. Staat: {{ State }}.",
             "encoder_title": "Encoder-status",
             "endtime_text": "Het einde van deze opname is gepland om {{ EndTime }}.",

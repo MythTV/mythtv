@@ -19,11 +19,7 @@ class AudioOutputOpenSLES : public AudioOutputBase
   friend class AudioOutputOpenSLESPrivate;
   public:
     explicit AudioOutputOpenSLES(const AudioSettings &settings);
-    virtual ~AudioOutputOpenSLES();
-
-    // Volume control
-    int  GetVolumeChannel(int channel) const override; // VolumeBase
-    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
+    ~AudioOutputOpenSLES() override;
 
   protected:
     bool OpenDevice(void) override; // AudioOutputBase
@@ -31,6 +27,10 @@ class AudioOutputOpenSLES : public AudioOutputBase
     void WriteAudio(unsigned char *aubuf, int size) override; // AudioOutputBase
     int  GetBufferedOnSoundcard(void) const override; // AudioOutputBase
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
+
+    // Volume control
+    int  GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
 
   private:
     int GetNumberOfBuffersQueued() const;
@@ -56,16 +56,16 @@ class AudioOutputOpenSLES : public AudioOutputBase
     SLPlayItf                       m_playerPlay        {nullptr};
 
     /* OpenSL symbols */
-    void                           *m_so_handle         {nullptr};
+    void                           *m_soHandle          {nullptr};
 
     slCreateEngine_t                m_slCreateEnginePtr {nullptr};
-    SLInterfaceID                   m_SL_IID_ENGINE     {nullptr};
-    SLInterfaceID                   m_SL_IID_ANDROIDSIMPLEBUFFERQUEUE {nullptr};
-    SLInterfaceID                   m_SL_IID_VOLUME     {nullptr};
-    SLInterfaceID                   m_SL_IID_PLAY       {nullptr};
+    SLInterfaceID                   m_slIidEngine       {nullptr};
+    SLInterfaceID                   m_slIidAndroidSimpleBufferQueue {nullptr};
+    SLInterfaceID                   m_slIidVolume       {nullptr};
+    SLInterfaceID                   m_slIidPlay         {nullptr};
 
     /* audio buffered through opensles */
-    uint8_t                        *m_buf               {nullptr};
+    std::vector<uint8_t>            m_buf;
     int                             m_bufWriteBase     {0}; // always fragment aligned
     int                             m_bufWriteIndex    {0}; // offset from base
 

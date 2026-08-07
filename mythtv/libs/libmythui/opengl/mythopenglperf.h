@@ -16,19 +16,25 @@
 using GLuint64 = uint64_t;
 #endif
 
+// This defines the Qt QOpenGLTimeMonitor class (for those systems
+// whose Qt doesn't have it).  This has to match the Qt definition of
+// the class.
+//
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 class QOpenGLTimeMonitor
 {
   public:
-    QOpenGLTimeMonitor() {};
-    void setSampleCount(int) {};
-    int  sampleCount() const { return 0; };
+    QOpenGLTimeMonitor() = default;
+    void setSampleCount(int /*count*/) {};
+    int  sampleCount() { return 0; };
     bool create() { return false; };
-    bool isCreated() const { return false; };
+    bool isCreated() { return false; };
     int  recordSample() { return 0; };
-    bool isResultAvailable() const { return false; };
-    QVector<GLuint64> waitForIntervals() const { return QVector<GLuint64>(); };
+    bool isResultAvailable() { return false; };
+    QVector<GLuint64> waitForIntervals() { return {}; };
     void reset() {};
 };
+// NOLINTEND(readability-convert-member-functions-to-static)
 #endif
 
 // MythTV

@@ -75,9 +75,9 @@ bool FirewireDevice::SetPowerState(bool on)
     cmd.push_back(kAVCControlCommand);
     cmd.push_back(kAVCSubunitTypeUnit | kAVCSubunitIdIgnore);
     cmd.push_back(kAVCUnitPowerOpcode);
-    cmd.push_back((on) ? kAVCPowerStateOn : kAVCPowerStateOff);
+    cmd.push_back(on ? kAVCPowerStateOn : kAVCPowerStateOff);
 
-    QString cmdStr = (on) ? "on" : "off";
+    QString cmdStr = on ? "on" : "off";
     LOG(VB_RECORD, LOG_INFO, LOC + QString("Powering %1").arg(cmdStr));
 
     if (!SendAVCCommand(cmd, ret, -1))

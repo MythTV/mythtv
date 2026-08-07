@@ -3,6 +3,9 @@
 #include <QObject>
 #include "stringutil.h"
 
+// For the spaceship operator, the c++ standard library explicitly
+// requires '0' and not nullptr.  NOLINTBEGIN(modernize-use-nullptr)
+
 bool StringUtil::isValidUTF8(const QByteArray& data)
 {
     const auto* p = (const unsigned char*)data.data();
@@ -302,3 +305,5 @@ QString StringUtil::formatBytes(int64_t sizeB, int precision)
         return formatKBytes(sizeB / 1024, precision);
     return QString("%1 B").arg(sizeB);
 }
+
+// NOLINTEND(modernize-use-nullptr)

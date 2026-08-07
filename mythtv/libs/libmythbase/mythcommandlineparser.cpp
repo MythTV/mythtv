@@ -22,6 +22,7 @@
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 
@@ -1361,7 +1362,9 @@ CommandLineArg* MythCommandLineParser::add(QStringList arglist,
     CommandLineArg *arg = nullptr;
 
     if (m_namedArgs.contains(name))
+    {
         arg = m_namedArgs[name];
+    }
     else
     {
         arg = new CommandLineArg(name, type, std::move(def), std::move(help), std::move(longhelp));
@@ -1655,8 +1658,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
 #ifdef Q_OS_DARWIN
         if (opt.startsWith("-psn_"))
         {
-            std::cerr << "Ignoring Process Serial Number from command line"
-                      << std::endl;
+            std::cerr << "Ignoring Process Serial Number from command line\n";
             continue;
         }
 #endif
@@ -1752,7 +1754,7 @@ bool MythCommandLineParser::Parse(int argc, const char * const * argv)
             std::cerr << "\nExtra argument list:\n";
             QStringList slist = toStringList("_args");
             for (const auto& lopt : std::as_const(slist))
-                std::cerr << "  " << (lopt).toLocal8Bit().constData() << '\n';
+                std::cerr << "  " << lopt.toLocal8Bit().constData() << '\n';
         }
 
         if (m_namedArgs.contains("_passthrough"))
@@ -3021,7 +3023,7 @@ static bool setUser(const QString &username)
     }
     else if (!user_id && user_info)
     {
-        if (setenv("HOME", user_info->pw_dir,1) == -1)
+        if (!qputenv("HOME", user_info->pw_dir))
         {
             std::cerr << "Error setting home directory.\n";
             return false;
@@ -3075,7 +3077,7 @@ int MythCommandLineParser::Daemonize(void) const
 #ifdef Q_OS_DARWIN
     if (toBool("daemon"))
     {
-        std::cerr << "Daemonizing is unavailable in OSX" << std::endl;
+        std::cerr << "Daemonizing is unavailable in OSX\n";
         LOG(VB_GENERAL, LOG_WARNING, "Unable to daemonize");
     }
 #else

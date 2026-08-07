@@ -266,3 +266,5 @@ void MythInputDeviceHandler::customEvent([[maybe_unused]] QEvent* Event)
         QCoreApplication::sendEvent(target, key.data());
     }
 }
+
+#include "moc_mythinputdevicehandler.cpp"

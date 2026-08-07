@@ -14,7 +14,9 @@ class MythWindowVulkan : public QVulkanWindow
    ~MythWindowVulkan() override;
 
     QVulkanWindowRenderer* createRenderer(void) override;
-    bool event(QEvent *Event) override;
+
+  protected:
+    bool event(QEvent *Event) override; // QWindow
 
   private:
     Q_DISABLE_COPY(MythWindowVulkan)

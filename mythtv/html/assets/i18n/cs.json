@@ -142,7 +142,7 @@
             "speedup_label": "Experimentální zrychlení komerční detekce",
             "strict_desc": "Povolit přísnější kód komerční detekce. Zakázat, pokud některé reklamy nejsou detekovány.",
             "strict_label": "Přísná komerční detekce",
-            "subtitle": "Komerční detekce a nastavení úlohy Transcode"
+            "subtitle": "Nastavení úlohy komerční detekce a překódování"
         },
         "playgroup": {
             "delete_details": "Tím se odstraní skupina přehrávání {{ Name }}.",
@@ -230,6 +230,7 @@
             "damaged": "Poškozený",
             "delete_details": "Tím se odstraní pravidlo nahrávání",
             "delete_rule": "Odstranit pravidlo nahrávání",
+            "deletewarning": "Tento soubor záznamu bude trvale smazán. Nelze to vrátit zpět. Pokud jste vybrali více řádků, všechny vybrané nahrávky ve skupinách Smazané a LiveTV budou trvale odstraněny. Nebudete varováni pro každou z nich. jsi si jistý?",
             "description": "Popis",
             "dont_rec": "Nezaznamenejte",
             "download": "Stáhnout záznam",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Označit jako nepoškozené",
             "mnu_markunwatched": "Označit jako nesledované",
             "mnu_markwatched": "Označit jako sledované",
+            "mnu_permdelete": "Trvale smazat",
             "mnu_rerec": "Povolit opětovné nahrávání",
             "mnu_runjobs": "Spustit Jobs",
             "mnu_stoprec": "Zastavit nahrávání",
@@ -395,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} je {{ Type }} na IP {{ IP }}",
             "backends_none": "Žádné backendy",
             "backends_title": "Backendy",
+            "dbbackups_none": "Žádné zálohy databáze.",
+            "dbbackups_title": "Zálohy databáze",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} je na hostiteli {{ HostName }}. Stav: {{ State }}.",
             "encoder_title": "Stav kodéru",
             "endtime_text": "Ukončení tohoto nahrávání je naplánováno na {{ EndTime }}.",

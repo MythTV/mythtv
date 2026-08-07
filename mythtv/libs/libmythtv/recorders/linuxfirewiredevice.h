@@ -26,6 +26,7 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
                         uint speed, bool use_p2p,
                         uint av_buffer_size_in_bytes = 0);
     ~LinuxFirewireDevice() override;
+    void run(void) override; // QRunnable
 
     // Commands
     bool OpenPort(void) override; // FirewireDevice
@@ -50,6 +51,11 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     static const uint kConnectionBroadcast;
     static const uint kMaxBufferedPackets;
 
+  protected:
+    bool SendAVCCommand(const std::vector<uint8_t> &cmd,
+                        std::vector<uint8_t>       &result,
+                        int                    retry_cnt) override; // FirewireDevice
+
   private:
     bool OpenNode(void);
     bool CloseNode(void);
@@ -66,7 +72,6 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool StartStreaming(void);
     bool StopStreaming(void);
 
-    void run(void) override; // QRunnable
     void PrintDropped(uint dropped_packets);
 
     bool SetAVStreamBufferSize(uint size_in_bytes);
@@ -78,10 +83,6 @@ class LinuxFirewireDevice : public FirewireDevice, public QRunnable
     bool UpdateDeviceList(void);
     void UpdateDeviceListItem(uint64_t guid, void *pitem);
     std::vector<AVCInfo> GetSTBListPrivate(void);
-
-    bool SendAVCCommand(const std::vector<uint8_t> &cmd,
-                        std::vector<uint8_t>       &result,
-                        int                    retry_cnt) override; // FirewireDevice
 
     LinuxAVCInfo *GetInfoPtr(void);
     const LinuxAVCInfo *GetInfoPtr(void) const;

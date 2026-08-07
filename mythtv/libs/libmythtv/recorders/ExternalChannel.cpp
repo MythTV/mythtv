@@ -248,7 +248,9 @@ uint ExternalChannel::GetTuneStatus(void)
     else
     {
         if (result.startsWith("OK:InProgress"))
+        {
             ret = 1;
+        }
         else
         {
             ret = 3;

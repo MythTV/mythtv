@@ -104,6 +104,9 @@ class SearchStream : public MythScreenType
 
     bool Create() override; // MythScreenType
 
+  protected:
+    void Load(void) override; // MythScreenType
+
   private slots:
     void doneLoading(void);
     void updateStreams(void);
@@ -112,7 +115,6 @@ class SearchStream : public MythScreenType
     static void streamVisible(MythUIButtonListItem *item);
 
   private:
-    void Load(void) override; // MythScreenType
     static void loadStreams(void);
     void updateBroadcasters(void);
     void updateGenres(void);

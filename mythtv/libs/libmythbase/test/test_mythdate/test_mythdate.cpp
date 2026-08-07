@@ -57,3 +57,5 @@ void TestMythDate::formatting(void)
 }
 
 QTEST_APPLESS_MAIN(TestMythDate)
+
+#include "moc_test_mythdate.cpp"

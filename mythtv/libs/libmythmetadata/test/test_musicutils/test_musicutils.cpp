@@ -118,3 +118,5 @@ void TestMusicUtils::cleanupTestCase()
 }
 
 QTEST_APPLESS_MAIN(TestMusicUtils)
+
+#include "moc_test_musicutils.cpp"

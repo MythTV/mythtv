@@ -10,10 +10,9 @@
 
 // MythUI headers
 #include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibuttonlist.h"
 
 class QEventLoop;
-class MythUIButtonList;
-class MythUIButtonListItem;
 class MythUIButton;
 class MythUIText;
 class MythScreenStack;
@@ -32,12 +31,16 @@ class MUI_PUBLIC LanguageSelection : public MythScreenType
     static bool prompt(bool force = false);
 
     bool Create(void) override; // MythScreenType
+
+  public slots:
+    void Close(void) override; // MythScreenType
+
+  protected:
     void Load(void) override; // MythScreenType
 
   private slots:
     //void LanguageClicked(MythUIButtonListItem *item);
     //void CountryClicked(MythUIButtonListItem *item);
-    void Close(void) override; // MythScreenType
     void Save(void);
 
   private:

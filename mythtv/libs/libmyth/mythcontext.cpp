@@ -10,6 +10,7 @@
 
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 #include <QCoreApplication>
@@ -32,10 +33,6 @@
 #endif
 #endif
 
-#ifdef Q_OS_WINDOWS
-#include <cstdlib> // getenv, _putenv
-#include "libmythbase/compat.h"
-#endif
 #include "libmythbase/configuration.h"
 #include "libmythbase/dbutil.h"
 #include "libmythbase/exitcodes.h"
@@ -142,13 +139,13 @@ class MythContext::Impl : public QObject
     bool    checkPort(const QString &host, int port, std::chrono::seconds timeLimit) const;
     static void processEvents();
 
-  protected:
     bool event(QEvent* /*e*/) override; // QObject
 
+  protected:
     void ShowConnectionFailurePopup(bool persistent);
     void HideConnectionFailurePopup();
 
-    void ShowVersionMismatchPopup(uint remote_version);
+    void ShowVersionMismatchPopup(unsigned remote_version);
 
   public slots:
     void OnCloseDialog() const;
@@ -1422,7 +1419,7 @@ void MythContext::Impl::ShowConnectionFailurePopup(bool persistent)
 
     m_lastCheck = now.addMSecs(5000); // don't refresh notification more than every 5s
 
-    QString description = (persistent) ?
+    QString description = persistent ?
         QObject::tr(
             "The connection to the master backend "
             "server has gone away for some reason. "
@@ -1455,7 +1452,7 @@ void MythContext::Impl::HideConnectionFailurePopup()
     m_lastCheck = QDateTime();
 }
 
-void MythContext::Impl::ShowVersionMismatchPopup(uint remote_version)
+void MythContext::Impl::ShowVersionMismatchPopup(unsigned remote_version)
 {
     if (m_mbeVersionPopup)
         return;
@@ -1647,16 +1644,16 @@ bool MythContext::Init(const bool gui,
 #ifdef Q_OS_WINDOWS
     // HOME environment variable might not be defined
     // some libraries will fail without it
-    QString home = getenv("HOME");
+    QString home = qEnvironmentVariable("HOME");
     if (home.isEmpty())
     {
-        home = getenv("LOCALAPPDATA");      // Vista
+        home = qEnvironmentVariable("LOCALAPPDATA");      // Vista
         if (home.isEmpty())
-            home = getenv("APPDATA");       // XP
+            home = qEnvironmentVariable("APPDATA");       // XP
         if (home.isEmpty())
-            home = QString(".");  // getenv("TEMP")?
+            home = QString(".");  // qEnvironmentVariable("TEMP")?
 
-        _putenv(QString("HOME=%1").arg(home).toLocal8Bit().constData());
+        qputenv("HOME", home.toLocal8Bit().constData());
     }
 #endif
 

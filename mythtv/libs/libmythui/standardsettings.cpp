@@ -351,7 +351,9 @@ void AutoIncrementSetting::Save(void)
         auto id = var.typeId();
 #endif
         if (id != QMetaType::UnknownType)
+        {
             setValue(var.toInt());
+        }
         else
         {
             querystr = "SELECT MAX(" + m_column + ") FROM " +
@@ -1141,3 +1143,5 @@ void StandardSettingDialog::deleteEntryConfirmed(bool ok)
     }
 
 }
+
+#include "moc_standardsettings.cpp"

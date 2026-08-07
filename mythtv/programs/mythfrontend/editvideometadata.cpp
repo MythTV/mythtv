@@ -995,7 +995,7 @@ void EditMetadataDialog::customEvent(QEvent *levent)
 {
     if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(levent);
+        auto *dce = (DialogCompletionEvent*)levent;
 
         const QString resultid = dce->GetId();
 
@@ -1075,3 +1075,5 @@ void EditMetadataDialog::customEvent(QEvent *levent)
         GetNotificationCenter()->Queue(n);
     }
 }
+
+#include "moc_editvideometadata.cpp"

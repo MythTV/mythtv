@@ -30,17 +30,15 @@ class AudioOutputNULL : public AudioOutputBase
     ~AudioOutputNULL() override;
 
     void Reset(void) override; // AudioOutputBase
+    int readOutputData(unsigned char *read_buffer, size_t max_length) override; // AudioOutputBase
 
-
+  protected:
     // Volume control
     int GetVolumeChannel(int /* channel */) const override // VolumeBase
         { return 100; }
     void SetVolumeChannel(int /* channel */, int /* volume */) override // VolumeBase
         {}
 
-    int readOutputData(unsigned char *read_buffer, size_t max_length) override; // AudioOutputBase
-
-  protected:
     // AudioOutputBase
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase

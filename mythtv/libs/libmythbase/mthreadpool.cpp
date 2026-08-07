@@ -108,6 +108,7 @@ class MPoolThread : public MThread
     {
     }
 
+  protected:
     void run(void) override // MThread
     {
         RunProlog();
@@ -165,6 +166,7 @@ class MPoolThread : public MThread
         RunEpilog();
     }
 
+  public:
     bool SetRunnable(QRunnable *runnable, QString runnableName,
                      bool reserved)
     {

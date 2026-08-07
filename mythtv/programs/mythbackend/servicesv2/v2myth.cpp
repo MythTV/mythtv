@@ -1199,9 +1199,13 @@ bool V2Myth::ManageDigestUser( const QString &sAction,
     loggedInUser = sessionManager->GetSession(authorization).GetUserName();
 
     if (sAction == "Add")
+    {
         sessionAction = DIGEST_USER_ADD;
+    }
     else if (sAction == "Remove")
+    {
         sessionAction = DIGEST_USER_REMOVE;
+    }
     else if (sAction == "ChangePassword")
     {
         sessionAction = DIGEST_USER_CHANGE_PW;
@@ -1356,7 +1360,9 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
     if (Enable == Disable)
         return false;
     if (Enable)
+    {
         scheduler->EnableScheduling();
+    }
     else
     {
         scheduler->DisableScheduling();
@@ -1408,3 +1414,5 @@ QString  V2Myth::Proxy ( const QString &urlString)
 
     return {};
 }
+
+#include "moc_v2myth.cpp"

@@ -20,14 +20,15 @@ class WebSocketMythEvent : public WebSocketExtension
     ~WebSocketMythEvent() override;
 
     bool HandleTextFrame(const WebSocketFrame &frame) override; // WebSocketExtension
-    void customEvent(QEvent* /*event*/) override; // QObject
 
-  protected:
     // No implicit copying.
     WebSocketMythEvent(const WebSocketMythEvent &other) = delete;
     WebSocketMythEvent &operator=(const WebSocketMythEvent &other) = delete;
     WebSocketMythEvent(WebSocketMythEvent &&) = delete;
     WebSocketMythEvent &operator=(WebSocketMythEvent &&) = delete;
+
+  protected:
+    void customEvent(QEvent* /*event*/) override; // QObject
 
   private:
     QStringList m_filters;

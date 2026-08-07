@@ -261,22 +261,21 @@ static void ArchiveCallback([[maybe_unused]] void *data, QString &selection)
 {
     QString sel = selection.toLower();
 
-    if (sel == "archive_create_dvd")
+    if (sel == "archive_create_dvd") {
         runCreateDVD();
-    else if (sel == "archive_create_archive")
+    } else if (sel == "archive_create_archive") {
         runCreateArchive();
-    else if (sel == "archive_encode_video")
+    } else if (sel == "archive_encode_video") {
         runEncodeVideo();
-    else if (sel == "archive_import_video")
+    } else if (sel == "archive_import_video") {
         runImportVideo();
-    else if (sel == "archive_last_log")
+    } else if (sel == "archive_last_log") {
         runShowLog();
-    else if (sel == "archive_test_dvd")
+    } else if (sel == "archive_test_dvd") {
         runTestDVD();
-    else if (sel == "archive_burn_dvd")
+    } else if (sel == "archive_burn_dvd") {
         runBurnDVD();
-    else
-    {
+    } else {
         // if we have found the mainmenu callback
         // pass the selection on to it
         if (m_callback && m_callbackdata)
@@ -307,7 +306,9 @@ static int runMenu(const QString& which_menu)
 
     // save the callback from the main menu
     if (mainMenu)
+    {
         mainMenu->getCallback(&m_callback, &m_callbackdata);
+    }
     else
     {
         m_callback = nullptr;

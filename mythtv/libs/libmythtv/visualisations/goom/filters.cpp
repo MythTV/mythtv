@@ -152,9 +152,9 @@ generatePrecalCoef ()
 
 				// coeffs[myPos] = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC)) <<
 				// 2;
-				if (!(coefh || coefv))
+				if (!(coefh || coefv)) {
 					i = 255;
-				else {
+				} else {
 					int i1 = diffcoeffh * diffcoeffv;
 					int i2 = coefh * diffcoeffv;
 					int i3 = diffcoeffh * coefv;
@@ -168,7 +168,7 @@ generatePrecalCoef ()
 					if (i4)
 						i4--;
 
-					i = (i1) | (i2 << 8) | (i3 << 16) | (i4 << 24);
+					i = i1 | (i2 << 8) | (i3 << 16) | (i4 << 24);
 				}
 				precalCoef[coefh][coefv] = i;
 			}
@@ -342,7 +342,7 @@ getPixelRGB (const unsigned int * buffer, unsigned int x, unsigned int y, Color 
 #endif
 
 	/* ATTENTION AU PETIT INDIEN  */
-	unsigned int i = *(buffer + (x + y * resolx));
+	unsigned int i = *(buffer + (x + (y * resolx)));
 	c->b = (i >> (BLEU * 8)) & 0xff;
 	c->v = (i >> (VERT * 8)) & 0xff;
 	c->r = (i >> (ROUGE * 8)) & 0xff;

@@ -31,3 +31,5 @@ void MythPainterGPU::DisplayChanged()
     m_pixelRatio = window ? window->devicePixelRatio() : screen->devicePixelRatio();
     m_usingHighDPI = !qFuzzyCompare(m_pixelRatio, 1.0);
 }
+
+#include "moc_mythpaintergpu.cpp"

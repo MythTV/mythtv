@@ -352,7 +352,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
             if ((ret == nullptr) ||
                 (hasArtwork && !foundMatchWithYear &&
                  ((!foundMatchWithArt) ||
-                  ((lkup->GetPopularity() > exactTitlePopularity)) ||
+                  (lkup->GetPopularity() > exactTitlePopularity) ||
                   ((exactTitlePopularity == 0.0F) && (lkup->GetReleaseDate() > exactTitleDate)))))
             {
                 exactTitleDate = lkup->GetReleaseDate();

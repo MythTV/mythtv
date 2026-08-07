@@ -177,7 +177,9 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
         QVariant returnvalue;
         try {
             if (qt_metacall(QMetaObject::InvokeMetaMethod, handler->m_index, param.data()) >= 0)
+            {
                 LOG(VB_GENERAL, LOG_ERR, "qt_metacall error");
+            }
             else
             {
                 // Retrieve result
@@ -281,3 +283,5 @@ QString& MythHTTPService::Name()
 {
     return m_name;
 }
+
+#include "moc_mythhttpservice.cpp"

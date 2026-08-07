@@ -3,6 +3,7 @@
 // Qt
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtSystemDetection>
 #endif
 #include <QDir>
@@ -177,11 +178,17 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
 
     // If we are using eglfs_kms we want atomic operations. No effect on other plugins.
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=1'").arg(s_kmsAtomic));
-    setenv(s_kmsAtomic, "1", 0);
+    if (!qEnvironmentVariableIsSet(s_kmsAtomic))
+    {
+        qputenv(s_kmsAtomic, "1");
+    }
 
     // Seems to fix occasional issues. Again no impact on other plugins.
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=1'").arg(s_kmsSetMode));
-    setenv(s_kmsSetMode, "1", 0);
+    if (!qEnvironmentVariableIsSet(s_kmsSetMode))
+    {
+        qputenv(s_kmsSetMode, "1");
+    }
 
     bool plane  = qEnvironmentVariableIsSet(s_kmsPlaneIndex) ||
                   qEnvironmentVariableIsSet(s_kmsPlaneCRTCS);
@@ -289,7 +296,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("Wrote %1:\r\n%2").arg(filename, wrote));
         LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsConfigFile, filename));
-        setenv(s_kmsConfigFile, qPrintable(filename), 1);
+        qputenv(s_kmsConfigFile, qPrintable(filename));
     }
     file.close();
 
@@ -297,8 +304,8 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
     auto crtcplane  = QString("%1,%2").arg(device->m_crtc->m_id).arg(guiplane->m_id);
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneIndex, planeindex));
     LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneCRTCS, crtcplane));
-    setenv(s_kmsPlaneIndex, qPrintable(planeindex), 1);
-    setenv(s_kmsPlaneCRTCS, qPrintable(crtcplane), 1);
+    qputenv(s_kmsPlaneIndex, qPrintable(planeindex));
+    qputenv(s_kmsPlaneCRTCS, qPrintable(crtcplane));
 
     // Set the zpos if supported
     if (auto zposp = MythDRMProperty::GetProperty("zpos", guiplane->m_properties); zposp.get())
@@ -307,7 +314,7 @@ void MythDRMDevice::SetupDRM(const MythCommandLineParser& CmdLine)
         {
             auto val = QString::number(std::min(range->m_min + 1, range->m_max));
             LOG(VB_GENERAL, LOG_INFO, QString("Exporting '%1=%2'").arg(s_kmsPlaneZpos, val));
-            setenv(s_kmsPlaneZpos, qPrintable(val), 1);
+            qputenv(s_kmsPlaneZpos, qPrintable(val));
         }
     }
 

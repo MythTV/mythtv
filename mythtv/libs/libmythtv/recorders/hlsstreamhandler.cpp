@@ -203,7 +203,9 @@ void HLSStreamHandler::run(void)
         }
 
         if (m_hls->IsThrottled())
+        {
             std::this_thread::sleep_for(1s);
+        }
         else if (size < BUFFER_SIZE)
         {
             LOG(VB_RECORD, LOG_DEBUG, LOC +

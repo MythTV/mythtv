@@ -32,7 +32,9 @@ static bool checkPath(QString path, QStringList &probs)
 
     QFile test(path.append("/.test"));
     if (test.open(QIODevice::WriteOnly))
+    {
         test.remove();
+    }
     else
     {
         probs.push_back(QObject::tr("Unable to create file \"%1\" - directory "
@@ -154,7 +156,9 @@ bool checkImageStoragePaths(QStringList &probs)
                 groups.contains("Coverart") &&
                 groups.contains("Screenshots") &&
                 groups.contains("Banners"))
+        {
             problemFound = false;
+        }
         else
         {
             QString trMesg =

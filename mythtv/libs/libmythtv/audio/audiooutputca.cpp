@@ -13,6 +13,7 @@
  *****************************************************************************/
 
 #include <array>
+#include <cmath>
 #include <thread>
 #include <vector>
 
@@ -32,8 +33,8 @@ static constexpr int8_t kMythAudioObjectPropertyElementMain { 0 };
 
 #define LOC QString("CoreAudio: ")
 
-#define CHANNELS_MIN 1
-#define CHANNELS_MAX 8
+static constexpr int CHANNELS_MIN { 1 };
+static constexpr int CHANNELS_MAX { 8 };
 
 using AudioStreamIDVec = std::vector<AudioStreamID>;
 using AudioStreamRangedVec = std::vector<AudioStreamRangedDescription>;
@@ -46,13 +47,13 @@ char* UInt32ToFourCC(const UInt32* pVal)
 {
     UInt32 inVal = *pVal;
     char* pIn = (char*)&inVal;
-    static char fourCC[5];
+    static std::array<char,5> fourCC;
     fourCC[4] = 0;
     fourCC[3] = pIn[0];
     fourCC[2] = pIn[1];
     fourCC[1] = pIn[2];
     fourCC[0] = pIn[3];
-    return fourCC;
+    return fourCC.data();
 }
 
 QString StreamDescriptionToString(AudioStreamBasicDescription desc)
@@ -102,11 +103,11 @@ class CoreAudioData {
 public:
     explicit CoreAudioData(AudioOutputCA *parent);
     CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID);
-    CoreAudioData(AudioOutputCA *parent, QString deviceName);
+    CoreAudioData(AudioOutputCA *parent, const QString& deviceName);
 
     static AudioDeviceID GetDefaultOutputDevice();
-    int  GetTotalOutputChannels();
-    QString *GetName();
+    int GetTotalOutputChannels() const;
+    QString *GetName() const;
     static AudioDeviceID GetDeviceWithName(const QString& deviceName);
 
     bool OpenDevice();
@@ -120,13 +121,13 @@ public:
     static pid_t GetHogStatus();
     bool SetHogStatus(bool hog);
     bool SetMixingSupport(bool mix);
-    bool GetMixingSupport();
+    bool GetMixingSupport() const;
 
-    bool FindAC3Stream();
+    bool FindAC3Stream() const;
     static void ResetAudioDevices();
     static void ResetStream(AudioStreamID s);
     static RatesVec RatesList(AudioDeviceID d);
-    bool ChannelsList(AudioDeviceID d, bool passthru, ChannelsArr& chans);
+    bool ChannelsList(AudioDeviceID d, bool passthru, ChannelsArr& chans) const;
 
     static AudioStreamIDVec      StreamsList(AudioDeviceID d);
     static AudioStreamRangedVec  FormatsList(AudioStreamID s);
@@ -263,7 +264,8 @@ bool AudioOutputCA::OpenDevice()
     if (m_passthru || m_enc)
     {
         LOG(VB_AUDIO, LOG_INFO, "AudioOutputCA::OpenDevice() Trying Digital.");
-        if (!(deviceOpened = d->OpenSPDIF()))
+        deviceOpened = d->OpenSPDIF();
+        if (!deviceOpened)
             d->CloseSPDIF();
     }
 
@@ -312,13 +314,13 @@ void AudioOutputCA::CloseDevice()
 }
 
 template <class AudioDataType>
-static inline void _ReorderSmpteToCA(AudioDataType *buf, uint frames)
+static inline void ReorderSmpteToCA(AudioDataType *buf, uint frames)
 {
     AudioDataType tmpLS;
     AudioDataType tmpRS;
     AudioDataType tmpRLs;
     AudioDataType tmpRRs;
-    AudioDataType *buf2;
+    AudioDataType *buf2 = nullptr;
     for (uint i = 0; i < frames; i++)
     {
         buf = buf2 = buf + 4;
@@ -338,9 +340,9 @@ static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
 {
     switch(AudioOutputSettings::FormatToBits(format))
     {
-        case  8: _ReorderSmpteToCA((uchar *)buf, frames); break;
-        case 16: _ReorderSmpteToCA((short *)buf, frames); break;
-        default: _ReorderSmpteToCA((int   *)buf, frames); break;
+        case  8: ReorderSmpteToCA((uchar *)buf, frames); break;
+        case 16: ReorderSmpteToCA((short *)buf, frames); break;
+        default: ReorderSmpteToCA((int   *)buf, frames); break;
     }
 }
 
@@ -436,7 +438,7 @@ OSStatus RenderCallbackAnalog(void                       *inRefCon,
 int AudioOutputCA::GetVolumeChannel([[maybe_unused]] int channel) const
 {
     // FIXME: this only returns global volume
-    Float32 volume;
+    Float32 volume = NAN;
 
     if (!AudioUnitGetParameter(d->mOutputUnit,
                                kHALOutputParam_Volume,
@@ -486,28 +488,25 @@ static OSStatus RenderCallbackSPDIF([[maybe_unused]] AudioDeviceID        inDevi
     return noErr;
 }
 
-CoreAudioData::CoreAudioData(AudioOutputCA *parent) : mCA(parent)
+CoreAudioData::CoreAudioData(AudioOutputCA *parent) :
+    mCA(parent), mDeviceID(GetDefaultOutputDevice())
 {
     // Reset all the devices to a default 'non-hog' and mixable format.
     // If we don't do this we may be unable to find the Default Output device.
     // (e.g. if we crashed last time leaving it stuck in AC-3 mode)
     ResetAudioDevices();
-
-    mDeviceID = GetDefaultOutputDevice();
 }
 
 CoreAudioData::CoreAudioData(AudioOutputCA *parent, AudioDeviceID deviceID) :
-    mCA(parent)
+    mCA(parent), mDeviceID(deviceID)
 {
     ResetAudioDevices();
-    mDeviceID = deviceID;
 }
 
-CoreAudioData::CoreAudioData(AudioOutputCA *parent, QString deviceName) :
-    mCA(parent)
+CoreAudioData::CoreAudioData(AudioOutputCA *parent, const QString& deviceName) :
+    mCA(parent), mDeviceID(GetDeviceWithName(deviceName))
 {
     ResetAudioDevices();
-    mDeviceID = GetDeviceWithName(deviceName);
     if (!mDeviceID)
     {
         // Didn't find specified device, use default one
@@ -578,7 +577,7 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
 
 AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
 {
-    UInt32        paramSize;
+    UInt32        paramSize = 0;
     AudioDeviceID deviceId = 0;
     AudioObjectPropertyAddress pa
     {
@@ -602,7 +601,7 @@ AudioDeviceID CoreAudioData::GetDefaultOutputDevice()
     return deviceId;
 }
 
-int CoreAudioData::GetTotalOutputChannels()
+int CoreAudioData::GetTotalOutputChannels() const
 {
     if (!mDeviceID)
         return 0;
@@ -626,7 +625,8 @@ int CoreAudioData::GetTotalOutputChannels()
 	return 0;
     }
 
-    auto *pList = (AudioBufferList *)malloc(size);
+    std::vector<char> plBuffer (size);
+    auto *pList = (AudioBufferList *)plBuffer.data();
     err = AudioObjectGetPropertyData(mDeviceID, &pa,
 				     0, nullptr, &size, pList);
     if (!err)
@@ -643,11 +643,10 @@ int CoreAudioData::GetTotalOutputChannels()
     }
     LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetTotalOutputChannels: Found %1 channels in %2 buffers")
           .arg(channels).arg(pList->mNumberBuffers));
-    free(pList);
     return channels;
 }
 
-QString *CoreAudioData::GetName()
+QString *CoreAudioData::GetName() const
 {
     if (!mDeviceID)
         return nullptr;
@@ -659,10 +658,10 @@ QString *CoreAudioData::GetName()
 	kMythAudioObjectPropertyElementMain
     };
 
-    CFStringRef name;
+    CFStringRef name = nullptr;
     UInt32 propertySize = sizeof(CFStringRef);
     OSStatus err = AudioObjectGetPropertyData(mDeviceID, &pa,
-                                              0, nullptr, &propertySize, &name);
+                                              0, nullptr, &propertySize, (void*)&name);
     if (err)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("CoreAudioData Error:AudioObjectGetPropertyData for kAudioObjectPropertyName error: [%1]")
@@ -718,7 +717,7 @@ void CoreAudioData::SetAutoHogMode(bool enable)
 
 pid_t CoreAudioData::GetHogStatus()
 {
-    pid_t PID;
+    pid_t PID = 0;
     UInt32 PIDsize = sizeof(PID);
     AudioObjectPropertyAddress pa
     {
@@ -826,7 +825,7 @@ bool CoreAudioData::SetMixingSupport(bool mix)
     return true;
 }
 
-bool CoreAudioData::GetMixingSupport()
+bool CoreAudioData::GetMixingSupport() const
 {
     if (!mDeviceID)
         return false;
@@ -850,8 +849,8 @@ bool CoreAudioData::GetMixingSupport()
  */
 AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
 {
-    OSStatus       err;
-    UInt32         listSize;
+    OSStatus       err = 0;
+    UInt32         listSize = 0;
     AudioStreamIDVec vec {};
 
     AudioObjectPropertyAddress pa
@@ -895,9 +894,9 @@ AudioStreamIDVec CoreAudioData::StreamsList(AudioDeviceID d)
 
 AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
 {
-    OSStatus                     err;
+    OSStatus                     err = 0;
     AudioStreamRangedVec         vec;
-    UInt32                       listSize;
+    UInt32                       listSize = 0;
 
     AudioObjectPropertyAddress pa
     {
@@ -937,8 +936,8 @@ AudioStreamRangedVec CoreAudioData::FormatsList(AudioStreamID s)
     return vec;
 }
 
-static UInt32   sNumberCommonSampleRates = 15;
-static Float64  sCommonSampleRates[] = {
+static constexpr UInt32   sNumberCommonSampleRates = 15;
+static std::array<Float64,sNumberCommonSampleRates>  sCommonSampleRates = {
     8000.0,   11025.0,  12000.0,
     16000.0,  22050.0,  24000.0,
     32000.0,  44100.0,  48000.0,
@@ -957,10 +956,10 @@ static bool IsRateCommon(Float64 inRate)
 
 RatesVec CoreAudioData::RatesList(AudioDeviceID d)
 {
-    OSStatus                    err;
+    OSStatus                    err = 0;
     AudioValueRangeVec          ranges;
     RatesVec                    finalvec;
-    UInt32                      listSize;
+    UInt32                      listSize = 0;
 
     AudioObjectPropertyAddress pa
     {
@@ -998,7 +997,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     }
 
     // iterate through the ranges and add the minimum, maximum, and common rates in between
-    UInt32 theFirstIndex;
+    UInt32 theFirstIndex = 0;
     UInt32 theLastIndex = 0;
     for(auto range : ranges)
     {
@@ -1026,7 +1025,7 @@ RatesVec CoreAudioData::RatesList(AudioDeviceID d)
     return finalvec;
 }
 
-bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr& chans)
+bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr& chans) const
 {
     AudioStreamIDVec            streams;
     AudioStreamRangedVec        formats;
@@ -1091,7 +1090,6 @@ int CoreAudioData::OpenAnalog()
 {
     AudioComponentDescription    desc;
     AudioStreamBasicDescription  DeviceFormat;
-    AudioChannelLayout          *layout;
     AudioChannelLayout           new_layout;
     AudioDeviceID                defaultDevice = GetDefaultOutputDevice();
     AudioObjectPropertyAddress pa
@@ -1208,8 +1206,8 @@ int CoreAudioData::OpenAnalog()
 
     if(!err)
     {
-        layout = (AudioChannelLayout *) malloc(param_size);
-
+	std::vector<char> layoutBuffer (param_size);
+	auto *layout = (AudioChannelLayout *)layoutBuffer.data();
 	err = AudioObjectGetPropertyData(kAudioObjectSystemObject, &pa,
 					 0, nullptr, &param_size, layout);
 
@@ -1270,7 +1268,6 @@ int CoreAudioData::OpenAnalog()
                  "the \"Audio Midi Setup\" utility in /Applications/"
                  "Utilities.");
         }
-        free(layout);
     }
     else
     {
@@ -1310,10 +1307,14 @@ int CoreAudioData::OpenAnalog()
     }
 
     if(new_layout.mNumberChannelDescriptions > 0)
+    {
+        // memory allocated by C library
+        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
         free(new_layout.mChannelDescriptions);
+    }
 
     // Set up the audio output unit
-    int formatFlags;
+    int formatFlags = 0;
     switch (mCA->m_outputFormat)
     {
         case FORMAT_S16:
@@ -1408,7 +1409,7 @@ int CoreAudioData::OpenAnalog()
 
 void CoreAudioData::CloseAnalog()
 {
-    OSStatus err;
+    OSStatus err = 0;
 
     LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseAnalog: Entering: %1")
           .arg((long)mOutputUnit));
@@ -1439,7 +1440,7 @@ void CoreAudioData::CloseAnalog()
 
 bool CoreAudioData::OpenSPDIF()
 {
-    OSStatus       err;
+    OSStatus       err = 0;
     AudioStreamIDVec streams;
     AudioStreamBasicDescription outputFormat {};
 
@@ -1554,7 +1555,7 @@ bool CoreAudioData::OpenSPDIF()
 
 void CoreAudioData::CloseSPDIF()
 {
-    OSStatus  err;
+    OSStatus  err = 0;
 
     LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::CloseSPDIF: Entering [%1]").arg(mDigitalInUse));;
     if (!mDigitalInUse)
@@ -1620,7 +1621,7 @@ int CoreAudioData::AudioStreamChangeFormat(AudioStreamID               s,
     return true;
 }
 
-bool CoreAudioData::FindAC3Stream()
+bool CoreAudioData::FindAC3Stream() const
 {
     AudioStreamIDVec streams;
 
@@ -1656,7 +1657,7 @@ bool CoreAudioData::FindAC3Stream()
  */
 void CoreAudioData::ResetAudioDevices()
 {
-    UInt32         size;
+    UInt32         size = 0;
     AudioObjectPropertyAddress pa
     {
 	kAudioHardwarePropertyDevices,
@@ -1701,8 +1702,8 @@ void CoreAudioData::ResetAudioDevices()
 void CoreAudioData::ResetStream(AudioStreamID s)
 {
     AudioStreamBasicDescription  currentFormat;
-    OSStatus                     err;
-    UInt32                       paramSize;
+    OSStatus                     err = 0;
+    UInt32                       paramSize = 0;
     AudioObjectPropertyAddress pa
     {
 	kAudioStreamPropertyPhysicalFormat,

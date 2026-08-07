@@ -24,11 +24,11 @@ class AudioOutputJACK : public AudioOutputBase
     explicit AudioOutputJACK(const AudioSettings &settings);
     ~AudioOutputJACK() override;
 
+  protected:
+
     // Volume control
     int GetVolumeChannel(int channel) const override; // VolumeBase
     void SetVolumeChannel(int channel, int volume) override; // VolumeBase
-
-  protected:
 
     // You need to implement the following functions
     bool OpenDevice(void) override; // AudioOutputBase

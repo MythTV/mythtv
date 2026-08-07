@@ -39,16 +39,17 @@ class ViewScheduled : public ScheduleCommon
     bool Create(void) override; // MythScreenType
     void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // ScheduleCommon
+  public slots:
+    void Close(void) override; // MythScreenType
 
   protected slots:
     void ChangeGroup(MythUIButtonListItem *item);
     void deleteRule();
     void updateInfo(MythUIButtonListItem *item);
     void SwitchList(void);
-    void Close(void) override; // MythScreenType
 
   protected:
+    void customEvent(QEvent *event) override; // ScheduleCommon
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
     ProgramInfo *GetCurrentProgram(void) const override; // ScheduleCommon

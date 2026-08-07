@@ -58,7 +58,9 @@ static int GetMarkupList(const MythUtilCommandLineParser &cmdline,
     }
 
     if (type == "cutlist")
+    {
         std::cout << QString("Cutlist: %1\n").arg(result).toLocal8Bit().constData();
+    }
     else
     {
         std::cout << QString("Commercial Skip List: %1\n")
@@ -334,9 +336,13 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
             QString tagName = e.tagName();
             bool isMark = false;
             if (tagName == "mark")
+            {
                 isMark = true;
+            }
             else if (tagName == "seek")
+            {
                 isMark = false;
+            }
             else
             {
                 LOG(VB_STDIO|VB_FLUSH, LOG_ERR,

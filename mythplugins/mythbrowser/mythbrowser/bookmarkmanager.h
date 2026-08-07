@@ -25,6 +25,7 @@ class Bookmark
         return m_category == b.m_category && m_name == b.m_name && m_url == b.m_url;
     }
     static bool sortByName(Bookmark *a, Bookmark *b)
+        // NOLINTNEXTLINE(modernize-use-nullptr)
         { return StringUtil::naturalCompare(a->m_sortName, b->m_sortName) < 0; }
 };
 

@@ -38,7 +38,7 @@ bool ProgDetails::Create(void)
 
 QString ProgDetails::getRatings(bool recorded, uint chanid, const QDateTime& startts)
 {
-    QString table = (recorded) ? "recordedrating" : "programrating";
+    QString table = recorded ? "recordedrating" : "programrating";
     QString sel = QString(
         "SELECT `system`, rating FROM %1 "
         "WHERE chanid  = :CHANID "
@@ -936,3 +936,5 @@ void ProgDetails::loadPage(void)
 
     delete record;
 }
+
+#include "moc_progdetails.cpp"

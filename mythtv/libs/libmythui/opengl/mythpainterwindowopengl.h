@@ -19,8 +19,11 @@ class MythPainterWindowOpenGL : public MythPainterWindow
 
     bool          IsValid    (void) const;
     QPaintEngine* paintEngine(void) const override;
+
+  protected:
     void          paintEvent (QPaintEvent *PaintEvent) override;
 
+  private:
     MythMainWindow *m_parent { nullptr };
     bool m_valid             { false   };
 };

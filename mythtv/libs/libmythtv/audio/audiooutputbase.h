@@ -77,9 +77,6 @@ class AudioOutputBase : public AudioOutput, public MThread
 
     void Reset(void) override; // AudioOutput
 
-    void SetSWVolume(int new_volume, bool save) override; // VolumeBase
-    int GetSWVolume(void) override; // VolumeBase
-
     // timecode is in milliseconds.
     bool AddFrames(void *buffer, int frames, std::chrono::milliseconds timecode) override; // AudioOutput
     bool AddData(void *buffer, int len, std::chrono::milliseconds timecode, int frames) override; // AudioOutput
@@ -118,6 +115,9 @@ class AudioOutputBase : public AudioOutput, public MThread
     bool has_optimized_SIMD() override; // AudioOutput
 
  protected:
+    void SetSWVolume(int new_volume, bool save) override; // VolumeBase
+    int GetSWVolume(void) override; // VolumeBase
+
     // Following function must be called from subclass constructor
     void InitSettings(const AudioSettings &settings);
 

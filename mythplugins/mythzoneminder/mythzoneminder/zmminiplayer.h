@@ -18,12 +18,14 @@ class MPLUGIN_PUBLIC ZMMiniPlayer : public ZMLivePlayer
 
     bool Create(void) override; // ZMLivePlayer
     bool keyPressEvent(QKeyEvent *event) override; // ZMLivePlayer
-    void customEvent (QEvent* event) override; // MythUIType
 
     void setAlarmMonitor(int monID) { m_alarmMonitor = monID; }
 
   public slots:
     void timerTimeout(void);
+
+  protected:
+    void customEvent (QEvent* event) override; // MythUIType
 
   private:
     QTimer      *m_displayTimer {nullptr};

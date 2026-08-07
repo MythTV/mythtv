@@ -1018,7 +1018,9 @@ void ZMServer::handleGetMonitorStatus(void)
             {
                 MYSQL_ROW row2 = mysql_fetch_row(res2);
                 if (row2)
+                {
                     events = row2[0];
+                }
                 else
                 {
                     std::cout << "Failed to get mysql row\n";
@@ -2071,7 +2073,9 @@ void ZMServer::zmcControl(MONITOR *monitor, const std::string &mode)
     int activeCount = atoi(row[0]);
 
     if (!activeCount)
+    {
         runCommand(g_binPath + "/zmdc.pl stop zmc " + zmcArgs);
+    }
     else
     {
         if (mode == RESTART)

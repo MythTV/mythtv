@@ -230,7 +230,7 @@ static QString filt_str(uint pid)
 {
     uint pid0 = (pid / (16*16*16)) % 16;
     uint pid1 = (pid / (16*16))    % 16;
-    uint pid2 = (pid / (16))        % 16;
+    uint pid2 = (pid /  16)        % 16;
     uint pid3 = pid % 16;
     return QString("0x%1%2%3%4")
         .arg(pid0,0,16).arg(pid1,0,16)

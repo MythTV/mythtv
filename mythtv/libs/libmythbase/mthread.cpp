@@ -56,33 +56,19 @@ bool is_current_thread(MThread &thread)
     return QThread::currentThread() == thread.qthread();
 }
 
-class DBPurgeHandler : public QObject
-{
-  public:
-    DBPurgeHandler()
-    {
-        m_purgeTimer = startTimer(5min);
-    }
-    void timerEvent(QTimerEvent *event) override // QObject
-    {
-        if (event->timerId() == m_purgeTimer)
-            GetMythDB()->GetDBManager()->PurgeIdleConnections(false);
-    }
-    int m_purgeTimer;
-};
-
 class MThreadInternal : public QThread
 {
-  public:
-    explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
+    // Allow MThread::exec to directly call the inherited
+    // QThread::exec function (which is a protected function).
+    friend int MThread::exec(void);
+
+  protected:
     void run(void) override { m_parent.run(); } // QThread
 
+  public:
+    explicit MThreadInternal(MThread &parent) : m_parent(parent) {}
+
     void QThreadRun(void) { QThread::run(); }
-    int exec(void)
-    {
-        DBPurgeHandler ph;
-        return QThread::exec();
-    }
 
     static void SetTerminationEnabled(bool enabled = true)
     { QThread::setTerminationEnabled(enabled); }

@@ -217,7 +217,7 @@ class MTV_PUBLIC RecorderBase : public QRunnable
      */
     void SavePositionMap(bool force = false, bool finished = false);
 
-    enum AspectRatio {
+    enum AspectRatio : uint8_t {
         ASPECT_UNKNOWN       = 0x00,
         ASPECT_1_1           = 0x01,
         ASPECT_4_3           = 0x02,

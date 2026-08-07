@@ -40,8 +40,6 @@ class FirewireRecorder :
     void StopStreaming(void);
 
     void run(void) override; // RecorderBase
-    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
-
     // Implements TSDataListener
     void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
@@ -54,6 +52,8 @@ class FirewireRecorder :
                                [[maybe_unused]] const QString &vbidev) override {}; // DTVRecorder
 
   protected:
+    bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
+
     void InitStreamData(void) override; // DTVRecorder
     explicit FirewireRecorder(TVRec *rec);
 

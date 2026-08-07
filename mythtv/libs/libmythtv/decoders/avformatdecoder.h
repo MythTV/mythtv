@@ -83,6 +83,7 @@ class AvFormatDecoder : public DecoderBase
     AvFormatDecoder(const AvFormatDecoder &) = delete;            // not copyable
     AvFormatDecoder &operator=(const AvFormatDecoder &) = delete; // not copyable
 
+    void UpdateFramesPlayed(void) override; // DecoderBase
     void SetEof(bool eof) override; // DecoderBase
 
     MythCodecMap* CodecMap(void);
@@ -123,6 +124,7 @@ class AvFormatDecoder : public DecoderBase
     long long GetChapter(int chapter) override; // DecoderBase
     bool DoRewind(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
     bool DoFastForward(long long desiredFrame, bool discardFrames = true) override; // DecoderBase
+    void SeekReset(long long newkey, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
         { m_avcParser->use_I_forKeyframes(!value); }
 
@@ -190,8 +192,6 @@ class AvFormatDecoder : public DecoderBase
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDSMCCPacket(const AVStream *stream, const AVPacket *pkt);
 
-    void SeekReset(long long newkey, uint skipFrames, bool doFlush, bool discardFrames) override; // DecoderBase
-
     inline bool DecoderWillDownmix(const AVCodecContext *ctx);
     bool DoPassThrough(const AVCodecParameters *par, bool withProfile=true);
     bool SetupAudioStream(void);
@@ -208,7 +208,6 @@ class AvFormatDecoder : public DecoderBase
     static void av_update_stream_timings_video(AVFormatContext *ic);
     bool OpenAVCodec(AVCodecContext *avctx, const AVCodec *codec);
 
-    void UpdateFramesPlayed(void) override; // DecoderBase
     bool DoRewindSeek(long long desiredFrame) override; // DecoderBase
     void DoFastForwardSeek(long long desiredFrame, bool &needflush) override; // DecoderBase
     virtual void StreamChangeCheck(void);

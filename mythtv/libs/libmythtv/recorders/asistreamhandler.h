@@ -57,17 +57,17 @@ class ASIStreamHandler : public StreamHandler
     void SetClockSource(ASIClockSource cs);
     void SetRXMode(ASIRXMode m);
 
+    void PriorityEvent(int fd) override; // DeviceReaderCB
+
+  protected:
+    void run(void) override; // MThread
+    void SetRunningDesired(bool desired) override; // StreamHandler
+
   private:
     explicit ASIStreamHandler(const QString &device, int inputid);
 
     bool Open(void);
     void Close(void);
-
-    void run(void) override; // MThread
-
-    void PriorityEvent(int fd) override; // DeviceReaderCB
-
-    void SetRunningDesired(bool desired) override; // StreamHandler
 
   private:
     int               m_deviceNum    {-1};

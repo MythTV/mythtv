@@ -59,8 +59,8 @@ bool VideoVisualMonoScope::UpdateVertices(float* Buffer)
         for (auto s = static_cast<long>(index); s < indexTo && s < node->m_length; s++)
         {
             double temp = (static_cast<double>(node->m_left[s]) +
-                          (node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
-                          (static_cast<double>(m_area.height())) ) / 65536.0;
+                          ((node->m_right ? static_cast<double>(node->m_right[s]) : 0.0) *
+                          (static_cast<double>(m_area.height()))) ) / 65536.0;
             value = temp > 0.0 ? std::max(temp, value) : std::min(temp, value);
         }
 

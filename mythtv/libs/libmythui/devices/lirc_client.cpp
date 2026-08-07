@@ -33,6 +33,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
+#include <QByteArray>
+
 #include "lirc_client.h"
 
 // clazy:excludeall=raw-environment-function
@@ -123,7 +130,7 @@ static int lirc_send_command(const struct lirc_state *state, int sockfd, const s
 
 static void lirc_printf(const struct lirc_state *state, const char *format_str, ...)
 {
-	va_list ap;  
+	va_list ap; // NOLINT(cppcoreguidelines-init-variables) for macos
 	
 	if(state)
 	{
@@ -199,7 +206,7 @@ struct lirc_state *lirc_init(const char *lircrc_root_file,
 		}
 	}
 
-	return(state);
+	return state;
 }
 
 int lirc_deinit(struct lirc_state *state)
@@ -231,7 +238,7 @@ static int lirc_readline(const struct lirc_state */*state*/, std::string& line,F
 		if (line.back() == '\n')
 		{
 			line.pop_back();
-			return(0);
+			return 0;
 		}
 	}
 }
@@ -510,7 +517,7 @@ int lirc_mode(const struct lirc_state *state,
 		lirc_printf(state, "unknown token \"%s\" in %s:%d ignored\n",
 			    token.c_str(),name.c_str(),line);
 	}
-	return(0);
+	return 0;
 }
 
 unsigned int lirc_flags(const struct lirc_state *state, const std::string& string)
@@ -547,7 +554,7 @@ unsigned int lirc_flags(const struct lirc_state *state, const std::string& strin
 		}
 		start = string.find_first_not_of(" \t|", end);
 	}
-	return(flags);
+	return flags;
 }
 
 static std::string lirc_getfilename(const struct lirc_state *state,
@@ -555,16 +562,16 @@ static std::string lirc_getfilename(const struct lirc_state *state,
 				    const std::string& current_file)
 {
 	std::string filename;
+	std::string home {"/"};
 
 	if(file.empty())
 	{
-		const char *home=getenv("HOME");
-		if(home==nullptr)
+		if (qEnvironmentVariableIsSet("HOME"))
 		{
-			home="/";
+			home = qgetenv("HOME").toStdString();
 		}
 		filename = home;
-		if(strlen(home)>0 && filename.back()!='/')
+		if(!home.empty() && filename.back()!='/')
 		{
 			filename += "/";
 		}
@@ -572,10 +579,9 @@ static std::string lirc_getfilename(const struct lirc_state *state,
 	}
 	else if(file.starts_with("~/"))
 	{
-		const char *home=getenv("HOME");
-		if(home==nullptr)
+		if (qEnvironmentVariableIsSet("HOME"))
 		{
-			home="/";
+			home = qgetenv("HOME").toStdString();
 		}
 		filename = home;
 		filename += file.substr(1);
@@ -1109,7 +1115,7 @@ static int lirc_readconfig_only_internal(const struct lirc_state *state,
 	{
 		stack_free(filestack);
 	}
-	return(ret);
+	return ret;
 }
 
 static std::string lirc_startupmode(const struct lirc_state *state, struct lirc_config_entry *first)
@@ -1158,7 +1164,7 @@ static std::string lirc_startupmode(const struct lirc_state *state, struct lirc_
 		}
 		scan=scan->next;
 	}
-	return(startupmode);
+	return startupmode;
 }
 
 void lirc_freeconfig(struct lirc_config *config)
@@ -1263,7 +1269,7 @@ static std::string lirc_execute(const struct lirc_state *state,
 		scan->next_config=scan->next_config->next;
 		if(scan->next_config==nullptr)
 			scan->next_config=scan->config;
-		return(s);
+		return s;
 	}
 	return {};
 }
@@ -1318,7 +1324,7 @@ static int lirc_iscode(struct lirc_config_entry *scan, std::string& remote,
 		}
 	}
 	
-        if(rep!=0) return(0);
+        if(rep!=0) return 0;
 	
 	/* handle toggle_reset */
 	if(scan->flags & toggle_reset)
@@ -1327,7 +1333,7 @@ static int lirc_iscode(struct lirc_config_entry *scan, std::string& remote,
 	}
 	
 	struct lirc_code *codes=scan->code;
-        if(codes==scan->next_code) return(0);
+        if(codes==scan->next_code) return 0;
 	codes=codes->next;
 	/* rebase code sequence */
 	while(codes!=scan->next_code->next)
@@ -1367,7 +1373,7 @@ static int lirc_iscode(struct lirc_config_entry *scan, std::string& remote,
                                         if(rep==0)
                                         {
                                                 scan->next_code=prev->next;
-                                                return(0);
+                                                return 0;
                                         }
                                 }
                         }
@@ -1375,7 +1381,7 @@ static int lirc_iscode(struct lirc_config_entry *scan, std::string& remote,
                 codes=codes->next;
 	}
 	scan->next_code=scan->code;
-	return(0);
+	return 0;
 }
 
 int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,
@@ -1437,7 +1443,7 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 
 		if(button.empty() || remote.empty())
 		{
-			return(0);
+			return 0;
 		}
 		
 		struct lirc_config_entry *scan=config->next;
@@ -1483,11 +1489,11 @@ static int lirc_code2char_internal(const struct lirc_state *state,
 		if(!s.empty())
 		{
 			string=s;
-			return(0);
+			return 0;
 		}
 	}
 	config->next=config->first;
-	return(0);
+	return 0;
 }
 
 size_t lirc_getsocketname(const std::string& filename, char *buf, size_t size)

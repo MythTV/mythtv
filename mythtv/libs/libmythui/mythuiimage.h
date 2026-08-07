@@ -135,6 +135,7 @@ class MUI_PUBLIC MythUIImage : public MythUIType
 
     void LoadNow(void) override; // MythUIType
 
+    void SetSize(QSize size) override; // MythUIType
     void SetOrientation(int orientation);
 
   signals:
@@ -156,7 +157,6 @@ class MUI_PUBLIC MythUIImage : public MythUIType
     void Finalize(void) override; // MythUIType
 
     void SetSize(int width, int height);
-    void SetSize(QSize size) override; // MythUIType
     void ForceSize(QSize size);
 
     void SetCropRect(int x, int y, int width, int height);

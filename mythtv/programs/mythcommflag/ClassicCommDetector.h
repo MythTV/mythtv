@@ -96,7 +96,7 @@ class ClassicCommDetector : public CommDetectorBase
             QString msgformat("%1 %2:%3 %4 %5 %6 %7 %8 %9 %10 %11 %12 %13 %14 %15");
             return msgformat.arg(first, 5)
                 .arg((int)(fbp->start / m_fps) / 60, 3)
-                .arg((int)((fbp->start / m_fps )) % 60, 2, 10, QChar('0'))
+                .arg((int)(fbp->start / m_fps ) % 60, 2, 10, QChar('0'))
                 .arg(fbp->start, 6)
                 .arg(fbp->end, 6)
                 .arg(fbp->frames, 6)

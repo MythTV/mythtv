@@ -17,7 +17,7 @@ static int buffers_filled(multiplex_t *mx)
 				     sizeof(index_unit);
 	}
 
-	if (aavail+vavail) return ((aavail+vavail));
+	if (aavail+vavail) return (aavail+vavail);
 	return 0;
 }
 
@@ -696,7 +696,7 @@ static int get_ts_ext_overhead(int pktsize, audio_frame_t *extframe,
 					extframe[i].framesize;
 		int size = extframe[i].framesize * ext[i].frmperpkt;
 		int numpkt = (size + pktdata - 1) / pktdata;
-		int overhead = (pktsize * numpkt - size + numpkt - 1) / numpkt;
+		int overhead = ((pktsize * numpkt) - size + numpkt - 1) / numpkt;
 		max = std::max(overhead, max);
 	}
 	return pktsize - max;

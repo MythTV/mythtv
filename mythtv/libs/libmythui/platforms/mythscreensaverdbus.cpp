@@ -188,3 +188,5 @@ bool MythScreenSaverDBus::Asleep()
 {
     return false;
 }
+
+#include "moc_mythscreensaverdbus.cpp"

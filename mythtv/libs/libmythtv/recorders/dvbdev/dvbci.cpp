@@ -129,9 +129,9 @@ static uint8_t *SetLength(uint8_t *Data, int Length)
 ///< \return Returns a pointer to the first byte after the length.
 {
   uint8_t *p = Data;
-  if (Length < 128)
+  if (Length < 128) {
      *p++ = Length;
-  else {
+  } else {
      int n = sizeof(Length);
      for (int i = n - 1; i >= 0; i--) {
          int b = (Length >> (8 * i)) & 0xFF;
@@ -849,7 +849,7 @@ int cCiSession::SendData(int Tag, int Length, const uint8_t *Data)
     static_cast<uint8_t>((m_sessionId     ) & 0xFF),
     static_cast<uint8_t>((Tag >> 16) & 0xFF),
     static_cast<uint8_t>((Tag >>  8) & 0xFF),
-    static_cast<uint8_t>((Tag      ) & 0xFF)} ;
+    static_cast<uint8_t>( Tag        & 0xFF)};
   buffer.reserve(2048);
 
   SetLength(buffer, Length);
@@ -1086,7 +1086,7 @@ bool cCiConditionalAccessSupport::Process(int Length, const uint8_t *Data)
 bool cCiConditionalAccessSupport::SendPMT(const cCiCaPmt &CaPmt)
 {
   if (m_state == 2) {
-     SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt);
+     SendData(AOT_CA_PMT, CaPmt.m_length, CaPmt.m_capmt.data());
      m_needCaPmt = false;
      return true;
      }
@@ -1143,7 +1143,7 @@ bool cCiDateTime::SendDateTime(void)
      int M = tm_gmt.tm_mon + 1;
      int D = tm_gmt.tm_mday;
      int L = (M == 1 || M == 2) ? 1 : 0;
-     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + L * 12) * 30.6001);
+     int MJD = 14956 + D + int((Y - L) * 365.25) + int((M + 1 + (L * 12)) * 30.6001);
      uint16_t mjd = htons(MJD);
      int16_t local_offset = htons(tm_loc.tm_gmtoff / 60);
      std::vector<uint8_t> T {
@@ -1435,7 +1435,7 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
   : m_mmi(MMI),
     m_selectable(Selectable)
 {
-  m_entries.resize(MAX_CIMENU_ENTRIES);
+  m_entries.resize(kMAX_CIMENU_ENTRIES);
 }
 
 bool cCiMenu::Select(int Index)
@@ -1488,7 +1488,7 @@ cCiCaPmt::cCiCaPmt(int ProgramNumber, uint8_t cplm)
 
 void cCiCaPmt::AddElementaryStream(int type, int pid)
 {
-  if (m_length + 5 > int(sizeof(m_capmt)))
+  if (m_length + 5 > int(m_capmt.size()))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
@@ -1530,7 +1530,7 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len,
     return;
   }
 
-  if (m_length + data_len + 7 > int(sizeof(m_capmt)))
+  if (m_length + data_len + 7 > int(m_capmt.size()))
   {
     esyslog("ERROR: buffer overflow in CA_PMT");
     return;
@@ -2007,7 +2007,7 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int /*Slot*/)
         return false;
     }
 
-    memcpy(&msg.msg[4], CaPmt.m_capmt, CaPmt.m_length);
+    memcpy(&msg.msg[4], CaPmt.m_capmt.data(), CaPmt.m_length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
         esyslog("HLCI communication failed");

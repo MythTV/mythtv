@@ -42,7 +42,7 @@ class HLSRecStream
     void SetVersion(int x)          { m_version = x; }
     std::chrono::seconds TargetDuration(void) const  { return m_targetDuration; }
     void SetTargetDuration(std::chrono::seconds x)   { m_targetDuration = x; }
-    int DiscontinuitySequence(void)       { return m_discontSeq; }
+    int DiscontinuitySequence(void) const { return m_discontSeq; }
     void SetDiscontinuitySequence(int s)  { m_discontSeq = s; }
     uint64_t AverageBandwidth(void) const { return static_cast<uint64_t>(m_bandwidth); }
     uint64_t Bitrate(void) const    { return m_bitrate; }

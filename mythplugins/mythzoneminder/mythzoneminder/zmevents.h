@@ -38,6 +38,7 @@ public:
     ~ZMEvents() override;
 
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
   private slots:
@@ -59,7 +60,6 @@ public:
     void getCameraList(void);
     void getDateList(void);
     void setGridLayout(int layout);
-    void ShowMenu(void) override; // MythScreenType
 
     bool                 m_oldestFirst    {false};
     bool                 m_showContinuous {false};

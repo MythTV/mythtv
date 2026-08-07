@@ -21,6 +21,10 @@ MythPainterWindowOpenGL::MythPainterWindowOpenGL(MythMainWindow *MainWin)
     if (QGuiApplication::platformName() != "eglfs" && windowHandle() != nullptr)
     {
         windowHandle()->setSurfaceType(QWindow::OpenGLSurface);
+        QWindow* window = MainWin->windowHandle();
+        if (window != nullptr) {
+            window->setSurfaceType(QWindow::OpenGLSurface);
+        }
     }
     winId();
 #ifdef Q_OS_MACOS
@@ -60,3 +64,5 @@ void MythPainterWindowOpenGL::paintEvent(QPaintEvent* /*PaintEvent*/)
 {
     m_parent->drawScreen();
 }
+
+#include "moc_mythpainterwindowopengl.cpp"

@@ -1,5 +1,5 @@
 <form name="recsform" #recsform="ngForm" style="min-width: 960px;">
-
+    <p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
     <div style="white-space: 'pre-line';">
         <p-toast position="center"></p-toast>
     </div>
@@ -63,7 +63,7 @@
             [metaKeySelection]="true" dataKey="Recording.RecordedId" (onRowSelect)="onSelectChange()"
             (onRowUnselect)="onSelectChange()" [showGridlines]="true" [stripedRows]="true" scrollHeight="flex"
             [scrollable]="true" [sortField]="sortField" [sortOrder]="sortOrder" (onSort)="onSort($event)"
-            (onLazyLoad)="loadLazy($event)" [lazy]="true" [virtualScroll]="true" size="small">
+            (onLazyLoad)="loadLazy($event)" [lazy]="true" [virtualScroll]="true" size="small" [virtualScrollItemSize]="43" >
             <ng-template pTemplate="header">
                 <tr>
                     <!-- Column Headings. -->

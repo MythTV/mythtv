@@ -19,9 +19,13 @@ static int QueueJob(const MythUtilCommandLineParser &cmdline)
     int jobType = JOB_NONE;
 
     if (cmdline.toString("queuejob") == "transcode")
+    {
         jobType = JOB_TRANSCODE;
+    }
     else if (cmdline.toString("queuejob") == "commflag")
+    {
         jobType = JOB_COMMFLAG;
+    }
     else if (cmdline.toString("queuejob") == "rebuild")
     {
         jobType = JOB_COMMFLAG;

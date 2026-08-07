@@ -33,14 +33,15 @@ class ViewScheduleDiff : public MythScreenType
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
 
+  protected:
+    void Load(void) override; // MythScreenType
+    void Init(void) override; // MythScreenType
+
   private slots:
    void updateInfo(MythUIButtonListItem *item);
    void showStatus(MythUIButtonListItem *item);
 
   private:
-    void Load(void) override; // MythScreenType
-    void Init(void) override; // MythScreenType
-
     void fillList(void);
     void updateUIList();
 

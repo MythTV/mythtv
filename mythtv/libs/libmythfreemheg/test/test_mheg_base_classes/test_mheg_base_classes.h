@@ -13,7 +13,7 @@ class TestMhegBaseClasses : public QObject
 {
     Q_OBJECT
 
-    std::array<int,10> original {8, 2, 5, 10, 4, 6, 1, 9, 7, 3};
+    std::array<int,10> m_original {8, 2, 5, 10, 4, 6, 1, 9, 7, 3};
   private slots:
     // Before/after all test cases
     static void initTestCase(void);

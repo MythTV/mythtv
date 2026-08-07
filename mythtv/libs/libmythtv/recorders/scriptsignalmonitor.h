@@ -18,6 +18,7 @@ class ScriptSignalMonitor : public SignalMonitor
         m_signalStrength.SetValue(100);
     }
 
+  protected:
     void UpdateValues(void) override // SignalMonitor
     {
         SignalMonitor::UpdateValues();

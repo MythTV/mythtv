@@ -35,7 +35,7 @@ public:
         r = other.r;
         return *this;
     }
-    ~RefCountHandler() { r->DecrRef(); }
+    ~RefCountHandler() { if (r) r->DecrRef(); }
     operator T *() const { return r; } // Convert to T* automatically.
     T *operator*() { return r; }
     const T* operator*() const { return r; }

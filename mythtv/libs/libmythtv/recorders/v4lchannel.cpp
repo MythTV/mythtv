@@ -412,7 +412,7 @@ bool V4LChannel::Tune(uint64_t frequency)
 
     struct v4l2_frequency vf {};
     vf.tuner = 0; // use first tuner
-    vf.frequency = (isTunerCapLow) ?
+    vf.frequency = isTunerCapLow ?
         ((int)(frequency / 62.5)) : (frequency / 62500);
 
     vf.type = V4L2_TUNER_ANALOG_TV;
@@ -769,7 +769,7 @@ int V4LChannel::ChangePictureAttribute(
         return -1;
 
     int old_value = GetPictureAttribute(attr);
-    int new_value = old_value + ((up) ? 655 : -655);
+    int new_value = old_value + (up ? 655 : -655);
 
     // make sure we are within bounds (wrap around for hue)
     if (V4L2_CID_HUE == v4l2_attrib)

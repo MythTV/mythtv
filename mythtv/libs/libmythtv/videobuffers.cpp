@@ -280,7 +280,7 @@ void VideoBuffers::Reset()
 void VideoBuffers::SetPrebuffering(bool Normal)
 {
     QMutexLocker locker(&m_globalLock);
-    m_needPrebufferFrames = (Normal) ? m_needPrebufferFramesNormal : m_needPrebufferFramesSmall;
+    m_needPrebufferFrames = Normal ? m_needPrebufferFramesNormal : m_needPrebufferFramesSmall;
 }
 
 MythVideoFrame *VideoBuffers::GetNextFreeFrameInternal(BufferType EnqueueTo)
@@ -1102,7 +1102,7 @@ const QString& DebugString(const MythVideoFrame *Frame, bool Short)
 
 const QString& DebugString(uint FrameNum, bool Short)
 {
-    return ((Short) ? dbg_str_arr_short : dbg_str_arr)[FrameNum];
+    return (Short ? dbg_str_arr_short : dbg_str_arr)[FrameNum];
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& Queue, int Num)

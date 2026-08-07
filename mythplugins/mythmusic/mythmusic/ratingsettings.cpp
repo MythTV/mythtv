@@ -76,4 +76,4 @@ void RatingSettings::slotSave(void)
     Close();
 }
 
-
+#include "moc_ratingsettings.cpp"

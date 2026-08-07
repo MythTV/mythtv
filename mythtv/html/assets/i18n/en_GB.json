@@ -142,7 +142,7 @@
             "speedup_label": "Experimental speedup of advert detection",
             "strict_desc": "Enable stricter advert detection code. Disable if some adverts are not being detected.",
             "strict_label": "Strict advert detection",
-            "subtitle": "Advert Detection and Transcode Job Settings"
+            "subtitle": "Commercial Detection and Transcode Job Settings"
         },
         "playgroup": {
             "delete_details": "This will delete Playback Group {{ Name }}.",
@@ -230,6 +230,7 @@
             "damaged": "Damaged",
             "delete_details": "This will delete the Recording Rule",
             "delete_rule": "Delete Recording Rule",
+            "deletewarning": "This will permanently delete this recording file. It cannot be undone. Also, if you selected multiple rows, all selected recordings in groups Deleted and LiveTV will be permanently deleted. You will not be warned for each one. Are you sure?",
             "description": "Description",
             "dont_rec": "Don't Record",
             "download": "Download Recording",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Mark as Undamaged",
             "mnu_markunwatched": "Mark as Unwatched",
             "mnu_markwatched": "Mark as Watched",
+            "mnu_permdelete": "Delete Permanently",
             "mnu_rerec": "Allow Rerecord",
             "mnu_runjobs": "Run Jobs",
             "mnu_stoprec": "Stop Recording",
@@ -395,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} is a {{ Type }} on IP {{ IP }}",
             "backends_none": "No Backends",
             "backends_title": "Backends",
+            "dbbackups_none": "No database backups.",
+            "dbbackups_title": "Database Backups",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} is on host {{ HostName }}. State: {{ State }}.",
             "encoder_title": "Encoder Status",
             "endtime_text": "This recording is scheduled to end at {{ EndTime }}.",

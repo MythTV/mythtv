@@ -30,11 +30,12 @@ class AudioOutputPulseAudio : public AudioOutputBase
     explicit AudioOutputPulseAudio(const AudioSettings &settings);
    ~AudioOutputPulseAudio() override;
 
-    int GetVolumeChannel(int channel) const override; // VolumeBase
-    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
     void Drain(void) override; // AudioOutputBase
 
   protected:
+    int GetVolumeChannel(int channel) const override; // VolumeBase
+    void SetVolumeChannel(int channel, int volume) override; // VolumeBase
+
     AudioOutputSettings* GetOutputSettings(bool digital) override; // AudioOutputBase
     bool OpenDevice(void) override; // AudioOutputBase
     void CloseDevice(void) override; // AudioOutputBase

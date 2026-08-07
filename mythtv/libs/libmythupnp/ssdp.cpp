@@ -220,7 +220,7 @@ static QString GetHeaderValue(const QMap<QString, QString> &headers,
     QMap<QString, QString>::const_iterator it = headers.find(sKey.toLower());
 
     if ( it == headers.end())
-        return( sDefault );
+        return sDefault;
 
     return *it;
 }

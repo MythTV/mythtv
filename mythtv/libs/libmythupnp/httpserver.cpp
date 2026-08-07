@@ -200,30 +200,11 @@ void HttpServer::LoadSSLConfig()
         secureCiphers.append(*it);
     }
     m_sslConfig.setCiphers(secureCiphers);
-#endif
 
     QString hostKeyPath = gCoreContext->GetSetting("hostSSLKey", "");
 
     if (hostKeyPath.isEmpty()) // No key, assume no SSL
         return;
-
-    QFile hostKeyFile(hostKeyPath);
-    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
-        return;
-    }
-
-#ifndef QT_NO_OPENSSL
-    QByteArray rawHostKey = hostKeyFile.readAll();
-    QSslKey hostKey = QSslKey(rawHostKey, QSsl::Rsa, QSsl::Pem, QSsl::PrivateKey);
-    if (!hostKey.isNull())
-        m_sslConfig.setPrivateKey(hostKey);
-    else
-    {
-        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
-        return;
-    }
 
     QString hostCertPath = gCoreContext->GetSetting("hostSSLCertificate", "");
     QSslCertificate hostCert;
@@ -250,6 +231,25 @@ void HttpServer::LoadSSLConfig()
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host cert from file (%1)").arg(hostCertPath));
+        return;
+    }
+
+    QFile hostKeyFile(hostKeyPath);
+    if (!hostKeyFile.exists() || !hostKeyFile.open(QIODevice::ReadOnly))
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: SSL Host key file (%1) does not exist or is not readable").arg(hostKeyPath));
+        return;
+    }
+
+    QByteArray rawHostKey = hostKeyFile.readAll();
+    QSslKey hostKey = QSslKey(rawHostKey, hostCert.publicKey().algorithm(), QSsl::Pem, QSsl::PrivateKey);
+    if (!hostKey.isNull())
+    {
+        m_sslConfig.setPrivateKey(hostKey);
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, QString("HttpServer: Unable to load host key from file (%1)").arg(hostKeyPath));
         return;
     }
 
@@ -685,4 +685,4 @@ void HttpWorker::run(void)
     LOG(VB_HTTP, LOG_DEBUG, QString("HttpWorker::run() socket=%1 -- end").arg(m_socket));
 }
 
-
+#include "moc_httpserver.cpp"

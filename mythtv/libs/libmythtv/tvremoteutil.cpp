@@ -131,7 +131,7 @@ void RemoteCancelNextRecording(uint inputid, bool cancel)
 {
     QStringList strlist(QString("QUERY_RECORDER %1").arg(inputid));
     strlist << "CANCEL_NEXT_RECORDING";
-    strlist << QString::number((cancel) ? 1 : 0);
+    strlist << QString::number(cancel ? 1 : 0);
 
     gCoreContext->SendReceiveStringList(strlist);
 }

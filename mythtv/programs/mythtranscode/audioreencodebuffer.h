@@ -48,8 +48,6 @@ class AudioReencodeBuffer : public AudioOutput
     void      PauseUntilBuffered(void) override     { } // AudioOutput
     void      Drain(void) override                  { } // AudioOutput
     std::chrono::milliseconds GetAudiotime(void) override { return m_last_audiotime; } // AudioOutput
-    int       GetVolumeChannel(int /*channel*/) const override  { return 100; } // VolumeBase
-    void      SetVolumeChannel(int /*channel*/, int /*volume*/) override   { } // VolumeBase
     uint      GetCurrentVolume(void) const override { return 100; } // VolumeBase
     void      SetCurrentVolume(int /*value*/) override { } // VolumeBase
     void      AdjustCurrentVolume(int /*change*/) override { } // VolumeBase
@@ -57,8 +55,6 @@ class AudioReencodeBuffer : public AudioOutput
     void      ToggleMute(void) override             { } // VolumeBase
     MuteState GetMuteState(void) const override     { return kMuteOff; } // VolumeBase
     virtual MuteState IterateMutedChannels(void)    { return kMuteOff; }
-    void      SetSWVolume(int /*new_volume*/, bool /*save*/) override       { } // VolumeBase
-    int       GetSWVolume(void) override            { return 100; } // VolumeBase
     bool      CanPassthrough(int /*samplerate*/, int /*channels*/, AVCodecID /*codec*/, int /*profile*/) const override // AudioOutput
                       { return m_initpassthru; }
 
@@ -73,6 +69,12 @@ class AudioReencodeBuffer : public AudioOutput
     std::chrono::milliseconds m_last_audiotime  {0ms};
     bool                 m_passthru        {false};
     int                  m_audioFrameSize  {0};
+
+  protected:
+    int       GetVolumeChannel(int /*channel*/) const override  { return 100; } // VolumeBase
+    void      SetVolumeChannel(int /*channel*/, int /*volume*/) override   { } // VolumeBase
+    void      SetSWVolume(int /*new_volume*/, bool /*save*/) override       { } // VolumeBase
+    int       GetSWVolume(void) override            { return 100; } // VolumeBase
 
   private:
     bool                 m_initpassthru    {false};

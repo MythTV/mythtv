@@ -25,6 +25,7 @@ class FirewireTableMonitorThread : public MThread
     explicit FirewireTableMonitorThread(FirewireSignalMonitor *p) :
         MThread("FirewireTableMonitor"), m_parent(p) { start(); }
     ~FirewireTableMonitorThread() override { wait(); m_parent = nullptr; }
+  protected:
     void run(void) override; // MThread
   private:
     FirewireSignalMonitor *m_parent;
@@ -43,6 +44,8 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
 
     void Stop(void) override; // SignalMonitor
 
+    void AddData(const unsigned char *data, uint len) override; // TSDataListener
+
   protected:
     FirewireSignalMonitor(void);
     FirewireSignalMonitor(const FirewireSignalMonitor&);
@@ -53,8 +56,6 @@ class FirewireSignalMonitor : public DTVSignalMonitor, public TSDataListener
     void RunTableMonitor(void);
 
     bool SupportsTSMonitoring(void);
-
-    void AddData(const unsigned char *data, uint len) override; // TSDataListener
 
   public:
     static constexpr std::chrono::milliseconds kPowerTimeout  { 3s };

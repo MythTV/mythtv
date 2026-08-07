@@ -12,7 +12,7 @@
 #include "libmythbase/referencecounter.h"
 #include "mythuiexp.h"
 
-enum RenderType
+enum RenderType : uint8_t
 {
     kRenderUnknown = 0,
     kRenderDirect3D9,
@@ -33,7 +33,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
     bool  IsErrored(void) const { return m_errored; }
     QSize GetSize(void) const   { return m_size;    }
     virtual QStringList GetDescription();
-    virtual void SetViewPort(const QRect, bool = false) {}
+    virtual void SetViewPort(const QRect /*Rect*/, bool /*ViewportOnly*/ = false) {}
 
   protected:
    ~MythRender() override = default;
@@ -41,7 +41,7 @@ class MUI_PUBLIC MythRender : public ReferenceCounter
 
     RenderType  m_type;
     QSize       m_size;
-    bool        m_errored;
+    bool        m_errored {false};
 
   private:
     Q_DISABLE_COPY(MythRender)

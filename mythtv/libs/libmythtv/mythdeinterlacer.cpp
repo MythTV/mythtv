@@ -398,7 +398,7 @@ bool MythDeinterlacer::SetUpCache(MythVideoFrame *Frame)
     if (!Frame)
         return false;
 
-    if (m_bobFrame && !((m_bobFrame->m_bufferSize == Frame->m_bufferSize)) && (m_bobFrame->m_width == Frame->m_width) &&
+    if (m_bobFrame && !(m_bobFrame->m_bufferSize == Frame->m_bufferSize) && (m_bobFrame->m_width == Frame->m_width) &&
                         (m_bobFrame->m_height == Frame->m_height) && (m_bobFrame->m_type == Frame->m_type))
     {
         delete m_bobFrame;

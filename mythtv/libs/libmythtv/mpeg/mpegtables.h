@@ -1042,7 +1042,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     bool IsEncryptedPacket(void) const { return ( pesdata()[4] & 0x80 ) != 0; }
     void SetEncryptedPacket(bool val)
     {
-        pesdata()[4] = (pesdata()[4] & ~0x80) | ((val) ? 0x80 : 0);
+        pesdata()[4] = (pesdata()[4] & ~0x80) | (val ? 0x80 : 0);
     }
     // encryption_algorithm     6   4.1
     enum : std::uint8_t
@@ -1077,7 +1077,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
         pesdata()[5] = ((val>>24) & 0xff);
         pesdata()[6] = ((val>>16) & 0xff);
         pesdata()[7] = ((val>>8 ) & 0xff);
-        pesdata()[8] = ((val    ) & 0xff);
+        pesdata()[8] = ( val      & 0xff);
     }
     // cw_index (enc key)       8   9.0
     uint CodeWordIndex(void) const { return pesdata()[9]; }

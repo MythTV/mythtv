@@ -749,7 +749,7 @@ bool MythCoreContext::IsThisHost(const QString &addr, const QString &host)
 
     QString thisip  = GetBackendServerIP(host);
 
-    return !addrstr.isEmpty() && ((addrstr == thisip));
+    return !addrstr.isEmpty() && (addrstr == thisip);
 }
 
 bool MythCoreContext::IsFrontendOnly(void)
@@ -822,7 +822,9 @@ QString MythCoreContext::GetMasterHostName(void)
     {
 
         if (IsMasterBackend())
+        {
             d->m_masterHostname = d->m_localHostname;
+        }
         else
         {
             QStringList strlist("QUERY_HOSTNAME");
@@ -1491,7 +1493,9 @@ bool MythCoreContext::SendReceiveStringList(
     if (ok)
     {
         if (strlist.isEmpty())
+        {
             ok = false;
+        }
         else if (strlist[0] == "ERROR")
         {
             if (strlist.size() == 2)
@@ -2047,6 +2051,7 @@ void MythCoreContext::WantingPlayback(QObject *sender)
                 Qt::BlockingQueuedConnection);
     }
     // Restore blocking connections
+    it = d->m_playbackClients.begin();
     for (; it != d->m_playbackClients.end(); ++it)
     {
         if (it.key() == sender)
@@ -2195,4 +2200,4 @@ bool MythCoreContext::IsRegisteredFileForWrite(const QString& file)
     return d->m_fileswritten.contains(file);
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythcorecontext.cpp"

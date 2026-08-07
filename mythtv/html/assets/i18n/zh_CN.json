@@ -142,7 +142,7 @@
             "speedup_label": "商业检测的实验加速",
             "strict_desc": "启用更严格的商业检测代码。如果未检测到某些广告，请禁用。",
             "strict_label": "严格商业检测",
-            "subtitle": "商业检测a和转码作业设置"
+            "subtitle": "商业检测和转码作业设置"
         },
         "playgroup": {
             "delete_details": "这将删除播放组 {{ Name }}。",
@@ -230,6 +230,7 @@
             "damaged": "损坏的",
             "delete_details": "这将删除记录规则",
             "delete_rule": "删除录音规则",
+            "deletewarning": "这将永久删除该录音文件。它无法撤消。此外，如果您选择了多行，则“已删除”组和“LiveTV”组中的所有选定录制内容都将被永久删除。您不会针对每一项都收到警告。你确定吗？",
             "description": "描述",
             "dont_rec": "不记录",
             "download": "下载录音",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "标记为未损坏",
             "mnu_markunwatched": "标记为未观看",
             "mnu_markwatched": "标记为已观看",
+            "mnu_permdelete": "永久删除",
             "mnu_rerec": "允许重新录制",
             "mnu_runjobs": "运行作业",
             "mnu_stoprec": "停止录音",
@@ -395,6 +397,8 @@
             "backends_detail": "后端：{{ Name }} 是 IP {{ Type }} 上的 {{ IP }}}}",
             "backends_none": "无后端",
             "backends_title": "后端",
+            "dbbackups_none": "没有数据库备份。",
+            "dbbackups_title": "数据库备份",
             "encoder_text": "{{ DisplayName }}、{{ CardDetails }} 位于主机 {{ HostName }} 上。州：{{ State }}。",
             "encoder_title": "编码器状态",
             "endtime_text": "该录制计划于 {{ EndTime }} 结束。",

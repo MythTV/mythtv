@@ -37,9 +37,7 @@ class ImportIconsWizard : public MythScreenType
    ~ImportIconsWizard() override;
 
     bool Create(void) override; // MythScreenType
-    void Load(void) override; // MythScreenType
 //    bool keyPressEvent(QKeyEvent *) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
     struct SearchEntry               //! search entry results
     {
@@ -47,6 +45,10 @@ class ImportIconsWizard : public MythScreenType
         QString strName;             //!< the remote name
         QString strLogo;             //!< the actual logo
     };
+
+  protected:
+    void customEvent(QEvent *event) override; // MythUIType
+    void Load(void) override; // MythScreenType
 
   private:
 
@@ -146,13 +148,15 @@ class ImportIconsWizard : public MythScreenType
      */
     bool doLoad();
 
+  public slots:
+    void Close() override; // MythScreenType
+
   protected slots:
     void enableControls(ImportIconsWizard::dialogState state=STATE_NORMAL);         //!< enable/disable the controls
     void manualSearch();           //!< process the manual search
     void menuSelection(MythUIButtonListItem *item);//!< process the icon selection
     void skip();                   //!< skip this icon
     void askSubmit(const QString& strParam);
-    void Close() override; // MythScreenType
 
   private slots:
     void itemChanged(MythUIButtonListItem *item);

@@ -163,12 +163,12 @@ class MHIContext : public MHContext, public QRunnable
     bool IsFaceLoaded(void) const { return m_faceLoaded; }
     bool LoadFont(const QString& name);
     bool ImageUpdated(void) const { return m_updated; }
+    void run(void) override; // QRunnable
 
     static const int kStdDisplayWidth = 720;
     static const int kStdDisplayHeight = 576;
 
   protected:
-    void run(void) override; // QRunnable
     void ProcessDSMCCQueue(void);
     void NetworkBootRequested(void);
     void ClearDisplay(void);

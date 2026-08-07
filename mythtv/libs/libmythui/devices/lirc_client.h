@@ -21,12 +21,15 @@
 #include <stddef.h>
 #endif
 
-#define LIRC_RET_SUCCESS  (0)
-#define LIRC_RET_ERROR   (-1)
+enum LIRC_ERR : int8_t {
+	LIRC_RET_SUCCESS = 0,
+	LIRC_RET_ERROR = -1,
+};
 
 #define LIRC_ALL "ALL"
 
-enum lirc_flags {none=0x00,
+enum lirc_flags : uint8_t {
+		 none=0x00,
 		 once=0x01,
 		 quit=0x02,
 		 modex=0x04,
@@ -37,8 +40,8 @@ enum lirc_flags {none=0x00,
 
 struct lirc_state
 {
-	int lirc_lircd;
-	int lirc_verbose;
+	int lirc_lircd {};
+	int lirc_verbose {};
 	std::string lirc_prog;
 	std::string lircrc_root_file;
 	std::string lircrc_user_file;
@@ -63,7 +66,7 @@ struct lirc_config
 	struct lirc_config_entry *next  { nullptr };
 	struct lirc_config_entry *first { nullptr };
 	
-	int sockfd;
+	int sockfd {};
 };
 
 struct lirc_config_entry

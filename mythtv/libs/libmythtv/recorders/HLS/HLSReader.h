@@ -48,7 +48,7 @@ class MTV_PUBLIC  HLSReader
     using StreamContainer = QMap<QString, HLSRecStream* >;
     using SegmentContainer = QVector<HLSRecSegment>;
 
-    HLSReader(int inputId) { m_inputId = inputId; };
+    HLSReader(int inputId) : m_inputId(inputId) { };
     ~HLSReader(void);
 
     bool Open(const QString & m3u, int bitrate_index = 0);

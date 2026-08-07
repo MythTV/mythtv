@@ -17,7 +17,6 @@ class MythBDPlayer : public MythPlayerUI
     int      GetNumChapters    (void) override;
     int      GetCurrentChapter (void) override;
     void     GetChapterTimes   (QList<std::chrono::seconds> &ChapterTimes) override;
-    int64_t  GetChapter        (int Chapter) override;
     int      GetNumTitles      (void) const override;
     int      GetNumAngles      (void) const override;
     int      GetCurrentTitle   (void) const override;
@@ -32,17 +31,18 @@ class MythBDPlayer : public MythPlayerUI
     bool     PrevAngle         (void) override;
     bool     NextAngle         (void) override;
     uint64_t GetBookmark       (void) override;
+    void     VideoStart        (void) override;
+    bool     VideoLoop         (void) override;
+    void     EventStart        (void) override;
+    void     PreProcessNormalFrame(void) override;
 
   protected slots:
     void     GoToMenu          (const QString& Menu);
     void     SetBookmark       (bool Clear) override;
 
   protected:
-    void     VideoStart        (void) override;
-    bool     VideoLoop         (void) override;
-    void     EventStart        (void) override;
+    int64_t  GetChapter        (int Chapter) override;
     void     DisplayPauseFrame (void) override;
-    void     PreProcessNormalFrame(void) override;
     bool     JumpToFrame       (uint64_t Frame) override;
     void     CreateDecoder     (TestBufferVec & TestBuffer) override;
 

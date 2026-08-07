@@ -83,7 +83,6 @@ class ExternalStreamHandler : public StreamHandler
                                    int majorid);
     ~ExternalStreamHandler(void) override { CloseApp(); }
 
-    void run(void) override; // MThread
     void PriorityEvent(int fd) override; // DeviceReaderCB
 
     QString GetDescription(void) { return m_loc; }
@@ -121,6 +120,9 @@ class ExternalStreamHandler : public StreamHandler
                      std::chrono::milliseconds timeout = 4s,
                      uint retry_cnt = 3);
     int APIVersion(void) const { return m_apiVersion; }
+
+  protected:
+    void run(void) override; // MThread
 
   private:
     int  StreamingCount(void) const;

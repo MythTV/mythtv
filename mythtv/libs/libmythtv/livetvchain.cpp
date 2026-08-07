@@ -97,7 +97,9 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, const QString& channum,
     query.bindValue(":INPUT", inputname);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Chain: AppendNewProgram", query);
+    }
     else
     {
         LOG(VB_RECORD, LOG_INFO, QString("Chain: Appended@%3 '%1_%2'")
@@ -122,7 +124,9 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     query.bindValue(":START", pginfo->GetRecordingStartTime());
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Chain: FinishedRecording", query);
+    }
     else
     {
         LOG(VB_RECORD, LOG_INFO,
@@ -278,7 +282,9 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     int new_at = (size && (at < 0 || at >= size)) ? size - 1 : at;
 
     if (size && new_at >= 0 && new_at < size)
+    {
         entry = m_chain[new_at];
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("GetEntryAt(%1) failed.").arg(at));

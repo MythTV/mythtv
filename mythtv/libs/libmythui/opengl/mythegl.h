@@ -5,6 +5,7 @@
 #include <QOpenGLContext>
 
 // MythTV
+#include "libmythbase/mythconfig.h"
 #include "libmythui/mythuiexp.h"
 
 using MYTH_EGLIMAGETARGET  = void  (*)(GLenum, void*);
@@ -25,7 +26,7 @@ class MUI_PUBLIC MythEGL
    ~MythEGL() = default;
 
     bool  IsEGL(void);
-    bool  HasEGLExtension(QString Extension);
+    bool  HasEGLExtension(const QString& Extension);
     void* GetEGLDisplay(void);
     static qint32 GetEGLError(void);
     void  eglImageTargetTexture2DOES (GLenum Target, void* Image);
@@ -38,7 +39,9 @@ class MUI_PUBLIC MythEGL
     Q_DISABLE_COPY(MythEGL)
     bool  InitEGL(void);
 
+#if CONFIG_EGL
     MythRenderOpenGL    *m_context                    { nullptr };
+#endif
     void*                m_eglDisplay                 { nullptr };
     MYTH_EGLIMAGETARGET  m_eglImageTargetTexture2DOES { nullptr };
     MYTH_EGLCREATEIMAGE  m_eglCreateImageKHR          { nullptr };

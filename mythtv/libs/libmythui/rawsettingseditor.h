@@ -7,9 +7,8 @@
 
 #include "mythuiexp.h"
 #include "libmythui/mythscreentype.h"
+#include "mythuibuttonlist.h"
 
-class MythUIButtonList;
-class MythUIButtonListItem;
 class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
@@ -35,6 +34,8 @@ class MUI_PUBLIC RawSettingsEditor : public MythScreenType
 
     // MythScreenType overrides
     bool Create(void) override; // MythScreenType
+
+  protected:
     void Load(void) override; // MythScreenType
     void Init(void) override; // MythScreenType
 

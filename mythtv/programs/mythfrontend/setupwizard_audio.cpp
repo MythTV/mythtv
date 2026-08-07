@@ -202,7 +202,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 #endif
     if (it != m_outputlist->cend())
     {
-        AudioOutput::AudioDeviceConfig ao = *it;
+        const AudioOutput::AudioDeviceConfig& ao = *it;
         settings = ao.m_settings;
     }
 
@@ -427,3 +427,5 @@ void AudioSetupWizard::toggleSpeakers(void)
         m_testSpeakerButton->SetText(tr("Stop Speaker Test"));
     }
 }
+
+#include "moc_setupwizard_audio.cpp"

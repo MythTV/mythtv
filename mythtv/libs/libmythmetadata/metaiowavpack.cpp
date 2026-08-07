@@ -78,7 +78,7 @@ bool MetaIOWavPack::write(const QString &filename, MusicMetadata* mdata)
 
     delete wpfile;
 
-    return (result);
+    return result;
 }
 
 /*!

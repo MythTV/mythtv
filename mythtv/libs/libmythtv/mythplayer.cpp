@@ -77,6 +77,9 @@ const double MythPlayer::kSeekToEndOffset = 1.0;
 MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
   : m_playerCtx(Context),
     m_playerThread(QThread::currentThread()),
+#ifdef Q_OS_ANDROID
+    m_playerThreadId(gettid()),
+#endif
     m_playerFlags(Flags),
     m_liveTV(Context->m_tvchain),
     // CC608/708
@@ -84,9 +87,6 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     // Audio
     m_audio(this, (Flags & kAudioMuted) != 0)
 {
-#ifdef Q_OS_ANDROID
-    m_playerThreadId = gettid();
-#endif
     m_deleteMap.SetPlayerContext(m_playerCtx);
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
@@ -97,7 +97,7 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     QString mypage = gCoreContext->GetSetting("VBIpageNr", "888");
     bool valid = false;
     uint tmp = mypage.toInt(&valid, 16);
-    m_ttPageNum = (valid) ? tmp : m_ttPageNum;
+    m_ttPageNum = valid ? tmp : m_ttPageNum;
     m_cc608.SetTTPageNum(m_ttPageNum);
 }
 
@@ -1197,7 +1197,7 @@ void MythPlayer::DoFFRewSkip(void)
     {
         long long cur_frame    = m_decoder->GetFramesPlayed();
         bool      toBegin      = -cur_frame > m_ffrewSkip + m_ffrewAdjust;
-        long long real_skip    = (toBegin) ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
+        long long real_skip    = toBegin ? -cur_frame : m_ffrewSkip + m_ffrewAdjust;
         long long target_frame = cur_frame + real_skip;
         m_decoder->DoRewind(target_frame, true);
 
@@ -1316,7 +1316,9 @@ uint64_t MythPlayer::GetBookmark(void)
 
     if (gCoreContext->IsDatabaseIgnored() ||
         (m_playerCtx->m_buffer && !m_playerCtx->m_buffer->IsBookmarkAllowed()))
+    {
         bookmark = 0;
+    }
     else
     {
         m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
@@ -1484,7 +1486,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
         float behind = secsWritten - secsPlayed;
 
         if (behind < maxtime) // if we're close, do nothing
+        {
             ret = 0;
+        }
         else if (behind - ff <= maxtime)
         {
             auto msec = millisecondsFromFloat(1000 * (secsWritten - maxtime));
@@ -1505,7 +1509,9 @@ long long MythPlayer::CalcMaxFFTime(long long ffframes, bool setjump) const
     {
         float secsMax = secsWritten - (2.F * maxtime);
         if (secsMax <= 0.F)
+        {
             ret = 0;
+        }
         else if (secsMax < secsPlayed + ff)
         {
             auto msec = millisecondsFromFloat(1000 * secsMax);
@@ -2017,3 +2023,5 @@ static unsigned dbg_ident(const MythPlayer *player)
         return *it;
     return s_dbgIdent[player] = s_dbgNextIdent++;
 }
+
+#include "moc_mythplayer.cpp"

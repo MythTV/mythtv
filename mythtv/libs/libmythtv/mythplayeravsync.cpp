@@ -164,7 +164,7 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
                 audio_adjustment = 0ms;
             }
             int sign = audio_adjustment < 0ms ? -1 : 1;
-            float fix_amount_ms = (m_lastFix * s_sync_fc + (1 - s_sync_fc) * audio_adjustment.count()) * sign * s_av_control_gain;
+            float fix_amount_ms = ((m_lastFix * s_sync_fc) + ((1 - s_sync_fc) * audio_adjustment.count())) * sign * s_av_control_gain;
             m_lastFix = fix_amount_ms * sign;
             m_rtcBase -= microsecondsFromFloat(1000 * fix_amount_ms * sign / PlaySpeed);
 

@@ -138,7 +138,6 @@ class MBASE_PUBLIC MythCommandLineParser
     static void PrintVersion(void) ;
     void PrintHelp(void) const;
     QString GetHelpString(void) const;
-    virtual QString GetHelpHeader(void) const { return ""; }
 
     static const char* NamedOptType(Result type);
     virtual bool Parse(int argc, const char * const * argv);
@@ -262,6 +261,8 @@ class MBASE_PUBLIC MythCommandLineParser
     void addJob(void);
     void addInFile(bool addOutFile = false);
     void addPlatform(void);
+
+    virtual QString GetHelpHeader(void) const { return ""; }
 
   private:
     Result getOpt(int argc, const char * const * argv, int &argpos,

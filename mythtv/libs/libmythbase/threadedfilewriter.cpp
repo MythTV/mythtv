@@ -98,7 +98,9 @@ bool ThreadedFileWriter::Open(void)
     m_ignoreWrites = false;
 
     if (m_filename == "-")
+    {
         m_fd = fileno(stdout);
+    }
     else
     {
         QByteArray fname = m_filename.toLocal8Bit();

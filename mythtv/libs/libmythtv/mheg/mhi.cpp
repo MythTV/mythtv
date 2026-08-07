@@ -186,7 +186,7 @@ void MHIContext::Restart(int chanid, int sourceid, bool isLive)
         QMutexLocker locker(&m_channelMutex);
         m_channelCache.clear();
     }
-    m_currentStream = (chanid) ? chanid : -1;
+    m_currentStream = chanid ? chanid : -1;
     if (!(tuneinfo & kTuneKeepChnl))
         m_currentChannel = m_currentStream;
 
@@ -761,12 +761,12 @@ void MHIContext::RequireRedraw(const QRegion & /*region*/)
 
 inline int MHIContext::ScaleX(int n, bool roundup) const
 {
-    return (n * m_displayRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
+    return ((n * m_displayRect.width()) + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleY(int n, bool roundup) const
 {
-    return (n * m_displayRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
+    return ((n * m_displayRect.height()) + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::Scale(const QRect r) const
@@ -777,12 +777,12 @@ inline QRect MHIContext::Scale(const QRect r) const
 
 inline int MHIContext::ScaleVideoX(int n, bool roundup) const
 {
-    return (n * m_videoRect.width() + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
+    return ((n * m_videoRect.width()) + (roundup ? kStdDisplayWidth - 1 : 0)) / kStdDisplayWidth;
 }
 
 inline int MHIContext::ScaleVideoY(int n, bool roundup) const
 {
-    return (n * m_videoRect.height() + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
+    return ((n * m_videoRect.height()) + (roundup ? kStdDisplayHeight - 1 : 0)) / kStdDisplayHeight;
 }
 
 inline QRect MHIContext::ScaleVideo(const QRect r) const
@@ -806,7 +806,9 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect displayRect, bool
 
     QMutexLocker locker(&m_displayLock);
     if (!bUnder)
+    {
         m_display.push_back(data);
+    }
     else
     {
         // Replace any existing items under the video with this
@@ -815,7 +817,9 @@ void MHIContext::AddToDisplay(const QImage &image, const QRect displayRect, bool
         {
             MHIImageData *old = *it;
             if (!old->m_bUnder)
+            {
                 ++it;
+            }
             else
             {
                 it = m_display.erase(it);
@@ -927,7 +931,9 @@ int MHIContext::GetChannelIndex(const QString &str)
             if (it == m_channelCache.constEnd())
                 break;
             if (transportID < 0)
+            {
                 nResult = Cid(it);
+            }
             else
             {
                 for ( ; it != m_channelCache.constEnd() ; it++)

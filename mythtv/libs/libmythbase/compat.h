@@ -59,9 +59,6 @@
 
             using uint = unsigned int;
 
-#   define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
-#   define unsetenv(x) 0
-
 #define lstat stat
 #define nice(x) ((int)!::SetPriorityClass(\
                     ::GetCurrentProcess(), ((x) < -10) ? \

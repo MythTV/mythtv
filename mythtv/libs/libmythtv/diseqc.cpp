@@ -455,7 +455,9 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     // store changed and new nodes
     uint devid = 0;
     if (m_root && m_root->Store())
+    {
         devid = m_root->GetDeviceID();
+    }
     else if (m_root)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to save DiSEqC tree.");
@@ -482,6 +484,7 @@ bool DiSEqCDevTree::Store(uint cardid, const QString &device)
     return true;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevTree::SetTone([[maybe_unused]] bool on) const
 {
     bool success = false;
@@ -672,6 +675,7 @@ static bool send_diseqc(int fd, const dvb_diseqc_master_cmd cmd)
  *  \param data_len Length of optional data.
  *  \param data Pointer to optional data.
  */
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevTree::SendCommand([[maybe_unused]] uint adr,
                                 [[maybe_unused]] uint cmd,
                                 [[maybe_unused]] uint repeats,
@@ -1362,6 +1366,7 @@ void DiSEqCDevSwitch::SetNumPorts(uint num_ports)
     m_numPorts = num_ports;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &settings,
                                     [[maybe_unused]] const DTVMultiplex &tuning,
                                     [[maybe_unused]] uint pos)
@@ -1495,6 +1500,7 @@ static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 }
 #endif // CONFIG_DVB
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
                                   const DTVMultiplex &/*tuning*/,
                                   uint pos)
@@ -1511,6 +1517,7 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
     return false;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &settings,
                                      [[maybe_unused]] const DTVMultiplex &tuning,
                                      uint pos)
@@ -1531,6 +1538,7 @@ bool DiSEqCDevSwitch::ExecuteVoltage([[maybe_unused]] const DiSEqCDevSettings &s
     return false;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool DiSEqCDevSwitch::ExecuteMiniDiSEqC([[maybe_unused]] const DiSEqCDevSettings &settings,
                                         [[maybe_unused]] const DTVMultiplex &tuning,
                                         uint pos)
@@ -2116,7 +2124,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     bool     high_band  = lnb->IsHighBand(tuning);
     bool     horizontal = lnb->IsHorizontal(tuning);
     uint32_t frequency  = lnb->GetIntermediateFrequency(settings, tuning);
-    uint t = ((frequency / 1000 + m_scrFrequency + 2) / 4) - 350;
+    uint t = (((frequency / 1000) + m_scrFrequency + 2) / 4) - 350;
 
     // retrieve position settings (value should be 0 or 1)
     auto scr_position = (dvbdev_pos_t)int(settings.GetValue(GetDeviceID()));
@@ -2218,7 +2226,7 @@ uint DiSEqCDevSCR::GetVoltage(const DiSEqCDevSettings &/*settings*/,
 
 uint32_t DiSEqCDevSCR::GetIntermediateFrequency(const uint32_t frequency) const
 {
-    uint t = ((frequency / 1000 + m_scrFrequency + 2) / 4) - 350;
+    uint t = (((frequency / 1000) + m_scrFrequency + 2) / 4) - 350;
     return (((t + 350) * 4) * 1000) - frequency;
 }
 

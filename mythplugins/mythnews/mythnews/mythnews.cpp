@@ -735,3 +735,5 @@ QString MythNews::cleanText(const QString &text)
 
     return result;
 }
+
+#include "moc_mythnews.cpp"

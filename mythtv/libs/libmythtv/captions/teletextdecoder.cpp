@@ -133,7 +133,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     return; // error in vbimode
             }
 
-            subpagenum= (b2 + b3 * 256) & 0x3f7f;
+            subpagenum= (b2 + (b3 * 256)) & 0x3f7f;
             pagenum = ((magazine ? magazine : 8)*256) + b1;
 
             lang = "\0\4\2\6\1\5\3\7"[b4 >> 5] + (latin1 ? 0 : 8);

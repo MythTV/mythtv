@@ -57,11 +57,10 @@ class ChannelScannerGUI :
     virtual void deleteLater(void)
         { Teardown(); }
 
-    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
-
   protected:
     ~ChannelScannerGUI() override;
 
+    void HandleEvent(const ScannerEvent *scanEvent) override; // ChannelScanner
     void InformUser(const QString &error) override; // ChannelScanner
 
     virtual void Process(const ScanDTVTransportList &_transports, bool success = false);

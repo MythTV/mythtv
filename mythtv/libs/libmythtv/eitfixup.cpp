@@ -530,7 +530,9 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
          if (nPosition1==-1)
              fSingleDot = false;
          if (nPosition1 > nLength)
+         {
              fSingleDot = false;
+         }
          else
          {
              QString strTmp = event.m_description.mid(nPosition1+1,
@@ -1194,11 +1196,17 @@ void EITFixUp::FixComHem(DBEventEIT &event, bool process_subtitle)
         auto hmatch = comHemHost.matchView(pmatch.capturedView(1));
 #endif
         if (dmatch.hasMatch())
+        {
             role = DBPerson::kDirector;
+        }
         else if (amatch.hasMatch())
+        {
             role = DBPerson::kActor;
+        }
         else if (hmatch.hasMatch())
+        {
             role = DBPerson::kHost;
+        }
         else
         {
             event.m_description.remove(pmatch.capturedStart(), pmatch.capturedLength());
@@ -2699,13 +2707,17 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
             if (tmpinteger < 1)
             {
                 if (match.captured(2) == "ΣΤ") // 6, don't ask!
+                {
                     event.m_season = 6;
+                }
                 else
                 {
                     static const QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";
                     tmpinteger = LettToNumber.indexOf(match.capturedView(2));
                     if (tmpinteger != -1)
+                    {
                         event.m_season = tmpinteger;
+                    }
                     else
                     //sometimes they use english letters instead of greek. Compensating:
                     {
@@ -2737,7 +2749,9 @@ void EITFixUp::FixGreekEIT(DBEventEIT &event)
             if (tmpinteger < 1)
             {
                 if (match.captured(2) == "ΣΤ") // 6, don't ask!
+                {
                     event.m_season = 6;
+                }
                 else
                 {
                     static const QString LettToNumber = "0ΑΒΓΔΕ6ΖΗΘΙΚΛΜΝ";

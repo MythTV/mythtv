@@ -6,7 +6,7 @@
 
 #include "libmythtv/mythtvexp.h"
 
-#define NB_FX 10
+static constexpr int8_t NB_FX {10};
 
 using GoomSingleData = std::array<int16_t,512>;
 using GoomDualData   = std::array<GoomSingleData,2>;

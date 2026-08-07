@@ -420,3 +420,5 @@ FrontendActionList::FrontendActionList(QVariantMap List)
     : m_ActionList(std::move(List))
 {
 }
+
+#include "moc_mythfrontendservice.cpp"

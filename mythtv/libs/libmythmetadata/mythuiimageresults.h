@@ -5,10 +5,10 @@
 
 #include "libmythtv/metadataimagehelper.h"
 #include "libmythui/mythscreentype.h"
+#include "libmythui/mythuibuttonlist.h"
 
 #include "mythmetaexp.h"
 
-class MythUIButtonList;
 class MetadataImageDownload;
 
 class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
@@ -23,6 +23,8 @@ class META_PUBLIC ImageSearchResultsDialog : public MythScreenType
 
     bool Create() override; // MythScreenType
     static void cleanCacheDir();
+
+  protected:
     void customEvent(QEvent *event) override; // MythUIType
 
   signals:

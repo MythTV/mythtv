@@ -2483,7 +2483,9 @@ void HostRefreshRateComboBoxSetting::ChangeResolution(StandardSetting * setting)
     // changed even though the previous value might still be available.  Mark it
     // as unchanged in this case if it wasn't already changed.
     if (wasUnchanged && previousValue == getValue())
+    {
         setChanged(false);
+    }
     else
     {
         if ("640x480" == resolution || "720x480" == resolution)
@@ -3899,7 +3901,7 @@ static HostCheckBoxSetting *LCDEnable()
 #ifdef Q_OS_DARWIN
 static HostCheckBoxSetting *MacGammaCorrect()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacGammaCorrect");
+    auto *gc = new HostCheckBoxSetting("MacGammaCorrect");
 
     gc->setLabel(PlaybackSettings::tr("Enable gamma correction for video"));
 
@@ -3914,7 +3916,7 @@ static HostCheckBoxSetting *MacGammaCorrect()
 
 static HostCheckBoxSetting *MacScaleUp()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacScaleUp");
+    auto *gc = new HostCheckBoxSetting("MacScaleUp");
 
     gc->setLabel(PlaybackSettings::tr("Scale video as necessary"));
 
@@ -3929,7 +3931,7 @@ static HostCheckBoxSetting *MacScaleUp()
 
 static HostSpinBoxSetting *MacFullSkip()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFullSkip", 0, 30, 1, true);
+    auto *gs = new HostSpinBoxSetting("MacFullSkip", 0, 30, 1, true);
 
     gs->setLabel(PlaybackSettings::tr("Frames to skip in fullscreen mode"));
 
@@ -3947,7 +3949,7 @@ static HostSpinBoxSetting *MacFullSkip()
 
 static HostCheckBoxSetting *MacMainEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacMainEnabled");
+    auto *gc = new HostCheckBoxSetting("MacMainEnabled");
 
     gc->setLabel(MacMainSettings::tr("Video in main window"));
 
@@ -3965,7 +3967,7 @@ static HostCheckBoxSetting *MacMainEnabled()
 
 static HostSpinBoxSetting *MacMainSkip()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacMainSkip", 0, 30, 1, true);
+    auto *gs = new HostSpinBoxSetting("MacMainSkip", 0, 30, 1, true);
 
     gs->setLabel(MacMainSettings::tr("Frames to skip"));
 
@@ -3980,7 +3982,7 @@ static HostSpinBoxSetting *MacMainSkip()
 
 static HostSpinBoxSetting *MacMainOpacity()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacMainOpacity", 0, 100, 5, false);
+    auto *gs = new HostSpinBoxSetting("MacMainOpacity", 0, 100, 5, false);
 
     gs->setLabel(MacMainSettings::tr("Opacity"));
 
@@ -3994,7 +3996,7 @@ static HostSpinBoxSetting *MacMainOpacity()
 
 static HostCheckBoxSetting *MacFloatEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacFloatEnabled");
+    auto *gc = new HostCheckBoxSetting("MacFloatEnabled");
 
     gc->setLabel(MacFloatSettings::tr("Video in floating window"));
 
@@ -4010,7 +4012,7 @@ static HostCheckBoxSetting *MacFloatEnabled()
 
 static HostSpinBoxSetting *MacFloatSkip()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFloatSkip", 0, 30, 1, true);
+    auto *gs = new HostSpinBoxSetting("MacFloatSkip", 0, 30, 1, true);
 
     gs->setLabel(MacFloatSettings::tr("Frames to skip"));
 
@@ -4025,7 +4027,7 @@ static HostSpinBoxSetting *MacFloatSkip()
 
 static HostSpinBoxSetting *MacFloatOpacity()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacFloatOpacity", 0, 100, 5, false);
+    auto *gs = new HostSpinBoxSetting("MacFloatOpacity", 0, 100, 5, false);
 
     gs->setLabel(MacFloatSettings::tr("Opacity"));
 
@@ -4040,7 +4042,7 @@ static HostSpinBoxSetting *MacFloatOpacity()
 
 static HostCheckBoxSetting *MacDockEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacDockEnabled");
+    auto *gc = new HostCheckBoxSetting("MacDockEnabled");
 
     gc->setLabel(MacDockSettings::tr("Video in the dock"));
 
@@ -4056,7 +4058,7 @@ static HostCheckBoxSetting *MacDockEnabled()
 
 static HostSpinBoxSetting *MacDockSkip()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacDockSkip", 0, 30, 1, true);
+    auto *gs = new HostSpinBoxSetting("MacDockSkip", 0, 30, 1, true);
 
     gs->setLabel(MacDockSettings::tr("Frames to skip"));
 
@@ -4070,7 +4072,7 @@ static HostSpinBoxSetting *MacDockSkip()
 
 static HostCheckBoxSetting *MacDesktopEnabled()
 {
-    HostCheckBoxSetting *gc = new HostCheckBoxSetting("MacDesktopEnabled");
+    auto *gc = new HostCheckBoxSetting("MacDesktopEnabled");
 
     gc->setLabel(MacDesktopSettings::tr("Video on the desktop"));
 
@@ -4088,7 +4090,7 @@ static HostCheckBoxSetting *MacDesktopEnabled()
 
 static HostSpinBoxSetting *MacDesktopSkip()
 {
-    HostSpinBoxSetting *gs = new HostSpinBoxSetting("MacDesktopSkip", 0, 30, 1, true);
+    auto *gs = new HostSpinBoxSetting("MacDesktopSkip", 0, 30, 1, true);
 
     gs->setLabel(MacDesktopSettings::tr("Frames to skip"));
 
@@ -4108,7 +4110,7 @@ class ShutDownRebootSetting : public GroupSetting
   public:
     ShutDownRebootSetting();
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting* /*unused*/) override;
 
   private:
@@ -4279,7 +4281,9 @@ MainGeneralSettings::MainGeneralSettings()
 void MainGeneralSettings::cecChanged(bool /*setting*/)
 {
     if (m_cecPowerOnTVAllowed->boolValue())
+    {
         m_cecPowerOnTVOnStart->setEnabled(true);
+    }
     else
     {
         m_cecPowerOnTVOnStart->setEnabled(false);
@@ -4287,7 +4291,9 @@ void MainGeneralSettings::cecChanged(bool /*setting*/)
     }
 
     if (m_cecPowerOffTVAllowed->boolValue())
+    {
         m_cecPowerOffTVOnExit->setEnabled(true);
+    }
     else
     {
         m_cecPowerOffTVOnExit->setEnabled(false);
@@ -4311,7 +4317,7 @@ class PlayBackScaling : public GroupSetting
     PlayBackScaling();
     void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-  private slots:
+  public slots:
     void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
 
   private:
@@ -4540,7 +4546,7 @@ void PlaybackSettings::Load(void)
     addChild(comms);
 
 #ifdef Q_OS_DARWIN
-    GroupSetting* mac = new GroupSetting();
+    auto* mac = new GroupSetting();
     mac->setLabel(tr("Mac OS X Video Settings"));
     mac->addChild(MacGammaCorrect());
     mac->addChild(MacScaleUp());
@@ -4696,7 +4702,7 @@ class GuiDimension : public GroupSetting
         //QString getValue() override; // StandardSetting
         void updateButton(MythUIButtonListItem *item) override; // GroupSetting
 
-    private slots:
+    public slots:
         void childChanged(StandardSetting * /*setting*/) override; // StandardSetting
     private:
         StandardSetting *m_width   {nullptr};
@@ -4989,7 +4995,9 @@ void ChannelGroupSetting::LoadChannelGroupChannels()
     }
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("ChannelGroupSetting::LoadChannelGroupChannels", query);
+    }
     else
     {
         while (query.next())
@@ -5117,4 +5125,4 @@ void ChannelGroupsSetting::CreateNewGroup(const QString& name)
     emit settingsChanged(this);
 }
 
-// vim:set sw=4 ts=4 expandtab:
+#include "moc_globalsettings.cpp"

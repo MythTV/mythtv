@@ -83,14 +83,16 @@ class MythDisplayMutter : public MythDisplay
     static MythDisplayMutter* Create();
     ~MythDisplayMutter() override;
 
-    void UpdateCurrentMode   () override;
     bool VideoModesAvailable () override { return true; }
     bool UsingVideoModes     () override;
     const MythDisplayModes& GetVideoModes(void) override;
-    bool SwitchToVideoMode   (QSize Size, double DesiredRate) override;
 
   public slots:
     void MonitorsChanged();
+
+  protected:
+    void UpdateCurrentMode   () override;
+    bool SwitchToVideoMode   (QSize Size, double DesiredRate) override;
 
   private:
     MythDisplayMutter();

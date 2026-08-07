@@ -28,7 +28,7 @@
 #include <fcntl.h>
 
 #if HAVE_POSIX_FADVISE < 1
-static int posix_fadvise(int, off_t, off_t, int) { return 0; }
+static int posix_fadvise(int /*fd*/, off_t /*offset*/, off_t /*size*/, int /*advice*/) { return 0; }
 static constexpr int8_t POSIX_FADV_SEQUENTIAL { 0 };
 static constexpr int8_t POSIX_FADV_WILLNEED { 0 };
 #endif
@@ -129,7 +129,7 @@ static bool CheckPermissions(const QString &Filename)
 
 static bool IsSubtitlePossible(const QString &Extension)
 {
-    return std::ranges::any_of(std::as_const(kSubExtNoCheck),
+    return std::ranges::none_of(std::as_const(kSubExtNoCheck),
                            [Extension] (const QString& ext) -> bool
                                {return ext.contains(Extension);});
 }

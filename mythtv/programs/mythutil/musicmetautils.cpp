@@ -1,4 +1,8 @@
 // qt
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
 #include <QDir>
 #include <QDomDocument>
 #include <QProcess>
@@ -328,7 +332,7 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
     avformat_close_input(&inputFC);
     inputFC = nullptr;
 
-    std::chrono::seconds dbLength = duration_cast<std::chrono::seconds>(mdata->Length());
+    auto dbLength = duration_cast<std::chrono::seconds>(mdata->Length());
     if (dbLength != duration)
     {
         LOG(VB_GENERAL, LOG_INFO, QString("The length of this track in the database was %1s "
@@ -361,17 +365,18 @@ public:
 static int FindLyrics(const MythUtilCommandLineParser &cmdline)
 {
 
-    #ifdef Q_OS_DARWIN
-        QString path = QCoreApplication::applicationDirPath();
-        setenv("PYTHONPATH",
-               QString("%1/../Resources/lib/python3:%1/../Resources/lib/python3/site-packages:%1/../Resources/lib/python3/lib-dynload:%2")
-               .arg(path)
-               .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
-               .toUtf8().constData(), 1);
-            QString PYTHON_LOCAL_EXE = path + "python3";
-    #else
-        QString PYTHON_LOCAL_EXE = QString(PYTHON_EXE);
-    #endif
+#ifdef Q_OS_DARWIN
+    QString path = QCoreApplication::applicationDirPath();
+    qputenv("PYTHONPATH",
+           QString("%1/../Resources/lib/%2:%1/../Resources/lib/%2/site-packages:%1/../Resources/lib/%2/lib-dynload:%3")
+           .arg(path)
+           .arg(QFileInfo(PYTHON_EXE).fileName())
+           .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
+           .toUtf8().constData());
+    QString PYTHON_LOCAL_EXE = path + QFileInfo(PYTHON_EXE).fileName();
+#else
+    QString PYTHON_LOCAL_EXE = QString(PYTHON_EXE);
+#endif
 
     // make sure our lyrics cache directory exists
     QString lyricsDir = GetConfDir() + "/MythMusic/Lyrics/";
@@ -420,7 +425,9 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
             // if the user specified a specific grabber assume they want to
             // re-search for the lyrics using the given grabber
             if (grabberName != "ALL")
+            {
                 QFile::remove(lyricsFile);
+            }
             else
             {
                 // load these lyrics to speed up future lookups

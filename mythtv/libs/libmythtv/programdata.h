@@ -127,6 +127,8 @@ class MTV_PUBLIC DBEvent
     bool HasTimeConflict(const DBEvent &other) const;
 
     DBEvent &operator=(const DBEvent &other);
+    virtual uint InsertDB(MSqlQuery &query, uint chanid,
+                          bool recording = false) const; // DBEvent
 
   protected:
     uint GetOverlappingPrograms(
@@ -139,8 +141,6 @@ class MTV_PUBLIC DBEvent
         MSqlQuery &query, uint chanid, const DBEvent &match) const;
     bool MoveOutOfTheWayDB(
         MSqlQuery &query, uint chanid, const DBEvent &prog) const;
-    virtual uint InsertDB(MSqlQuery &query, uint chanid,
-                          bool recording = false) const; // DBEvent
 
     virtual void Squeeze(void);
 
@@ -231,12 +231,13 @@ class MTV_PUBLIC ProgInfo : public DBEvent
 
     ProgInfo(const ProgInfo &other);
 
+    ProgInfo &operator=(const ProgInfo &other);
+
     uint InsertDB(MSqlQuery &query, uint chanid,
                   bool recording = false) const override; // DBEvent
 
+  protected:
     void Squeeze(void) override; // DBEvent
-
-    ProgInfo &operator=(const ProgInfo &other);
 
   public:
     // extra XMLTV stuff

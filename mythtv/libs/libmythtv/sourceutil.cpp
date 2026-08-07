@@ -212,7 +212,9 @@ static QStringList get_inputtypes(uint sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("get_inputtypes()", query);
+    }
     else
     {
         while (query.next())
@@ -329,7 +331,9 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 
     bool has_any_chan = false;
     if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("SourceUtil::IsEncoder", query);
+    }
     else
     {
         while (query.next())

@@ -14,10 +14,44 @@
 #include "libmythbase/mythsystemlegacy.h"
 #include "libmythbase/rssparse.h"
 
+class GrabberScript;
+
+class MBASE_PUBLIC GrabberDownloadThread : public QObject, public MThread
+{
+    Q_OBJECT
+
+   friend class GrabberScript;
+
+  public:
+
+    explicit GrabberDownloadThread(QObject *parent);
+    ~GrabberDownloadThread() override;
+
+    void refreshAll();
+    void cancel();
+
+  signals:
+    void finished();
+
+  protected:
+
+    void run() override; // MThread
+
+  private:
+
+    QObject               *m_parent     {nullptr};
+    QList<GrabberScript*>  m_scripts;
+    QMutex                 m_mutex;
+    bool                   m_refreshAll {false};
+
+};
+
 class MBASE_PUBLIC GrabberScript : public QObject, public MThread
 {
 
     Q_OBJECT
+
+    friend void GrabberDownloadThread::run(void);
 
   public:
 
@@ -47,13 +81,15 @@ class MBASE_PUBLIC GrabberScript : public QObject, public MThread
     const QString& GetCommandline() const { return m_commandline; }
     const double& GetVersion() const { return m_version; }
 
-    void run(void) override; // MThread
-
     using scriptList = QList<GrabberScript *>;
 
   signals:
 
     void finished(void);
+
+  protected:
+
+    void run(void) override; // MThread
 
   private:
 
@@ -110,34 +146,6 @@ class MBASE_PUBLIC GrabberUpdateEvent : public QEvent
     GrabberUpdateEvent(void)
          : QEvent((QEvent::Type)kGrabberUpdateEventType) {}
     ~GrabberUpdateEvent() override = default;
-};
-
-class MBASE_PUBLIC GrabberDownloadThread : public QObject, public MThread
-{
-    Q_OBJECT
-
-  public:
-
-    explicit GrabberDownloadThread(QObject *parent);
-    ~GrabberDownloadThread() override;
-    
-    void refreshAll();
-    void cancel();
-
-  signals:
-    void finished();
-
-  protected:
-
-    void run() override; // MThread
-
-  private:
-
-    QObject               *m_parent     {nullptr};
-    QList<GrabberScript*>  m_scripts;
-    QMutex                 m_mutex;
-    bool                   m_refreshAll {false};
-
 };
 
 class MBASE_PUBLIC Search : public QObject

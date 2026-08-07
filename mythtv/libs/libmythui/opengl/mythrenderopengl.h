@@ -101,7 +101,6 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     static MythRenderOpenGL* Create(QWidget *Widget);
 
     // MythRender
-    void  ReleaseResources(void) override;
     QStringList GetDescription(void) override;
 
     bool  IsReady(void);
@@ -167,6 +166,9 @@ class MUI_PUBLIC MythRenderOpenGL : public QOpenGLContext, public QOpenGLFunctio
     void  DrawProcedural(QRect Area, int Alpha, QOpenGLFramebufferObject* Target,
                          QOpenGLShaderProgram* Program, float TimeVal);
     std::tuple<int,int,int> GetGPUMemory();
+
+  protected:
+    void  ReleaseResources(void) override;
 
   public slots:
     void  MessageLogged  (const QOpenGLDebugMessage &Message);

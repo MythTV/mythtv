@@ -27,9 +27,9 @@ class MythMediaCodecContext : public MythCodecContext
                                              const QString  &Decoder,
                                              AVStream       *Stream,
                                              uint            StreamType);
-    static AVPixelFormat GetFormat          (AVCodecContext*, const AVPixelFormat *PixFmt);
-    void   PostProcessFrame                 (AVCodecContext*, MythVideoFrame*) override;
-    bool   IsDeinterlacing                  (bool &DoubleRate, bool = false) override;
+    static AVPixelFormat GetFormat          (AVCodecContext* /*Context*/, const AVPixelFormat *PixFmt);
+    void   PostProcessFrame                 (AVCodecContext* /*Context*/, MythVideoFrame *Frame) override;
+    bool   IsDeinterlacing                  (bool &DoubleRate, bool /*StreamChange*/ = false) override;
     static void GetDecoderList              (QStringList &Decoders);
     static bool HaveMediaCodec              (bool Reinit = false);
 

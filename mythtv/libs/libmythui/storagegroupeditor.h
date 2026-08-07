@@ -13,13 +13,13 @@ class MUI_PUBLIC StorageGroupEditor :
     explicit StorageGroupEditor(QString group);
     void Load(void) override; // StandardSetting
     bool canDelete(void) override; // GroupSetting
+    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
 
   protected slots:
     void DoDeleteSlot(bool doDelete);
     void ShowFileBrowser(void);
 
   protected:
-    bool keyPressEvent(QKeyEvent *event) override; // StandardSetting
     void customEvent(QEvent *event) override; // QObject
     void ShowDeleteDialog();
     void SetLabel(void);

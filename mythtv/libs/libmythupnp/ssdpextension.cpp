@@ -21,10 +21,10 @@ SSDPExtension::SSDPExtension( int nServicePort , const QString &sSharePath)
 
 SSDPExtension::SSDPMethod SSDPExtension::GetMethod( const QString &sURI )
 {
-    if (sURI == "getDeviceDesc"     ) return( SSDPM_GetDeviceDesc    );
-    if (sURI == "getDeviceList"     ) return( SSDPM_GetDeviceList    );
+    if (sURI == "getDeviceDesc"     ) return SSDPM_GetDeviceDesc;
+    if (sURI == "getDeviceList"     ) return SSDPM_GetDeviceList;
 
-    return( SSDPM_Unknown );
+    return SSDPM_Unknown;
 }
 
 QStringList SSDPExtension::GetBasePaths()
@@ -40,18 +40,18 @@ bool SSDPExtension::ProcessRequest( HTTPRequest *pRequest )
     if (pRequest)
     {
         if ( pRequest->m_sBaseUrl != "/")
-            return( false );
+            return false;
 
         switch( GetMethod( pRequest->m_sMethod ))
         {
-            case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return( true );
-            case SSDPM_GetDeviceList: GetDeviceList( pRequest ); return( true );
+            case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return true;
+            case SSDPM_GetDeviceList: GetDeviceList( pRequest ); return true;
 
             default: break;
         }
     }
 
-    return( false );
+    return false;
 }
 
 void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest ) const

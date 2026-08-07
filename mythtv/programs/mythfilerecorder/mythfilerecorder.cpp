@@ -249,7 +249,9 @@ bool Commands::process_command(QString & cmd)
         else
         {
             if (m_eof.loadAcquire() != 0)
+            {
                 send_status("ERR:End of file");
+            }
             else
             {
                 send_status("OK");
@@ -452,4 +454,4 @@ int main(int argc, char *argv[])
     return GENERIC_EXIT_OK;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythfilerecorder.cpp"

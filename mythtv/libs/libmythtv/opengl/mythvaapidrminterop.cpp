@@ -469,11 +469,16 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
 
     VASurfaceID surface = 0;
 
-    VASurfaceAttrib attribs = {};
-    attribs.flags = VA_SURFACE_ATTRIB_SETTABLE;
-    attribs.type = VASurfaceAttribPixelFormat;
-    attribs.value.type = VAGenericValueTypeInteger;
-    attribs.value.value.i = VA_FOURCC_NV12;
+    VASurfaceAttrib attribs = {
+        .type = VASurfaceAttribPixelFormat,
+        .flags = VA_SURFACE_ATTRIB_SETTABLE,
+        .value = {
+            .type = VAGenericValueTypeInteger,
+            .value = {
+                .i = VA_FOURCC_NV12,
+            }
+        }
+    };
 
     if (vaCreateSurfaces(m_vaDisplay, VA_RT_FORMAT_YUV420, 1920, 1080,
                          &surface, 1, &attribs, 1) == VA_STATUS_SUCCESS)

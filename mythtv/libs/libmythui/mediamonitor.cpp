@@ -815,7 +815,9 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
         }
 
         if (pDev->isUsable())
+        {
             JumpToMediaHandler(pDev);
+        }
         else
         {
             // We don't want to jump around in the menus, but should
@@ -980,7 +982,9 @@ void MediaMonitor::ejectOpticalDisc()
 {
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
+    {
         mon->ChooseAndEjectMedia();
+    }
     else
     {
         LOG(VB_MEDIA, LOG_INFO, "CD/DVD Monitor isn't enabled.");
@@ -995,6 +999,4 @@ void MediaMonitor::ejectOpticalDisc()
     }
 }
 
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_mediamonitor.cpp"

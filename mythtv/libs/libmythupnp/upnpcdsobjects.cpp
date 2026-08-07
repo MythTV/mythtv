@@ -22,7 +22,7 @@
 
 #include "libmythbase/mythlogging.h"
 
-inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
+inline QString GetBool( bool bVal ) { return( bVal ? "1" : "0" ); }
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -173,7 +173,7 @@ CDSObject *CDSObject::AddChild( CDSObject *pChild )
         m_children.append( pChild );
     }
 
-    return( pChild );
+    return pChild;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ Resource *CDSObject::AddResource( const QString& sProtocol, const QString& sURI 
     
     m_resources.append( pRes );
 
-    return( pRes );
+    return pRes;
 }
 
 
@@ -221,7 +221,7 @@ uint32_t CDSObject::GetChildCount(void) const
     if (nCount == 0)
         return( m_nChildCount );
 
-    return( nCount );
+    return nCount;
 }
 
 /**
@@ -273,7 +273,7 @@ QString CDSObject::toXml( FilterMap &filter,
 #endif
     toXml(os, filter, ignoreChildren);
     os << Qt::flush;
-    return( sXML );
+    return sXML;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -464,7 +464,7 @@ CDSObject *CDSObject::CreateItem( const QString& sId, const QString& sTitle, con
 
     pObject->AddProperty( new Property( "refID" ) );
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -491,7 +491,7 @@ CDSObject *CDSObject::CreateContainer( const QString& sId, const QString& sTitle
     pObject->AddProperty( new Property( "longDescription", "upnp"   ));
     pObject->AddProperty( new Property( "description"    , "dc"   ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -517,7 +517,7 @@ CDSObject *CDSObject::CreateAudioItem( const QString& sId, const QString& sTitle
     pObject->AddProperty( new Property( "creator"         , "dc" ));
     pObject->AddProperty( new Property( "date"            , "dc" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -559,7 +559,7 @@ CDSObject *CDSObject::CreateMusicTrack( const QString& sId, const QString& sTitl
     pObject->AddProperty( new Property( "contributor"         , "dc"   ));
 #endif
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -580,7 +580,7 @@ CDSObject *CDSObject::CreateAudioBroadcast( const QString& sId, const QString& s
     pObject->AddProperty( new Property( "radioBand"      , "upnp" ));
     pObject->AddProperty( new Property( "channelNr"      , "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -599,7 +599,7 @@ CDSObject *CDSObject::CreateAudioBook( const QString& sId, const QString& sTitle
     pObject->AddProperty( new Property( "producer"     , "upnp" ));
     pObject->AddProperty( new Property( "contributor"  , "dc"   ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -657,7 +657,7 @@ CDSObject *CDSObject::CreateVideoItem( const QString& sId, const QString& sTitle
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // SM
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // MED
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true )); // LRG
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -675,7 +675,7 @@ CDSObject *CDSObject::CreateMovie( const QString& sId, const QString& sTitle, co
     pObject->AddProperty( new Property( "storageMedium"     , "upnp" ));
     pObject->AddProperty( new Property( "DVDRegionCode"     , "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -693,7 +693,7 @@ CDSObject *CDSObject::CreateVideoBroadcast( const QString& sId, const QString& s
     pObject->AddProperty( new Property( "icon"     , "upnp" ));
     pObject->AddProperty( new Property( "region"   , "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -713,7 +713,7 @@ CDSObject *CDSObject::CreateMusicVideoClip( const QString& sId, const QString& s
     pObject->AddProperty( new Property( "album"             , "upnp" ));
     pObject->AddProperty( new Property( "contributor"       , "dc"   ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -738,7 +738,7 @@ CDSObject *CDSObject::CreateImageItem( const QString& sId, const QString& sTitle
     pObject->AddProperty( new Property( "creator"        , "dc" ));
     pObject->AddProperty( new Property( "date"           , "dc" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -755,7 +755,7 @@ CDSObject *CDSObject::CreatePhoto( const QString& sId, const QString& sTitle, co
 
     pObject->AddProperty( new Property( "album", "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -777,7 +777,7 @@ CDSObject *CDSObject::CreatePlaylistItem ( const QString& sId, const QString& sT
     pObject->AddProperty( new Property( "description"    , "dc"   ));
     pObject->AddProperty( new Property( "language"       , "dc"   ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -804,7 +804,7 @@ CDSObject *CDSObject::CreateTextItem( const QString& sId, const QString& sTitle,
     pObject->AddProperty( new Property( "language"       , "dc"   ));
     pObject->AddProperty( new Property( "rights"         , "dc"   ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -831,7 +831,7 @@ CDSObject *CDSObject::CreateAlbum( const QString& sId, const QString& sTitle, co
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // MED
     pObject->AddProperty( new Property( "albumArtURI", "upnp", false, "", true)); // LRG
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -851,7 +851,7 @@ CDSObject *CDSObject::CreateMusicAlbum( const QString& sId, const QString& sTitl
     pObject->AddProperty( new Property( "producer"   , "upnp" ));
     pObject->AddProperty( new Property( "toc"        , "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -866,7 +866,7 @@ CDSObject *CDSObject::CreatePhotoAlbum( const QString& sId, const QString& sTitl
 
     CreateAlbum( sId, sTitle, sParentId, pObject );
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -881,7 +881,7 @@ CDSObject *CDSObject::CreateGenre( const QString& sId, const QString& sTitle, co
 
     CreateContainer( sId, sTitle, sParentId, pObject );
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -896,7 +896,7 @@ CDSObject *CDSObject::CreateMusicGenre( const QString& sId, const QString& sTitl
 
     CreateGenre( sId, sTitle, sParentId, pObject );
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -911,7 +911,7 @@ CDSObject *CDSObject::CreateMovieGenre( const QString& sId, const QString& sTitl
 
     CreateGenre( sId, sTitle, sParentId, pObject );
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -934,7 +934,7 @@ CDSObject *CDSObject::CreatePlaylistContainer( const QString& sId, const QString
     pObject->AddProperty( new Property( "language"       , "dc"   ));  
     pObject->AddProperty( new Property( "rights"         , "dc"   ));  
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -951,7 +951,7 @@ CDSObject *CDSObject::CreatePerson( const QString& sId, const QString& sTitle, c
 
     pObject->AddProperty( new Property( "language", "dc" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -969,7 +969,7 @@ CDSObject *CDSObject::CreateMusicArtist( const QString& sId, const QString& sTit
     pObject->AddProperty( new Property( "genre"               , "upnp" ));
     pObject->AddProperty( new Property( "artistDiscographyURI", "upnp" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -990,7 +990,7 @@ CDSObject *CDSObject::CreateStorageSystem( const QString& sId, const QString& sT
     pObject->AddProperty( new Property( "storageMaxPartition", "upnp", true, "-1"  ));
     pObject->AddProperty( new Property( "storageMedium"      , "upnp", true, "HDD" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1010,7 +1010,7 @@ CDSObject *CDSObject::CreateStorageVolume( const QString& sId, const QString& sT
     pObject->AddProperty( new Property( "storageFree"  , "upnp", true, "-1"  ));
     pObject->AddProperty( new Property( "storageMedium", "upnp", true, "HDD" ));
 
-    return( pObject );
+    return pObject;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1027,7 +1027,7 @@ CDSObject *CDSObject::CreateStorageFolder( const QString& sId, const QString& sT
 
     pObject->AddProperty( new Property( "storageUsed", "upnp", true, "-1" ));
 
-    return( pObject );
+    return pObject;
 }
 
 bool CDSObject::FilterContains(const FilterMap &filter, const QString& name)

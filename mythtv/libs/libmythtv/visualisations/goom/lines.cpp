@@ -113,10 +113,10 @@ static void
 goom_lines_move (GMLine * l)
 {
 	for (int i = 0; i < LINENUMPOINTS; i++) {
-		l->points[i].x = (l->points2[i].x + 39.0F * l->points[i].x) / 40.0F;
-		l->points[i].y = (l->points2[i].y + 39.0F * l->points[i].y) / 40.0F;
+		l->points[i].x = (l->points2[i].x + (39.0F * l->points[i].x)) / 40.0F;
+		l->points[i].y = (l->points2[i].y + (39.0F * l->points[i].y)) / 40.0F;
 		l->points[i].angle =
-			(l->points2[i].angle + 39.0F * l->points[i].angle) / 40.0F;
+			(l->points2[i].angle + (39.0F * l->points[i].angle)) / 40.0F;
 	}
 
 	auto *c1 = (unsigned char *) &l->color;
@@ -124,7 +124,7 @@ goom_lines_move (GMLine * l)
 	for (int i = 0; i < 4; i++) {
 		int cc1 = *c1;
 		int cc2 = *c2;
-		*c1 = (unsigned char) ((cc1 * 63 + cc2) >> 6);
+		*c1 = (unsigned char) (((cc1 * 63) + cc2) >> 6);
 		++c1;
 		++c2;
 	}
@@ -139,7 +139,7 @@ goom_lines_move (GMLine * l)
 		l->powinc = -(float) MythRandomInt(10, 29) / 300.0F;
 	}
 
-	l->amplitude = (99.0F * l->amplitude + l->amplitudeF) / 100.0F;
+	l->amplitude = ((99.0F * l->amplitude) + l->amplitudeF) / 100.0F;
 }
 
 void

@@ -1738,7 +1738,9 @@ void ImageHandler<DBFS>::RemoveFiles(ImageList &images) const
                 && (im->IsFile() ? QFile::remove(absFilename)
                                  : QDir::root().rmdir(absFilename));
         if (success)
+        {
             LOG(VB_FILE, LOG_DEBUG, LOC + QString("Deleted %1").arg(absFilename));
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC +

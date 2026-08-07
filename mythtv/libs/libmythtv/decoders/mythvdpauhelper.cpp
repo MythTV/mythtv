@@ -619,3 +619,5 @@ QSize MythVDPAUHelper::GetSurfaceParameters(VdpVideoSurface Surface, VdpChromaTy
 
     return {static_cast<int>(width), static_cast<int>(height)};
 }
+
+#include "moc_mythvdpauhelper.cpp"

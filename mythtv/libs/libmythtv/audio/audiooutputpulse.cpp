@@ -433,7 +433,9 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
                                              OpCompletionCallback, this);
         pa_threaded_mainloop_unlock(m_mainloop);
         if (op)
+        {
             pa_operation_unref(op);
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +
@@ -453,7 +455,9 @@ void AudioOutputPulseAudio::SetVolumeChannel(int channel, int volume)
                                                 OpCompletionCallback, this);
         pa_threaded_mainloop_unlock(m_mainloop);
         if (op)
+        {
             pa_operation_unref(op);
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + fn_log_tag +

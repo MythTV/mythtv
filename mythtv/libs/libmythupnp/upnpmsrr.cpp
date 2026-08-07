@@ -109,7 +109,7 @@ bool UPnpMSRR::ProcessRequest( HTTPRequest *pRequest )
         }       
     }
 
-    return( true );
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////

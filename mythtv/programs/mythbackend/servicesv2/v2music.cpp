@@ -82,7 +82,9 @@ V2MusicMetadataInfoList* V2Music::GetTrackList(int nStartIndex,
         totalPages = (int)std::ceil((float)musicList->count() / nCount);
 
     if (totalPages == 1)
+    {
         curPage = 1;
+    }
     else
     {
         curPage = (int)std::ceil((float)nStartIndex / nCount) + 1;
@@ -132,3 +134,5 @@ V2MusicMetadataInfo* V2Music::GetTrack(int Id)
 
     return pMusicMetadataInfo;
 }
+
+#include "moc_v2music.cpp"

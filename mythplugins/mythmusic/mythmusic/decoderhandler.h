@@ -94,7 +94,6 @@ class DecoderHandler : public QObject, public MythObservable
     void start(MusicMetadata *mdata);
 
     void stop(void);
-    void customEvent(QEvent *e) override; // QObject
     bool done(void);
     bool next(void);
     void error(const QString &e);
@@ -105,6 +104,7 @@ class DecoderHandler : public QObject, public MythObservable
     void setUrl (const QUrl &url) { m_url = url; }
 
   protected:
+    void customEvent(QEvent *e) override; // QObject
     void doOperationStart(const QString &name);
     void doOperationStop(void);
     void doConnectDecoder(const QUrl &url, const QString &format);

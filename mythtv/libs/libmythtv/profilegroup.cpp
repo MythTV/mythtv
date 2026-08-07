@@ -226,3 +226,5 @@ void ProfileGroupEditor::Load(void)
     ProfileGroup::fillSelections(this);
     StandardSetting::Load();
 }
+
+#include "moc_profilegroup.cpp"

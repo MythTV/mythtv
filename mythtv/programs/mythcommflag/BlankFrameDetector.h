@@ -28,7 +28,7 @@ public:
     int finished(long long nframes, bool final) override; // FrameAnalyzer
     int reportTime(void) const override; // FrameAnalyzer
     FrameMap GetMap(unsigned int index) const override // FrameAnalyzer
-        { return (index) ? m_blankMap : m_breakMap; }
+        { return index ? m_blankMap : m_breakMap; }
 
     /* BlankFrameDetector interface. */
     const FrameAnalyzer::FrameMap *getBlanks(void) const { return &m_blankMap; }

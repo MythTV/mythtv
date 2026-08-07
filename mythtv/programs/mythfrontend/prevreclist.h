@@ -36,11 +36,13 @@ class PrevRecordedList : public ScheduleCommon
                         QString title = QString());
     ~PrevRecordedList() override;
     bool Create(void) override; // MythScreenType
+    void ShowMenu(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *e) override; // MythScreenType
+
+  protected:
     void customEvent(QEvent *event) override; // ScheduleCommon
 
   protected slots:
-    void ShowMenu(void) override; // MythScreenType
     void ShowItemMenu(void);
     void updateInfo(void);
     void showListLoseFocus(void);

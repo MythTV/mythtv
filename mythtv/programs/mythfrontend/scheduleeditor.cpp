@@ -560,7 +560,7 @@ void ScheduleEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid  = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -1154,7 +1154,7 @@ void StoreOptEditor::customEvent(QEvent *event)
 {
     if (event->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(event);
+        auto *dce = (DialogCompletionEvent*)event;
 
         QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
@@ -1890,7 +1890,7 @@ void MetadataOptions::customEvent(QEvent *levent)
     }
     else if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        auto *dce = (DialogCompletionEvent*)(levent);
+        auto *dce = (DialogCompletionEvent*)levent;
 
         const QString resultid = dce->GetId();
         ArtworkInfo info;
@@ -2889,3 +2889,5 @@ void PostProcMixin::TranscodeChanged(bool enable)
     if (m_transcodeprofileList)
         m_transcodeprofileList->SetEnabled(m_rule->m_autoTranscode);
 }
+
+#include "moc_scheduleeditor.cpp"

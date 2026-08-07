@@ -45,9 +45,13 @@ bool TeletextReader::KeyPress(const QString &Key, bool& Exit)
         numeric_input = true;
         m_curpageShowHeader = true;
         if (m_pageinput[0] == ' ')
+        {
             m_pageinput[0] = '0' + Key.toInt();
+        }
         else if (m_pageinput[1] == ' ')
+        {
             m_pageinput[1] = '0' + Key.toInt();
+        }
         else if (m_pageinput[2] == ' ')
         {
             m_pageinput[2] = '0' + Key.toInt();
@@ -326,7 +330,7 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
         // setting shall be used for all page headers in the service.
 
         bool isMagazineSerialMode = (flags & TP_MAGAZINE_SERIAL) != 0;
-        if (!(isMagazineSerialMode) && m != magazine)
+        if (!isMagazineSerialMode && m != magazine)
         {
             continue;   // in parallel mode only process magazine
         }

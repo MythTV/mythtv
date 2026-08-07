@@ -61,6 +61,7 @@ class TVBrowseHelper : public MThread
     void BrowseChannel(const QString& Channum);
     BrowseInfo GetBrowsedInfo() const;
     uint GetBrowseChanId(const QString& Channum, uint PrefCardid, uint PrefSourceid) const;
+    void run() override;
 
     int                     m_browseTimerId         { 0 };
 
@@ -68,7 +69,6 @@ class TVBrowseHelper : public MThread
     Q_DISABLE_COPY(TVBrowseHelper)
     void GetNextProgram(BrowseDirection Direction, InfoMap& Infomap) const;
     void GetNextProgramDB(BrowseDirection Direction, InfoMap& Infomap) const;
-    void run() override;
 
     TV*                     m_parent                { nullptr };
     ChannelInfoList         m_dbAllChannels;

@@ -58,3 +58,7 @@ export interface RecStats {
 export interface StatsResponse {
     RecStats: RecStats;
 }
+
+export interface BackupsList {
+    BackupsList: string[];
+}

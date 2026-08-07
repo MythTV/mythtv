@@ -1674,7 +1674,7 @@ bool MythDVDBuffer::DVDButtonUpdate(bool ButtonMode)
     for (uint i = 0 ; i < 4 ; i++)
     {
         m_buttonAlpha[i] = 0xf & (highlight.palette >> (4 * i));
-        m_buttonColor[i] = 0xf & (highlight.palette >> (16 + 4 * i));
+        m_buttonColor[i] = 0xf & (highlight.palette >> (16 + (4 * i)));
     }
 
     // If the button overlay has already been decoded, make sure
@@ -2109,7 +2109,7 @@ int MythDVDBuffer::FindSmallestBoundingRectangle(AVSubtitle *Subtitle)
     }
 
     for (int i = 0; i < Subtitle->rects[0]->nb_colors; i++)
-        if (((reinterpret_cast<uint32_t*>(Subtitle->rects[0]->data[1])[i] >> 24)) == 0)
+        if ((reinterpret_cast<uint32_t*>(Subtitle->rects[0]->data[1])[i] >> 24) == 0)
             colors[i] = 1;
 
     ptrdiff_t bottom = 0;

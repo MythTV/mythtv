@@ -286,7 +286,9 @@ void SearchView::ShowMenu(void)
             if (mdata)
             {
                 if (gPlayer->getCurrentPlaylist() && gPlayer->getCurrentPlaylist()->checkTrack(mdata->ID()))
+                {
                     menu->AddItem(tr("Remove From Playlist"));
+                }
                 else
                 {
                     if (MusicPlayer::getPlayNow())
@@ -495,3 +497,5 @@ void SearchView::trackVisible(MythUIButtonListItem *item)
         }
     }
 }
+
+#include "moc_searchview.cpp"

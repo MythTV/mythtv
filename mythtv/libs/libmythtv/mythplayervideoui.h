@@ -42,6 +42,8 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
     MythPlayerVideoUI(MythMainWindow* MainWindow, TV* Tv, PlayerContext* Context, PlayerFlags Flags);
    ~MythPlayerVideoUI() override = default;
 
+    bool InitVideo() override;
+
     const MythInteropGPU::InteropMap& GetInteropTypes() const;
     void HandleDecoderCallback(const QString& Debug, DecoderCallback::Callback Function,
                                void* Opaque1, void* Opaque2);
@@ -59,8 +61,6 @@ class MTV_PUBLIC MythPlayerVideoUI : public MythPlayerCaptionsUI
     void ToggleAdjustFill(AdjustFillMode Mode = kAdjustFill_Toggle);
 
   protected:
-    bool InitVideo() override;
-
     DetectLetterbox m_detectLetterBox;
 
   private:

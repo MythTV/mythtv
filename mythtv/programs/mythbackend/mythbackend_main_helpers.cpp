@@ -636,6 +636,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
             gHousekeeping->RegisterTask(new ThemeUpdateTask());
             gHousekeeping->RegisterTask(new ArtworkTask());
             gHousekeeping->RegisterTask(new MythFillDatabaseTask());
+            gHousekeeping->RegisterTask(new DBConnPurgeTask());
 
             // only run this task if MythMusic is installed and we have a new enough schema
             if (gCoreContext->GetNumSetting("MusicDBSchemaVer", 0) >= 1024)

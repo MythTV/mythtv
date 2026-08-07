@@ -349,7 +349,7 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
     // looking for first byte of MPEG start code (3 bytes 0 0 1)
     // otherwise, pick up search where we left off.
     const bool payloadStart = tspacket.PayloadStart();
-    m_startCode = (payloadStart) ? 0xffffffff : m_startCode;
+    m_startCode = payloadStart ? 0xffffffff : m_startCode;
 
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
@@ -478,9 +478,13 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
                     audio_pid = pmt->StreamPID(i);
             }
             if (video_pid)
+            {
                 m_sd->AddWritingPID(video_pid);
+            }
             else if (audio_pid)
+            {
                 m_sd->AddWritingPID(audio_pid);
+            }
             else
             {
                 LOG(VB_STDIO|VB_FLUSH, LOG_WARNING,

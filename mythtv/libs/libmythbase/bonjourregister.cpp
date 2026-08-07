@@ -3,6 +3,10 @@
 #include <cstdlib>
 #include <limits> // workaround QTBUG-90395
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
 #include <QSocketNotifier>
 #include <QtEndian>
 
@@ -16,7 +20,7 @@ QMutex BonjourRegister::g_lock;
 BonjourRegister::BonjourRegister(QObject *parent)
     : QObject(parent)
 {
-    setenv("AVAHI_COMPAT_NOWARN", "1", 1);
+    qputenv("AVAHI_COMPAT_NOWARN", "1");
 }
 
 BonjourRegister::~BonjourRegister()
@@ -166,3 +170,5 @@ bool BonjourRegister::ReAnnounceService(void)
     }
     return kDNSServiceErr_NoError != res;
 }
+
+#include "moc_bonjourregister.cpp"

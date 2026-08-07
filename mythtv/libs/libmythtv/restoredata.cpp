@@ -450,3 +450,5 @@ bool RestoreData::doSave(void)
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Restored data for %1 channels").arg(m_ocd.size()));
     return true;
 }
+
+#include "moc_restoredata.cpp"

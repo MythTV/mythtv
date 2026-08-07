@@ -181,7 +181,7 @@ float RemoteEncoder::GetFrameRate(void)
             "GetFrameRate(): SendReceiveStringList() failed");
     }
 
-    return (ok) ? retval : 30.0F;
+    return ok ? retval : 30.0F;
 }
 
 /** \fn RemoteEncoder::GetFramesWritten(void)
@@ -321,7 +321,7 @@ void RemoteEncoder::CancelNextRecording(bool cancel)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(m_recordernum));
     strlist << "CANCEL_NEXT_RECORDING";
-    strlist << QString::number((cancel) ? 1 : 0);
+    strlist << QString::number(cancel ? 1 : 0);
 
     SendReceiveStringList(strlist);
 }

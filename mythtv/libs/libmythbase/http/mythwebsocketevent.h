@@ -1,3 +1,6 @@
+#ifndef LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H
+#define LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H
+
 #include <QObject>
 #include <QString>
 
@@ -11,8 +14,6 @@ class MythWebSocketEvent : public QObject
         MythWebSocketEvent();
         ~MythWebSocketEvent() override;
 
-        void customEvent(QEvent* /*event*/) override; // QObject
-
         bool HandleTextMessage   (const StringPayload& Text);
         bool HandleRawTextMessage(const DataPayloads& Payloads);
         //void HandleBinaryMessage (const DataPayloads& Payloads);
@@ -21,7 +22,12 @@ class MythWebSocketEvent : public QObject
         void SendTextMessage(const QString &);
         void SendBinaryMessage(const QByteArray &);
 
+    protected:
+        void customEvent(QEvent* /*event*/) override; // QObject
+
     private:
         QStringList m_filters;
         bool        m_sendEvents {false}; /// True if the client has enabled events
 };
+
+#endif // LIBMYTHBASE_HTTP_MYTHWEBSOCKETEVENT_H

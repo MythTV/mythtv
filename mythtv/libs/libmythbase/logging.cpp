@@ -431,7 +431,7 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 
 #else // Q_OS_ANDROID
 
-    android_LogPriority aprio;
+    android_LogPriority aprio {ANDROID_LOG_UNKNOWN};
     switch (item->m_level)
     {
     case LOG_EMERG:
@@ -1041,7 +1041,4 @@ QString logStrerror(int errnum)
     return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
-
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
+#include "moc_logging.cpp"

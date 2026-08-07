@@ -395,7 +395,7 @@ class BEEventConnection( BEConnection ):
         except MythError as e:
             if e.sockcode == 54:
                 # remote has closed connection, attempt reconnect
-                self.reconnect(True, True)
+                self.reconnect(True)
                 return self.backendCommand(event, self.socket.getdeadline())
             else:
                 raise

@@ -142,7 +142,7 @@
             "speedup_label": "Aceleração experimental de detecção comercial",
             "strict_desc": "Habilite um código de detecção comercial mais rigoroso. Desative se alguns comerciais não estiverem sendo detectados.",
             "strict_label": "Detecção comercial estrita",
-            "subtitle": "Configurações de trabalho de detecção e transcodificação comercial"
+            "subtitle": "Configurações de trabalho de detecção comercial e transcodificação"
         },
         "playgroup": {
             "delete_details": "Isso excluirá o grupo de reprodução {{ Name }}.",
@@ -230,6 +230,7 @@
             "damaged": "Danificado",
             "delete_details": "Isso excluirá a regra de gravação",
             "delete_rule": "Excluir Regra de Gravação",
+            "deletewarning": "Isso excluirá permanentemente este arquivo de gravação. Não pode ser desfeito. Além disso, se você selecionou várias linhas, todas as gravações selecionadas nos grupos Excluídos e LiveTV serão excluídas permanentemente. Você não será avisado para cada um. Tem certeza?",
             "description": "Descrição",
             "dont_rec": "Não grave",
             "download": "Baixar Gravação",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Marcar como não danificado",
             "mnu_markunwatched": "Marcar como não assistido",
             "mnu_markwatched": "Marcar como assistido",
+            "mnu_permdelete": "Excluir permanentemente",
             "mnu_rerec": "Permitir regravação",
             "mnu_runjobs": "Executar Trabalhos",
             "mnu_stoprec": "Pare de gravar",
@@ -395,6 +397,8 @@
             "backends_detail": "Back-end: {{ Name }} é um {{ Type }} no IP {{ IP }}",
             "backends_none": "Sem back-ends",
             "backends_title": "Infra-estruturas",
+            "dbbackups_none": "Sem backups de banco de dados.",
+            "dbbackups_title": "Backups de banco de dados",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} está no host {{ HostName }}. Estado: {{ State }}.",
             "encoder_title": "Estado do Codificador",
             "endtime_text": "Esta gravação está programada para terminar em {{ EndTime }}.",

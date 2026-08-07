@@ -1,0 +1,16 @@
+<div class="statusBox">
+    <h2>{{ 'dashboard.status.dbbackups_title' | translate }}</h2>
+    @if (backupsList?.length != 0) {
+    <div>
+        <ul class="list-disc list-inside ml-4">
+            @for (backup of backupsList; track backup) {
+            <div>
+                <li>{{ backup }}</li>
+            </div>
+            }
+        </ul>
+    </div>
+    } @else {
+    <p>{{ 'dashboard.status.dbbackups_none' | translate }}</p>
+    }
+</div>

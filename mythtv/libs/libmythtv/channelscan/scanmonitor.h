@@ -53,8 +53,6 @@ class ScanMonitor :
     explicit ScanMonitor(ChannelScanner *cs) : m_channelScanner(cs) { }
     virtual void deleteLater(void);
 
-    void customEvent(QEvent *event) override; // QObject
-
     // Values from 1-100 of scan completion
     void ScanPercentComplete(int pct);
     void ScanUpdateStatusText(const QString &status);
@@ -74,6 +72,9 @@ class ScanMonitor :
     void StatusBitErrorRate(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
     void StatusUncorrectedBlocks(const SignalMonitorValue &/*val*/) override { } // DVBSignalMonitorListener
     void StatusRotorPosition(const SignalMonitorValue &val) override; // DVBSignalMonitorListener
+
+  protected:
+    void customEvent(QEvent *event) override; // QObject
 
   private:
     ~ScanMonitor() override = default;

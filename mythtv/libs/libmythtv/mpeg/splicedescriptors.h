@@ -276,11 +276,13 @@ class SegmentationDescriptor : public SpliceDescriptor
     uint SegmentsExpected(void) const { return _ptrs[2][2]; }
     // }
 
-    bool Parse(void) override; // SpliceDescriptor
     QString toString(void) const override; // SpliceDescriptor
 
     // _ptrs[0] = program_segmentation_flag ? 12 : 13 + component_count * 6
     // _ptrs[1] = _ptrs[0] + HasSegmentationDuration() ? 5 : 0
     // _ptrs[2] = _ptrs[1] + 2 + SegmentationUPIDLength()
     std::array<unsigned char const *,3> _ptrs {};
+
+  protected:
+    bool Parse(void) override; // SpliceDescriptor
 };

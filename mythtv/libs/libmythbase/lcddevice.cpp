@@ -723,7 +723,7 @@ QString LCD::quotedString(const QString &string)
     sRes.replace(QString("\""), QString("\"\""));
     sRes = "\"" + sRes + "\"";
 
-    return(sRes);
+    return sRes;
 }
 
 bool LCD::startLCDServer(void)
@@ -736,3 +736,5 @@ bool LCD::startLCDServer(void)
     uint retval = myth_system(command, flags);
     return( retval == GENERIC_EXIT_RUNNING );
 }
+
+#include "moc_lcddevice.cpp"

@@ -171,16 +171,15 @@ void V4LRecorder::RunVBIDevice(void)
 {
     if (m_vbiFd < 0)
         return;
+    if (m_ntscVbiWidth == 0)
+        return;
 
-    unsigned char *buf = nullptr;
-    unsigned char *ptr = nullptr;
-    unsigned char *ptr_end = nullptr;
-    if (m_ntscVbiWidth)
-    {
-        uint sz   = m_ntscVbiWidth * m_ntscVbiLineCount * 2;
-        buf = ptr = new unsigned char[sz];
-        ptr_end   = buf + sz;
-    }
+    uint sz   = m_ntscVbiWidth * m_ntscVbiLineCount * 2;
+    auto *buf = new unsigned char[sz];
+    if (buf == nullptr)
+        return;
+    unsigned char *ptr = buf;
+    unsigned char *ptr_end = buf + sz;
 
     while (IsHelperRequested() && !IsErrored())
     {

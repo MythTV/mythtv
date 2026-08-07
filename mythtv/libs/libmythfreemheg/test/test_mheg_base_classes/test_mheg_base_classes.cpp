@@ -46,7 +46,7 @@ void TestMhegBaseClasses::test_sequence(void)
 
     QCOMPARE(seq.Size(), 0);
 
-    for (int i : original)
+    for (int i : m_original)
         seq.Append(i);
 
     // Test appends
@@ -97,7 +97,7 @@ void TestMhegBaseClasses::test_sequence2(void)
 
     QCOMPARE(seq.Size(), 0);
 
-    for (int i : original)
+    for (int i : m_original)
     {
         Simple a {};
         a.value = i;
@@ -154,7 +154,7 @@ void TestMhegBaseClasses::test_ownptr_sequence(void)
 
     QCOMPARE(seq.Size(), 0);
 
-    for (int i : original)
+    for (int i : m_original)
     {
         auto* a = new Simple;
         a->value = i;
@@ -212,7 +212,7 @@ void TestMhegBaseClasses::test_stack(void)
     QCOMPARE(stack.Size(), 0);
     QCOMPARE(stack.Empty(), true);
 
-    for (int i : original)
+    for (int i : m_original)
         stack.Push(i);
 
     QCOMPARE(stack.Size(), 10);

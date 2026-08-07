@@ -27,6 +27,7 @@
 #ifndef DVBCI_H
 #define DVBCI_H
 
+#include <array>
 #include <cstdint>
 #include <cstdio>
 #include <vector>
@@ -72,7 +73,7 @@ class cCiMMI;
 class cCiMenu {
   friend class cCiMMI;
 private:
-  enum { MAX_CIMENU_ENTRIES = 64 }; ///< XXX is there a specified maximum?
+  static constexpr int kMAX_CIMENU_ENTRIES { 64 }; ///< XXX is there a specified maximum?
   cCiMMI *m_mmi          {nullptr};
   bool    m_selectable;
   std::string m_titleText;
@@ -81,10 +82,10 @@ private:
   std::vector<std::string> m_entries;
   cCiMenu(cCiMMI *MMI, bool Selectable);
 public:
-  const std::string TitleText(void) { return m_titleText; }
-  const std::string SubTitleText(void) { return m_subTitleText; }
-  const std::string BottomText(void) { return m_bottomText; }
-  const std::string Entry(int n)
+  std::string TitleText(void) { return m_titleText; }
+  std::string SubTitleText(void) { return m_subTitleText; }
+  std::string BottomText(void) { return m_bottomText; }
+  std::string Entry(int n)
         { if (n < static_cast<int>(m_entries.size())) return m_entries[n]; return {}; }
   int NumEntries(void) const { return m_entries.size(); }
   bool Selectable(void) const { return m_selectable; }
@@ -101,7 +102,7 @@ private:
   int     m_expectedLength {0};
   explicit cCiEnquiry(cCiMMI *MMI) : m_mmi(MMI) {}
 public:
-  const std::string Text(void) { return m_text; }
+  std::string Text(void) { return m_text; }
   bool Blind(void) const { return m_blind; }
   int ExpectedLength(void) const { return m_expectedLength; }
   bool Reply(const char *s);
@@ -110,12 +111,14 @@ public:
 
 // Ca Pmt List Management:
 
-#define CPLM_MORE    0x00
-#define CPLM_FIRST   0x01
-#define CPLM_LAST    0x02
-#define CPLM_ONLY    0x03
-#define CPLM_ADD     0x04
-#define CPLM_UPDATE  0x05
+enum CPLM : uint8_t {
+    CPLM_MORE    = 0x00,
+    CPLM_FIRST   = 0x01,
+    CPLM_LAST    = 0x02,
+    CPLM_ONLY    = 0x03,
+    CPLM_ADD     = 0x04,
+    CPLM_UPDATE  = 0x05,
+};
 
 class cCiCaPmt {
   friend class cCiConditionalAccessSupport;
@@ -123,7 +126,7 @@ class cCiCaPmt {
 private:
   int     m_length        {0};
   int     m_infoLengthPos {0};
-  uint8_t m_capmt[2048]   {0}; ///< XXX is there a specified maximum?
+  std::array<uint8_t,2048> m_capmt   {0}; ///< XXX is there a specified maximum?
 public:
   explicit cCiCaPmt(int ProgramNumber, uint8_t cplm = CPLM_ONLY);
   void AddElementaryStream(int type, int pid);
@@ -131,7 +134,7 @@ public:
                        const uint8_t *data);
   };
 
-#define MAX_CI_SESSION  16 //XXX
+static constexpr int8_t MAX_CI_SESSION  {16};  //XXX
 
 class cCiSession;
 class cCiTransportLayer;
@@ -162,7 +165,7 @@ private:
   bool                    m_newCaSupport {false};
   bool                    m_hasUserIO    {false};
   bool                    m_needCaPmt    {false};
-  cCiSession             *m_sessions[MAX_CI_SESSION] {};
+  std::array<cCiSession*,MAX_CI_SESSION> m_sessions {};
   cCiTransportLayer      *m_tpl          {nullptr};
   cCiTransportConnection *m_tc           {nullptr};
   static int ResourceIdToInt(const uint8_t *Data);
@@ -204,7 +207,7 @@ class cHlCiHandler : public cCiHandler {
     int            m_numSlots;
     int            m_state          {0};
     int            m_numCaSystemIds {0};
-    dvbca_vector   m_caSystemIds    {};
+    dvbca_vector   m_caSystemIds;
     cHlCiHandler(int Fd, int NumSlots);
     int CommHL(unsigned tag, unsigned function, struct ca_msg *msg) const;
     int GetData(unsigned tag, struct ca_msg *msg);

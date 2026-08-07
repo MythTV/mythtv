@@ -181,7 +181,9 @@ void NetEditorBase::CreateBusyDialog(const QString& title)
             "mythvideobusydialog");
 
     if (m_busyPopup->Create())
+    {
         m_popupStack->AddScreen(m_busyPopup);
+    }
     else
     {
         delete m_busyPopup;
@@ -244,3 +246,5 @@ void NetEditorBase::ToggleItem(MythUIButtonListItem *item)
         item->setChecked(MythUIButtonListItem::NotChecked);
     }
 }
+
+#include "moc_neteditorbase.cpp"

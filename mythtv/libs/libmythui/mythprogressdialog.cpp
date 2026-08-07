@@ -106,7 +106,9 @@ MythUIBusyDialog  *ShowBusyPopup(const QString &message)
         MythMainWindow *win = GetMythMainWindow();
 
         if (win)
+        {
             s_stk = win->GetStack("popup stack");
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "no main window?");
@@ -239,3 +241,5 @@ void MythUIProgressDialog::UpdateProgress()
     if (m_progressText)
         m_progressText->SetText(QString("%1%").arg(percentage));
 }
+
+#include "moc_mythprogressdialog.cpp"

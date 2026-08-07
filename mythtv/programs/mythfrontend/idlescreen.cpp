@@ -85,7 +85,9 @@ bool IdleScreen::CheckConnectionToServer(void)
     bool bRes = false;
 
     if (gCoreContext->IsConnectedToMaster())
+    {
         bRes = true;
+    }
     else
     {
         if (gCoreContext->SafeConnectToMasterServer(false))
@@ -297,3 +299,5 @@ void IdleScreen::customEvent(QEvent* event)
 
     MythUIType::customEvent(event);
 }
+
+#include "moc_idlescreen.cpp"

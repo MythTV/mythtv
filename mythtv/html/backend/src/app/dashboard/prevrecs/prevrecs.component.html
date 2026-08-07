@@ -67,7 +67,8 @@
                 [virtualScroll]="true" [lazy]="true" (onLazyLoad)="loadLazy($event)" [rowHover]="true"
                 [sortField]="sortField" [sortOrder]="sortOrder" selectionMode="multiple" [metaKeySelection]="true"
                 [(selection)]="selection" (onRowSelect)="onSelectChange()" (onRowUnselect)="onSelectChange()"
-                (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small">
+                (onSort)="onSort($event)" [showGridlines]="true" [stripedRows]="true" size="small"
+                [virtualScrollItemSize]="43" >
                 <ng-template pTemplate="header">
                     <tr>
                         <!-- Column Headings -->

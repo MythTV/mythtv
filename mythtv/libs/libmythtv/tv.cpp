@@ -81,5 +81,5 @@ QString toString(CommSkipMode type)
         QObject::tr("Auto-Skip Notify"),
     };
 
-    return kCommSkipTitles[(uint)(type) % kCommSkipCount];
+    return kCommSkipTitles[(uint)type % kCommSkipCount];
 }

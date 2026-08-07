@@ -1232,7 +1232,9 @@ bool MythUIType::ParseElement(
     //FIXME add movement etc.
 
     if (element.tagName() == "position")
+    {
         SetPosition(parsePoint(element));
+    }
     else if (element.tagName() == "area")
     {
         SetArea(parseRect(element));
@@ -1492,3 +1494,5 @@ void MythUIType::ConnectDependants(bool recurse)
         }
     }
 }
+
+#include "moc_mythuitype.cpp"

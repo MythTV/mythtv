@@ -28,13 +28,13 @@ class MythVisualMonoScopeVulkan : public VideoVisualMonoScope, public MythVisual
     MythVisualMonoScopeVulkan(AudioPlayer* Audio, MythRender* Render, bool Fade);
    ~MythVisualMonoScopeVulkan() override;
 
+    MythRenderVulkan* InitialiseVulkan (QRect Area) override;
+    void              TearDownVulkan   () override;
+
     void Prepare (QRect Area) override;
     void Draw    (QRect Area, MythPainter* /*Painter*/, QPaintDevice* /*Device*/) override;
 
   private:
-    MythRenderVulkan* InitialiseVulkan (QRect Area) override;
-    void              TearDownVulkan   () override;
-
     VertexStates m_vertexBuffers;
     PushBuffer   m_pushBuffer { };
 };

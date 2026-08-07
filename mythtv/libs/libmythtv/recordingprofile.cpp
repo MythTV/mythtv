@@ -149,8 +149,8 @@ class SampleRate : public MythUIComboBoxSetting, public CodecParamStorage
     }
 
     void addSelection(const QString &label,
-                      const QString& value  = QString(),
-                      bool           select = false)
+                      const QString  value  = QString(), // clazy:exclude=function-args-by-ref
+                      bool           select = false) override
     {
         QString val = value.isEmpty() ? label : value;
         uint rate = val.toUInt();
@@ -527,7 +527,9 @@ class AudioCompressionSettings : public GroupSetting
         if (!groupType.isNull())
         {
             if (groupType == "MPEG")
+            {
                m_codecName->addSelection("MPEG-2 Hardware Encoder");
+            }
             else if (groupType == "HDPVR")
             {
                 m_codecName->addSelection("AC3 Hardware Encoder");
@@ -1139,7 +1141,9 @@ class VideoCompressionSettings : public GroupSetting
         if (!groupType.isNull())
         {
             if (groupType == "HDPVR")
+            {
                m_codecName->addSelection("MPEG-4 AVC Hardware Encoder");
+            }
             else if (groupType.startsWith("V4L2:"))
             {
                 for (const auto & codec : std::as_const(m_v4l2codecs))
@@ -1303,7 +1307,7 @@ class ImageSize : public GroupSetting
             setLabel(QObject::tr("Width"));
             setValue(defaultwidth);
 
-            QString help = (transcoding) ?
+            QString help = transcoding ?
                 QObject::tr("If the width is set to 'Auto', the width "
                             "will be calculated based on the height and "
                             "the recording's physical aspect ratio.") :
@@ -1330,7 +1334,7 @@ class ImageSize : public GroupSetting
             setLabel(QObject::tr("Height"));
             setValue(defaultheight);
 
-            QString help = (transcoding) ?
+            QString help = transcoding ?
                 QObject::tr("If the height is set to 'Auto', the height "
                             "will be calculated based on the width and "
                             "the recording's physical aspect ratio.") :
@@ -1364,7 +1368,7 @@ class ImageSize : public GroupSetting
         else if (tvFormat.startsWith("ntsc", Qt::CaseInsensitive))
         {
             maxsize     = QSize(720, 480);
-            defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
+            defaultsize = ivtv ? QSize(720, 480) : QSize(480, 480);
         }
         else if (tvFormat.toLower() == "atsc")
         {
@@ -1374,7 +1378,7 @@ class ImageSize : public GroupSetting
         else
         {
             maxsize     = QSize(768, 576);
-            defaultsize = (ivtv) ? QSize(720, 576) : QSize(480, 576);
+            defaultsize = ivtv ? QSize(720, 576) : QSize(480, 576);
         }
 
         addChild(new Width(parent, defaultsize.width(),
@@ -1424,6 +1428,7 @@ RecordingProfile::RecordingProfile(const QString& profName)
     }
 };
 
+// NOLINTNEXTLINE(modernize-use-equals-default)
 RecordingProfile::~RecordingProfile(void)
 {
 #if CONFIG_V4L2
@@ -1441,7 +1446,7 @@ void RecordingProfile::ResizeTranscode(const QString & /*val*/)
 void RecordingProfile::SetLosslessTranscode(const QString & /*val*/)
 {
     bool lossless = m_trLossless->boolValue();
-    bool show_size = (lossless) ? false : m_trResize->boolValue();
+    bool show_size = lossless ? false : m_trResize->boolValue();
     if (m_imageSize)
         m_imageSize->setEnabled(show_size);
     m_videoSettings->setEnabled(! lossless);
@@ -1493,16 +1498,18 @@ bool RecordingProfile::loadByType(const QString &name, const QString &card,
                                   [[maybe_unused]] const QString &videodev)
 {
     QString hostname = gCoreContext->GetHostName().toLower();
-    QString cardtype = card;
     uint profileId = 0;
 
 #if CONFIG_V4L2
+    QString cardtype = card;
     if (cardtype == "V4L2ENC")
     {
         m_v4l2util = new V4L2util(videodev);
         if (m_v4l2util->IsOpen())
             cardtype = m_v4l2util->ProfileName();
     }
+#else
+    const QString& cardtype = card;
 #endif
 
     MSqlQuery result(MSqlQuery::InitCon());
@@ -1911,5 +1918,4 @@ void RecordingProfile::deleteEntry(void)
 
 }
 
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_recordingprofile.cpp"

@@ -19,7 +19,8 @@ movd_r2m (mm0, _out); \
 #else
 #define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
 {\
-      int tra=0,i=0;\
+      int tra=0;\
+      int i=0;\
       unsigned char *bra = (unsigned char*)&(_backbuf);\
       unsigned char *dra = (unsigned char*)&(_out);\
       unsigned char *cra = (unsigned char*)&(_col);\

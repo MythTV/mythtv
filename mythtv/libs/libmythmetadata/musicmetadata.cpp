@@ -1052,34 +1052,33 @@ QString MusicMetadata::getLocalFilename(void)
 
 void MusicMetadata::setField(const QString &field, const QString &data)
 {
-    if (field == "artist")
+    if (field == "artist") {
         m_artist = data;
-    else if (field == "compilation_artist")
+    } else if (field == "compilation_artist") {
       m_compilationArtist = data;
-    else if (field == "album")
+    } else if (field == "album") {
         m_album = data;
-    else if (field == "title")
+    } else if (field == "title") {
         m_title = data;
-    else if (field == "genre")
+    } else if (field == "genre") {
         m_genre = data;
-    else if (field == "filename")
+    } else if (field == "filename") {
         m_filename = data;
-    else if (field == "year")
+    } else if (field == "year") {
         m_year = data.toInt();
-    else if (field == "tracknum")
+    } else if (field == "tracknum") {
         m_trackNum = data.toInt();
-    else if (field == "trackcount")
+    } else if (field == "trackcount") {
         m_trackCount = data.toInt();
-    else if (field == "discnum")
+    } else if (field == "discnum") {
         m_discNum = data.toInt();
-    else if (field == "disccount")
+    } else if (field == "disccount") {
         m_discCount = data.toInt();
-    else if (field == "length")
+    } else if (field == "length") {
         m_length = std::chrono::milliseconds(data.toInt());
-    else if (field == "compilation")
+    } else if (field == "compilation") {
         m_compilation = (data.toInt() > 0);
-    else
-    {
+    } else {
         LOG(VB_GENERAL, LOG_ERR, QString("Something asked me to set data "
                                          "for a field called %1").arg(field));
     }
@@ -1088,16 +1087,15 @@ void MusicMetadata::setField(const QString &field, const QString &data)
 
 void MusicMetadata::getField(const QString &field, QString *data)
 {
-    if (field == "artist")
+    if (field == "artist") {
         *data = FormatArtist();
-    else if (field == "album")
+    } else if (field == "album") {
         *data = m_album;
-    else if (field == "title")
+    } else if (field == "title") {
         *data = FormatTitle();
-    else if (field == "genre")
+    } else if (field == "genre") {
         *data = m_genre;
-    else
-    {
+    } else {
         LOG(VB_GENERAL, LOG_ERR, QString("Something asked me to return data "
                                          "about a field called %1").arg(field));
         *data = "I Dunno";

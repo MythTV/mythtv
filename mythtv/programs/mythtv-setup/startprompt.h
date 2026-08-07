@@ -9,6 +9,7 @@ class StartPrompter : public QObject
 
   public:
     StartPrompter();
+    StartPrompter(const StartPrompter &) = delete;
     ~StartPrompter() override;
 
   public slots:
@@ -17,9 +18,6 @@ class StartPrompter : public QObject
     static void leaveBackendRunning();
     static void stopBackend();
     static void quit();
-
-  private:
-    StartPrompter(const StartPrompter &);
 
   private:
     struct StartPrompterPrivate *m_d {nullptr};

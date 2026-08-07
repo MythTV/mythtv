@@ -142,7 +142,7 @@
             "speedup_label": "Experimentelle Beschleunigung der kommerziellen Erkennung",
             "strict_desc": "Aktivieren Sie einen strengeren kommerziellen Erkennungscode. Deaktivieren Sie diese Option, wenn einige Werbespots nicht erkannt werden.",
             "strict_label": "Strenge kommerzielle Erkennung",
-            "subtitle": "Kommerzielle Erkennung und Transkodierungsauftragseinstellungen"
+            "subtitle": "Einstellungen für kommerzielle Erkennung und Transkodierungsjobs"
         },
         "playgroup": {
             "delete_details": "Dadurch wird die Wiedergabegruppe {{ Name }} gelöscht.",
@@ -230,6 +230,7 @@
             "damaged": "Beschädigt",
             "delete_details": "Dadurch wird die Aufzeichnungsregel gelöscht",
             "delete_rule": "Aufzeichnungsregel löschen",
+            "deletewarning": "Dadurch wird diese Aufnahmedatei dauerhaft gelöscht. Es kann nicht rückgängig gemacht werden. Wenn Sie mehrere Zeilen ausgewählt haben, werden außerdem alle ausgewählten Aufnahmen in den Gruppen „Gelöscht“ und „LiveTV“ dauerhaft gelöscht. Sie werden nicht vor jedem einzelnen gewarnt. Bist du sicher?",
             "description": "Beschreibung",
             "dont_rec": "Nicht aufnehmen",
             "download": "Aufnahme herunterladen",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Als unbeschädigt markieren",
             "mnu_markunwatched": "Als „Unbeobachtet“ markieren",
             "mnu_markwatched": "Als beobachtet markieren",
+            "mnu_permdelete": "Dauerhaft löschen",
             "mnu_rerec": "Neuaufnahme zulassen",
             "mnu_runjobs": "Jobs ausführen",
             "mnu_stoprec": "Höre auf, aufzunehmen",
@@ -395,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} ist ein {{ Type }} auf IP {{ IP }}",
             "backends_none": "Keine Backends",
             "backends_title": "Backends",
+            "dbbackups_none": "Keine Datenbanksicherungen.",
+            "dbbackups_title": "Datenbanksicherungen",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} ist auf Host {{ HostName }}. Bundesstaat: {{ State }}.",
             "encoder_title": "Encoderstatus",
             "endtime_text": "Das Ende dieser Aufzeichnung ist für {{ EndTime }} geplant.",

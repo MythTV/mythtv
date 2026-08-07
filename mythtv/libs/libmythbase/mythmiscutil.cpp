@@ -17,6 +17,7 @@
 #include "compat.h"
 #include <QtGlobal>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
 #include <QtProcessorDetection>
 #include <QtSystemDetection>
 #endif
@@ -74,7 +75,7 @@ bool getUptime(std::chrono::seconds &uptime)
 #elif defined(Q_OS_BSD4)
     std::array<int,2> mib { CTL_KERN, KERN_BOOTTIME };
     struct timeval bootTime;
-    size_t         len;
+    size_t         len = 0;
 
     // Uptime is calculated. Get this machine's boot time
     // and subtract it from the current machine time
@@ -124,9 +125,9 @@ bool getMemStats([[maybe_unused]] int &totalMB,
     freeVM  = (int)((sinfo.freeswap  * sinfo.mem_unit)/MB);
     return true;
 #elif defined(Q_OS_DARWIN)
-    mach_port_t             mp;
-    mach_msg_type_number_t  count;
-    vm_size_t               pageSize;
+    mach_port_t             mp = 0;
+    mach_msg_type_number_t  count = 0;
+    vm_size_t               pageSize = 0;
     vm_statistics_data_t    s;
 
     mp = mach_host_self();
@@ -366,7 +367,7 @@ long long MythFile::copy(QFile &dst, QFile &src, uint block_size)
     if (osrc)
         src.close();
 
-    return (ok) ? total_bytes : -1LL;
+    return ok ? total_bytes : -1LL;
 }
 
 QString createTempFile(QString name_template, bool dir)
@@ -603,7 +604,9 @@ QString FileHash(const QString& filename)
         return {"NULL"};
 
     if (file.open(QIODevice::ReadOnly))
+    {
         hash = initialsize;
+    }
     else
     {
         LOG(VB_GENERAL, LOG_ERR,
@@ -799,7 +802,7 @@ bool myth_ioprio(int val)
 
 #else
 
-bool myth_ioprio(int) { return true; }
+bool myth_ioprio(int /*val*/) { return true; }
 
 #endif
 
@@ -833,7 +836,7 @@ bool MythRemoveDirectory(QDir &aDir)
     if (!has_err && !aDir.rmdir(aDir.absolutePath()))
         has_err = true;
 
-    return(has_err);
+    return has_err;
 }
 
 /**
@@ -947,8 +950,11 @@ void setHttpProxy(void)
         }
 
         url = url.arg(p.hostName()).arg(p.port());
-        setenv("HTTP_PROXY", url.toLatin1().constData(), 1);
-        setenv("http_proxy", url.toLatin1().constData(), 0);
+        qputenv("HTTP_PROXY", url.toLocal8Bit().constData());
+        if (!qEnvironmentVariableIsSet("http_proxy"))
+        {
+            qputenv("http_proxy", url.toLocal8Bit().constData());
+        }
 
         return;
     }

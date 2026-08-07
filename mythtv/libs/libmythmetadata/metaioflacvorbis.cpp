@@ -89,7 +89,7 @@ bool MetaIOFLACVorbis::write(const QString &filename, MusicMetadata* mdata)
 
     delete flacfile;
 
-    return (result);
+    return result;
 }
 
 /*!

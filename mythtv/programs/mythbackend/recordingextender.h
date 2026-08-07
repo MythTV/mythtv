@@ -312,9 +312,11 @@ class RecordingExtender : public QObject, public MThread
 
   public:
     static void create(Scheduler *scheduler, RecordingInfo& ri);
-    void run(void) override; // MThread
     ~RecordingExtender() override;
     static void nameCleanup(const SportInfo& info, QString& name1, QString& name2);
+
+  protected:
+    void run(void) override; // MThread
 
   private:
     RecordingExtender () : MThread("RecordingExtender") {}

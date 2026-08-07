@@ -342,14 +342,13 @@ int main(int argc, char *argv[])
         mpeg2 = true;
     if (cmdline.toBool("ostream"))
     {
-        if (cmdline.toString("ostream") == "dvd")
+        if (cmdline.toString("ostream") == "dvd") {
             otype = REPLEX_DVD;
-        else if (cmdline.toString("ostream") == "ps")
+        } else if (cmdline.toString("ostream") == "ps") {
             otype = REPLEX_MPEG2;
-        else if (cmdline.toString("ostream") == "ts")
+        } else if (cmdline.toString("ostream") == "ts") {
             otype = REPLEX_TS_SD;
-        else
-        {
+        } else {
             std::cerr << "Invalid 'ostream' type: "
                       << cmdline.toString("ostream").toLocal8Bit().constData()
                       << '\n';

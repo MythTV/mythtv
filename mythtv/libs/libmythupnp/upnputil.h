@@ -61,7 +61,7 @@ class NameValue
     NameValue(QString name, qulonglong value, bool required = false) :
         m_sName(std::move(name)), m_sValue(QString::number(value)), m_bRequired(required) { }
     NameValue(QString name, bool value, bool required = false) :
-        m_sName(std::move(name)), m_sValue((value) ? "1" : "0"), m_bRequired(required) { }
+        m_sName(std::move(name)), m_sValue(value ? "1" : "0"), m_bRequired(required) { }
     inline NameValue(const NameValue &nv);
     inline NameValue& operator=(const NameValue &nv);
 

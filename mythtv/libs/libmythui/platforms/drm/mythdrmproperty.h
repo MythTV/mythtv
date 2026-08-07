@@ -10,7 +10,7 @@ using DRMProps = std::vector<DRMProp>;
 class MUI_PUBLIC MythDRMProperty
 {
   public:
-    enum Type
+    enum Type : uint8_t
     {
         Invalid = 0,
         Range,

@@ -58,7 +58,9 @@ void CheckedSet(MythUIType *container, const QString &itemName,
         MythUIType *uit = container->GetChild(itemName);
         auto *tt = dynamic_cast<MythUIText *>(uit);
         if (tt)
+        {
             CheckedSet(tt, value);
+        }
         else
         {
             auto *st = dynamic_cast<MythUIStateType *>(uit);

@@ -377,7 +377,7 @@ int MythDirCheck(int DirID)
 {
     LOG(VB_FILE, LOG_DEBUG, QString("MythDirCheck: '%1'").arg(DirID));
     s_dirWrapperLock.lockForWrite();
-    int result = ((s_localdirs.contains(DirID) || s_remotedirs.contains(DirID))) ? 1 : 0;
+    int result = (s_localdirs.contains(DirID) || s_remotedirs.contains(DirID)) ? 1 : 0;
     s_dirWrapperLock.unlock();
     return result;
 }

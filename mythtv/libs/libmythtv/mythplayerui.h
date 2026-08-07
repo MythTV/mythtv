@@ -34,7 +34,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
     virtual void EventStart();
     virtual bool VideoLoop();
     virtual void PreProcessNormalFrame();
-    void ChangeSpeed() override;
+    void InitFrameInterval() override;
     void SetVideoParams(int Width, int Height, double FrameRate, float Aspect,
                         bool ForceUpdate, int ReferenceFrames,
                         FrameScanType Scan = kScan_Ignore,
@@ -45,7 +45,7 @@ class MTV_PUBLIC MythPlayerUI : public MythPlayerEditorUI, public MythVideoScanT
     void SetWatched(bool ForceWatched = false);
 
   protected:
-    void InitFrameInterval() override;
+    void ChangeSpeed() override;
     virtual void DisplayPauseFrame();
     virtual bool DisplayNormalFrame(bool CheckPrebuffer = true);
 

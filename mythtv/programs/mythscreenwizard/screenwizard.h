@@ -27,9 +27,9 @@ class ScreenWizard : public MythScreenType
     void SetInitialSettings(int _x, int _y, int _w, int _h);
     bool Create(void) override; // MythScreenType
     bool keyPressEvent(QKeyEvent *event) override; // MythScreenType
-    void customEvent(QEvent *event) override; // MythUIType
 
   protected:
+    void customEvent(QEvent *event) override; // MythUIType
     void doMenu();
     void doExit();
   private:

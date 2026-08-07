@@ -142,3 +142,5 @@ bool InputSelector::Parse(const QString &cardid_inputname,
 
     return true;
 }
+
+#include "moc_inputselectorsetting.cpp"

@@ -905,7 +905,9 @@ void AudioTest::toggle()
     if (this->sender() == m_startButton)
     {
         if (m_at && m_at->isRunning())
+        {
             cancelTest();
+        }
         else
         {
             prepareTest();
@@ -927,13 +929,21 @@ void AudioTest::toggle()
     int channel = 1;
 
     if (this->sender() == m_frontleft)
+    {
         channel = 0;
+    }
     else if (this->sender() == m_frontright)
+    {
         channel = (m_channels == 2) ? 1 : 2;
+    }
     else if (this->sender() == m_rearleft)
+    {
         channel = 5;
+    }
     else if (this->sender() == m_rearright)
+    {
         channel = 4;
+    }
     else if (this->sender() == m_lfe)
     {
         if (m_channels == 6)
@@ -1322,4 +1332,5 @@ void AudioConfigSettings::setMPCMEnabled(bool flag)
 {
     m_mpcm->setEnabled(flag);
 }
-// vim:set sw=4 ts=4 expandtab:
+
+#include "moc_audiogeneralsettings.cpp"

@@ -395,7 +395,9 @@ void MythBurn::updateArchiveList(void)
             MythUIBusyDialog(message, popupStack, "mythburnbusydialog");
 
     if (busyPopup->Create())
+    {
         popupStack->AddScreen(busyPopup, false);
+    }
     else
     {
         delete busyPopup;
@@ -1179,4 +1181,4 @@ void BurnMenu::doBurn(int mode)
     showLogViewer();
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythburn.cpp"

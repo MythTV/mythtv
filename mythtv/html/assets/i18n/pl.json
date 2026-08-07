@@ -142,7 +142,7 @@
             "speedup_label": "Eksperymentalne przyspieszenie wykrywania komercyjnego",
             "strict_desc": "Włącz bardziej rygorystyczny komercyjny kod wykrywania. Wyłącz, jeśli niektóre reklamy nie są wykrywane.",
             "strict_label": "Ścisłe wykrywanie komercyjne",
-            "subtitle": "Ustawienia zadań wykrywania komercyjnych i transkodowania"
+            "subtitle": "Ustawienia zadań wykrywania handlu i transkodowania"
         },
         "playgroup": {
             "delete_details": "Spowoduje to usunięcie grupy odtwarzania {{ Name }}.",
@@ -230,6 +230,7 @@
             "damaged": "Uszkodzony",
             "delete_details": "Spowoduje to usunięcie reguły nagrywania",
             "delete_rule": "Usuń regułę nagrywania",
+            "deletewarning": "Spowoduje to trwałe usunięcie tego pliku nagrania. Nie można tego cofnąć. Ponadto, jeśli wybrałeś wiele wierszy, wszystkie wybrane nagrania w grupach Usunięte i LiveTV zostaną trwale usunięte. Nie otrzymasz ostrzeżenia za każdy z nich. Czy jesteś pewien?",
             "description": "Opis",
             "dont_rec": "Nie rejestruj",
             "download": "Pobierz nagranie",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Oznacz jako nieuszkodzone",
             "mnu_markunwatched": "Oznacz jako nieobserwowane",
             "mnu_markwatched": "Oznacz jako obejrzane",
+            "mnu_permdelete": "Usuń trwale",
             "mnu_rerec": "Zezwalaj na ponowne nagrywanie",
             "mnu_runjobs": "Uruchom zadania",
             "mnu_stoprec": "Zatrzymaj nagrywanie",
@@ -395,6 +397,8 @@
             "backends_detail": "Backend: {{ Name }} to {{ Type }} na IP {{ IP }}",
             "backends_none": "Brak zaplecza",
             "backends_title": "Backendy",
+            "dbbackups_none": "Brak kopii zapasowych baz danych.",
+            "dbbackups_title": "Kopie zapasowe baz danych",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} jest na hoście {{ HostName }}. Stan: {{ State }}.",
             "encoder_title": "Stan enkodera",
             "endtime_text": "To nagranie ma zakończyć się o {{ EndTime }}.",

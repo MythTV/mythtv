@@ -614,7 +614,9 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
     QString sNewFileName;
 
     if (bDefaultPixmap)
+    {
         sNewFileName = sPreviewFileName;
+    }
     else
     {
         sNewFileName = QString( "%1.%2.%3x%4.%5" )
@@ -893,3 +895,5 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
 }
 
 // NOLINTEND(modernize-return-braced-init-list)
+
+#include "moc_v2content.cpp"

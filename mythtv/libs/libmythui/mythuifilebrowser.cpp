@@ -534,7 +534,9 @@ void MythUIFileBrowser::updateRemoteFileList()
         displayName = tokens[1];
 
         if (tokens[0] == "sgdir")
+        {
             dataName = m_baseDirectory;
+        }
         else if (m_subDirectory.isEmpty())
         {
             dataName = QString("%1%2").arg(m_baseDirectory, displayName);
@@ -723,4 +725,4 @@ bool MythUIFileBrowser::GetRemoteFileList(const QString &url,
 
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_mythuifilebrowser.cpp"

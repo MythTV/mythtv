@@ -30,7 +30,7 @@ MythVTBInterop* MythVTBInterop::CreateVTB(MythPlayerUI* Player, MythRenderOpenGL
         {
             if (type == GL_VTBSURFACE)
                 return new MythVTBSurfaceInterop(Player, Context);
-            else if (type == GL_VTB)
+            if (type == GL_VTB)
                 return new MythVTBInterop(Player, Context, GL_VTB);
         }
     }
@@ -40,10 +40,6 @@ MythVTBInterop* MythVTBInterop::CreateVTB(MythPlayerUI* Player, MythRenderOpenGL
 MythVTBInterop::MythVTBInterop(MythPlayerUI* Player, MythRenderOpenGL* Context,
                                MythOpenGLInterop::InteropType Type)
   : MythOpenGLInterop(Context, Type, Player)
-{
-}
-
-MythVTBInterop::~MythVTBInterop()
 {
 }
 
@@ -86,7 +82,7 @@ std::vector<MythVideoTextureOpenGL*>
 MythVTBInterop::Acquire(MythRenderOpenGL* Context,
                         MythVideoColourSpace* ColourSpace,
                         MythVideoFrame* Frame,
-                        FrameScanType)
+                        FrameScanType /*Scan*/)
 {
     std::vector<MythVideoTextureOpenGL*> result;
     OpenGLLocker locker(m_openglContext);
@@ -172,10 +168,6 @@ MythVTBSurfaceInterop::MythVTBSurfaceInterop(MythPlayerUI* Player, MythRenderOpe
 {
 }
 
-MythVTBSurfaceInterop::~MythVTBSurfaceInterop()
-{
-}
-
 std::vector<MythVideoTextureOpenGL*>
 MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
                                MythVideoColourSpace* ColourSpace,
@@ -241,7 +233,7 @@ MythVTBSurfaceInterop::Acquire(MythRenderOpenGL* Context,
     {
         int width  = IOSurfaceGetWidthOfPlane(surface, plane);
         int height = IOSurfaceGetHeightOfPlane(surface, plane);
-        sizes.push_back(QSize(width, height));
+        sizes.emplace_back(width, height);
     }
     // NB P010 support is untested
     // NB P010 support was added to FFmpeg in https://github.com/FFmpeg/FFmpeg/commit/036b4b0f85933f49a709
@@ -291,7 +283,7 @@ void MythVTBSurfaceInterop::RotateReferenceFrames(IOSurfaceID Buffer)
         return;
 
     // don't retain twice for double rate
-    if ((m_referenceFrames.size() > 0) && (m_referenceFrames[0] == Buffer))
+    if (!m_referenceFrames.empty() && (m_referenceFrames[0] == Buffer))
         return;
 
     m_referenceFrames.push_front(Buffer);

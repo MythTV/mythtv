@@ -28,11 +28,11 @@ class EditMetadataDialog : public MythScreenType
     ~EditMetadataDialog() override;
 
     bool Create() override; // MythScreenType
-    void customEvent(QEvent *levent) override; // MythUIType
 
     void fillWidgets();
 
   protected:
+    void customEvent(QEvent *levent) override; // MythUIType
     void createBusyDialog(const QString& title);
 
   signals:

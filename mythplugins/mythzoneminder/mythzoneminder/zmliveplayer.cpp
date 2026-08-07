@@ -290,7 +290,9 @@ void ZMLivePlayer::customEvent(QEvent *event)
         if (resultid == "mainmenu")
         {
             if (data == "VIEW")
+            {
                 changeView();
+            }
             else if (data.startsWith("CAMERA"))
             {
                 data = data.remove("CAMERA");
@@ -515,3 +517,5 @@ void Player::updateCamera()
     if (m_cameraText)
         m_cameraText->SetText(m_monitor.name);
 }
+
+#include "moc_zmliveplayer.cpp"

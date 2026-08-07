@@ -73,7 +73,7 @@ class TestRecExtEspnDataSource : public RecExtEspnDataSource
     QUrl makeInfoUrl(const SportInfo& info, const QDateTime& dt) override;
     QUrl makeGameUrl(const ActiveGame& game, const QString& str) override;
     QDateTime getNow()
-        {return static_cast<TestRecordingExtender*>(parent())->getNow(); }
+        {return dynamic_cast<TestRecordingExtender*>(parent())->getNow(); }
 };
 
 class TestRecExtEspnDataPage : public RecExtEspnDataPage
@@ -82,7 +82,7 @@ class TestRecExtEspnDataPage : public RecExtEspnDataPage
     TestRecExtEspnDataPage(RecExtDataSource* parent, QJsonDocument doc) :
         RecExtEspnDataPage(parent, std::move(doc)) {}
     QDateTime getNow() override
-        {return static_cast<TestRecExtEspnDataSource*>(parent())->getNow(); }
+        {return dynamic_cast<TestRecExtEspnDataSource*>(parent())->getNow(); }
 };
 
 //////////////////////////////////////////////////
@@ -94,7 +94,7 @@ class TestRecExtMlbDataSource : public RecExtMlbDataSource
       RecExtMlbDataSource(parent) {};
     RecExtDataPage* newPage(const QJsonDocument& doc) override;
     QDateTime getNow()
-        {return static_cast<TestRecordingExtender*>(parent())->getNow(); }
+        {return dynamic_cast<TestRecordingExtender*>(parent())->getNow(); }
 };
 
 class TestRecExtMlbDataPage : public RecExtMlbDataPage
@@ -103,7 +103,7 @@ class TestRecExtMlbDataPage : public RecExtMlbDataPage
     TestRecExtMlbDataPage(RecExtDataSource* parent, QJsonDocument doc) :
         RecExtMlbDataPage(parent, std::move(doc)) {}
     QDateTime getNow() override
-        {return static_cast<TestRecExtMlbDataSource*>(parent())->getNow(); }
+        {return dynamic_cast<TestRecExtMlbDataSource*>(parent())->getNow(); }
 };
 
 #endif // MYTHBACKEND_TEST_RECORDINGEXTENDER_H

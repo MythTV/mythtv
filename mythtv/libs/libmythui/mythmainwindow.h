@@ -34,6 +34,8 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     friend class MythPainterWindowQt;
 
   public:
+    bool eventFilter(QObject* Watched, QEvent* Event) override;
+
     void Init(bool MayReInit = true);
     void Show();
     void MoveResize(QRect& Geometry);
@@ -140,7 +142,6 @@ class MUI_PUBLIC MythMainWindow : public MythUIScreenBounds
     static void LoadQtConfig();
     void InitKeys();
 
-    bool eventFilter(QObject* Watched, QEvent* Event) override;
     void customEvent(QEvent* Event) override;
     void closeEvent(QCloseEvent* Event) override;
     void drawScreen(QPaintEvent* Event = nullptr);

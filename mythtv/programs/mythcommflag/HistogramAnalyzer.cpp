@@ -382,7 +382,7 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     halfnpixels = npixels / 2;
     for (unsigned int color = 0; color < UCHAR_MAX + 1; color++)
         m_histogram[frameno][color] =
-            (m_histVal[color] * UCHAR_MAX + halfnpixels) / npixels;
+            ((m_histVal[color] * UCHAR_MAX) + halfnpixels) / npixels;
 
     bordercolor = 0;
     if (ismonochromatic && livepixels)
@@ -401,7 +401,7 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
     m_mean[frameno] = (float)sumval / npixels;
     m_median[frameno] = quick_select_median<uint8_t>(m_buf, npixels);
     m_stddev[frameno] = npixels > 1 ?
-        sqrt((sumsquares - (float)sumval * sumval / npixels) / (npixels - 1)) :
+        sqrt((sumsquares - ((float)sumval * sumval / npixels)) / (npixels - 1)) :
             0;
 
     end = nowAsDuration<std::chrono::microseconds>();

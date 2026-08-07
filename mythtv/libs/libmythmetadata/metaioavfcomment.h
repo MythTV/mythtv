@@ -25,7 +25,7 @@ public:
     bool write(const QString &filename, MusicMetadata* mdata) override; // MetaIO
     MusicMetadata* read(const QString &filename) override; // MetaIO
 
-private:
+protected:
     std::chrono::milliseconds getTrackLength(const QString &filename) override; // MetaIO
     static std::chrono::milliseconds getTrackLength(AVFormatContext* pContext);
 };

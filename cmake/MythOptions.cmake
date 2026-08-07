@@ -24,7 +24,7 @@ set(MYTH_DEFAULT_LIBS_PREFIX
 set(MYTH_RUN_PREFIX
     ""
     CACHE PATH
-          "The prefix where MythTV is expected to be at runtime.  This may differ from MYTH_DEFAULT_PREFIX or CMAKE_INSTALL_PREFIX for packagers."
+          "The prefix where MythTV is expected to be at runtime, used by the Python bindings.  This may differ from MYTH_DEFAULT_PREFIX or CMAKE_INSTALL_PREFIX for packagers."
 )
 
 # Location for downloaded tarballs.
@@ -169,6 +169,8 @@ option(ENABLE_SYSTEMD_JOURNAL "Enable systemd journal support." ON)
 option(ENABLE_SYSTEMD_NOTIFY "Enable systemd notify support." ON)
 option(ENABLE_QTWEBENGINE "Enable webengine support." ON)
 option(ENABLE_VALGRIND "Enable valgrind support." OFF)
+option(ENABLE_ASAN "Enable AddressSanitizer." OFF)
+option(ENABLE_TSAN "Enable ThreadSanitizer." OFF)
 option(
   ENABLE_EXIV2_DOWNLOAD
   "Build latest exiv2 instead of embedded copy.  This only afects native builds. Android/Windows builds will always downloded exiv2."

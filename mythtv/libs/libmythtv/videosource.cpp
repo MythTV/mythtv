@@ -885,7 +885,7 @@ class VideoDevice : public CaptureCardComboBoxSetting
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
     void fillSelectionsFromDir(const QDir &dir,
-                               [[maybe_unused]] bool absPath = true)
+                               [[maybe_unused]] bool absPath = true) override
     {
         fillSelectionsFromDir(dir, 0, 255, QString(), QRegularExpression(), false);
     }
@@ -994,7 +994,7 @@ class VBIDevice : public CaptureCardComboBoxSetting
      *  \param absPath  Ignored. The function always uses absolute paths.
      */
     void fillSelectionsFromDir(const QDir &dir,
-                               [[maybe_unused]] bool absPath = true)
+                               [[maybe_unused]] bool absPath = true) override
     {
         fillSelectionsFromDir(dir, QString(), QString());
     }
@@ -3156,7 +3156,7 @@ void InputGroup::Load(void)
     for (size_t i = 0; i < names.size(); i++)
     {
         bool sel = (m_groupId == grpid[i]);
-        index = (sel) ? i : index;
+        index = sel ? i : index;
 
 #if 0
         LOG(VB_GENERAL, LOG_DEBUG, QString("grpid %1, name '%2', i %3, s %4")
@@ -4452,3 +4452,5 @@ SatIPDeviceAttribute::SatIPDeviceAttribute(const QString& label, const QString& 
     setHelpText(helptext);
 };
 #endif // CONFIG_SATIP
+
+#include "moc_videosource.cpp"

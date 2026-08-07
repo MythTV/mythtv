@@ -819,7 +819,9 @@ void MusicFileScanner::ScanMusic(MusicLoadedMap &music_files, QList<int> &songid
             if (iter != music_files.end())
             {
                 if (m_forceupdate || HasFileChanged(name, query.value(1).toString()))
+                {
                     music_files[name].location = MusicFileScanner::kNeedUpdate;
+                }
                 else
                 {
                     ++m_tracksUnchanged;

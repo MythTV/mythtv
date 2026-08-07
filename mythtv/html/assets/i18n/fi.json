@@ -142,7 +142,7 @@
             "speedup_label": "Kokeellinen kaupallisen havaitsemisen nopeuttaminen",
             "strict_desc": "Ota käyttöön tiukempi kaupallinen tunnistuskoodi. Poista käytöstä, jos joitain mainoksia ei havaita.",
             "strict_label": "Tiukka kaupallinen havaitseminen",
-            "subtitle": "Kaupalliset tunnistus- ja transkoodaustyöasetukset"
+            "subtitle": "Kaupallisen tunnistus- ja transkoodaustyöasetukset"
         },
         "playgroup": {
             "delete_details": "Tämä poistaa toistoryhmän {{ Name }}.",
@@ -230,6 +230,7 @@
             "damaged": "Vaurioitunut",
             "delete_details": "Tämä poistaa tallennussäännön",
             "delete_rule": "Poista tallennussääntö",
+            "deletewarning": "Tämä poistaa tämän tallennustiedoston pysyvästi. Sitä ei voi kumota. Lisäksi, jos valitsit useita rivejä, kaikki valitut tallenteet ryhmissä Poistettu ja LiveTV poistetaan pysyvästi. Sinua ei varoiteta jokaisesta. Oletko varma?",
             "description": "Kuvaus",
             "dont_rec": "Älä tallentaa",
             "download": "Lataa tallennus",
@@ -253,6 +254,7 @@
             "mnu_markundamaged": "Merkitse vahingoittumattomaksi",
             "mnu_markunwatched": "Merkitse katsomattomaksi",
             "mnu_markwatched": "Merkitse katsotuksi",
+            "mnu_permdelete": "Poista pysyvästi",
             "mnu_rerec": "Salli tallennus uudelleen",
             "mnu_runjobs": "Suorita työpaikkoja",
             "mnu_stoprec": "Lopeta tallennus",
@@ -395,6 +397,8 @@
             "backends_detail": "Taustajärjestelmä: {{ Name }} on {{ Type }} IP-osoitteessa {{ IP }}",
             "backends_none": "Ei taustaohjelmia",
             "backends_title": "Taustaohjelmat",
+            "dbbackups_none": "Ei tietokannan varmuuskopioita.",
+            "dbbackups_title": "Tietokannan varmuuskopiot",
             "encoder_text": "{{ DisplayName }}, {{ CardDetails }} on isännässä {{ HostName }}. Tila: {{ State }}.",
             "encoder_title": "Enkooderin tila",
             "endtime_text": "Tämän tallennuksen on määrä päättyä {{ EndTime }}.",

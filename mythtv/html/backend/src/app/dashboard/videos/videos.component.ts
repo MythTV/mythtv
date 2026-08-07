@@ -106,7 +106,22 @@ export class VideosComponent implements OnInit {
         let sortOrder = this.utility.sortStorage.getItem('videos.sortOrder');
         if (sortOrder)
             this.sortOrder = Number(sortOrder);
+
+
+        let searchValue = sessionStorage.getItem('videos.searchValue');
+        if (searchValue)
+            this.searchValue = searchValue;
+        let selectedCategory = sessionStorage.getItem('recordings.selectedCategory');
+        if (selectedCategory)
+            this.selectedCategory = Number.parseInt(selectedCategory);
+        let showAllVideos = sessionStorage.getItem('videos.showAllVideos');
+        if (showAllVideos)
+            this.showAllVideos = (showAllVideos == 'true');
+        let directory = sessionStorage.getItem('videos.directory');
+        if (directory)
+            this.directory = directory.split('/');  
     }
+
 
     ngOnInit(): void {
         // Initial Load
@@ -118,6 +133,7 @@ export class VideosComponent implements OnInit {
         this.sortOrder = sortMeta.order;
         this.utility.sortStorage.setItem("videos.sortField", sortMeta.field);
         this.utility.sortStorage.setItem('videos.sortOrder', sortMeta.order.toString());
+        this.reload();
     }
 
     loadLazy(event: TableLazyLoadEvent) {
@@ -163,7 +179,8 @@ export class VideosComponent implements OnInit {
 
         if (request.TitleRegEx != this.priorRequest.TitleRegEx
             || request.Category != this.priorRequest.Category) {
-            this.menu.hide();
+            if (this.menu)
+                this.menu.hide();
             this.priorRequest = request;
             this.showTable = false;
         }
@@ -183,31 +200,37 @@ export class VideosComponent implements OnInit {
                 this.virtualScrollItemSize = row.nativeElement.offsetHeight;
             if (this.table) {
                 this.table.totalRecords = this.totalRecords;
-                this.table.virtualScrollItemSize = this.virtualScrollItemSize;
+                if (this.virtualScrollItemSize)
+                    this.table.virtualScrollItemSize = this.virtualScrollItemSize;
             }
         });
 
     }
 
 
-    reLoadVideos() {
-        this.showTable = false;
-        this.videos.length = 0;
-        this.refreshing = true;
-        this.loadLazy(({ first: 0, rows: 1 }));
+    reload() {
+
+        sessionStorage.setItem('videos.searchValue', this.searchValue);
+        if (this.selectedCategory)
+            sessionStorage.setItem('recordings.selectedCategory', this.selectedCategory.toString());
+        else
+            sessionStorage.removeItem('recordings.selectedCategory');
+        sessionStorage.setItem('videos.showAllVideos', this.showAllVideos.toString());
+        sessionStorage.setItem('videos.directory', this.directory.join('/'));
+        location.reload();
     }
 
     onFilter() {
-        this.reLoadVideos();
+        this.reload();
     }
 
     showAllChange() {
-        setTimeout(() => this.reLoadVideos(), 100);
+        setTimeout(() => this.reload(), 100);
     }
 
     resetSearch() {
         this.searchValue = '';
-        this.reLoadVideos();
+        this.reload();
     }
 
     keydown(event: KeyboardEvent) {
@@ -221,12 +244,12 @@ export class VideosComponent implements OnInit {
 
     onDirectory(subdir: string) {
         this.directory.push(subdir);
-        this.reLoadVideos();
+        this.reload();
     }
 
     breadCrumb(ix: number) {
         this.directory.length = ix;
-        this.reLoadVideos();
+        this.reload();
     }
 
     showMenu(video: VideoMetadataInfo, event: any) {

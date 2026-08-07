@@ -305,10 +305,10 @@ static inline bool codec_is_vdpau(MythCodecID id)
     { return ((id > kCodec_VDPAU_BEGIN) &&
               (id < kCodec_VDPAU_END)); };
 static inline bool codec_is_vdpau_hw(MythCodecID id)
-    { return ((codec_is_vdpau(id) &&
+    { return (codec_is_vdpau(id) &&
                (id != kCodec_H263_VDPAU) &&
                (id != kCodec_VP8_VDPAU) &&
-               (id != kCodec_VP9_VDPAU))); };
+               (id != kCodec_VP9_VDPAU)); };
 static inline bool codec_is_vdpau_dec(MythCodecID id)
     { return ((id > kCodec_VDPAU_DEC_BEGIN) &&
               (id < kCodec_VDPAU_DEC_END)); };

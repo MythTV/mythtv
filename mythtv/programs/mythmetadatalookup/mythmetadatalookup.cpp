@@ -8,6 +8,9 @@
 
 // Qt headers
 #include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtEnvironmentVariables>
+#endif
 #include <QCoreApplication>
 #include <QEventLoop>
 #ifdef Q_OS_DARWIN
@@ -56,12 +59,12 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_DARWIN
     QString path = QCoreApplication::applicationDirPath();
-    setenv("PYTHONPATH",
-           QString("%1/../Resources/lib/%2:/../Resources/lib/%2/site-packages:/../Resources/lib/%2/lib-dynload:%3")
+    qputenv("PYTHONPATH",
+           QString("%1/../Resources/lib/%2:%1/../Resources/lib/%2/site-packages:%1/../Resources/lib/%2/lib-dynload:%3")
            .arg(path)
            .arg(QFileInfo(PYTHON_EXE).fileName())
            .arg(QProcessEnvironment::systemEnvironment().value("PYTHONPATH"))
-           .toUtf8().constData(), 1);
+           .toUtf8().constData());
 #endif
 
     int retval = cmdline.ConfigureLogging();
@@ -83,7 +86,7 @@ int main(int argc, char *argv[])
 
     MythTranslation::load("mythfrontend");
 
-    std::unique_ptr<LookerUpper> lookup {new LookerUpper};
+    std::unique_ptr<LookerUpper> lookup = std::make_unique<LookerUpper>();
 
     LOG(VB_GENERAL, LOG_INFO,
             "Testing grabbers and metadata sites for functionality...");

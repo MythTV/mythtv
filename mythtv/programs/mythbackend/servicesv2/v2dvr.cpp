@@ -809,9 +809,13 @@ bool V2Dvr::ReactivateRecording(int RecordedId,
 {
     RecordingInfo ri;
     if (RecordedId > 0)
+    {
         ri = RecordingInfo(RecordedId);
+    }
     else if (ChanId > 0 && StartTime.isValid())
+    {
         ri = RecordingInfo(ChanId, StartTime.toUTC());
+    }
     else if (RecordId > 0)
     {
         // Find latest recording for that record id
@@ -1178,9 +1182,13 @@ V2CutList* V2Dvr::GetRecordedSeek ( int RecordedId,
 
     auto* pCutList = new V2CutList();
     if (offsettype.toLower() == "bytes")
+    {
         marktype = MARK_GOP_BYFRAME;
+    }
     else if (offsettype.toLower() == "duration")
+    {
         marktype = MARK_DURATION_MS;
+    }
     else
     {
         delete pCutList;
@@ -2396,9 +2404,9 @@ int V2Dvr::ManageJobQueue( const QString   &sAction,
     if (!gCoreContext->GetBoolSettingOnHost(QString("JobAllow%1").arg(sJobName),
                                             sRemoteHost, false))
     {
-        LOG(VB_GENERAL, LOG_NOTICE, QString("Note: %1 hasn't been allowed on host %2.")
-                                            .arg(sJobName, sRemoteHost));
-        // return nReturn;
+        LOG(VB_GENERAL, LOG_INFO, QString("JobAllow%1 hasn't been setup for "
+                                          "host %2 (will be run by default.)")
+                                          .arg(sJobName, sRemoteHost));
     }
 
     if (!JobStartTime.isValid())
@@ -2668,7 +2676,7 @@ bool V2Dvr::AddPowerPriority    ( const QString & PriorityName,
         throw QString("ERROR: SelectClause is required");
     QString msg = CheckPowerQuery(SelectClause);
     if (! msg.isEmpty() )
-        throw(msg);
+        throw std::move(msg);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO powerpriority "
                 " (priorityname, recpriority, selectclause) "
@@ -2694,7 +2702,7 @@ bool V2Dvr::UpdatePowerPriority ( const QString & PriorityName,
     {
         QString msg = CheckPowerQuery(SelectClause);
         if (! msg.isEmpty() )
-            throw(msg);
+            throw std::move(msg);
     }
     MSqlQuery query(MSqlQuery::InitCon());
     bool comma = false;
@@ -2747,3 +2755,5 @@ QString V2Dvr::CheckPowerQuery(const QString & SelectClause)
     }
     return msg;
 }
+
+#include "moc_v2dvr.cpp"

@@ -391,9 +391,9 @@ bool ClassicLogoDetector::doesThisFrameContainTheFoundLogo(
     }
 
     m_frameNumber++;
-    double goodEdgeRatio = (testEdges) ?
+    double goodEdgeRatio = testEdges ?
         (double)goodEdges / (double)testEdges : 0.0;
-    double badEdgeRatio = (testNotEdges) ?
+    double badEdgeRatio = testNotEdges ?
         (double)badEdges / (double)testNotEdges : 0.0;
     return (goodEdgeRatio > m_commDetectLogoGoodEdgeThreshold) &&
            (badEdgeRatio < m_commDetectLogoBadEdgeThreshold);

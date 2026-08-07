@@ -51,7 +51,7 @@ class UPnpEventTask : public Task
             m_pPayload(pPayload)  // We take ownership of this pointer.
         {}
 
-        QString Name() override { return( "Event" ); } // Task
+        QString Name() override { return "Event"; } // Task
         void Execute( TaskQueue *pQueue ) override; // Task
 
 };

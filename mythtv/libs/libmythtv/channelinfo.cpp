@@ -249,7 +249,9 @@ void ChannelInfo::LoadInputIds()
         query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
+        {
             MythDB::DBError("ChannelInfo::LoadInputIds()", query);
+        }
         else
         {
             while(query.next())
@@ -270,7 +272,9 @@ void ChannelInfo::LoadGroupIds()
         query.bindValue(":CHANID", m_chanId);
 
         if (!query.exec())
+        {
             MythDB::DBError("ChannelInfo::LoadGroupIds()", query);
+        }
         else if (query.size() == 0)
         {
             // HACK Avoid re-running this query each time for channels
@@ -391,7 +395,7 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
     if (!other.m_serviceName.isEmpty() && m_serviceName.isEmpty())
         m_serviceName        = other.m_serviceName;
     if (!other.m_chanNum.isEmpty() &&
-        ((m_chanNum.isEmpty() || m_chanNum == "0")))
+        (m_chanNum.isEmpty() || m_chanNum == "0"))
         m_chanNum            = other.m_chanNum;
     if (other.m_serviceId && !m_serviceId)
         m_serviceId          = other.m_serviceId;

@@ -47,9 +47,6 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     MythUIGuideGrid(MythUIType *parent, const QString &name);
     ~MythUIGuideGrid() override;
 
-    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                  int alphaMod, QRect clipRect) override; // MythUIType
-
     enum FillType : std::uint8_t { Alpha = 10, Dense, Eco, Solid };
 
     bool isVerticalLayout(void) const { return m_verticalLayout; }
@@ -75,6 +72,8 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void Finalize(void) override; // MythUIType
     bool ParseElement(const QString &filename, QDomElement &element,
                       bool showWarnings) override; // MythUIType
+    void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                  int alphaMod, QRect clipRect) override; // MythUIType
     void CopyFrom(MythUIType *base) override; // MythUIType
     void CreateCopy(MythUIType *parent) override; // MythUIType
 

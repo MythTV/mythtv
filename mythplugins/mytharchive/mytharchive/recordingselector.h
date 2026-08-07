@@ -55,8 +55,10 @@ class RecordingSelector : public MythScreenType
     void titleChanged(MythUIButtonListItem *item);
     void toggleSelected(MythUIButtonListItem *item);
 
-  private:
+  protected:
     void Init(void) override; // MythScreenType
+
+  private:
     void updateRecordingList(void);
     void updateSelectedList(void);
     void updateCategorySelector(void);

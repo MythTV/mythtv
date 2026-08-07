@@ -1722,8 +1722,8 @@ void AvFormatDecoder::UpdateATSCCaptionTracks(void)
         int lang_indx = lang_cc_cnt[type][nsi.m_language];
         lang_cc_cnt[type][nsi.m_language]++;
         nsi.m_language_index = lang_indx;
-        m_tracks[(type) ? kTrackTypeCC708 : kTrackTypeCC608].push_back(nsi);
-        int key = nsi.m_stream_id + ((type) ? 4 : -1);
+        m_tracks[type ? kTrackTypeCC708 : kTrackTypeCC608].push_back(nsi);
+        int key = nsi.m_stream_id + (type ? 4 : -1);
         if (key < 0)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "in_tracks key too small");
@@ -4974,7 +4974,7 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
     if (disable != m_disablePassthru)
     {
         m_disablePassthru = disable;
-        QString msg = (disable) ? "Disabling" : "Allowing";
+        QString msg = disable ? "Disabling" : "Allowing";
         LOG(VB_AUDIO, LOG_INFO, LOC + msg + " pass through");
 
         // Force pass through state to be reanalyzed

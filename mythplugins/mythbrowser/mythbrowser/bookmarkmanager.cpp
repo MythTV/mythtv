@@ -659,3 +659,5 @@ void BookmarkManager::slotClearMarked(void)
         }
     }
 }
+
+#include "moc_bookmarkmanager.cpp"

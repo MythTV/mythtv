@@ -230,3 +230,5 @@ void TestCommFlagMisc::test_quick_selectf(void)
 }
 
 QTEST_GUILESS_MAIN(TestCommFlagMisc)
+
+#include "moc_test_commflag_misc.cpp"

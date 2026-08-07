@@ -9,19 +9,19 @@ using floatvec = std::vector<float>;
 struct surf3d {
 	std::vector<v3d> vertex;
 	std::vector<v3d> svertex;
-	int nbvertex;
+	int nbvertex {};
 
-	v3d center;
+	v3d center {};
 };
 
 struct grid3d {
 	surf3d surf;
 	
-	int defx;
-	int sizex;
-	int defz;
-	int sizez;
-	int mode;
+	int defx  {};
+	int sizex {};
+	int defz  {};
+	int sizez {};
+	int mode  {};
 };
 
 /* hi-level */

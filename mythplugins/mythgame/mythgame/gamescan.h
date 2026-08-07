@@ -36,12 +36,14 @@ class GameScannerThread : public MThread
     explicit GameScannerThread(void);
     ~GameScannerThread() override = default;
 
-    void run(void) override; // MThread
-
     void SetHandlers(QList<GameHandler*> handlers) { m_handlers = std::move(handlers); };
     void SetProgressDialog(MythUIProgressDialog *dialog) { m_dialog = dialog; };
 
     bool getDataChanged() const { return m_dbDataChanged; };
+
+  protected:
+
+    void run(void) override; // MThread
 
   private:
 

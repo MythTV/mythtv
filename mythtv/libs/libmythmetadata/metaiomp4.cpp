@@ -181,7 +181,7 @@ std::chrono::milliseconds MetaIOMP4::getTrackLength(const QString &filename)
     if (avformat_find_stream_info(p_context, nullptr) < 0)
         return 0ms;
 
-    std::chrono::milliseconds rv =
+    auto rv =
         duration_cast<std::chrono::milliseconds>(av_duration(p_context->duration));
 
     avformat_close_input(&p_context);

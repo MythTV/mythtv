@@ -36,12 +36,14 @@ class MythSystemLegacyIOHandler: public MThread
             : MThread(QString("SystemIOHandler%1").arg(read ? "R" : "W")),
               m_read(read) {};
         ~MythSystemLegacyIOHandler() override { wait(); }
-        void   run(void) override; // MThread
 
         void   insert(int fd, QBuffer *buff);
         void   Wait(int fd);
         void   remove(int fd);
         void   wake();
+
+    protected:
+        void   run(void) override; // MThread
 
     private:
         void   HandleRead(int fd, QBuffer *buff);
@@ -67,9 +69,10 @@ class MythSystemLegacyManager : public MThread
         MythSystemLegacyManager()
             : MThread("SystemManager") {}
         ~MythSystemLegacyManager() override { wait(); }
-        void run(void) override; // MThread
         void append(MythSystemLegacyUnix *ms);
         void jumpAbort(void);
+    protected:
+        void run(void) override; // MThread
     private:
         MSMap_t    m_pMap;
         QMutex     m_mapLock;
@@ -84,6 +87,7 @@ class MythSystemLegacySignalManager : public MThread
         MythSystemLegacySignalManager()
             : MThread("SystemSignalManager") {}
         ~MythSystemLegacySignalManager() override { wait(); }
+    protected:
         void run(void) override; // MThread
     private:
 };

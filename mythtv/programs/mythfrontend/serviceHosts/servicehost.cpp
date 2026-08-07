@@ -377,7 +377,9 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
             bool    bMethodFound = false;
 
             if (m_methods.contains(sMethodName))
+            {
                 bMethodFound = true;
+            }
             else
             {
                 switch( pRequest->m_eType )

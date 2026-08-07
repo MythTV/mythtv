@@ -157,7 +157,9 @@ SignalMonitorList SignalMonitorValue::Parse(const QStringList& slist)
             "Parse(" + slist[i] + ", (" + slist[i+1] + "))");
 #endif
         if (smv.Set(slist[i], slist[i+1]))
+        {
             monitor_list.push_back(smv);
+        }
         else
         {
             LOG(VB_GENERAL, LOG_ERR,

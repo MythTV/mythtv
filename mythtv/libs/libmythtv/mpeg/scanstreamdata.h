@@ -36,8 +36,10 @@ class MTV_PUBLIC ScanStreamData :
 
     void SetFreesatAdditionalSI(bool freesat_si);
 
-  private:
+  protected:
     bool DeleteCachedTable(const PSIPTable *psip) const override; // ATSCStreamData
+
+  private:
     /// listen for additional Freesat service information
     bool m_dvbUkFreesatSi {false};
     bool m_noDefaultPid;

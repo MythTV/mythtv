@@ -41,6 +41,7 @@
 
 #ifndef __suseconds_t
 #ifdef Q_OS_MACOS
+// NOLINTNEXTLINE(bugprone-reserved-identifier)
 using __suseconds_t = __darwin_suseconds_t;
 #else
 using __suseconds_t = long int;
@@ -443,7 +444,9 @@ void LIRC::run(void)
             d->m_lircState = nullptr;
 
             if (Init())
+            {
                 m_retryCount = 0;
+            }
             else
             {
                 // wait a while before we retry..
@@ -544,3 +547,5 @@ QList<QByteArray> LIRC::GetCodes(void)
     m_bufOffset = m_buf.size();
     return ret;
 }
+
+#include "moc_lirc.cpp"

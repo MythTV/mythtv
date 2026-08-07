@@ -254,7 +254,7 @@ private:
                 m_yFs[f] = clamp_unit_mag(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                m_xFs[f] = clamp_unit_mag(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
+                m_xFs[f] = clamp_unit_mag(m_xFs[f] * ((m_frontSeparation*(1+m_yFs[f])/2) + (m_rearSeparation*(1-m_yFs[f])/2)));
 
                 // 3. generate frequency filters for each output channel
                 float left = (1-m_xFs[f])/2;
@@ -263,9 +263,9 @@ private:
                 float back = (1-m_yFs[f])/2;
                 std::array<float, 5> volume
                 {
-                    front * (left  * center_width + std::max(0.0F, -m_xFs[f]) * (1.0F - center_width) ), // left
+                    front * ((left  * center_width) + (std::max(0.0F, -m_xFs[f]) * (1.0F - center_width)) ), // left
                     front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),      // center
-                    front * (right * center_width + std::max(0.0F,  m_xFs[f]) * (1.0F - center_width) ), // right
+                    front * ((right * center_width) + (std::max(0.0F,  m_xFs[f]) * (1.0F - center_width)) ), // right
                     back * m_surroundLevel * left,                                        // left surround
                     back * m_surroundLevel * right                                        // right surround
                 };
@@ -294,7 +294,7 @@ private:
                 m_yFs[f] = clamp_unit_mag(m_yFs[f] - dimension);
 
                 // add crossfeed control
-                m_xFs[f] = clamp_unit_mag(m_xFs[f] * (m_frontSeparation*(1+m_yFs[f])/2 + m_rearSeparation*(1-m_yFs[f])/2));
+                m_xFs[f] = clamp_unit_mag(m_xFs[f] * ((m_frontSeparation*(1+m_yFs[f])/2) + (m_rearSeparation*(1-m_yFs[f])/2)));
 
                 // 3. generate frequency filters for each output channel, according to the signal position
                 // the sum of all channel volumes must be 1.0
@@ -304,9 +304,9 @@ private:
                 float back = (1-m_yFs[f])/2;
                 std::array<float, 5> volume
                 {
-                    front * (left  * center_width + std::max(0.0F, -m_xFs[f]) * (1.0F-center_width)), // left
+                    front * ((left  * center_width) + (std::max(0.0F, -m_xFs[f]) * (1.0F-center_width))), // left
                     front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),   // center
-                    front * (right * center_width + std::max(0.0F,  m_xFs[f]) * (1.0F-center_width)), // right
+                    front * ((right * center_width) + (std::max(0.0F,  m_xFs[f]) * (1.0F-center_width))), // right
                     back * m_surroundLevel * std::clamp( (1.0F - (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F),// left surround
                     back * m_surroundLevel * std::clamp( (1.0F + (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F) // right surround
                 };

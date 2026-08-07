@@ -10,10 +10,10 @@
 #include <libmythui/mythuitext.h>
 
 // MythWeather headers
+#include "weatherScreen.h"
 #include "weatherUtils.h"
 
 class SourceManager;
-class WeatherScreen;
 
 using ScreenList = QList<WeatherScreen*>;
 

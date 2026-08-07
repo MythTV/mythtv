@@ -29,7 +29,7 @@ MythCDROM *GetMythCDROMDarwin(QObject* par, const QString& devicePath,
 
 void MythCDROMDarwin::setDeviceSpeed(const char *device, int speed)
 {
-    int       fd;
+    int       fd = 0;
     QString   raw = device;
     uint16_t  spd = speed;
 

@@ -4,7 +4,6 @@ add_executable(
 
 target_include_directories(mythpreviewgen PRIVATE .)
 
-target_link_libraries(mythpreviewgen PUBLIC myth mythtv mythbase
-         $<TARGET_NAME_IF_EXISTS:PkgConfig::VALGRIND>)
+target_link_libraries(mythpreviewgen PUBLIC myth mythtv mythbase)
 
 install(TARGETS mythpreviewgen RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

@@ -88,7 +88,7 @@ static inline float clipcheck(float f)
 static int toFloat8(float* out, const uint8_t* in, int len)
 {
     int i = 0;
-    float f = 1.0F / ((1<<7));
+    float f = 1.0F / (1<<7);
 
 #ifdef Q_PROCESSOR_X86
     if (sse2_check() && len >= 16)
@@ -215,7 +215,7 @@ static int fromFloat8(uint8_t* out, const float* in, int len)
 static int toFloat16(float* out, const short* in, int len)
 {
     int i = 0;
-    float f = 1.0F / ((1<<15));
+    float f = 1.0F / (1<<15);
 
 #ifdef Q_PROCESSOR_X86
     if (sse2_check() && len >= 16)

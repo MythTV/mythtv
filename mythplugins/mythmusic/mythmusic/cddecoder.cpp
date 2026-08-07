@@ -403,7 +403,9 @@ void CdDecoder::run()
     }
 
     if (m_userStop)
+    {
         m_inited = false;
+    }
     else if (output())
     {
         // Drain our buffer
@@ -516,7 +518,9 @@ MusicMetadata *CdDecoder::getMetadata()
     track_t tracknum = 0;
 
     if (-1 == m_setTrackNum)
+    {
         tracknum = getURL().toUInt();
+    }
     else
     {
         tracknum = m_setTrackNum;
@@ -578,7 +582,7 @@ MusicMetadata *CdDecoder::getMetadata()
     const lsn_t start = cdio_get_track_lsn(cdio, tracknum);
     if (CDIO_INVALID_LSN != start && CDIO_INVALID_LSN != end)
     {
-        length = std::chrono::milliseconds(((end - start + 1) * 1000 + CDIO_CD_FRAMES_PER_SEC/2) /
+        length = std::chrono::milliseconds((((end - start + 1) * 1000) + CDIO_CD_FRAMES_PER_SEC/2) /
                                            CDIO_CD_FRAMES_PER_SEC);
     }
 

@@ -36,9 +36,10 @@ class MonitorThread : public MThread
         m_lastCheckTime(QDateTime::currentDateTimeUtc()) {}
     ~MonitorThread() override { wait(); m_monitor = nullptr; }
     void setMonitor(MediaMonitor* pMon) { m_monitor = pMon; }
-    void run(void) override; // MThread
 
   protected:
+    void run(void) override; // MThread
+
     QPointer<MediaMonitor> m_monitor;
     unsigned long m_interval;
     QDateTime m_lastCheckTime;
@@ -52,6 +53,7 @@ class MUI_PUBLIC MediaMonitor : public QObject
 
   public:
     virtual void deleteLater(void);
+    bool eventFilter(QObject *obj, QEvent *event) override; // QObject
     bool IsActive(void) const { return m_active; }
 
     virtual void StartMonitoring(void);
@@ -90,6 +92,7 @@ class MUI_PUBLIC MediaMonitor : public QObject
 
     static void ejectOpticalDisc(void);
 
+  protected:
     virtual QStringList GetCDROMBlockDevices(void) = 0;
 
   public slots:
@@ -105,7 +108,6 @@ class MUI_PUBLIC MediaMonitor : public QObject
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
     bool shouldIgnore(const MythMediaDevice *device);
-    bool eventFilter(QObject *obj, QEvent *event) override; // QObject
 
     QString listDevices(void);
 

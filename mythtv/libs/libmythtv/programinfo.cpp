@@ -5,6 +5,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <mutex>
 
 // Qt headers
 #include <QMap>
@@ -33,8 +34,6 @@
 #define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
 
 //#define DEBUG_IN_USE
-
-static int init_tr(void);
 
 int pginfo_init_statics() { return ProgramInfo::InitStatics(); }
 QMutex ProgramInfo::s_staticDataLock;
@@ -473,7 +472,7 @@ ProgramInfo::ProgramInfo(
     m_recordId(_recordid),
     m_findId(_findid),
 
-    m_programFlags((duplicate) ? FL_DUPLICATE : FL_NONE),
+    m_programFlags(duplicate ? FL_DUPLICATE : FL_NONE),
 
     m_recStatus(_recstatus),
     m_recType(_rectype),
@@ -578,8 +577,8 @@ ProgramInfo::ProgramInfo(
     m_recStatus(_recstatus),
     m_recType(_rectype)
 {
-    m_programFlags |= (commfree) ? FL_CHANCOMMFREE : FL_NONE;
-    m_programFlags |= (repeat)   ? FL_REPEAT       : FL_NONE;
+    m_programFlags |= commfree ? FL_CHANCOMMFREE : FL_NONE;
+    m_programFlags |= repeat   ? FL_REPEAT       : FL_NONE;
 
     if (m_originalAirDate.isValid() && m_originalAirDate < QDate(1895, 12, 28))
         m_originalAirDate = QDate();
@@ -1786,7 +1785,9 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     progMap["playgroup"] = m_playGroup;
 
     if (m_storageGroup == "Default")
+    {
         progMap["storagegroup"] = QObject::tr("Default");
+    }
     else if (StorageGroup::kSpecialGroups.contains(m_storageGroup))
     {
         // This relies upon the translation established in the
@@ -2403,7 +2404,9 @@ void ProgramInfo::CheckProgramIDAuthorities(void)
             "SELECT DISTINCT LEFT(programid, LOCATE('/', programid)) "
             "FROM %1 WHERE programid <> ''").arg(table));
         if (!query.exec())
+        {
             MythDB::DBError("CheckProgramIDAuthorities", query);
+        }
         else
         {
             while (query.next())
@@ -2438,11 +2441,17 @@ static ProgramInfoType discover_program_info_type(
     QString fn_lower = pathname.toLower();
     ProgramInfoType pit = kProgramInfoTypeVideoFile;
     if (chanid)
+    {
         pit = kProgramInfoTypeRecording;
+    }
     else if (fn_lower.startsWith("http:"))
+    {
         pit = kProgramInfoTypeVideoStreamingHTML;
+    }
     else if (fn_lower.startsWith("rtsp:"))
+    {
         pit = kProgramInfoTypeVideoStreamingRTSP;
+    }
     else
     {
         fn_lower = determineURLType(pathname);
@@ -2648,7 +2657,7 @@ QString ProgramInfo::GetPlaybackURL(
     }
 
     // Check to see if we should stream from the master backend
-    if ((checkMaster) &&
+    if (checkMaster &&
         (gCoreContext->GetBoolSetting("MasterBackendOverride", false)) &&
         (RemoteCheckFile(this, false)))
     {
@@ -2955,7 +2964,7 @@ void ProgramInfo::SaveDVDBookmark(const QStringList &fields)
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString serialid    = *(it);
+    QString serialid    = *it;
     QString name        = *(++it);
 
     if( fields.count() == 3 )
@@ -3017,7 +3026,7 @@ void ProgramInfo::SaveBDBookmark(const QStringList &fields)
     QStringList::const_iterator it = fields.begin();
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString serialid    = *(it);
+    QString serialid    = *it;
     QString name        = *(++it);
 
     if( fields.count() == 3 )
@@ -4289,7 +4298,9 @@ void ProgramInfo::SaveAspect(
     query.bindValue(":TYPE", type);
 
     if (type == MARK_ASPECT_CUSTOM)
+    {
         query.bindValue(":DATA", customAspect);
+    }
     else
     {
         // create NULL value
@@ -5122,7 +5133,7 @@ QString ProgramInfo::QueryRecordingGroupPassword(const QString &group)
     if (query.exec() && query.next())
         result = query.value(0).toString();
 
-    return(result);
+    return result;
 }
 
 /** \brief Query recgroup from recorded
@@ -5436,14 +5447,13 @@ bool ProgramInfo::QueryTuningInfo(QString &channum, QString &input) const
     return false;
 }
 
-static int init_tr(void)
+namespace {
+    // This prevents the compiler and tools from complaining that all
+    // the strings in the init_tr function are unused.
+    int s_tr_count {0};
+};
+static void init_tr(void)
 {
-    static bool s_done = false;
-    static QMutex s_initTrLock;
-    QMutexLocker locker(&s_initTrLock);
-    if (s_done)
-        return 1;
-
     QString rec_profile_names =
         QObject::tr("Default",        "Recording Profile Default") +
         QObject::tr("High Quality",   "Recording Profile High Quality") +
@@ -5502,13 +5512,12 @@ static int init_tr(void)
     QString play_groups =
         QObject::tr("Default",        "Playback Group Name");
 
-    s_done = true;
-    return (rec_profile_names.length() +
+    s_tr_count = rec_profile_names.length() +
             rec_profile_groups.length() +
             display_rec_groups.length() +
             special_program_groups.length() +
             storage_groups.length() +
-            play_groups.length());
+            play_groups.length();
 }
 
 int ProgramInfo::InitStatics(void)
@@ -5522,7 +5531,9 @@ int ProgramInfo::InitStatics(void)
 /// Translations for play,recording, & storage groups
 QString ProgramInfo::i18n(const QString &msg)
 {
-    init_tr();
+    static std::once_flag init_done;
+    std::call_once(init_done, init_tr);
+
     QByteArray msg_arr = msg.toLatin1();
     QString msg_i18n = QObject::tr(msg_arr.constData());
     QByteArray msg_i18n_arr = msg_i18n.toLatin1();
@@ -6037,7 +6048,9 @@ bool LoadFromOldRecorded(ProgramList &destination, const QString &sql,
     // If a limit arg was given then append the LIMIT, otherwise set a hard
     // limit of 20000, which can be overridden by a setting
     if (limit > 0)
+    {
         querystr += QString("LIMIT %1 ").arg(limit);
+    }
     else if (!hasLimit)
     {
         // For performance reasons we have to have an upper limit
@@ -6468,7 +6481,7 @@ bool GetNextRecordingList(QDateTime &nextRecordingStart,
     nextRecordingStart = QDateTime();
 
     bool dummy = false;
-    bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
+    bool *conflicts = hasConflicts ? hasConflicts : &dummy;
 
     ProgramList progList;
     if (!LoadFromScheduler(progList, *conflicts))
@@ -6711,4 +6724,4 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
     return true;
 }
 
-/* vim: set expandtab tabstop=4 shiftwidth=4: */
+#include "moc_programinfo.cpp"

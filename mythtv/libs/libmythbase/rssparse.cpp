@@ -85,7 +85,9 @@ void ResultItem::toMap(InfoMap &metadataMap)
         metadataMap["date"] = MythDate::toString(m_date, MythDate::kDateFull);
 
     if (m_time.toInt() == 0)
+    {
         metadataMap["length"] = QString();
+    }
     else
     {
         QTime time(0,0,0,0);
@@ -1179,3 +1181,5 @@ QString Parse::UnescapeHTML(const QString& escaped)
 
     return result;
 }
+
+#include "moc_rssparse.cpp"

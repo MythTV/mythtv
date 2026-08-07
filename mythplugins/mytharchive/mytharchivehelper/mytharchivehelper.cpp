@@ -324,12 +324,11 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         {
             type = elem.attribute("type");
 
-            if (type.toLower() == "recording")
+            if (type.toLower() == "recording") {
                 exportRecording(elem, saveDirectory);
-            else if (type.toLower() == "video")
+            } else if (type.toLower() == "video") {
                 exportVideo(elem, saveDirectory);
-            else
-            {
+            } else {
                 LOG(VB_JOBQUEUE, LOG_ERR,
                     QString("Don't know how to archive items of type '%1'")
                         .arg(type.toLower()));
@@ -2509,22 +2508,21 @@ static int main_local(int argc, char **argv)
         }
     }
 
-    if (bGrabThumbnail)
+    if (bGrabThumbnail) {
         res = grabThumbnail(inFile, thumbList, outFile, frameCount);
-    else if (bGetDBParameters)
+    } else if (bGetDBParameters) {
         res = getDBParamters(outFile);
-    else if (bNativeArchive)
+    } else if (bNativeArchive) {
         res = doNativeArchive(outFile);
-    else if (bImportArchive)
+    } else if (bImportArchive) {
         res = doImportArchive(inFile, chanID);
-    else if (bGetFileInfo)
+    } else if (bGetFileInfo) {
         res = getFileInfo(inFile, outFile, lenMethod);
-    else if (bIsRemote)
+    } else if (bIsRemote) {
         res = isRemote(inFile);
-    else if (bDoBurn)
+    } else if (bDoBurn) {
         res = doBurnDVD(mediaType, bEraseDVDRW, bNativeFormat);
-    else if (bSup2Dast)
-    {
+    } else if (bSup2Dast) {
         QByteArray inFileBA = inFile.toLocal8Bit();
         QByteArray ifoFileBA = ifoFile.toLocal8Bit();
         res = sup2dast(inFileBA.constData(), ifoFileBA.constData(), delay);

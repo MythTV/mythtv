@@ -32,6 +32,7 @@
  * extensions. -- Daniel Kristjansson 2012-12-13
  */
 
+// NOLINTBEGIN(modernize-avoid-c-arrays)
 union mmx_t {
         unsigned long long      uq;     /* Unsigned Quadword */
         long long               q;      /* Quadword (64-bit) value */
@@ -43,6 +44,7 @@ union mmx_t {
         unsigned char           ub[8];  /* 8 Unsigned Byte */
         float                   s[2];   /* Single-precision (32-bit) value */
 };        /* On an 8-byte (64-bit) boundary */
+// NOLINTEND(modernize-avoid-c-arrays)
 
 
 #define         mmx_i2r(op,imm,reg) \

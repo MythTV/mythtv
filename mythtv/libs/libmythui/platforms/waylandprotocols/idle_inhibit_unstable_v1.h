@@ -173,7 +173,7 @@ zwp_idle_inhibit_manager_v1_destroy(struct zwp_idle_inhibit_manager_v1 *zwp_idle
 static inline struct zwp_idle_inhibitor_v1 *
 zwp_idle_inhibit_manager_v1_create_inhibitor(struct zwp_idle_inhibit_manager_v1 *zwp_idle_inhibit_manager_v1, struct wl_surface *surface)
 {
-	struct wl_proxy *id;
+	struct wl_proxy *id {nullptr};
 
 	id = wl_proxy_marshal_constructor((struct wl_proxy *) zwp_idle_inhibit_manager_v1,
 			 ZWP_IDLE_INHIBIT_MANAGER_V1_CREATE_INHIBITOR, &zwp_idle_inhibitor_v1_interface, NULL, surface);
