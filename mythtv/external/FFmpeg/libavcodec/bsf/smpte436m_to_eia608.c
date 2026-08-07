@@ -19,9 +19,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "bsf.h"
-#include "bsf_internal.h"
-#include "codec_id.h"
+#include "libavcodec/bsf.h"
+#include "libavcodec/bsf_internal.h"
+#include "libavcodec/codec_id.h"
 #include "libavcodec/smpte_436m.h"
 #include "libavutil/error.h"
 
@@ -73,7 +73,7 @@ static int ff_smpte436m_to_eia608_filter(AVBSFContext *ctx, AVPacket *out)
         return 0;
     }
     if (ret != AVERROR_EOF)
-        return ret;
+        goto fail;
     ret = AVERROR(EAGAIN);
 
 fail:

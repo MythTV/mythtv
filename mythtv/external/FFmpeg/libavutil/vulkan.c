@@ -477,6 +477,17 @@ int ff_vk_exec_pool_init(FFVulkanContext *s, AVVulkanDeviceQueueFamily *qf,
 
     pool->pool_size = nb_contexts;
 
+#ifdef VK_KHR_internally_synchronized_queues
+    /* Check if the extension and its flag are actually enabled */
+    int internal_queue_sync = 0;
+    if (s->extensions & FF_VK_EXT_INTERNAL_QUEUE_SYNC) {
+        const VkPhysicalDeviceInternallySynchronizedQueuesFeaturesKHR *iqs;
+        iqs = ff_vk_find_struct(s->hwctx->device_features.pNext,
+                                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_INTERNALLY_SYNCHRONIZED_QUEUES_FEATURES_KHR);
+        internal_queue_sync = iqs && iqs->internallySynchronizedQueues;
+    }
+#endif
+
     /* Init contexts */
     for (int i = 0; i < pool->pool_size; i++) {
         FFVkExecContext *e = &pool->contexts[i];
@@ -507,7 +518,16 @@ int ff_vk_exec_pool_init(FFVulkanContext *s, AVVulkanDeviceQueueFamily *qf,
         /* Queue index distribution */
         e->qi = i % qf->num;
         e->qf = qf->idx;
-        vk->GetDeviceQueue(s->hwctx->act_dev, qf->idx, e->qi, &e->queue);
+        VkDeviceQueueInfo2 qinfo = {
+            .sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_INFO_2,
+#ifdef VK_KHR_internally_synchronized_queues
+            .flags            = internal_queue_sync ?
+                                VK_DEVICE_QUEUE_CREATE_INTERNALLY_SYNCHRONIZED_BIT_KHR : 0,
+#endif
+            .queueFamilyIndex = qf->idx,
+            .queueIndex       = e->qi,
+        };
+        vk->GetDeviceQueue2(s->hwctx->act_dev, &qinfo, &e->queue);
     }
 
     return 0;
@@ -1559,6 +1579,7 @@ int ff_vk_mt_is_np_rgb(enum AVPixelFormat pix_fmt)
         pix_fmt == AV_PIX_FMT_GBRAP   || pix_fmt == AV_PIX_FMT_GBRAP10 ||
         pix_fmt == AV_PIX_FMT_GBRAP12 || pix_fmt == AV_PIX_FMT_GBRAP14 ||
         pix_fmt == AV_PIX_FMT_GBRAP16 || pix_fmt == AV_PIX_FMT_GBRAP32 ||
+        pix_fmt == AV_PIX_FMT_GBRPF16 || pix_fmt == AV_PIX_FMT_GBRAPF16 ||
         pix_fmt == AV_PIX_FMT_GBRPF32 || pix_fmt == AV_PIX_FMT_GBRAPF32 ||
         pix_fmt == AV_PIX_FMT_X2RGB10 || pix_fmt == AV_PIX_FMT_X2BGR10 ||
         pix_fmt == AV_PIX_FMT_RGBAF32 || pix_fmt == AV_PIX_FMT_RGBF32 ||
@@ -1577,10 +1598,12 @@ void ff_vk_set_perm(enum AVPixelFormat pix_fmt, int lut[4], int inv)
     case AV_PIX_FMT_GBRAP12:
     case AV_PIX_FMT_GBRAP14:
     case AV_PIX_FMT_GBRAP16:
+    case AV_PIX_FMT_GBRAPF16:
     case AV_PIX_FMT_GBRP10:
     case AV_PIX_FMT_GBRP12:
     case AV_PIX_FMT_GBRP14:
     case AV_PIX_FMT_GBRP16:
+    case AV_PIX_FMT_GBRPF16:
     case AV_PIX_FMT_GBRPF32:
     case AV_PIX_FMT_GBRAP32:
     case AV_PIX_FMT_GBRAPF32:
@@ -1593,6 +1616,14 @@ void ff_vk_set_perm(enum AVPixelFormat pix_fmt, int lut[4], int inv)
         lut[0] = 0;
         lut[1] = 2;
         lut[2] = 1;
+        lut[3] = 3;
+        break;
+    case AV_PIX_FMT_BGRA:
+    case AV_PIX_FMT_BGR0:
+        /* Stored in RGBA images, so reverse them */
+        lut[0] = 2;
+        lut[1] = 1;
+        lut[2] = 0;
         lut[3] = 3;
         break;
     default:
@@ -1661,6 +1692,15 @@ const char *ff_vk_shader_rep_fmt(enum AVPixelFormat pix_fmt,
         };
         return rep_tab[rep_fmt];
     }
+    case AV_PIX_FMT_RGBAF16: {
+        const char *rep_tab[] = {
+            [FF_VK_REP_NATIVE] = "rgba16f",
+            [FF_VK_REP_FLOAT] = "rgba16f",
+            [FF_VK_REP_INT] = "rgba32i",
+            [FF_VK_REP_UINT] = "rgba16u",
+        };
+        return rep_tab[rep_fmt];
+    }
     case AV_PIX_FMT_RGBF32:
     case AV_PIX_FMT_RGBAF32: {
         const char *rep_tab[] = {
@@ -1706,10 +1746,12 @@ const char *ff_vk_shader_rep_fmt(enum AVPixelFormat pix_fmt,
     case AV_PIX_FMT_GBRAP12:
     case AV_PIX_FMT_GBRAP14:
     case AV_PIX_FMT_GBRAP16:
+    case AV_PIX_FMT_GBRAPF16:
     case AV_PIX_FMT_GBRP10:
     case AV_PIX_FMT_GBRP12:
     case AV_PIX_FMT_GBRP14:
     case AV_PIX_FMT_GBRP16:
+    case AV_PIX_FMT_GBRPF16:
     case AV_PIX_FMT_YUV420P10:
     case AV_PIX_FMT_YUV420P12:
     case AV_PIX_FMT_YUV420P16:
@@ -1867,6 +1909,12 @@ static VkFormat map_fmt_to_rep(VkFormat fmt, enum FFVkShaderRepFormat rep_fmt)
             VK_FORMAT_UNDEFINED,
         },
         {
+            VK_FORMAT_R16G16B16A16_SFLOAT,
+            VK_FORMAT_R16G16B16A16_SFLOAT,
+            VK_FORMAT_UNDEFINED,
+            VK_FORMAT_UNDEFINED,
+        },
+        {
             VK_FORMAT_R32G32B32A32_SFLOAT,
             VK_FORMAT_R32G32B32A32_SFLOAT,
             VK_FORMAT_UNDEFINED,
@@ -1883,6 +1931,12 @@ static VkFormat map_fmt_to_rep(VkFormat fmt, enum FFVkShaderRepFormat rep_fmt)
             VK_FORMAT_UNDEFINED,
             VK_FORMAT_R32G32B32A32_SINT,
             VK_FORMAT_R32G32B32A32_UINT,
+        },
+        {
+            VK_FORMAT_R16_SFLOAT,
+            VK_FORMAT_R16_SFLOAT,
+            VK_FORMAT_R16_SINT,
+            VK_FORMAT_R16_UINT,
         },
     };
 #undef REPS_FMT_PACK
@@ -2106,92 +2160,6 @@ int ff_vk_shader_load(FFVulkanShader *shd,
     };
 
     return 0;
-}
-
-int ff_vk_shader_init(FFVulkanContext *s, FFVulkanShader *shd, const char *name,
-                      VkPipelineStageFlags stage,
-                      const char *extensions[], int nb_extensions,
-                      int lg_x, int lg_y, int lg_z,
-                      uint32_t required_subgroup_size)
-{
-    ff_vk_shader_load(shd, stage, NULL,
-                      (uint32_t []) { lg_x, lg_y, lg_z }, required_subgroup_size);
-
-    shd->name = name;
-    shd->precompiled = 0;
-    av_bprint_init(&shd->src, 0, AV_BPRINT_SIZE_UNLIMITED);
-
-    if (required_subgroup_size) {
-        shd->subgroup_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO;
-        shd->subgroup_info.requiredSubgroupSize = required_subgroup_size;
-    }
-
-    av_bprintf(&shd->src, "/* %s shader: %s */\n",
-               (stage == VK_SHADER_STAGE_TASK_BIT_EXT ||
-                stage == VK_SHADER_STAGE_MESH_BIT_EXT) ?
-               "Mesh" :
-               (shd->bind_point == VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR) ?
-               "Raytrace" :
-               (shd->bind_point == VK_PIPELINE_BIND_POINT_COMPUTE) ?
-               "Compute" : "Graphics",
-               name);
-    GLSLF(0, #version %i                                                  ,460);
-    GLSLC(0,                                                                  );
-
-    /* Common utilities */
-    GLSLC(0, #define IS_WITHIN(v1, v2) ((v1.x < v2.x) && (v1.y < v2.y))       );
-    GLSLC(0,                                                                  );
-    GLSLC(0, #extension GL_EXT_scalar_block_layout : require                  );
-    GLSLC(0, #extension GL_EXT_shader_explicit_arithmetic_types : require     );
-    GLSLC(0, #extension GL_EXT_control_flow_attributes : require              );
-    GLSLC(0, #extension GL_EXT_shader_image_load_formatted : require          );
-    if (s->extensions & FF_VK_EXT_EXPECT_ASSUME) {
-        GLSLC(0, #extension GL_EXT_expect_assume : require                    );
-    } else {
-        GLSLC(0, #define assumeEXT(x) (x)                                     );
-        GLSLC(0, #define expectEXT(x, c) (x)                                  );
-    }
-    if ((s->extensions & FF_VK_EXT_DEBUG_UTILS) &&
-        (s->extensions & FF_VK_EXT_RELAXED_EXTENDED_INSTR)) {
-        GLSLC(0, #extension GL_EXT_debug_printf : require                     );
-        GLSLC(0, #define DEBUG                                                );
-    }
-
-    if (stage == VK_SHADER_STAGE_TASK_BIT_EXT ||
-        stage == VK_SHADER_STAGE_MESH_BIT_EXT)
-        GLSLC(0, #extension GL_EXT_mesh_shader : require                      );
-
-    for (int i = 0; i < nb_extensions; i++)
-        GLSLF(0, #extension %s : %s                  ,extensions[i], "require");
-    GLSLC(0,                                                                  );
-
-    GLSLF(0, layout (local_size_x = %i, local_size_y = %i, local_size_z = %i) in;
-          , shd->lg_size[0], shd->lg_size[1], shd->lg_size[2]);
-    GLSLC(0,                                                                  );
-
-    return 0;
-}
-
-void ff_vk_shader_print(void *ctx, FFVulkanShader *shd, int prio)
-{
-    int line = 0;
-    const char *p = shd->src.str;
-    const char *start = p;
-    const size_t len = strlen(p);
-
-    AVBPrint buf;
-    av_bprint_init(&buf, 0, AV_BPRINT_SIZE_UNLIMITED);
-
-    for (int i = 0; i < len; i++) {
-        if (p[i] == '\n') {
-            av_bprintf(&buf, "%i\t", ++line);
-            av_bprint_append_data(&buf, start, &p[i] - start + 1);
-            start = &p[i + 1];
-        }
-    }
-
-    av_log(ctx, prio, "Shader %s: \n%s", shd->name, buf.str);
-    av_bprint_finalize(&buf, NULL);
 }
 
 static int init_pipeline_layout(FFVulkanContext *s, FFVulkanShader *shd)
@@ -2468,34 +2436,10 @@ end:
     return err;
 }
 
-static const struct descriptor_props {
-    size_t struct_size; /* Size of the opaque which updates the descriptor */
-    const char *type;
-    int is_uniform;
-    int mem_quali;      /* Can use a memory qualifier */
-    int dim_needed;     /* Must indicate dimension */
-    int buf_content;    /* Must indicate buffer contents */
-} descriptor_props[] = {
-    [VK_DESCRIPTOR_TYPE_SAMPLER]                = { sizeof(VkDescriptorImageInfo),  "sampler",       1, 0, 0, 0, },
-    [VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE]          = { sizeof(VkDescriptorImageInfo),  "texture",       1, 0, 1, 0, },
-    [VK_DESCRIPTOR_TYPE_STORAGE_IMAGE]          = { sizeof(VkDescriptorImageInfo),  "image",         1, 1, 1, 0, },
-    [VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT]       = { sizeof(VkDescriptorImageInfo),  "subpassInput",  1, 0, 0, 0, },
-    [VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER] = { sizeof(VkDescriptorImageInfo),  "sampler",       1, 0, 1, 0, },
-    [VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER]         = { sizeof(VkDescriptorBufferInfo),  NULL,           1, 0, 0, 1, },
-    [VK_DESCRIPTOR_TYPE_STORAGE_BUFFER]         = { sizeof(VkDescriptorBufferInfo), "buffer",        0, 1, 0, 1, },
-    [VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC] = { sizeof(VkDescriptorBufferInfo),  NULL,           1, 0, 0, 1, },
-    [VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC] = { sizeof(VkDescriptorBufferInfo), "buffer",        0, 1, 0, 1, },
-    [VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER]   = { sizeof(VkBufferView),           "samplerBuffer", 1, 0, 0, 0, },
-    [VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER]   = { sizeof(VkBufferView),           "imageBuffer",   1, 0, 0, 0, },
-};
-
-int ff_vk_shader_add_descriptor_set(FFVulkanContext *s, FFVulkanShader *shd,
-                                    const FFVulkanDescriptorSetBinding *desc, int nb,
-                                    int singular, int print_to_shader_only)
+void ff_vk_shader_add_descriptor_set(FFVulkanContext *s, FFVulkanShader *shd,
+                                     const FFVulkanDescriptorSetBinding *desc, int nb,
+                                     int singular)
 {
-    if (print_to_shader_only)
-        goto print;
-
     FFVulkanDescriptorSet *set = &shd->desc_set[shd->nb_descriptor_sets++];
     av_assert1(shd->nb_descriptor_sets < FF_VK_MAX_DESCRIPTOR_SETS);
     av_assert1(nb < FF_VK_MAX_DESCRIPTOR_BINDINGS);
@@ -2524,69 +2468,6 @@ int ff_vk_shader_add_descriptor_set(FFVulkanContext *s, FFVulkanShader *shd,
 
     set->singular = singular;
     set->nb_bindings = nb;
-
-    if (shd->precompiled)
-        return 0;
-
-print:
-    /* Write shader info */
-    for (int i = 0; i < nb; i++) {
-        const struct descriptor_props *prop = &descriptor_props[desc[i].type];
-        GLSLA("layout (set = %i, binding = %i", FFMAX(shd->nb_descriptor_sets - 1, 0), i);
-
-        if (desc[i].mem_layout &&
-            (desc[i].type != VK_DESCRIPTOR_TYPE_STORAGE_IMAGE))
-            GLSLA(", %s", desc[i].mem_layout);
-
-        GLSLA(")");
-
-        if (prop->is_uniform)
-            GLSLA(" uniform");
-
-        if (prop->mem_quali && desc[i].mem_quali)
-            GLSLA(" %s", desc[i].mem_quali);
-
-        if (prop->type) {
-            GLSLA(" ");
-            if (desc[i].type == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE) {
-                if (desc[i].mem_layout) {
-                    int len = strlen(desc[i].mem_layout);
-                    if (desc[i].mem_layout[len - 1] == 'i' &&
-                        desc[i].mem_layout[len - 2] == 'u') {
-                        GLSLA("u");
-                    } else if (desc[i].mem_layout[len - 1] == 'i') {
-                        GLSLA("i");
-                    }
-                }
-            }
-            GLSLA("%s", prop->type);
-        }
-
-        if (prop->dim_needed)
-            GLSLA("%iD", desc[i].dimensions);
-
-        GLSLA(" %s", desc[i].name);
-
-        if (prop->buf_content) {
-            GLSLA(" {\n    ");
-            if (desc[i].buf_elems) {
-                GLSLA("%s", desc[i].buf_content);
-                GLSLA("[%i];", desc[i].buf_elems);
-            } else {
-                GLSLA("%s", desc[i].buf_content);
-            }
-            GLSLA("\n}");
-        }
-
-        if (desc[i].elems > 0)
-            GLSLA("[%i]", desc[i].elems);
-
-        GLSLA(";");
-        GLSLA("\n");
-    }
-    GLSLA("\n");
-
-    return 0;
 }
 
 int ff_vk_shader_register_exec(FFVulkanContext *s, FFVkExecPool *pool,
@@ -2799,8 +2680,6 @@ void ff_vk_exec_bind_shader(FFVulkanContext *s, FFVkExecContext *e,
 void ff_vk_shader_free(FFVulkanContext *s, FFVulkanShader *shd)
 {
     FFVulkanFunctions *vk = &s->vkfn;
-
-    av_bprint_finalize(&shd->src, NULL);
 
 #if 0
     if (shd->shader.module)

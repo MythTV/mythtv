@@ -43,6 +43,7 @@
 #include "demux.h"
 #include "mpeg.h"
 #include "isom.h"
+#include "id3v2.h"
 #if CONFIG_ICONV
 #include <iconv.h>
 #endif
@@ -129,6 +130,15 @@ struct Stream {
 
 #define MAX_STREAMS_PER_PROGRAM 128
 #define MAX_PIDS_PER_PROGRAM (MAX_STREAMS_PER_PROGRAM + 2)
+
+struct StreamGroup {
+    enum AVStreamGroupParamsType type;
+    int id;
+    int dep_pid; /* PID of the linked dependency stream */
+    unsigned int nb_streams;
+    AVStream *streams[MAX_STREAMS_PER_PROGRAM];
+};
+
 struct Program {
     unsigned int id; // program id/service id
     unsigned int nb_pids;
@@ -136,6 +146,8 @@ struct Program {
     uint8_t      stream_types[MAX_PIDS_PER_PROGRAM]; // stream_type for pid at same index in pids
     unsigned int nb_streams;
     struct Stream streams[MAX_STREAMS_PER_PROGRAM];
+    unsigned int nb_stream_groups;
+    struct StreamGroup stream_groups[MAX_STREAMS_PER_PROGRAM];
 
     /** have we found pmt for this program */
     int pmt_found;
@@ -187,6 +199,7 @@ struct MpegTSContext {
     /* scan context */
     /** structure to keep track of Program->pids mapping */
     unsigned int nb_prg;
+    unsigned int prg_size; ///< allocated size of prg in bytes
     struct Program *prg;
 
     int8_t crc_validity[NB_PID_MAX];
@@ -294,6 +307,8 @@ EXTERN const FFInputFormat ff_mpegts_demuxer;
 static struct Program * get_program(MpegTSContext *ts, unsigned int programid)
 {
     int i;
+    if (!ts)
+        return NULL;
     for (i = 0; i < ts->nb_prg; i++) {
         if (ts->prg[i].id == programid) {
             return &ts->prg[i];
@@ -323,6 +338,8 @@ static void clear_program(struct Program *p)
         return;
     p->nb_pids = 0;
     p->nb_streams = 0;
+    p->nb_stream_groups = 0;
+    memset(p->stream_groups, 0, sizeof(p->stream_groups));
     p->pmt_found = 0;
 }
 
@@ -330,17 +347,26 @@ static void clear_programs(MpegTSContext *ts)
 {
     av_freep(&ts->prg);
     ts->nb_prg = 0;
+    ts->prg_size = 0;
 }
 
 static struct Program * add_program(MpegTSContext *ts, unsigned int programid)
 {
     struct Program *p = get_program(ts, programid);
+    struct Program *tmp = NULL;
+    size_t new_prg_size;
     if (p)
         return p;
-    if (av_reallocp_array(&ts->prg, ts->nb_prg + 1, sizeof(*ts->prg)) < 0) {
-        ts->nb_prg = 0;
+
+    if (!av_size_mult(ts->nb_prg + 1,  sizeof(*ts->prg), &new_prg_size))
+        tmp = av_fast_realloc(ts->prg, &ts->prg_size,new_prg_size);
+    if (!tmp) {
+        av_freep(&ts->prg);
+        ts->nb_prg   = 0;
+        ts->prg_size = 0;
         return NULL;
     }
+    ts->prg = tmp;
     p = &ts->prg[ts->nb_prg];
     p->id = programid;
     clear_program(p);
@@ -602,7 +628,7 @@ static void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
         av_buffer_unref(&pes->buffer);
         /* referenced private data will be freed later in
          * avformat_close_input (pes->st->priv_data == pes) */
-        if (!pes->st || pes->merged_st) {
+        if (!pes->st || pes->merged_st || !pes->st->priv_data) {
             av_freep(&filter->u.pes_filter.opaque);
         }
     }
@@ -1049,6 +1075,30 @@ static void new_data_packet(const uint8_t *buffer, int len, AVPacket *pkt)
     pkt->size = len;
 }
 
+static int timed_id3_update_metadata(AVStream *s, AVPacket *pkt)
+{
+    FFIOContext id3_buf;
+    ID3v2ExtraMeta *extra_meta = NULL;
+    AVDictionary *metadata = NULL;
+    int ret = 0;
+
+    ffio_init_read_context(&id3_buf, pkt->data, pkt->size);
+    ff_id3v2_read_dict(&id3_buf.pub, &metadata, ID3v2_DEFAULT_MAGIC, &extra_meta);
+    ret = ff_id3v2_parse_priv_dict(&metadata, extra_meta);
+    ff_id3v2_free_extra_meta(&extra_meta);
+
+    if (ret < 0 || !av_dict_count(metadata))
+        goto end;
+
+    ret = av_dict_copy(&s->metadata, metadata, 0);
+    if (ret == 0)
+        s->event_flags |= AVSTREAM_EVENT_FLAG_METADATA_UPDATED;
+
+end:
+    av_dict_free(&metadata);
+    return ret;
+}
+
 static int new_pes_packet(PESContext *pes, AVPacket *pkt)
 {
     uint8_t *sd;
@@ -1102,6 +1152,12 @@ static int new_pes_packet(PESContext *pes, AVPacket *pkt)
     if (!sd)
         return AVERROR(ENOMEM);
     *sd = pes->stream_id;
+
+    if (pes->st->codecpar->codec_id == AV_CODEC_ID_TIMED_ID3) {
+        int ret = timed_id3_update_metadata(pes->st, pkt);
+        if (ret < 0)
+            return ret;
+    }
 
     return 0;
 }
@@ -1871,9 +1927,9 @@ static const uint8_t opus_channel_map[8][8] = {
 };
 
 static int parse_mpeg2_extension_descriptor(AVFormatContext *fc, AVStream *st, int prg_id,
-                                            const uint8_t **pp, const uint8_t *desc_end)
+                                            const uint8_t **pp, const uint8_t *desc_end,
+                                            MpegTSContext *ts)
 {
-    MpegTSContext *ts = fc->priv_data;
     int ext_tag = get8(pp, desc_end);
 
     switch (ext_tag) {
@@ -1952,82 +2008,87 @@ static int parse_mpeg2_extension_descriptor(AVFormatContext *fc, AVStream *st, i
         break;
     case LCEVC_VIDEO_DESCRIPTOR:
         {
-            AVStreamGroup *stg = NULL;
+            struct Program *p = get_program(ts, prg_id);
+            struct StreamGroup *stg;
             int lcevc_stream_tag = get8(pp, desc_end);
-            int ret, i;
+            int i;
 
-            if (!get_program(ts, prg_id))
+            if (!p)
                 return 0;
 
             if (st->codecpar->codec_id != AV_CODEC_ID_LCEVC)
                 return AVERROR_INVALIDDATA;
 
-            for (i = 0; i < fc->nb_stream_groups; i++) {
-                stg = fc->stream_groups[i];
+            for (i = 0; i < p->nb_stream_groups; i++) {
+                stg = &p->stream_groups[i];
                 if (stg->type != AV_STREAM_GROUP_PARAMS_LCEVC)
                     continue;
                 if (stg->id == lcevc_stream_tag)
                     break;
             }
-            if (i == fc->nb_stream_groups)
-                stg = avformat_stream_group_create(fc, AV_STREAM_GROUP_PARAMS_LCEVC, NULL);
-            if (!stg)
-                return AVERROR(ENOMEM);
+            if (i == p->nb_stream_groups) {
+                if (p->nb_stream_groups == MAX_STREAMS_PER_PROGRAM)
+                    return AVERROR(EINVAL);
+                p->nb_stream_groups++;
+            }
 
+            stg = &p->stream_groups[i];
             stg->id = lcevc_stream_tag;
+            stg->type = AV_STREAM_GROUP_PARAMS_LCEVC;
             for (i = 0; i < stg->nb_streams; i++) {
                 if (stg->streams[i]->codecpar->codec_id == AV_CODEC_ID_LCEVC)
                     break;
             }
             if (i == stg->nb_streams) {
-                ret = avformat_stream_group_add_stream(stg, st);
-                av_assert0(ret != AVERROR(EEXIST));
-                if (ret < 0)
-                    return ret;
+                if (stg->nb_streams == MAX_STREAMS_PER_PROGRAM)
+                    return AVERROR(EINVAL);
+                stg->streams[stg->nb_streams++] = st;
             } else
                 stg->streams[i] = st;
 
             av_assert0(i < stg->nb_streams);
-            stg->params.lcevc->lcevc_index = i;
         }
         break;
     case LCEVC_LINKAGE_DESCRIPTOR:
         {
+            struct Program *p = get_program(ts, prg_id);
             int num_lcevc_stream_tags = get8(pp, desc_end);
 
-            if (!get_program(ts, prg_id))
+            if (!p)
                 return 0;
 
             if (st->codecpar->codec_id == AV_CODEC_ID_LCEVC)
                 return AVERROR_INVALIDDATA;
 
             for (int i = 0; i < num_lcevc_stream_tags; i++) {
-                AVStreamGroup *stg = NULL;
+                struct StreamGroup *stg = NULL;
                 int lcevc_stream_tag = get8(pp, desc_end);;
-                int ret, j;
+                int j;
 
-                for (j = 0; j < fc->nb_stream_groups; j++) {
-                    stg = fc->stream_groups[j];
+                for (j = 0; j < p->nb_stream_groups; j++) {
+                    stg = &p->stream_groups[j];
                     if (stg->type != AV_STREAM_GROUP_PARAMS_LCEVC)
                         continue;
                     if (stg->id == lcevc_stream_tag)
                         break;
                 }
-                if (j == fc->nb_stream_groups)
-                    stg = avformat_stream_group_create(fc, AV_STREAM_GROUP_PARAMS_LCEVC, NULL);
-                if (!stg)
-                    return AVERROR(ENOMEM);
+                if (j == p->nb_stream_groups) {
+                    if (p->nb_stream_groups == MAX_STREAMS_PER_PROGRAM)
+                        return AVERROR(EINVAL);
+                    p->nb_stream_groups++;
+                }
 
+                stg = &p->stream_groups[j];
                 stg->id = lcevc_stream_tag;
+                stg->type = AV_STREAM_GROUP_PARAMS_LCEVC;
                 for (j = 0; j < stg->nb_streams; j++) {
                     if (stg->streams[j]->index == st->index)
                         break;
                 }
                 if (j == stg->nb_streams) {
-                    ret = avformat_stream_group_add_stream(stg, st);
-                    av_assert0(ret != AVERROR(EEXIST));
-                    if (ret < 0)
-                        return ret;
+                    if (stg->nb_streams == MAX_STREAMS_PER_PROGRAM)
+                        return AVERROR(EINVAL);
+                    stg->streams[stg->nb_streams++] = st;
                 }
             }
         }
@@ -2309,6 +2370,7 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
                 sti->need_parsing = AVSTREAM_PARSE_FULL;
                 sti->need_context_update = 1;
             }
+            break;
         }
         if (ext_desc_tag == SUPPLEMENTARY_AUDIO_DESCRIPTOR) {
             int flags;
@@ -2346,22 +2408,14 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
                 if (language[0])
                     av_dict_set(&st->metadata, "language", language, 0);
             }
+            break;
+        }
+        if (ext_desc_tag == AC4_DESCRIPTOR) {
+            st->codecpar->codec_id = AV_CODEC_ID_AC4;
+            st->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
         }
         break;
     case AC3_DESCRIPTOR:
-        {
-            int component_type_flag = get8(pp, desc_end) & (1 << 7);
-            if (component_type_flag) {
-                int component_type = get8(pp, desc_end);
-                int service_type_mask = 0x38;  // 0b00111000
-                int service_type = ((component_type & service_type_mask) >> 3);
-                if (service_type == 0x02 /* 0b010 */) {
-                    st->disposition |= AV_DISPOSITION_DESCRIPTIONS;
-                    av_log(ts ? ts->stream : fc, AV_LOG_DEBUG, "New track disposition for id %u: %u\n", st->id, st->disposition);
-                }
-            }
-        }
-        break;
     case ENHANCED_AC3_DESCRIPTOR:
         {
             int component_type_flag = get8(pp, desc_end) & (1 << 7);
@@ -2480,11 +2534,41 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
                    dependency_pid,
                    dovi->dv_bl_signal_compatibility_id,
                    dovi->dv_md_compression);
+
+            /* A Profile 7 dual-track EL stream points at its base layer via
+             * the descriptor's dependency_pid. Record a pending group entry,
+             * it will be resolved once all streams are available. */
+            if (dovi->dv_profile == 7 && dovi->el_present_flag &&
+                !dovi->bl_present_flag && dependency_pid >= 0) {
+                struct Program *p = get_program(ts, prg_id);
+                struct StreamGroup *stg;
+                int gi;
+
+                if (!p)
+                    break;
+
+                for (gi = 0; gi < p->nb_stream_groups; gi++) {
+                    stg = &p->stream_groups[gi];
+                    if (stg->type == AV_STREAM_GROUP_PARAMS_DOLBY_VISION &&
+                        stg->nb_streams && stg->streams[0] == st)
+                        break;
+                }
+                if (gi == p->nb_stream_groups) {
+                    if (p->nb_stream_groups == MAX_STREAMS_PER_PROGRAM)
+                        return AVERROR(EINVAL);
+                    p->nb_stream_groups++;
+                    stg = &p->stream_groups[gi];
+                    stg->type = AV_STREAM_GROUP_PARAMS_DOLBY_VISION;
+                    stg->id = st->id;
+                    stg->streams[stg->nb_streams++] = st;
+                }
+                stg->dep_pid = dependency_pid;
+            }
         }
         break;
     case EXTENSION_DESCRIPTOR: /* descriptor extension */
         {
-            int ret = parse_mpeg2_extension_descriptor(fc, st, prg_id, pp, desc_end);
+            int ret = parse_mpeg2_extension_descriptor(fc, st, prg_id, pp, desc_end, ts);
 
             if (ret < 0)
                 return ret;
@@ -2680,6 +2764,121 @@ static void export_pmt(AVFormatContext *ctx, int program_number, const uint8_t *
     av_buffer_unref(&buf);
 }
 // End MythTV only ------------------------------------------------------
+
+/* UHD Blu-ray titles don't follow the Dolby Vision MPEG-TS spec [1] when
+ * signaling a dual-PID Profile 7 stream. The enhancement-layer PID lacks the
+ * DOVI_video_stream_descriptor, is advertised with stream_type 0x24 (HEVC)
+ * instead of the spec-mandated 0x06, and uses the HDMV registration descriptor
+ * instead of "DOVI". EL always has M2TS_VIDEO_EL_PID (0x1015) PID.
+ * [1] <https://professionalsupport.dolby.com/s/article/How-to-signal-Dolby-Vision-in-MPEG-2-TS>
+ */
+static void detect_bdmv_dovi_group(MpegTSContext *ts, struct Program *prg,
+                                   uint32_t prog_reg_desc)
+{
+    AVStream *bl_st = NULL, *el_st = NULL;
+    struct StreamGroup *grp;
+
+    if (prog_reg_desc != AV_RL32("HDMV"))
+        return;
+
+    if (prg->nb_stream_groups >= MAX_STREAMS_PER_PROGRAM)
+        return;
+
+    for (int i = 0; i < prg->nb_stream_groups; i++) {
+        if (prg->stream_groups[i].type == AV_STREAM_GROUP_PARAMS_DOLBY_VISION)
+            return;
+    }
+
+    for (int j = 0; j < prg->nb_streams; j++) {
+        int idx = prg->streams[j].idx;
+        AVStream *st;
+        if (idx < 0 || idx >= ts->stream->nb_streams)
+            continue;
+        st = ts->stream->streams[idx];
+        if (st->codecpar->codec_id != AV_CODEC_ID_HEVC)
+            continue;
+        if (st->id == M2TS_VIDEO_PID)
+            bl_st = st;
+        else if (st->id == M2TS_VIDEO_EL_PID)
+            el_st = st;
+    }
+
+    if (!bl_st || !el_st)
+        return;
+
+    grp = &prg->stream_groups[prg->nb_stream_groups++];
+    grp->type = AV_STREAM_GROUP_PARAMS_DOLBY_VISION;
+    grp->id = el_st->id;
+    grp->streams[0] = bl_st;
+    grp->streams[1] = el_st;
+    grp->nb_streams = 2;
+}
+
+static void create_stream_groups(MpegTSContext *ts, struct Program *prg)
+{
+    for (int i = 0; i < prg->nb_stream_groups; i++) {
+        struct StreamGroup *grp = &prg->stream_groups[i];
+        AVStreamGroup *stg;
+        int j;
+
+        /* The DOVI descriptor on a Profile 7 EL points at its base layer
+         * via dependency_pid. Resolve the BL now that all streams of the
+         * program have been added. */
+        if (grp->type == AV_STREAM_GROUP_PARAMS_DOLBY_VISION && grp->nb_streams == 1) {
+            for (j = 0; j < prg->nb_streams; j++) {
+                int idx = prg->streams[j].idx;
+                AVStream *cand;
+                if (idx < 0 || idx >= ts->stream->nb_streams)
+                    continue;
+                cand = ts->stream->streams[idx];
+                if (cand == grp->streams[0] || cand->id != grp->dep_pid)
+                    continue;
+                grp->streams[1] = grp->streams[0];
+                grp->streams[0] = cand;
+                grp->nb_streams = 2;
+                break;
+            }
+        }
+
+        if (grp->nb_streams < 2)
+            continue;
+        for (j = 0; j < ts->stream->nb_stream_groups; j++) {
+            stg = ts->stream->stream_groups[j];
+            if (stg->id == grp->id)
+                break;
+        }
+        if (j == ts->stream->nb_stream_groups)
+            stg = avformat_stream_group_create(ts->stream, grp->type, NULL);
+        else
+            continue;
+        if (!stg)
+            continue;
+        stg->id = grp->id;
+        for (int j = 0; j < grp->nb_streams; j++) {
+            int ret = avformat_stream_group_add_stream(stg, grp->streams[j]);
+            if (ret < 0) {
+                ff_remove_stream_group(ts->stream, stg);
+                continue;
+            }
+            switch (grp->type) {
+            case AV_STREAM_GROUP_PARAMS_LCEVC:
+                if (grp->streams[j]->codecpar->codec_id == AV_CODEC_ID_LCEVC)
+                    stg->params.layered_video->el_index = stg->nb_streams - 1;
+                break;
+            case AV_STREAM_GROUP_PARAMS_DOLBY_VISION:
+                if (j == 0) {
+                    stg->params.layered_video->width  = grp->streams[j]->codecpar->width;
+                    stg->params.layered_video->height = grp->streams[j]->codecpar->height;
+                }
+                if (j == grp->nb_streams - 1)
+                    stg->params.layered_video->el_index = stg->nb_streams - 1;
+                break;
+            default:
+                av_unreachable("Invalid group type!");
+            }
+        }
+    }
+}
 
 static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len)
 {
@@ -2964,6 +3163,11 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         mpegts_open_pcr_filter(ts, pcr_pid);
 
 out:
+    if (prg) {
+        detect_bdmv_dovi_group(ts, prg, prog_reg_desc);
+        create_stream_groups(ts, prg);
+    }
+
     for (i = 0; i < mp4_descr_count; i++)
         av_free(mp4_descr[i].dec_config_descr);
 }
@@ -3054,8 +3258,11 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             break;
         pmt_pid &= 0x1fff;
 
-        if (pmt_pid == ts->current_pid)
-            break;
+        if (pmt_pid <= 0x000F || pmt_pid == 0x1FFF) {
+            av_log(ts->stream, AV_LOG_WARNING,
+                   "Ignoring invalid PAT entry: sid=0x%x pid=0x%x\n", sid, pmt_pid);
+            continue;
+        }
 
         av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x pid=0x%x\n", sid, pmt_pid);
 
@@ -3547,6 +3754,8 @@ static int mpegts_probe(const AVProbeData *p)
     ff_dlog(0, "TS score: %d %d\n", sumscore, maxscore);
 
     if        (check_count > CHECK_COUNT && sumscore > 6) {
+        return AVPROBE_SCORE_MAX   + sumscore - CHECK_COUNT;
+    } else if (check_count >= CHECK_COUNT && sumscore >= CHECK_COUNT) {
         return AVPROBE_SCORE_MAX   + sumscore - CHECK_COUNT;
     } else if (check_count >= CHECK_COUNT && sumscore > 6) {
         return AVPROBE_SCORE_MAX/2 + sumscore - CHECK_COUNT;

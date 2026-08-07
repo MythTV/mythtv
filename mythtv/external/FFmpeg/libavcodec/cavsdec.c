@@ -27,7 +27,6 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
-#include "libavutil/emms.h"
 #include "libavutil/mem.h"
 #include "avcodec.h"
 #include "get_bits.h"
@@ -1161,7 +1160,6 @@ static int decode_pic(AVSContext *h)
                 break;
         } while (ff_cavs_next_mb(h));
     }
-    emms_c();
     if (ret >= 0 && h->cur.f->pict_type != AV_PICTURE_TYPE_B) {
         av_frame_unref(h->DPB[1].f);
         FFSWAP(AVSFrame, h->cur, h->DPB[1]);
@@ -1268,10 +1266,11 @@ static int cavs_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                 av_log(h->avctx, AV_LOG_WARNING, "no frame decoded\n");
             return FFMAX(0, buf_ptr - buf);
         }
-        input_size = (buf_end - buf_ptr) * 8;
+        input_size = buf_end - buf_ptr;
+        if ((ret = init_get_bits8(&h->gb, buf_ptr, input_size)) < 0)
+            return ret;
         switch (stc) {
         case CAVS_START_CODE:
-            init_get_bits(&h->gb, buf_ptr, input_size);
             decode_seq_header(h);
             break;
         case PIC_I_START_CODE:
@@ -1280,6 +1279,7 @@ static int cavs_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
                 av_frame_unref(h->DPB[1].f);
                 h->got_keyframe = 1;
             }
+            av_fallthrough;
         case PIC_PB_START_CODE:
             if (frame_start > 1)
                 return AVERROR_INVALIDDATA;
@@ -1289,7 +1289,6 @@ static int cavs_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
             *got_frame = 0;
             if (!h->got_keyframe)
                 break;
-            init_get_bits(&h->gb, buf_ptr, input_size);
             h->stc = stc;
             if (decode_pic(h))
                 break;
@@ -1313,7 +1312,6 @@ static int cavs_decode_frame(AVCodecContext *avctx, AVFrame *rframe,
             break;
         default:
             if (stc <= SLICE_MAX_START_CODE) {
-                init_get_bits(&h->gb, buf_ptr, input_size);
                 decode_slice_header(h, &h->gb);
             }
             break;

@@ -358,8 +358,8 @@ struct thread_data {
     const uint16_t (*tab)[256*256] = (const uint16_t (*)[256*256])s->lut;\
     const int step = s->step;\
 \
-    const int slice_start = (h *  jobnr   ) / nb_jobs;\
-    const int slice_end   = (h * (jobnr+1)) / nb_jobs;\
+    const int slice_start = ff_slice_pos(h, jobnr, nb_jobs); \
+    const int slice_end   = ff_slice_pos(h, jobnr + 1, nb_jobs); \
 
 /* packed, 16-bit */
 static int lut_packed_16bits(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
@@ -379,14 +379,14 @@ static int lut_packed_16bits(AVFilterContext *ctx, void *arg, int jobnr, int nb_
 
             switch (step) {
 #if HAVE_BIGENDIAN
-            case 4:  outrow[3] = av_bswap16(tab[3][av_bswap16(inrow[3])]); // Fall-through
-            case 3:  outrow[2] = av_bswap16(tab[2][av_bswap16(inrow[2])]); // Fall-through
-            case 2:  outrow[1] = av_bswap16(tab[1][av_bswap16(inrow[1])]); // Fall-through
+            case 4:  outrow[3] = av_bswap16(tab[3][av_bswap16(inrow[3])]); av_fallthrough;
+            case 3:  outrow[2] = av_bswap16(tab[2][av_bswap16(inrow[2])]); av_fallthrough;
+            case 2:  outrow[1] = av_bswap16(tab[1][av_bswap16(inrow[1])]); av_fallthrough;
             default: outrow[0] = av_bswap16(tab[0][av_bswap16(inrow[0])]);
 #else
-            case 4:  outrow[3] = tab[3][inrow[3]]; // Fall-through
-            case 3:  outrow[2] = tab[2][inrow[2]]; // Fall-through
-            case 2:  outrow[1] = tab[1][inrow[1]]; // Fall-through
+            case 4:  outrow[3] = tab[3][inrow[3]]; av_fallthrough;
+            case 3:  outrow[2] = tab[2][inrow[2]]; av_fallthrough;
+            case 2:  outrow[1] = tab[1][inrow[1]]; av_fallthrough;
             default: outrow[0] = tab[0][inrow[0]];
 #endif
             }
@@ -414,9 +414,9 @@ static int lut_packed_8bits(AVFilterContext *ctx, void *arg, int jobnr, int nb_j
         outrow = outrow0 + i * out_linesize;
         for (j = 0; j < w; j++) {
             switch (step) {
-            case 4:  outrow[3] = tab[3][inrow[3]]; // Fall-through
-            case 3:  outrow[2] = tab[2][inrow[2]]; // Fall-through
-            case 2:  outrow[1] = tab[1][inrow[1]]; // Fall-through
+            case 4:  outrow[3] = tab[3][inrow[3]]; av_fallthrough;
+            case 3:  outrow[2] = tab[2][inrow[2]]; av_fallthrough;
+            case 2:  outrow[1] = tab[1][inrow[1]]; av_fallthrough;
             default: outrow[0] = tab[0][inrow[0]];
             }
             outrow += step;
@@ -441,8 +441,8 @@ static int lut_packed_8bits(AVFilterContext *ctx, void *arg, int jobnr, int nb_j
         int w = AV_CEIL_RSHIFT(td->w, hsub);\
         const uint16_t *tab = s->lut[plane];\
 \
-        const int slice_start = (h *  jobnr   ) / nb_jobs;\
-        const int slice_end   = (h * (jobnr+1)) / nb_jobs;\
+        const int slice_start = ff_slice_pos(h, jobnr, nb_jobs); \
+        const int slice_end   = ff_slice_pos(h, jobnr + 1, nb_jobs); \
 
 /* planar >8 bit depth */
 static int lut_planar_16bits(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)

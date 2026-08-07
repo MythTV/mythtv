@@ -36,7 +36,11 @@ int ff_mov_init_hinting(AVFormatContext *s, int index, int src_index)
     int ret = AVERROR(ENOMEM);
 
     track->tag = MKTAG('r','t','p',' ');
-    track->src_track = src_index;
+    track->src_track = av_malloc(sizeof(*track->src_track));
+    if (!track->src_track)
+        return AVERROR(ENOMEM);
+    *track->src_track = src_index;
+    track->nb_src_track = 1;
 
     track->par = avcodec_parameters_alloc();
     if (!track->par)

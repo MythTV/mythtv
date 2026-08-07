@@ -86,7 +86,7 @@ static av_cold int init_filter(AVFilterContext *ctx)
             .elems  = planes,
         },
     };
-    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc_set, 4, 0, 0);
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc_set, 4, 0);
 
     ff_vk_shader_add_push_const(&s->shd, 0, sizeof(BWDIFParameters),
                                 VK_SHADER_STAGE_COMPUTE_BIT);
@@ -115,7 +115,7 @@ static void bwdif_vulkan_filter_frame(AVFilterContext *ctx, AVFrame *dst,
 
     ff_vk_filter_process_Nin(&s->vkctx, &s->e, &s->shd, dst,
                              (AVFrame *[]){ y->prev, y->cur, y->next }, 3,
-                             VK_NULL_HANDLE, &params, sizeof(params));
+                             VK_NULL_HANDLE, 1, &params, sizeof(params));
 
     if (y->current_field == YADIF_FIELD_END)
         y->current_field = YADIF_FIELD_NORMAL;
