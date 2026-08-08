@@ -79,7 +79,7 @@ bool MetaIOOggOpus::write(const QString &filename, MusicMetadata* mdata)
 
     delete opusfile;
 
-    return (result);
+    return result;
 }
 
 /*!

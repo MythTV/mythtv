@@ -732,7 +732,9 @@ void MusicFileScanner::SearchDirs(const QStringList &dirList)
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if ((*iter).location == MusicFileScanner::kFileSystem)
+        {
             AddMusicToDB(iter.key(), (*iter).startDir);
+        }
         else if ((*iter).location == MusicFileScanner::kNeedUpdate)
         {
             UpdateMusicInDB(iter.key(), (*iter).startDir);
