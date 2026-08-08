@@ -334,9 +334,6 @@ class ChannelGroupsSetting : public GroupSetting
   public slots:
     void ShowNewGroupDialog(void) const;
     void CreateNewGroup(const QString& name);
-
-  private:
-    ButtonStandardSetting *m_addGroupButton {nullptr};
 };
 
 #endif

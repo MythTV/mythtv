@@ -594,7 +594,6 @@ class HDPVRConfigurationGroup: public GroupSetting
     CaptureCard         &m_parent;
     GroupSetting        *m_cardInfo   {nullptr};
     TunerCardAudioInput *m_audioInput {nullptr};
-    VBIDevice           *m_vbiDevice  {nullptr};
 };
 
 class ASIDevice;

@@ -553,10 +553,8 @@ class MUI_PUBLIC StandardSettingDialog : public MythScreenType
     MythUIText      *m_title               {nullptr};
     MythUIText      *m_groupHelp           {nullptr};
     MythUIText      *m_selectedSettingHelp {nullptr};
-    MythDialogBox   *m_menuPopup           {nullptr};
     GroupSetting    *m_settingsTree        {nullptr};
     StandardSetting *m_currentGroupSetting {nullptr};
-    bool             m_loaded              {false};
 };
 
 Q_DECLARE_METATYPE(StandardSetting *);

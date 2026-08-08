@@ -205,8 +205,6 @@ class ScheduleEditor : public ScheduleCommon,
     RecordingInfo    *m_recInfo         {nullptr};
     RecordingRule    *m_recordingRule   {nullptr};
 
-    bool              m_sendSig         {false};
-
     MythUIButton     *m_saveButton      {nullptr};
     MythUIButton     *m_cancelButton    {nullptr};
 
