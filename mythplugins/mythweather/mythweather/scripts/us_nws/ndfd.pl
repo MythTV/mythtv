@@ -156,6 +156,9 @@ print "copyright::National Digital Forecast Database\n";
 print "copyrightlogo::none\n";
 
 foreach $time (sort(keys(%$result))) {
+    if ($time eq "") {
+        next;
+    }
     my $date;
     if ($time =~ m/,/) {
        ($date) = split /,/, $time;
@@ -164,7 +167,7 @@ foreach $time (sort(keys(%$result))) {
     }
 
     if (Date_Cmp($date, $d1) < 0) {
-        next;    
+        next;
     }
 
     my $numdate = UnixDate($date, "%Q");
