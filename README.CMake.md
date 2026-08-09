@@ -124,19 +124,23 @@
   following commands.  You do not need to run `configure`.
 
   ```
-  $ cmake --preset qt5 -DCMAKE_INSTALL_PREFIX=<install_location>
+  $ cmake --preset qt5 -DMYTH_RUN_PREFIX=<install_location>
   $ cmake --build build-qt5
+  $ cmake --install build-qt5
   ```
 
   The first line will create a new directory named "build-qt5", and
   then install into that directory the framework to compile MythTV
   using the Ninja build tool.  The second line will
-  download/compile/install all dependencies, then compile/install
-  MythTV, and then compile/install the plugins.  More specifically,
-  this will compile/install exiv2, then compile/install FFmpeg. then
-  compile/install MythTV, then compile/install the plugins.  If you
-  don't specify the CMAKE_INSTALL_PREFIX directory, this will install
-  into /usr/local.  Once the initial build has been performed, you can
+  download/compile all dependencies, then compile
+  MythTV, and then compile the plugins.  More specifically,
+  this will compile exiv2, then compile FFmpeg. then
+  compile MythTV, then compile the plugins.  The third
+  line will copy the compiled installation to the MYTH_RUN_PREFIX directory.
+  If you don't specify the MYTH_RUN_PREFIX directory, this will install
+  into /usr/local.
+
+  Once the initial build has been performed, you can
   compile only the MythTV component by issuing the following
   command(s):
 
@@ -160,8 +164,9 @@
   instead:
 
   ```
-  $ cmake --preset qt6 -DCMAKE_INSTALL_PREFIX=<install_location>
+  $ cmake --preset qt6 -DMYTH_RUN_PREFIX=<install_location>
   $ cmake --build build-qt6
+  $ cmake --install build-qt6
   ```
 
   If you want more control over the build process, look at the first
@@ -170,7 +175,7 @@
   without using a preset, you would issue commands like this:
 
   ```
-  $ cmake -S . -B build-qt5 -G Ninja -DCMAKE_INSTALL_PREFIX=<install_location>
+  $ cmake -S . -B build-qt5 -G Ninja -DMYTH_RUN_PREFIX=<install_location>
   $ cmake --build build-qt5
   ```
 

@@ -156,9 +156,17 @@ endif()
 # If the user didn't specify CMAKE_INSTALL_PREFIX on the command line, use the
 # mythtv or user default value.
 #
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND NOT MYTH_DEFAULT_PREFIX
-                                                   STREQUAL "")
+if(MYTH_DEFAULT_PREFIX STREQUAL "")
+  set(MYTH_DEFAULT_PREFIX "${PROJECT_BINARY_DIR}/install")
+endif()
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(_TMP_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
   set(CMAKE_INSTALL_PREFIX ${MYTH_DEFAULT_PREFIX})
+  if(MYTH_RUN_PREFIX STREQUAL "")
+    set(MYTH_RUN_PREFIX "${_TMP_CMAKE_INSTALL_PREFIX}")
+  endif()
+  unset(_TMP_CMAKE_INSTALL_PREFIX)
 endif()
 if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX STREQUAL "")
   message(FATAL_ERROR "The CMAKE_INSTALL_PREFIX variable is undefined.")
@@ -167,6 +175,11 @@ if(CMAKE_CROSSCOMPILING AND CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
   message(
     FATAL_ERROR "CMAKE_INSTALL_PREFIX is /usr/local while cross compiling.")
 endif()
+
+message(VERBOSE "PROJECT_BINARY_DIR is   ${PROJECT_BINARY_DIR}")
+message(VERBOSE "MYTH_DEFAULT_PREFIX is  ${MYTH_DEFAULT_PREFIX}")
+message(VERBOSE "CMAKE_INSTALL_PREFIX is ${CMAKE_INSTALL_PREFIX}")
+message(VERBOSE "MYTH_RUN_PREFIX is      ${MYTH_RUN_PREFIX}")
 
 #
 # If the user didn't specify LIBS_INSTALL_PREFIX on the command line, use the
@@ -532,3 +545,31 @@ endif()
 include(platform/${CMAKE_SYSTEM_NAME}${_CROSS}Packaging OPTIONAL)
 
 include(StaticAnalysis)
+
+if(NOT MYTH_RUN_PREFIX STREQUAL "")
+  install(DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}
+          DESTINATION ${MYTH_RUN_PREFIX}
+          USE_SOURCE_PERMISSIONS
+          )
+  install(DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}
+          DESTINATION ${MYTH_RUN_PREFIX}
+          USE_SOURCE_PERMISSIONS
+          )
+  install(DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
+          DESTINATION ${MYTH_RUN_PREFIX}
+          USE_SOURCE_PERMISSIONS
+          PATTERN "ffnvcodec.pc" EXCLUDE # headers are not installed
+          PATTERN "*.pc" EXCLUDE # point inside CMAKE_INSTALL_LIBDIR
+          )
+  if(CMAKE_INSTALL_LIBDIR STREQUAL "lib64")
+    # python bindings on Fedora builds are in lib not lib64
+    install(DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib
+            DESTINATION ${MYTH_RUN_PREFIX}
+            USE_SOURCE_PERMISSIONS
+            )
+  endif()
+  install(DIRECTORY ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATADIR}
+          DESTINATION ${MYTH_RUN_PREFIX}
+          USE_SOURCE_PERMISSIONS
+          )
+endif()
