@@ -1674,28 +1674,28 @@ void TV::ShowOSDAskAllow()
 
     // eliminate timed out programs
     QDateTime timeNow = MythDate::current();
-    QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.begin();
-    while (it != m_askAllowPrograms.end())
+    QMap<QString,AskProgramInfo>::iterator it2 = m_askAllowPrograms.begin();
+    while (it2 != m_askAllowPrograms.end())
     {
-        if ((*it).m_expiry <= timeNow)
+        if ((*it2).m_expiry <= timeNow)
         {
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
-                QString("removing '%1'").arg((*it).m_info->m_title));
+                QString("removing '%1'").arg((*it2).m_info->m_title));
 #endif
-            delete (*it).m_info;
-            it = m_askAllowPrograms.erase(it);
+            delete (*it2).m_info;
+            it2 = m_askAllowPrograms.erase(it2);
         }
         else
         {
-            it++;
+            it2++;
         }
     }
     std::chrono::milliseconds timeuntil = 0ms;
     QString      message;
     uint conflict_count = static_cast<uint>(m_askAllowPrograms.size());
 
-    it = m_askAllowPrograms.begin();
+    QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.begin();
     if ((1 == m_askAllowPrograms.size()) && ((*it).m_info->GetInputID() == cardid))
     {
         (*it).m_isInSameInputGroup = (*it).m_isConflicting = true;
