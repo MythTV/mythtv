@@ -458,15 +458,17 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
 
         for (; it != m_imageCache.end(); ++it)
         {
-            if (m_cacheTrack[it.key()] < oldestTime)
+            const QString& key = it.key();
+            MythImage* value = it.value();
+            if (m_cacheTrack[key] < oldestTime)
             {
-                if ((2 == it.value()->IncrRef()) && (it.value() != Image))
+                if ((2 == value->IncrRef()) && (value != Image))
                 {
-                    oldestTime = m_cacheTrack[it.key()];
-                    oldestKey = it.key();
+                    oldestTime = m_cacheTrack[key];
+                    oldestKey = key;
                     count++;
                 }
-                it.value()->DecrRef();
+                value->DecrRef();
             }
         }
 

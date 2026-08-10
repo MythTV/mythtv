@@ -137,12 +137,13 @@ void TeletextScreen::OptimiseDisplayedArea()
 {
     for (auto it = m_rowImages.begin(); it != m_rowImages.end(); ++it)
     {
+        int row = it.key();
+        QImage *value = it.value();
         MythImage *image = m_painter->GetFormatImage();
-        if (!image || !it.value())
+        if (!image || !value)
             continue;
 
-        int row = it.key();
-        image->Assign(*(it.value()));
+        image->Assign(*value);
         auto *uiimage = new MythUIImage(this, QString("ttrow%1").arg(row));
         if (uiimage)
         {

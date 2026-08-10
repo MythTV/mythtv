@@ -2165,13 +2165,15 @@ void ChannelScanSM::HandleActiveScan(void)
         QMap<uint32_t,DTVMultiplex>::iterator it = m_extendTransports.begin();
         while (it != m_extendTransports.end())
         {
-            if (!m_tsScanned.contains(it.key()))
+            uint32_t index = it.key();
+            const DTVMultiplex& mplex = it.value();
+            if (!m_tsScanned.contains(index))
             {
-                QString name = QString("TransportID %1").arg(it.key() & 0xffff);
-                TransportScanItem item(m_sourceID, name, *it, m_signalTimeout);
+                QString name = QString("TransportID %1").arg(index & 0xffff);
+                TransportScanItem item(m_sourceID, name, mplex, m_signalTimeout);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + name + ' ' + item.m_tuning.toString());
                 m_scanTransports.push_back(item);
-                m_tsScanned.insert(it.key());
+                m_tsScanned.insert(index);
             }
             ++it;
         }

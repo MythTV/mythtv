@@ -550,21 +550,23 @@ void OSD::CheckExpiry()
 
     for (auto it = m_expireTimes.begin(); it != m_expireTimes.end(); ++it)
     {
+        auto *dialog = it.key();
+        const auto& time = it.value();
         // Both DialogQuit and HideWindow alter m_expireTimes.  Do
         // them after running the list is finished.
-        if (it.value() < now)
+        if (time < now)
         {
-            if (it.key() == m_dialog)
+            if (dialog == m_dialog)
             {
                 quitDialog = true;
                 continue;
             }
-            hideWindows << m_children.key(it.key());
+            hideWindows << m_children.key(dialog);
             continue;
         }
-        if (it.key() == m_dialog)
+        if (dialog == m_dialog)
         {
-            DoPulse(now, it.value());
+            DoPulse(now, time);
         }
     }
     if (quitDialog)

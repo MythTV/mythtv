@@ -2021,16 +2021,18 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     QMap<QObject *, PlaybackStartCb>::iterator it = d->m_playbackClients.begin();
     for (; it != d->m_playbackClients.end(); ++it)
     {
-        if (it.key() == sender)
+        auto* object = it.key();
+        auto callback = it.value();
+        if (object == sender)
             continue;   // will be done separately, no need to do it again
 
-        QThread *thread = it.key()->thread();
+        QThread *thread = object->thread();
 
         if (thread != currentThread)
             continue;
 
-        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
-        connect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, object, callback);
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart, object, callback);
     }
 
     // disconnect sender so it won't receive the message
@@ -2054,18 +2056,20 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     it = d->m_playbackClients.begin();
     for (; it != d->m_playbackClients.end(); ++it)
     {
-        if (it.key() == sender)
+        auto* object = it.key();
+        auto callback = it.value();
+        if (object == sender)
             continue;   // already done above, no need to do it again
 
-        QThread *thread = it.key()->thread();
+        QThread *thread = object->thread();
 
         if (thread != currentThread)
             continue;
 
         disconnect(this, &MythCoreContext::TVPlaybackAboutToStart,
-                   it.key(), it.value());
+                   object, callback);
         connect(this, &MythCoreContext::TVPlaybackAboutToStart,
-                it.key(), it.value(), Qt::BlockingQueuedConnection);
+                object, callback, Qt::BlockingQueuedConnection);
     }
     d->m_inwanting = false;
 }

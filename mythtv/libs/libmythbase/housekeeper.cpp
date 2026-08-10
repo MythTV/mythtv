@@ -775,13 +775,15 @@ void HouseKeeper::Run(void)
     // check if any tasks are ready to run, and add to queue
     for (auto it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
     {
-        if ((*it)->CheckRun(now))
+        const auto& name = it.key();
+        auto* task = it.value();
+        if (task->CheckRun(now))
         {
             LOG(VB_GENERAL, LOG_INFO,
-                QString("Queueing HouseKeeperTask '%1'.").arg(it.key()));
+                QString("Queueing HouseKeeperTask '%1'.").arg(name));
             QMutexLocker queueLock(&m_queueLock);
-            (*it)->IncrRef();
-            m_taskQueue.enqueue(*it);
+            task->IncrRef();
+            m_taskQueue.enqueue(task);
         }
     }
 

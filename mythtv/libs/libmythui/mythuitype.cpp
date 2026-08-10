@@ -1435,10 +1435,11 @@ void MythUIType::ConnectDependants(bool recurse)
     QList<int> operators;
     for (auto it = m_dependsMap.begin(); it != m_dependsMap.end(); ++it)
     {
+        const QString& key = it.key();
+        const QString& name = it.value();
         // build list of operators and dependeees.
         dependees.clear();
         operators.clear();
-        QString& name = it.value();
         QStringList tmp1 = name.split("&");
         for (const QString& t1 : std::as_const(tmp1))
         {
@@ -1453,7 +1454,7 @@ void MythUIType::ConnectDependants(bool recurse)
             operators.append(2);     // 2 is AND
         }
 
-        MythUIType *dependant = GetChild(it.key());
+        MythUIType *dependant = GetChild(key);
         if (dependant)
         {
             dependant->m_dependOperator = operators;

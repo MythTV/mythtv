@@ -76,16 +76,18 @@ void StorageGroup::StaticInit(void)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (auto it = m_builtinGroups.begin(); it != m_builtinGroups.end(); ++it)
     {
-        QDir qdir(it.value());
+        const auto& name = it.key();
+        const auto& path = it.value();
+        QDir qdir(path);
         if (!qdir.exists())
-            qdir.mkpath(it.value());
+            qdir.mkpath(path);
 
         if (!qdir.exists())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("SG() Error: Could not create builtin"
                         "Storage Group directory '%1' for '%2'")
-                    .arg(it.value(), it.key()));
+                    .arg(path, name));
         }
     }
 }

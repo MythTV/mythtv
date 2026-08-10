@@ -689,12 +689,14 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia, bool forcePlaybac
 
     while (itr != m_handlerMap.end())
     {
-        if (((*itr).MythMediaType & (int)pMedia->getMediaType()))
+        const auto& name = itr.key();
+        const auto& handler = itr.value();
+        if ((handler.MythMediaType & (int)pMedia->getMediaType()))
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 QString("Found a handler for %1 - '%2'")
-                .arg(pMedia->MediaTypeString(), itr.key()));
-            handlers.append(*itr);
+                .arg(pMedia->MediaTypeString(), name));
+            handlers.append(handler);
         }
         itr++;
     }

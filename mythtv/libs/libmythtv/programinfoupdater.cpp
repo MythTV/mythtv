@@ -76,18 +76,18 @@ void ProgramInfoUpdater::run(void)
         // NOLINTNEXTLINE(modernize-loop-convert)
         for (auto itu = m_needsUpdate.begin(); itu != m_needsUpdate.end(); ++itu)
         {
+            auto key = itu.key();
+            auto data = itu.value();
             QString msg;
 
-            if (kPIUpdateFileSize == (*itu).m_action)
+            if (kPIUpdateFileSize == data.m_action)
             {
-                msg = QString("UPDATE_FILE_SIZE %1 %2")
-                    .arg(itu.key())
-                    .arg((*itu).m_filesize);
+                msg = QString("UPDATE_FILE_SIZE %1 %2").arg(key)
+                    .arg(data.m_filesize);
             }
             else
             {
-                msg = QString("MASTER_UPDATE_REC_INFO %1")
-                    .arg(itu.key());
+                msg = QString("MASTER_UPDATE_REC_INFO %1").arg(key);
             }
 
             workDone = true;

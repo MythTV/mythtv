@@ -513,6 +513,7 @@ int SSDPCache::RemoveStale()
 
     for (auto it = m_cache.begin(); it != m_cache.end(); ++it )
     {
+        const QString& key = it.key();
         SSDPCacheEntries *pEntries = *it;
 
         if (pEntries != nullptr)
@@ -522,7 +523,7 @@ int SSDPCache::RemoveStale()
             nCount += pEntries->RemoveStale( ttNow );
 
             if (pEntries->Count() == 0)
-                lstKeys.append( it.key() );
+                lstKeys.append( key );
 
             pEntries->DecrRef();
         }
