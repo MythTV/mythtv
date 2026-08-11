@@ -9,7 +9,9 @@ include(GetDefine)
 #
 # This module needs git functionality
 #
-find_package(Git)
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+  find_package(Git)
+endif()
 
 #
 # Parse a file in the style of a git EXPORTED_VERSION file.  This file contains
