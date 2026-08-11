@@ -20,8 +20,7 @@ cmake_minimum_required(VERSION 3.20)
 #
 # Validate parameters
 #
-foreach(_param IN ITEMS SUPER_SOURCE_DIR SUPER_VERSION MYTHTV_SOURCE_VERSION
-                        MYTHTV_SOURCE_BRANCH)
+foreach(_param IN ITEMS SUPER_SOURCE_DIR SUPER_VERSION)
   if(${_param} STREQUAL "")
     message(FATAL_ERROR "${_param} is a required parameter")
   endif()
