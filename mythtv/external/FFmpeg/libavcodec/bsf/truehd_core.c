@@ -18,11 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "bsf.h"
-#include "bsf_internal.h"
-#include "get_bits.h"
-#include "mlp_parse.h"
-#include "mlp.h"
+#include "libavcodec/bsf.h"
+#include "libavcodec/bsf_internal.h"
+#include "libavcodec/get_bits.h"
+#include "libavcodec/mlp_parse.h"
+#include "libavcodec/mlp.h"
 
 typedef struct AccessUnit {
     uint8_t bits[4];
@@ -33,6 +33,13 @@ typedef struct AccessUnit {
 typedef struct TrueHDCoreContext {
     MLPHeaderInfo hdr;
 } TrueHDCoreContext;
+
+static int truehd_core_init(AVBSFContext *ctx)
+{
+    ctx->par_out->profile = AV_PROFILE_UNKNOWN;
+
+    return 0;
+}
 
 static int truehd_core_filter(AVBSFContext *ctx, AVPacket *pkt)
 {
@@ -177,6 +184,7 @@ const FFBitStreamFilter ff_truehd_core_bsf = {
     .p.name         = "truehd_core",
     .p.codec_ids    = codec_ids,
     .priv_data_size = sizeof(TrueHDCoreContext),
+    .init           = truehd_core_init,
     .filter         = truehd_core_filter,
     .flush          = truehd_core_flush,
 };

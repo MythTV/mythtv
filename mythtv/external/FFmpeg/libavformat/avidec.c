@@ -23,6 +23,7 @@
 
 #include <inttypes.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/mem.h"
@@ -377,15 +378,15 @@ static void avi_read_nikon(AVFormatContext *s, uint64_t end)
         {
             uint64_t tag_end = avio_tell(s->pb) + size;
             while (avio_tell(s->pb) < tag_end && !avio_feof(s->pb)) {
-                uint16_t tag     = avio_rl16(s->pb);
-                uint16_t size    = avio_rl16(s->pb);
+                uint16_t tag2     = avio_rl16(s->pb);
+                uint16_t size2    = avio_rl16(s->pb);
                 const char *name = NULL;
                 char buffer[64]  = { 0 };
                 uint64_t remaining = tag_end - avio_tell(s->pb);
-                size = FFMIN(size, remaining);
-                size -= avio_read(s->pb, buffer,
-                                  FFMIN(size, sizeof(buffer) - 1));
-                switch (tag) {
+                size2  = FFMIN(size2, remaining);
+                size2 -= avio_read(s->pb, buffer,
+                                   FFMIN(size2, sizeof(buffer) - 1));
+                switch (tag2) {
                 case 0x03:
                     name = "maker";
                     break;
@@ -400,7 +401,7 @@ static void avi_read_nikon(AVFormatContext *s, uint64_t end)
                 }
                 if (name)
                     av_dict_set(&s->metadata, name, buffer, 0);
-                avio_skip(s->pb, size);
+                avio_skip(s->pb, size2);
             }
             break;
         }
@@ -513,7 +514,6 @@ static int avi_read_header(AVFormatContext *s)
     int codec_type, stream_index, frame_period;
     unsigned int size;
     int i;
-    AVStream *st;
     AVIStream *ast      = NULL;
     int avih_width      = 0, avih_height = 0;
     int amv_file_format = 0;
@@ -562,9 +562,11 @@ static int avi_read_header(AVFormatContext *s)
                     avi->movi_end = avi->fsize;
                 av_log(s, AV_LOG_TRACE, "movi end=%"PRIx64"\n", avi->movi_end);
                 goto end_of_header;
-            } else if (tag1 == MKTAG('I', 'N', 'F', 'O'))
+            } else if (tag1 == MKTAG('I', 'N', 'F', 'O')) {
+                if (size < 4)
+                    return AVERROR_INVALIDDATA;
                 ff_read_riff_info(s, size - 4);
-            else if (tag1 == MKTAG('n', 'c', 'd', 't'))
+            } else if (tag1 == MKTAG('n', 'c', 'd', 't'))
                 avi_read_nikon(s, list_end);
 
             break;
@@ -583,6 +585,7 @@ static int avi_read_header(AVFormatContext *s)
             break;
         case MKTAG('a', 'm', 'v', 'h'):
             amv_file_format = 1;
+            av_fallthrough;
         case MKTAG('a', 'v', 'i', 'h'):
             /* AVI header */
             /* using frame_period is bad idea */
@@ -599,7 +602,7 @@ static int avi_read_header(AVFormatContext *s)
 
             avio_skip(pb, size - 10 * 4);
             break;
-        case MKTAG('s', 't', 'r', 'h'):
+        case MKTAG('s', 't', 'r', 'h'): {
             /* stream header */
 
             tag1    = avio_rl32(pb);
@@ -608,18 +611,17 @@ static int avi_read_header(AVFormatContext *s)
             if (tag1 == MKTAG('p', 'a', 'd', 's')) {
                 avio_skip(pb, size - 8);
                 break;
-            } else {
-                stream_index++;
-                st = avformat_new_stream(s, NULL);
-                if (!st)
-                    return AVERROR(ENOMEM);
-
-                st->id = stream_index;
-                ast    = av_mallocz(sizeof(AVIStream));
-                if (!ast)
-                    return AVERROR(ENOMEM);
-                st->priv_data = ast;
             }
+            stream_index++;
+            AVStream *const st = avformat_new_stream(s, NULL);
+            if (!st)
+                return AVERROR(ENOMEM);
+
+            st->id = stream_index;
+            ast    = av_mallocz(sizeof(AVIStream));
+            if (!ast)
+                return AVERROR(ENOMEM);
+            st->priv_data = ast;
             if (amv_file_format)
                 tag1 = stream_index ? MKTAG('a', 'u', 'd', 's')
                                     : MKTAG('v', 'i', 'd', 's');
@@ -758,6 +760,7 @@ static int avi_read_header(AVFormatContext *s)
             ast->frame_offset = ast->cum_len;
             avio_skip(pb, size - 12 * 4);
             break;
+        }
         case MKTAG('s', 't', 'r', 'f'):
             /* stream header */
             if (!size && (codec_type == AVMEDIA_TYPE_AUDIO ||
@@ -767,12 +770,11 @@ static int avi_read_header(AVFormatContext *s)
                 avio_skip(pb, size);
             } else {
                 uint64_t cur_pos = avio_tell(pb);
-                FFStream *sti;
                 unsigned esize;
                 if (cur_pos < list_end)
                     size = FFMIN(size, list_end - cur_pos);
-                st = s->streams[stream_index];
-                sti = ffstream(st);
+                AVStream *const st = s->streams[stream_index];
+                FFStream *const sti = ffstream(st);
                 if (st->codecpar->codec_type != AVMEDIA_TYPE_UNKNOWN) {
                     avio_skip(pb, size);
                     break;
@@ -972,7 +974,7 @@ static int avi_read_header(AVFormatContext *s)
                 uint64_t cur_pos = avio_tell(pb);
                 if (cur_pos < list_end)
                     size = FFMIN(size, list_end - cur_pos);
-                st = s->streams[stream_index];
+                AVStream *const st = s->streams[stream_index];
 
                 if (size<(1<<30)) {
                     if (st->codecpar->extradata) {
@@ -1002,9 +1004,9 @@ static int avi_read_header(AVFormatContext *s)
             break;
         case MKTAG('v', 'p', 'r', 'p'):
             if (stream_index < (unsigned)s->nb_streams && size > 9 * 4) {
+                AVStream *const st = s->streams[stream_index];
                 AVRational active, active_aspect;
 
-                st = s->streams[stream_index];
                 avio_rl32(pb);
                 avio_rl32(pb);
                 avio_rl32(pb);
@@ -1043,6 +1045,7 @@ static int avi_read_header(AVFormatContext *s)
                     return ret;
                 break;
             }
+            av_fallthrough;
         default:
             if (size > 1000000) {
                 av_log(s, AV_LOG_ERROR,
@@ -1056,6 +1059,7 @@ static int avi_read_header(AVFormatContext *s)
                 avi->movi_end  = avi->fsize;
                 goto end_of_header;
             }
+            av_fallthrough;
         /* Do not fail for very large idx1 tags */
         case MKTAG('i', 'd', 'x', '1'):
             /* skip tag */
@@ -1497,7 +1501,7 @@ resync:
         FFStream *const sti = ffstream(st);
         AVIStream *ast = st->priv_data;
         int dv_demux = CONFIG_DV_DEMUXER && avi->dv_demux;
-        int size, err;
+        int size;
 
         if (get_subtitle_pkt(s, st, pkt))
             return 0;
@@ -1834,6 +1838,10 @@ static int avi_load_index(AVFormatContext *s)
             avi->index_loaded=2;
             ret = 0;
         }else if (tag == MKTAG('L', 'I', 'S', 'T')) {
+            if (size < 4) {
+                av_log(s, AV_LOG_WARNING, "Invalid size (%u) LIST in index\n", size);
+                break;
+            }
             uint32_t tag1 = avio_rl32(pb);
 
             if (tag1 == MKTAG('I', 'N', 'F', 'O'))

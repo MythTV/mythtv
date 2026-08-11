@@ -435,7 +435,7 @@ static void set_micro_version(FFV1Context *f)
         if (f->version == 3) {
             f->micro_version = 4;
         } else if (f->version == 4) {
-            f->micro_version = 9;
+            f->micro_version = 10;
         } else
             av_assert0(0);
 
@@ -480,6 +480,8 @@ av_cold int ff_ffv1_write_extradata(AVCodecContext *avctx)
     put_symbol(&c, state, f->chroma_h_shift, 0);
     put_symbol(&c, state, f->chroma_v_shift, 0);
     put_rac(&c, state, f->transparency);
+    if (f->colorspace == 2)
+        put_symbol(&c, state, f->bayer_order, 0); /* 0 = RGGB */
     put_symbol(&c, state, f->num_h_slices - 1, 0);
     put_symbol(&c, state, f->num_v_slices - 1, 0);
 
@@ -504,6 +506,8 @@ av_cold int ff_ffv1_write_extradata(AVCodecContext *avctx)
     if (f->version > 2) {
         put_symbol(&c, state, f->ec, 0);
         put_symbol(&c, state, f->intra = (f->avctx->gop_size < 2), 0);
+        if (f->combined_version >= 0x40004)
+            put_symbol(&c, state, f->flt, 0);
     }
 
     f->avctx->extradata_size = ff_rac_terminate(&c, 0);
@@ -566,9 +570,9 @@ static int sort_stt(FFV1Context *s, uint8_t stt[256])
 int ff_ffv1_encode_determine_slices(AVCodecContext *avctx)
 {
     FFV1Context *s = avctx->priv_data;
-    int plane_count = 1 + 2*s->chroma_planes + s->transparency;
-    int max_h_slices = AV_CEIL_RSHIFT(avctx->width , s->chroma_h_shift);
-    int max_v_slices = AV_CEIL_RSHIFT(avctx->height, s->chroma_v_shift);
+    int plane_count = 1 + 2*s->chroma_planes + s->bayer + s->transparency;
+    int max_h_slices = AV_CEIL_RSHIFT(avctx->width , s->bayer ? 1 : s->chroma_h_shift);
+    int max_v_slices = AV_CEIL_RSHIFT(avctx->height, s->bayer ? 1 : s->chroma_v_shift);
     s->num_v_slices = (avctx->width > 352 || avctx->height > 288 || !avctx->slices) ? 2 : 1;
     s->num_v_slices = FFMIN(s->num_v_slices, max_v_slices);
     for (; s->num_v_slices <= 32; s->num_v_slices++) {
@@ -694,6 +698,8 @@ av_cold int ff_ffv1_encode_init(AVCodecContext *avctx)
         s->plane_count = 2;
     if (!s->chroma_planes && s->version > 3)
         s->plane_count--;
+    if (s->bayer)
+        s->plane_count = 3;
 
     s->picture_number = 0;
 
@@ -804,6 +810,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
     FFV1Context *s = avctx->priv_data;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
 
+    s->bayer = 0;
     s->plane_count = 3;
     switch(pix_fmt) {
     case AV_PIX_FMT_GRAY9:
@@ -815,6 +822,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
     case AV_PIX_FMT_YUVA420P9:
         if (!avctx->bits_per_raw_sample)
             s->bits_per_raw_sample = 9;
+        av_fallthrough;
     case AV_PIX_FMT_GRAY10:
     case AV_PIX_FMT_YUV444P10:
     case AV_PIX_FMT_YUV440P10:
@@ -825,6 +833,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
     case AV_PIX_FMT_YUVA420P10:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 10;
+        av_fallthrough;
     case AV_PIX_FMT_GRAY12:
     case AV_PIX_FMT_YUV444P12:
     case AV_PIX_FMT_YUV440P12:
@@ -834,6 +843,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
     case AV_PIX_FMT_YUVA422P12:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 12;
+        av_fallthrough;
     case AV_PIX_FMT_GRAY14:
     case AV_PIX_FMT_YUV444P14:
     case AV_PIX_FMT_YUV420P14:
@@ -841,6 +851,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 14;
         s->packed_at_lsb = 1;
+        av_fallthrough;
     case AV_PIX_FMT_GRAY16:
     case AV_PIX_FMT_P016:
     case AV_PIX_FMT_P216:
@@ -863,6 +874,7 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
             return AVERROR_INVALIDDATA;
         }
         s->version = FFMAX(s->version, 1);
+        av_fallthrough;
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_YA8:
     case AV_PIX_FMT_NV12:
@@ -906,6 +918,14 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
         s->use32bit = 1;
         s->version = FFMAX(s->version, 1);
         break;
+    case AV_PIX_FMT_BAYER_RGGB16:
+        s->colorspace = 2;
+        s->chroma_planes = 1;
+        s->bits_per_raw_sample = 16;
+        s->use32bit = 1;
+        s->version = FFMAX(s->version, 4);
+        s->bayer = 1;
+        break;
     case AV_PIX_FMT_GBRP:
     case AV_PIX_FMT_0RGB32:
         s->colorspace = 1;
@@ -915,26 +935,31 @@ av_cold int ff_ffv1_encode_setup_plane_info(AVCodecContext *avctx,
     case AV_PIX_FMT_GBRP9:
         if (!avctx->bits_per_raw_sample)
             s->bits_per_raw_sample = 9;
+        av_fallthrough;
     case AV_PIX_FMT_X2BGR10:
     case AV_PIX_FMT_X2RGB10:
     case AV_PIX_FMT_GBRP10:
     case AV_PIX_FMT_GBRAP10:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 10;
+        av_fallthrough;
     case AV_PIX_FMT_GBRP12:
     case AV_PIX_FMT_GBRAP12:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 12;
+        av_fallthrough;
     case AV_PIX_FMT_GBRP14:
     case AV_PIX_FMT_GBRAP14:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 14;
+        av_fallthrough;
     case AV_PIX_FMT_GBRP16:
     case AV_PIX_FMT_GBRAP16:
     case AV_PIX_FMT_GBRPF16:
     case AV_PIX_FMT_GBRAPF16:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
             s->bits_per_raw_sample = 16;
+        av_fallthrough;
     case AV_PIX_FMT_GBRPF32:
     case AV_PIX_FMT_GBRAPF32:
         if (!avctx->bits_per_raw_sample && !s->bits_per_raw_sample)
@@ -990,6 +1015,11 @@ static av_cold int encode_init_internal(AVCodecContext *avctx)
     ret = ff_ffv1_encode_setup_plane_info(avctx, avctx->pix_fmt);
     if (ret < 0)
         return ret;
+
+    if (s->bayer && (avctx->width & 1 || avctx->height & 1)) {
+        av_log(avctx, AV_LOG_ERROR, "bayer requires even dimensions\n");
+        return AVERROR(EINVAL);
+    }
 
     if (s->bits_per_raw_sample > (s->version > 3 ? 16 : 8) && !s->remap_mode) {
         if (s->ac == AC_GOLOMB_RICE) {
@@ -1096,7 +1126,7 @@ static void encode_slice_header(FFV1Context *f, FFV1SliceContext *sc)
         if (sc->slice_coding_mode == 1)
             ff_ffv1_clear_slice_state(f, sc);
         put_symbol(c, state, sc->slice_coding_mode, 0);
-        if (sc->slice_coding_mode != 1 && f->colorspace == 1) {
+        if (sc->slice_coding_mode != 1 && f->colorspace != 0) {
             put_symbol(c, state, sc->slice_rct_by_coef, 0);
             put_symbol(c, state, sc->slice_rct_ry_coef, 0);
         }
@@ -1194,6 +1224,69 @@ static void choose_rct_params(const FFV1Context *f, FFV1SliceContext *sc,
         if (stat[i] < stat[best])
             best = i;
     }
+
+    sc->slice_rct_by_coef = rct_y_coeff[best][1];
+    sc->slice_rct_ry_coef = rct_y_coeff[best][0];
+}
+
+static void choose_rct_params_bayer(const FFV1Context *f, FFV1SliceContext *sc,
+                                    const uint8_t *src[4], const int stride[4],
+                                    int w, int h)
+{
+    static const int rct_y_coeff[NB_Y_COEFF][2] = {
+        { 0, 0 }, { 1, 1 }, { 2, 2 }, { 0, 2 }, { 2, 0 }, { 4, 0 }, { 0, 4 }, { 0, 3 },
+        { 3, 0 }, { 3, 1 }, { 1, 3 }, { 1, 2 }, { 2, 1 }, { 0, 1 }, { 1, 0 },
+    };
+    int stat[NB_Y_COEFF] = {0};
+    int16_t *sample[3];
+    int i, best;
+
+    /* Walk in 2x2 blocks, build per-block gm/b/r, evaluate prediction-error */
+    w >>= 1;
+    for (i = 0; i < 3; i++)
+        sample[i] = sc->sample_buffer + i*w;
+
+    for (int y = 0; y < h; y += 2) {
+        int last_gm = 0, last_b = 0, last_r = 0;
+        for (int x = 0; x < w; x++) {
+            const uint16_t *l1 = (const uint16_t *)(src[0] + stride[0]*(y + 0) + x*2*2);
+            const uint16_t *l2 = (const uint16_t *)(src[0] + stride[0]*(y + 1) + x*2*2);
+            int r  = l1[0];
+            int gr = l1[1];
+            int gb = l2[0];
+            int b  = l2[1];
+            int gd = gr - gb;
+            int gm = gb + (gd >> 1);
+
+            int agm = gm - last_gm;
+            int ab  = b  - last_b;
+            int ar  = r  - last_r;
+
+            if (x && y) {
+                int bgm = agm - sample[0][x];
+                int bb  = ab  - sample[1][x];
+                int br  = ar  - sample[2][x];
+
+                br -= bgm;
+                bb -= bgm;
+
+                for (i = 0; i < NB_Y_COEFF; i++)
+                    stat[i] += FFABS(bgm + ((br*rct_y_coeff[i][0] + bb*rct_y_coeff[i][1]) >> 2));
+            }
+            sample[0][x] = agm;
+            sample[1][x] = ab;
+            sample[2][x] = ar;
+
+            last_gm = gm;
+            last_b  = b;
+            last_r  = r;
+        }
+    }
+
+    best = 0;
+    for (i = 1; i < NB_Y_COEFF; i++)
+        if (stat[i] < stat[best])
+            best = i;
 
     sc->slice_rct_by_coef = rct_y_coeff[best][1];
     sc->slice_rct_ry_coef = rct_y_coeff[best][0];
@@ -1559,6 +1652,86 @@ static int encode_float32_rgb_frame(FFV1Context *f, FFV1SliceContext *sc,
     return 0;
 }
 
+static int encode_bayer_frame(FFV1Context *f, FFV1SliceContext *sc,
+                              const uint8_t *src[4],
+                              int w, int h, const int stride[4], int ac)
+{
+    const int pass1 = !!(f->avctx->flags & AV_CODEC_FLAG_PASS1);
+    const int ring_size = f->context_model ? 3 : 2;
+    TYPE *sample[4][3];
+
+    int bits[4], offset;
+    ff_ffv1_compute_bits_per_plane(f, sc, bits, &offset, NULL, f->bits_per_raw_sample);
+
+    w >>= 1;
+
+    sc->run_index = 0;
+
+    for (int p = 0; p < MAX_PLANES; ++p)
+        sample[p][2] = RENAME(sc->sample_buffer);
+
+    memset(RENAME(sc->sample_buffer), 0, ring_size * MAX_PLANES *
+           (w + 6) * sizeof(*RENAME(sc->sample_buffer)));
+
+    for (int y = 0; y < h; y += 2) {
+        for (int i = 0; i < ring_size; i++)
+            for (int p = 0; p < MAX_PLANES; p++)
+                sample[p][i] = RENAME(sc->sample_buffer) + p*ring_size*(w+6) +
+                               ((h+i-y/2) % ring_size)*(w+6) + 3;
+
+        for (int x = 0; x < w; x++) {
+            const uint16_t *l1 = ((const uint16_t*)(src[0] + stride[0]*(y + 0) + x*2*2));
+            const uint16_t *l2 = ((const uint16_t*)(src[0] + stride[0]*(y + 1) + x*2*2));
+
+            int r, gr, gb, b;
+            r  = l1[0];
+            gr = l1[1];
+            gb = l2[0];
+            b  = l2[1];
+
+            if (sc->slice_coding_mode != 1) {
+               /**
+                * Bayer 2x2 RCT, based on:
+                * "Reversible color transform for Bayer color filter array images", S. Poomrittigul et al,
+                * APSIPA Transactions on Signal and Information Processing (2013) 2 (1): 1-10,
+                * doi:10.1017/ATSIP.2013.6 */
+               int gd = gr - gb;
+               int gm = gb + (gd >> 1);
+
+                b -= gm;
+                r -= gm;
+                gm += (b * sc->slice_rct_by_coef + r * sc->slice_rct_ry_coef) >> 2;
+                b += offset;
+                r += offset;
+                gd += offset;
+
+                gr = gm;
+                gb = gd;
+            }
+
+            sample[0][0][x] = gr;
+            sample[1][0][x] = gb;
+            sample[2][0][x] = b;
+            sample[3][0][x] = r;
+        }
+
+        for (int p = 0; p < 4; p++) {
+            int ret;
+            sample[p][0][-1] = sample[p][1][0  ];
+            sample[p][1][ w] = sample[p][1][w-1];
+            /* Plane contexts: gm=0 (luma), b-gm/r-gm=1 (chroma diff from
+             * green), gd=2 (own context - green-green diff has different
+             * statistics from both luma and chroma). */
+            ret = RENAME(encode_line)(f, sc, f->avctx, w, sample[p],
+                                      p == 1 ? 2 : (p > 1),
+                                      bits[p], ac, pass1);
+            if (ret < 0)
+                return ret;
+        }
+    }
+
+    return 0;
+}
 
 static int encode_slice(AVCodecContext *c, void *arg)
 {
@@ -1583,6 +1756,8 @@ static int encode_slice(AVCodecContext *c, void *arg)
     sc->slice_coding_mode = 0;
     if (f->version > 3 && f->colorspace == 1) {
         choose_rct_params(f, sc, planes, p->linesize, width, height);
+    } else if (f->bayer) {
+        choose_rct_params_bayer(f, sc, planes, p->linesize, width, height);
     } else {
         sc->slice_rct_by_coef = 1;
         sc->slice_rct_ry_coef = 1;
@@ -1654,6 +1829,8 @@ retry:
         ret |= encode_plane(f, sc, p->data[0] + (ps>>1) + ps*x + y*p->linesize[0], width, height, p->linesize[0], 1, 1, 2, ac);
     } else if (f->bits_per_raw_sample == 32) {
         ret = encode_float32_rgb_frame(f, sc, planes, width, height, p->linesize, ac);
+    } else if (f->bayer) {
+        ret = encode_bayer_frame(f, sc, planes, width, height, p->linesize, ac);
     } else if (f->use32bit) {
         ret = encode_rgb_frame32(f, sc, planes, width, height, p->linesize, ac);
     } else {
@@ -1696,7 +1873,7 @@ size_t ff_ffv1_encode_buffer_size(AVCodecContext *avctx)
     if (f->version > 3) {
         maxsize *= f->bits_per_raw_sample + 1;
         if (f->remap_mode)
-            maxsize += f->slice_count * 70000 * (1 + 2*f->chroma_planes + f->transparency);
+            maxsize += f->slice_count * 70000 * (1 + 2*f->chroma_planes + f->bayer + f->transparency);
     } else {
         maxsize += f->slice_count * 2 * (avctx->width + avctx->height); //for bug with slices that code some pixels more than once
         maxsize *= 8*(2*f->bits_per_raw_sample + 5);
@@ -1947,7 +2124,8 @@ const FFCodec ff_ffv1_encoder = {
         AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV440P12,
         AV_PIX_FMT_YAF16,
         AV_PIX_FMT_GRAYF16,
-        AV_PIX_FMT_GBRPF16, AV_PIX_FMT_GBRPF32),
+        AV_PIX_FMT_GBRPF16, AV_PIX_FMT_GBRPF32,
+        AV_PIX_FMT_BAYER_RGGB16),
     .color_ranges   = AVCOL_RANGE_MPEG,
     .p.priv_class   = &ffv1_class,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_EOF_FLUSH,

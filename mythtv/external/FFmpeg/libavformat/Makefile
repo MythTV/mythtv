@@ -20,12 +20,14 @@ OBJS = allformats.o         \
        id3v1.o              \
        id3v2.o              \
        isom_tags.o          \
+       lcevc.o              \
        metadata.o           \
        mux.o                \
        mux_utils.o          \
        nal.o                \
        options.o            \
        os_support.o         \
+       packet_list.o        \
        protocols.o          \
        riff.o               \
        sdp.o                \
@@ -39,6 +41,8 @@ OBJS = allformats.o         \
 OBJS-$(HAVE_LIBC_MSVCRT)                 += file_open.o
 
 # subsystems
+OBJS-$(CONFIG_CBS_APV_LAVF)              += cbs_apv.o cbs.o
+OBJS-$(CONFIG_CBS_AV1_LAVF)              += cbs_av1.o cbs.o
 OBJS-$(CONFIG_ISO_MEDIA)                 += isom.o
 OBJS-$(CONFIG_ISO_WRITER)                += avc.o hevc.o vvc.o
 OBJS-$(CONFIG_IAMFDEC)                   += iamf_reader.o iamf_parse.o iamf.o
@@ -389,7 +393,7 @@ OBJS-$(CONFIG_MOV_DEMUXER)               += mov.o mov_chan.o mov_esds.o \
 OBJS-$(CONFIG_MOV_MUXER)                 += movenc.o \
                                             movenchint.o mov_chan.o rtp.o \
                                             movenccenc.o movenc_ttml.o rawutils.o \
-                                            apv.o dovi_isom.o evc.o cbs.o cbs_av1.o cbs_apv.o
+                                            apv.o dovi_isom.o evc.o
 OBJS-$(CONFIG_MP2_MUXER)                 += rawenc.o
 OBJS-$(CONFIG_MP3_DEMUXER)               += mp3dec.o replaygain.o
 OBJS-$(CONFIG_MP3_MUXER)                 += mp3enc.o rawenc.o id3v2enc.o
@@ -433,7 +437,6 @@ OBJS-$(CONFIG_AV1_DEMUXER)               += av1dec.o
 OBJS-$(CONFIG_OBU_DEMUXER)               += av1dec.o
 OBJS-$(CONFIG_OBU_MUXER)                 += rawenc.o
 OBJS-$(CONFIG_OGG_DEMUXER)               += oggdec.o         \
-                                            oggparsecelt.o   \
                                             oggparsedirac.o  \
                                             oggparseflac.o   \
                                             oggparseogm.o    \
@@ -501,6 +504,7 @@ OBJS-$(CONFIG_PCM_U8_MUXER)              += pcmenc.o rawenc.o
 OBJS-$(CONFIG_PCM_VIDC_DEMUXER)          += pcmdec.o pcm.o
 OBJS-$(CONFIG_PCM_VIDC_MUXER)            += pcmenc.o rawenc.o
 OBJS-$(CONFIG_PDV_DEMUXER)               += pdvdec.o
+OBJS-$(CONFIG_PDV_MUXER)                 += pdvenc.o
 OBJS-$(CONFIG_PJS_DEMUXER)               += pjsdec.o subtitles.o
 OBJS-$(CONFIG_PMP_DEMUXER)               += pmpdec.o
 OBJS-$(CONFIG_PP_BNK_DEMUXER)            += pp_bnk.o
@@ -642,6 +646,7 @@ OBJS-$(CONFIG_WEBM_MUXER)                += matroskaenc.o matroska.o \
                                             avlanguage.o
 OBJS-$(CONFIG_WEBM_DASH_MANIFEST_MUXER)  += webmdashenc.o
 OBJS-$(CONFIG_WEBM_CHUNK_MUXER)          += webm_chunk.o
+OBJS-$(CONFIG_WEBP_ANIM_DEMUXER)         += webp_anim_dec.o
 OBJS-$(CONFIG_WEBP_MUXER)                += webpenc.o
 OBJS-$(CONFIG_WEBVTT_DEMUXER)            += webvttdec.o subtitles.o
 OBJS-$(CONFIG_WEBVTT_MUXER)              += webvttenc.o
@@ -708,6 +713,7 @@ OBJS-$(CONFIG_RTMPTE_PROTOCOL)           += rtmpproto.o rtmpdigest.o rtmppkt.o
 OBJS-$(CONFIG_RTMPTS_PROTOCOL)           += rtmpproto.o rtmpdigest.o rtmppkt.o
 OBJS-$(CONFIG_RTP_PROTOCOL)              += rtpproto.o ip.o
 OBJS-$(CONFIG_SCTP_PROTOCOL)             += sctp.o
+OBJS-$(CONFIG_SHARED_PROTOCOL)           += shared.o
 OBJS-$(CONFIG_SRTP_PROTOCOL)             += srtpproto.o srtp.o
 OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
 OBJS-$(CONFIG_TEE_PROTOCOL)              += teeproto.o tee_common.o
@@ -740,7 +746,8 @@ OBJS-$(CONFIG_LIBSSH_PROTOCOL)           += libssh.o
 OBJS-$(CONFIG_LIBZMQ_PROTOCOL)           += libzmq.o
 
 # Objects duplicated from other libraries for shared builds
-SHLIBOBJS                                += log2_tab.o to_upper4.o
+SHLIBOBJS                                += log2_tab.o to_upper4.o \
+                                            h2645_parse.o lcevctab.o
 SHLIBOBJS-$(CONFIG_ISO_MEDIA)            += mpegaudiotabs.o
 SHLIBOBJS-$(CONFIG_ISO_WRITER)           += golomb_tab.o
 SHLIBOBJS-$(CONFIG_FLV_MUXER)            += mpeg4audio_sample_rates.o
@@ -770,7 +777,10 @@ SKIPHEADERS-$(CONFIG_IMF_DEMUXER)        += imf.h
 SKIPHEADERS-$(CONFIG_FFRTMPCRYPT_PROTOCOL) += rtmpdh.h
 SKIPHEADERS-$(CONFIG_NETWORK)            += network.h rtsp.h
 
-TESTPROGS = seek                                                        \
+TESTPROGS = id3v2                                                       \
+            mkdir                                                       \
+            rename                                                      \
+            seek                                                        \
             url                                                         \
             seek_utils
 #           async                                                       \

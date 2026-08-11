@@ -76,8 +76,8 @@ static int super2xsai(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
     const uint32_t lo_pixel_mask = s->lo_pixel_mask;
     const uint32_t q_hi_pixel_mask = s->q_hi_pixel_mask;
     const uint32_t q_lo_pixel_mask = s->q_lo_pixel_mask;
-    const int slice_start = (height * jobnr) / nb_jobs;
-    const int slice_end = (height * (jobnr+1)) / nb_jobs;
+    const int slice_start = ff_slice_pos(height, jobnr, nb_jobs);
+    const int slice_end = ff_slice_pos(height, jobnr + 1, nb_jobs);
 
     /* Point to the first 4 lines, first line is duplicated */
     src_line[0] = src + src_linesize*FFMAX(slice_start - 1, 0);
@@ -271,6 +271,7 @@ static int config_input(AVFilterLink *inlink)
     case AV_PIX_FMT_RGB565BE:
     case AV_PIX_FMT_BGR565BE:
         s->is_be = 1;
+        av_fallthrough;
     case AV_PIX_FMT_RGB565LE:
     case AV_PIX_FMT_BGR565LE:
         s->hi_pixel_mask   = 0xF7DEF7DE;
@@ -283,6 +284,7 @@ static int config_input(AVFilterLink *inlink)
     case AV_PIX_FMT_BGR555BE:
     case AV_PIX_FMT_RGB555BE:
         s->is_be = 1;
+        av_fallthrough;
     case AV_PIX_FMT_BGR555LE:
     case AV_PIX_FMT_RGB555LE:
         s->hi_pixel_mask   = 0x7BDE7BDE;

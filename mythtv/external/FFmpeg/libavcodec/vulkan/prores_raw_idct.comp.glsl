@@ -30,17 +30,18 @@ struct TileData {
    ivec2 pos;
    uint offset;
    uint size;
+   uint log2_nb_blocks;
 };
 
-layout (set = 0, binding = 0) uniform uimage2D dst;
+layout (set = 0, binding = 0, r16ui) uniform uimage2D dst;
 layout (set = 0, binding = 1, scalar) readonly buffer frame_data_buf {
     TileData tile_data[];
 };
 
 layout (push_constant, scalar) uniform pushConstants {
    u8buf pkt_data;
-   ivec2 tile_size;
    uint8_t qmat[64];
+   uint16_t lin_curve[8];
 };
 
 #define COMP_ID (gl_LocalInvocationID.z)
@@ -66,53 +67,66 @@ const u8vec2 scan[64] = {
     u8vec2(12, 12), u8vec2( 8, 14), u8vec2(10, 14), u8vec2(14, 14),
 };
 
+shared uint8_t qmat_buf[64];
+shared uint lin_curve_buf[8];
+
 void main(void)
 {
     const uint tile_idx = gl_WorkGroupID.y*gl_NumWorkGroups.x + gl_WorkGroupID.x;
     TileData td = tile_data[tile_idx];
 
-    int width = imageSize(dst).x;
-    if (expectEXT(td.pos.x >= width, false))
-        return;
-
     uint64_t pkt_offset = uint64_t(pkt_data) + td.offset;
     u8vec2buf hdr_data = u8vec2buf(pkt_offset);
-    int qscale = pack16(hdr_data[0].v.yx);
+    int qscale = int(hdr_data[0].v.y);
 
     const ivec2 offs = td.pos + ivec2(COMP_ID & 1, COMP_ID >> 1);
-    const uint w = min(tile_size.x, width - td.pos.x) >> 1;
-    const uint nb_blocks = w >> 3;
+    const uint nb_blocks = 1 << td.log2_nb_blocks;
 
-    /* We have to do non-uniform access, so copy it */
-    uint8_t qmat_buf[64] = qmat;
+    if (gl_LocalInvocationIndex == 0) {
+        [[unroll]] for (uint i = 0; i < 64; i++) qmat_buf[i]      = qmat[i];
+        [[unroll]] for (uint i = 0; i < 8;  i++) lin_curve_buf[i] = uint(lin_curve[i]);
+    }
+    barrier();
 
     [[unroll]]
     for (uint y = 0; y < 8; y++) {
         uint block_off = y*8 + ROW_ID;
         int v = int(imageLoad(dst, offs + 2*ivec2(BLOCK_ID*8, 0) + scan[block_off])[0]);
-        float vf = float(sign_extend(v, 16)) / 32768.0;
-        vf *= qmat_buf[block_off] * qscale;
-        blocks[BLOCK_ID][COMP_ID*72 + y*9 + ROW_ID] = (vf / (64*4.56)) *
-                                                      idct_scale[block_off];
+        /* Dequantize (coeff * qmat * qscale), matching the reference decoder */
+        float vf = float(sign_extend(v, 16)) * float(qmat_buf[block_off]) * float(qscale);
+        blocks[BLOCK_ID][COMP_ID*72 + y*9 + ROW_ID] = vf * idct_scale[block_off];
     }
 
     /* Column-wise iDCT */
     idct8(BLOCK_ID, COMP_ID*72 + ROW_ID, 9);
     barrier();
 
-    blocks[BLOCK_ID][COMP_ID*72 + ROW_ID * 9] += 0.5f;
-
     /* Row-wise iDCT */
     idct8(BLOCK_ID, COMP_ID*72 + ROW_ID * 9, 1);
     barrier();
 
+    /* Border tile check */
+    if (BLOCK_ID >= nb_blocks)
+        return;
+
     [[unroll]]
     for (uint y = 0; y < 8; y++) {
-        int v = int(round(blocks[BLOCK_ID][COMP_ID*72 + y*9 + ROW_ID]*4095.0));
-        v = clamp(v, 0, 4095);
-        v <<= 4;
+        /* Bias the signed iDCT output into the reference's unsigned 16-bit space */
+        int u = clamp(int(round(blocks[BLOCK_ID][COMP_ID*72 + y*9 + ROW_ID])) + 32768,
+                      0, 65535);
+
+        /* 8-point combined linearization curve (inv. transfer fn +
+         * encoder-defined shaping). cp1 - cp0 is the segment slope; for the
+         * final segment cp[8] == 0. */
+        uint seg  = uint(u) >> 13;
+        uint frac = uint(u) & 0x1FFFu;
+        uint cp0  = lin_curve_buf[seg];
+        uint cp1  = seg < 7u ? lin_curve_buf[seg + 1u] : 0u;
+        uint outv = (cp0 * 8192u + ((cp1 - cp0) & 0xFFFFu) * frac + 4096u) >> 13u;
+        outv = min(outv, 0xFFFFu);
+
         imageStore(dst,
                    offs + 2*ivec2(BLOCK_ID*8 + ROW_ID, y),
-                   ivec4(v));
+                   ivec4(outv));
     }
 }

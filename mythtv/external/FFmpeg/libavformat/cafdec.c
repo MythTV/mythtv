@@ -33,6 +33,7 @@
 #include "demux.h"
 #include "internal.h"
 #include "isom.h"
+#include "libavutil/attributes.h"
 #include "mov_chan.h"
 #include "libavcodec/flac.h"
 #include "libavutil/intreadwrite.h"
@@ -419,6 +420,7 @@ static int read_header(AVFormatContext *s)
             av_log(s, AV_LOG_WARNING,
                    "skipping CAF chunk: %08"PRIX32" (%s), size %"PRId64"\n",
                    tag, av_fourcc2str(av_bswap32(tag)), size);
+            av_fallthrough;
         case MKBETAG('f','r','e','e'):
             if (size < 0 && found_data)
                 goto found_data;
@@ -566,6 +568,8 @@ static int read_seek(AVFormatContext *s, int stream_index,
         frame_cnt  = caf->frames_per_packet * packet_cnt - st->codecpar->initial_padding;
     } else if (sti->nb_index_entries) {
         packet_cnt = av_index_search_timestamp(st, timestamp, flags);
+        if (packet_cnt < 0)
+            return -1;
         frame_cnt  = sti->index_entries[packet_cnt].timestamp;
         pos        = sti->index_entries[packet_cnt].pos;
     } else {

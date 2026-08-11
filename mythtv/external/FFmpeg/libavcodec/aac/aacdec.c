@@ -676,6 +676,7 @@ ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id)
             ac->tags_mapped++;
             return ac->tag_che_map[type][elem_id] = ac->che[type][elem_id];
         }
+        av_fallthrough;
     case 13:
         if (ac->tags_mapped > 3 && ((type == TYPE_CPE && elem_id < 8) ||
                                     (type == TYPE_SCE && elem_id < 6) ||
@@ -683,17 +684,20 @@ ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id)
             ac->tags_mapped++;
             return ac->tag_che_map[type][elem_id] = ac->che[type][elem_id];
         }
+        av_fallthrough;
     case 12:
     case 7:
         if (ac->tags_mapped == 3 && type == TYPE_CPE) {
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_CPE][elem_id] = ac->che[TYPE_CPE][2];
         }
+        av_fallthrough;
     case 11:
         if (ac->tags_mapped == 3 && type == TYPE_SCE) {
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_SCE][elem_id] = ac->che[TYPE_SCE][1];
         }
+        av_fallthrough;
     case 6:
         /* Some streams incorrectly code 5.1 audio as
          * SCE[0] CPE[0] CPE[1] SCE[1]
@@ -711,11 +715,13 @@ ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id)
             ac->tags_mapped++;
             return ac->tag_che_map[type][elem_id] = ac->che[TYPE_LFE][0];
         }
+        av_fallthrough;
     case 5:
         if (ac->tags_mapped == 2 && type == TYPE_CPE) {
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_CPE][elem_id] = ac->che[TYPE_CPE][1];
         }
+        av_fallthrough;
     case 4:
         /* Some streams incorrectly code 4.0 audio as
          * SCE[0] CPE[0] LFE[0]
@@ -739,6 +745,7 @@ ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id)
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_SCE][elem_id] = ac->che[TYPE_SCE][1];
         }
+        av_fallthrough;
     case 3:
     case 2:
         if (ac->tags_mapped == (ac->oc[1].m4ac.chan_config != 2) &&
@@ -750,11 +757,13 @@ ChannelElement *ff_aac_get_che(AACDecContext *ac, int type, int elem_id)
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_SCE][elem_id] = ac->che[TYPE_SCE][1];
         }
+        av_fallthrough;
     case 1:
         if (!ac->tags_mapped && type == TYPE_SCE) {
             ac->tags_mapped++;
             return ac->tag_che_map[TYPE_SCE][elem_id] = ac->che[TYPE_SCE][0];
         }
+        av_fallthrough;
     default:
         return NULL;
     }
@@ -822,8 +831,8 @@ static int decode_pce(AVCodecContext *avctx, MPEG4AudioConfig *m4ac,
     sampling_index = get_bits(gb, 4);
     if (m4ac->sampling_index != sampling_index)
         av_log(avctx, AV_LOG_WARNING,
-               "Sample rate index in program config element does not "
-               "match the sample rate index configured by the container.\n");
+               "Sample rate index (%d) in program config element does not "
+               "match the sample rate index (%d) configured by the container.\n", sampling_index, m4ac->sampling_index);
 
     num_front       = get_bits(gb, 4);
     num_side        = get_bits(gb, 4);
@@ -866,6 +875,91 @@ static int decode_pce(AVCodecContext *avctx, MPEG4AudioConfig *m4ac,
         av_log(avctx, AV_LOG_ERROR, "decode_pce: " overread_err);
         return AVERROR_INVALIDDATA;
     }
+
+    // Height extension
+    int height_ext = 0;
+    if (comment_len >= 16 + (num_front * 2 + num_side * 2 + num_back * 2))
+        height_ext = show_bits(gb, 8) == 0xAC;
+    if (height_ext) {
+        uint8_t height_map[4 /* ChannelPosition */][16 /* Channel */]; // 0 == base, 1 == top, 2 == bottom.
+        uint8_t tag[6 /* ChannelPosition */ ][16 /* Channel */][3];
+        int i, invalid = 0, height_tags = 0;
+
+        skip_bits(gb, 8);
+
+        // Read height extension bits to height_map, which define which layer each element belongs to.
+        // Also make a copy of layout_map that will then be used to rearrange it.
+        for (i = 0; i < num_front; i++) {
+            int height = get_bits(gb, 2);
+            invalid |= height > 2;
+            height_map [AAC_CHANNEL_FRONT][i] = height;
+            memcpy(&tag[AAC_CHANNEL_FRONT][i], layout_map + height_tags, sizeof(*layout_map));
+            height_tags++;
+        }
+        for (i = 0; i < num_side; i++) {
+            int height = get_bits(gb, 2);
+            invalid |= height > 2;
+            height_map [AAC_CHANNEL_SIDE][i] = height;
+            memcpy(&tag[AAC_CHANNEL_SIDE][i], layout_map + height_tags, sizeof(*layout_map));
+            height_tags++;
+        }
+        for (i = 0; i < num_back; i++) {
+            int height = get_bits(gb, 2);
+            invalid |= height > 2;
+            height_map [AAC_CHANNEL_BACK][i] = height;
+            memcpy(&tag[AAC_CHANNEL_BACK][i], layout_map + height_tags, sizeof(*layout_map));
+            height_tags++;
+        }
+        for (i = 0; i < num_lfe; i++) {
+            memcpy(&tag[AAC_CHANNEL_LFE][i], layout_map + height_tags, sizeof(*layout_map));
+            height_tags++;
+        }
+        for (i = 0; i < num_cc; i++) {
+            memcpy(&tag[AAC_CHANNEL_CC][i], layout_map + height_tags, sizeof(*layout_map));
+            height_tags++;
+        }
+        av_assert0(height_tags == tags);
+
+        if (!invalid) {
+            height_tags = 0;
+            // For each height layer, check that an element belongs to it and copy it back to layout_map.
+            // We need to take into account LFE and CC elements that may be present.
+            for (i = 0; i < 3; i++) {
+                for (int j = 0; j < num_front; j++) {
+                    if (height_map[AAC_CHANNEL_FRONT][j] == i) {
+                        memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_FRONT][j], sizeof(*layout_map));
+                        height_tags++;
+                    }
+                }
+                for (int j = 0; j < num_side; j++) {
+                    if (height_map[AAC_CHANNEL_SIDE][j] == i) {
+                        memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_SIDE][j], sizeof(*layout_map));
+                        height_tags++;
+                    }
+                }
+                for (int j = 0; j < num_back; j++) {
+                    if (height_map[AAC_CHANNEL_BACK][j] == i) {
+                        memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_BACK][j], sizeof(*layout_map));
+                        height_tags++;
+                    }
+                }
+                if (i == 0) { // Base height, copy LFE and CC elements before moving to Top and Bottom
+                    for (int j = 0; j < num_lfe; j++) {
+                        memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_LFE][j], sizeof(*layout_map));
+                        height_tags++;
+                    }
+                    for (int j = 0; j < num_cc; j++) {
+                        memcpy(layout_map + height_tags, &tag[AAC_CHANNEL_CC][j], sizeof(*layout_map));
+                        height_tags++;
+                    }
+                }
+            }
+            av_assert0(height_tags == tags);
+        }
+
+        comment_len -= 8 + (num_front * 2 + num_side * 2 + num_back * 2);
+    }
+
     skip_bits_long(gb, comment_len);
     return tags;
 }
@@ -889,12 +983,6 @@ static int decode_ga_specific_config(AACDecContext *ac, AVCodecContext *avctx,
     int tags = 0;
 
     m4ac->frame_length_short = get_bits1(gb);
-    if (m4ac->frame_length_short && m4ac->sbr == 1) {
-      avpriv_report_missing_feature(avctx, "SBR with 960 frame length");
-      if (ac) ac->warned_960_sbr = 1;
-      m4ac->sbr = 0;
-      m4ac->ps = 0;
-    }
 
     if (get_bits1(gb))       // dependsOnCoreCoder
         skip_bits(gb, 14);   // coreCoderDelay
@@ -1246,7 +1334,7 @@ av_cold int ff_aac_decode_init(AVCodecContext *avctx)
         ac->oc[1].m4ac.chan_config = i;
 
         if (ac->oc[1].m4ac.chan_config) {
-            int ret = ff_aac_set_default_channel_config(ac, avctx, layout_map,
+            ret = ff_aac_set_default_channel_config(ac, avctx, layout_map,
                                                         &layout_map_tags,
                                                         ac->oc[1].m4ac.chan_config);
             if (!ret)
@@ -1946,16 +2034,10 @@ static int decode_extension_payload(AACDecContext *ac, GetBitContext *gb, int cn
     switch (type) { // extension type
     case EXT_SBR_DATA_CRC:
         crc_flag++;
+        av_fallthrough;
     case EXT_SBR_DATA:
         if (!che) {
             av_log(ac->avctx, AV_LOG_ERROR, "SBR was found before the first channel element.\n");
-            return res;
-        } else if (ac->oc[1].m4ac.frame_length_short) {
-            if (!ac->warned_960_sbr)
-              avpriv_report_missing_feature(ac->avctx,
-                                            "SBR with 960 frame length");
-            ac->warned_960_sbr = 1;
-            skip_bits_long(gb, 8 * cnt - 4);
             return res;
         } else if (!ac->oc[1].m4ac.sbr) {
             av_log(ac->avctx, AV_LOG_ERROR, "SBR signaled to be not-present but was found in the bitstream.\n");
@@ -1977,7 +2059,8 @@ static int decode_extension_payload(AACDecContext *ac, GetBitContext *gb, int cn
             ac->avctx->profile = AV_PROFILE_AAC_HE;
         }
 
-        ac->proc.sbr_decode_extension(ac, che, gb, crc_flag, cnt, elem_type);
+        ac->proc.sbr_decode_extension(ac, che, gb, crc_flag, cnt, elem_type,
+                                      ac->oc[1].m4ac.frame_length_short);
 
         if (ac->oc[1].m4ac.ps == 1 && !ac->warned_he_aac_mono) {
             av_log(ac->avctx, AV_LOG_VERBOSE, "Treating HE-AAC mono as stereo.\n");
@@ -2087,6 +2170,7 @@ static void spectral_to_sample(AACDecContext *ac, int samples)
                     }
                     if (ac->oc[1].m4ac.sbr > 0) {
                         ac->proc.sbr_apply(ac, che, type,
+                                           ac->oc[1].m4ac.frame_length_short,
                                            che->ch[0].output,
                                            che->ch[1].output);
                     }
@@ -2383,6 +2467,12 @@ static int decode_frame_ga(AVCodecContext *avctx, AACDecContext *ac,
         ac->oc[1].status = OC_LOCKED;
     }
 
+    if (samples && avctx->sample_rate <= 0) {
+        av_log(avctx, AV_LOG_ERROR,
+               "Cannot output a frame without a valid sample rate\n");
+        return AVERROR_INVALIDDATA;
+    }
+
     if (!ac->frame->data[0] && samples) {
         av_log(avctx, AV_LOG_ERROR, "no frame data found\n");
         return AVERROR_INVALIDDATA;
@@ -2557,6 +2647,9 @@ static const AVOption options[] = {
         { .i64 = CHANNEL_ORDER_DEFAULT }, .flags = AACDEC_FLAGS, .unit = "channel_order" },
       { "coded",    "order in which the channels are coded in the bitstream",
         0, AV_OPT_TYPE_CONST, { .i64 = CHANNEL_ORDER_CODED }, .flags = AACDEC_FLAGS, .unit = "channel_order" },
+
+    { "target_level", "Target output loudness in dBFS for xHE-AAC normalization (0 = disabled)",
+        OFF(target_level), AV_OPT_TYPE_INT, { .i64 = 0 }, -70, 0, AACDEC_FLAGS },
 
     {NULL},
 };

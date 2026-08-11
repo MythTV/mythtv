@@ -57,7 +57,7 @@ static void *urlcontext_child_next(void *obj, void *prev)
 #define OFFSET(x) offsetof(URLContext,x)
 #define E AV_OPT_FLAG_ENCODING_PARAM
 #define D AV_OPT_FLAG_DECODING_PARAM
-static const AVOption options[] = {
+static const AVOption urlcontext_options[] = {
     {"protocol_whitelist", "List of protocols that are allowed to be used", OFFSET(protocol_whitelist), AV_OPT_TYPE_STRING, { .str = NULL },  0, 0, D },
     {"protocol_blacklist", "List of protocols that are not allowed to be used", OFFSET(protocol_blacklist), AV_OPT_TYPE_STRING, { .str = NULL },  0, 0, D },
     {"rw_timeout", "Timeout for IO operations (in microseconds)", offsetof(URLContext, rw_timeout), AV_OPT_TYPE_INT64, { .i64 = 0 }, 0, INT64_MAX, AV_OPT_FLAG_ENCODING_PARAM | AV_OPT_FLAG_DECODING_PARAM },
@@ -67,7 +67,7 @@ static const AVOption options[] = {
 static const AVClass url_context_class = {
     .class_name       = "URLContext",
     .item_name        = urlcontext_to_name,
-    .option           = options,
+    .option           = urlcontext_options,
     .version          = LIBAVUTIL_VERSION_INT,
     .child_next       = urlcontext_child_next,
     .child_class_iterate = ff_urlcontext_child_class_iterate,
@@ -239,7 +239,7 @@ int ffurl_connect(URLContext *uc, AVDictionary **options)
     if ((err = av_dict_set(options, "protocol_whitelist", uc->protocol_whitelist, 0)) < 0)
         return err;
     if ((err = av_dict_set(options, "protocol_blacklist", uc->protocol_blacklist, 0)) < 0)
-        return err;
+        goto fail;
 
     err =
         uc->prot->url_open2 ? uc->prot->url_open2(uc,
@@ -260,6 +260,11 @@ int ffurl_connect(URLContext *uc, AVDictionary **options)
         if (!uc->is_streamed && ffurl_seek(uc, 0, SEEK_SET) < 0)
             uc->is_streamed = 1;
     return 0;
+
+fail:
+    if (options == &tmp_opts)
+        av_dict_free(&tmp_opts);
+    return err;
 }
 
 int ffurl_accept(URLContext *s, URLContext **c)

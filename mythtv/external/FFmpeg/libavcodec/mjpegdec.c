@@ -43,6 +43,7 @@
 #include "copy_block.h"
 #include "decode.h"
 #include "exif.h"
+#include "exif_internal.h"
 #include "hwaccel_internal.h"
 #include "hwconfig.h"
 #include "idctdsp.h"
@@ -147,6 +148,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
     if ((ret = init_default_huffman_tables(s)) < 0)
         return ret;
 
+#if FF_API_MJPEG_EXTERN_HUFF
     if (s->extern_huff && avctx->extradata) {
         av_log(avctx, AV_LOG_INFO, "using external huffman table\n");
         bytestream2_init(&s->gB, avctx->extradata, avctx->extradata_size);
@@ -157,6 +159,7 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
                 return ret;
         }
     }
+#endif
     if (avctx->field_order == AV_FIELD_BB) { /* quicktime icefloe 019 */
         s->interlace_polarity = 1;           /* bottom field first */
         av_log(avctx, AV_LOG_DEBUG, "bottom field first\n");
@@ -383,6 +386,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
     }
 
     s->nb_components = nb_components;
+    s->nb_seq_component_scans = 0;
     s->h_max         = 1;
     s->v_max         = 1;
     for (i = 0; i < nb_components; i++) {
@@ -424,19 +428,6 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         return AVERROR_PATCHWELCOME;
     }
 
-    if (s->bayer) {
-        if (nb_components == 2) {
-            /* Bayer images embedded in DNGs can contain 2 interleaved components and the
-               width stored in their SOF3 markers is the width of each one.  We only output
-               a single component, therefore we need to adjust the output image width.  We
-               handle the deinterleaving (but not the debayering) in this file. */
-            width *= 2;
-        }
-        /* They can also contain 1 component, which is double the width and half the height
-            of the final image (rows are interleaved).  We don't handle the decoding in this
-            file, but leave that to the TIFF/DNG decoder. */
-    }
-
     /* if different size, realloc/alloc picture */
     if (width != s->width || height != s->height || bits != s->bits ||
         memcmp(s->h_count, h_count, sizeof(h_count))                ||
@@ -472,6 +463,19 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
              s->avctx->codec_tag == MKTAG('A', 'V', 'D', 'J')) &&
             s->orig_height < height)
             s->avctx->height = AV_CEIL_RSHIFT(s->orig_height, s->avctx->lowres);
+
+        if (s->bayer) {
+            if (nb_components == 2) {
+                /* Bayer images embedded in DNGs can contain 2 interleaved components and the
+                 * width stored in their SOF3 markers is the width of each one.  We only output
+                 * a single component, therefore we need to adjust the output image width.  We
+                 * handle the deinterleaving (but not the debayering) in this file. */
+                s->avctx->width *= 2;
+            }
+            /* They can also contain 1 component, which is double the width and half the height
+             * of the final image (rows are interleaved).  We don't handle the decoding in this
+             * file, but leave that to the TIFF/DNG decoder. */
+        }
 
         s->first_picture = 0;
     } else {
@@ -1084,14 +1088,12 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s)
     int predictor = s->Ss;
     int point_transform = s->Al;
     int i, mb_x, mb_y;
-    unsigned width;
     uint16_t (*buffer)[4];
     int left[4], top[4], topleft[4];
     const int linesize = s->linesize[0];
     const int mask     = ((1 << s->bits) - 1) << point_transform;
     int resync_mb_y = 0;
     int resync_mb_x = 0;
-    int vpred[6];
     int ret;
 
     if (!s->bayer && s->nb_components < 3)
@@ -1107,16 +1109,8 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s)
             return AVERROR_INVALIDDATA;
     }
 
-
-    for (i = 0; i < 6; i++)
-        vpred[i] = 1 << (s->bits - 1);
-
-    if (s->bayer)
-        width = s->mb_width / nb_components; /* Interleaved, width stored is the total so need to divide */
-    else
-        width = s->mb_width;
-
-    av_fast_malloc(&s->ljpeg_buffer, &s->ljpeg_buffer_size, width * 4 * sizeof(s->ljpeg_buffer[0][0]));
+    av_fast_malloc(&s->ljpeg_buffer, &s->ljpeg_buffer_size,
+                   (unsigned)s->mb_width * 4 * sizeof(s->ljpeg_buffer[0][0]));
     if (!s->ljpeg_buffer)
         return AVERROR(ENOMEM);
 
@@ -1136,7 +1130,7 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s)
         for (i = 0; i < 4; i++)
             top[i] = left[i] = topleft[i] = buffer[0][i];
 
-        for (mb_x = 0; mb_x < width; mb_x++) {
+        for (mb_x = 0; mb_x < s->mb_width; mb_x++) {
             int modified_predictor = predictor;
             int restart;
 
@@ -1164,18 +1158,11 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s)
                 topleft[i] = top[i];
                 top[i]     = buffer[mb_x][i];
 
+                PREDICT(pred, topleft[i], top[i], left[i], modified_predictor);
+
                 ret = mjpeg_decode_dc(s, s->dc_index[i], &dc);
                 if (ret < 0)
                     return ret;
-
-                if (!s->bayer || mb_x) {
-                    pred = left[i];
-                } else { /* This path runs only for the first line in bayer images */
-                    vpred[i] += dc;
-                    pred = vpred[i] - dc;
-                }
-
-                PREDICT(pred, topleft[i], top[i], pred, modified_predictor);
 
                 left[i] = buffer[mb_x][i] =
                     mask & (pred + (unsigned)(dc * (1 << point_transform)));
@@ -1220,10 +1207,10 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s)
                 return AVERROR_PATCHWELCOME;
             if (nb_components == 1) {
                 /* Leave decoding to the TIFF/DNG decoder (see comment in ff_mjpeg_decode_sof) */
-                for (mb_x = 0; mb_x < width; mb_x++)
+                for (mb_x = 0; mb_x < s->mb_width; mb_x++)
                     ((uint16_t*)ptr)[mb_x] = buffer[mb_x][0];
             } else if (nb_components == 2) {
-                for (mb_x = 0; mb_x < width; mb_x++) {
+                for (mb_x = 0; mb_x < s->mb_width; mb_x++) {
                     ((uint16_t*)ptr)[2 * mb_x + 0] = buffer[mb_x][0];
                     ((uint16_t*)ptr)[2 * mb_x + 1] = buffer[mb_x][1];
                 }
@@ -1453,6 +1440,7 @@ static int mjpeg_decode_scan(MJpegDecodeContext *s)
     int linesize[MAX_COMPONENTS];
     GetBitContext mb_bitmask_gb = {0}; // initialize to silence gcc warning
     int bytes_per_pixel = 1 + (s->bits > 8);
+    int field_pos = -1;
     int ret;
 
     if (s->avctx->codec_id == AV_CODEC_ID_MXPEG) {
@@ -1586,9 +1574,11 @@ next_field:
     if (s->interlaced &&
         bytestream2_get_bytes_left(&s->gB) > 2 &&
         bytestream2_tell(&s->gB) > 2 &&
+        bytestream2_tell(&s->gB) != field_pos &&
         s->gB.buffer[-2] == 0xFF &&
         s->gB.buffer[-1] == 0xD1) {
         av_log(s->avctx, AV_LOG_DEBUG, "AVRn interlaced picture marker found\n");
+        field_pos = bytestream2_tell(&s->gB);
         s->bottom_field ^= 1;
 
         goto next_field;
@@ -1780,6 +1770,16 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s)
     /* mjpeg-b can have padding bytes between sos and image data, skip them */
     if (s->mjpb_skiptosod)
         bytestream2_skip(&s->gB, s->mjpb_skiptosod);
+
+    if (!s->progressive && !s->lossless &&
+        s->avctx->codec_id != AV_CODEC_ID_MXPEG) {
+        s->nb_seq_component_scans += s->nb_components_sos;
+        if (s->nb_seq_component_scans > s->nb_components) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "too many scans for a sequential image\n");
+            return AVERROR_INVALIDDATA;
+        }
+    }
 
     if (s->avctx->hwaccel) {
         const uint8_t *buf_ptr;
@@ -2404,6 +2404,7 @@ int ff_mjpeg_decode_frame_from_buf(AVCodecContext *avctx, AVFrame *frame,
     int is16bit;
 
     s->force_pal8 = 0;
+    s->total_ls_decoded_height = 0;
 
     s->buf_size = buf_size;
 
@@ -2515,11 +2516,6 @@ redo_for_pal8:
             break;
         case SOF3:
             avctx->profile     = AV_PROFILE_MJPEG_HUFFMAN_LOSSLESS;
-#if FF_API_CODEC_PROPS
-FF_DISABLE_DEPRECATION_WARNINGS
-            avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
             s->lossless    = 1;
             s->ls          = 0;
             s->progressive = 0;
@@ -2528,11 +2524,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
             break;
         case SOF55:
             avctx->profile     = AV_PROFILE_MJPEG_JPEG_LS;
-#if FF_API_CODEC_PROPS
-FF_DISABLE_DEPRECATION_WARNINGS
-            avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
             s->lossless    = 1;
             s->ls          = 1;
             s->progressive = 0;
@@ -2770,7 +2761,7 @@ the_end:
             }
         }
     }
-    if (s->flipped && !s->rgb) {
+    if (s->flipped && !s->rgb && !s->bayer) {
         ret = av_pix_fmt_get_chroma_sub_sample(avctx->pix_fmt, &hshift, &vshift);
         if (ret)
             return ret;
@@ -2953,18 +2944,22 @@ static av_cold void decode_flush(AVCodecContext *avctx)
 }
 
 #if CONFIG_MJPEG_DECODER
+#if FF_API_MJPEG_EXTERN_HUFF
 #define OFFSET(x) offsetof(MJpegDecodeContext, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
     { "extern_huff", "Use external huffman table.",
-      OFFSET(extern_huff), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VD },
+      OFFSET(extern_huff), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VD | AV_OPT_FLAG_DEPRECATED },
     { NULL },
 };
+#endif
 
 static const AVClass mjpegdec_class = {
     .class_name = "MJPEG decoder",
     .item_name  = av_default_item_name,
+#if FF_API_MJPEG_EXTERN_HUFF
     .option     = options,
+#endif
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
