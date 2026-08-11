@@ -5,7 +5,7 @@
 #              timestamp formats
 #------------------------------
 
-from MythTV.exceptions import MythError, MythTZError
+from MythTV.exceptions import MythTZError
 
 from datetime import datetime as _pydatetime, \
                      tzinfo as _pytzinfo, \
@@ -357,7 +357,7 @@ class datetime( _pydatetime ):
     def now(cls, tz=None):
         if tz is None:
             tz = cls.localTZ()
-        obj = super(datetime, cls).now(tz)
+        obj = super().now(tz)
         return cls.fromDatetime(obj)
 
     @classmethod
@@ -365,14 +365,14 @@ class datetime( _pydatetime ):
         if IS_PY312plus:
             return cls.now(tz=cls.UTCTZ())
         else:
-            obj = super(datetime, cls).utcnow()
+            obj = super().utcnow()
             return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def fromtimestamp(cls, timestamp, tz=None):
         if tz is None:
             tz = cls.localTZ()
-        obj = super(datetime, cls).fromtimestamp(float(timestamp), tz)
+        obj = super().fromtimestamp(float(timestamp), tz)
         return cls.fromDatetime(obj)
 
     @classmethod
@@ -380,12 +380,12 @@ class datetime( _pydatetime ):
         if IS_PY312plus:
             return cls.fromtimestamp(timestamp, tz=cls.UTCTZ())
         else:
-            obj = super(datetime, cls).utcfromtimestamp(float(timestamp))
+            obj = super().utcfromtimestamp(float(timestamp))
             return obj.replace(tzinfo=cls.UTCTZ())
 
     @classmethod
     def strptime(cls, datestring, format, tzinfo=LTZ):
-        obj = super(datetime, cls).strptime(datestring, format)
+        obj = super().strptime(datestring, format)
         return cls.fromDatetime(obj, tzinfo)
 
 # new class methods for interfacing with MythTV
@@ -540,7 +540,7 @@ class datetime( _pydatetime ):
         return self.astimezone(self.UTCTZ()).isoformat().split('+')[0]
 
     def astimezone(self, tz):
-        return self.fromDatetime(super(datetime, self).astimezone(tz))
+        return self.fromDatetime(super().astimezone(tz))
 
     def asnaiveutc(self):
         return self.astimezone(self.UTCTZ()).replace(tzinfo=None)

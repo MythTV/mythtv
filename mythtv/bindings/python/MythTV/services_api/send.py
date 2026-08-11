@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """API Client."""
 
@@ -21,7 +20,7 @@ from .mythversions import MYTHTV_VERSION_LIST
 
 
 # pylint: disable=too-many-instance-attributes
-class Send():
+class Send:
     """Services API."""
 
     def __init__(self, host, port=6544):
