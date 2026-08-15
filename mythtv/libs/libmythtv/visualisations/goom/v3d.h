@@ -5,8 +5,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "mathtools.h"
-
 struct v3d {
 	float x,y,z;
 };
@@ -26,8 +24,8 @@ struct v2d {
 	int Xp; \
 	int Yp; \
   if ((v3).z > 2) { \
-	 F2I(((distance) * (v3).x / (v3).z),Xp) ; \
-	 F2I(((distance) * (v3).y / (v3).z),Yp) ; \
+	 Xp = (int)((distance) * (v3).x / (v3).z) ; \
+	 Yp = (int)((distance) * (v3).y / (v3).z) ; \
 	 (v2).x = Xp + ((width)>>1); \
 	 (v2).y = -Yp + ((height)>>1); \
   } \
