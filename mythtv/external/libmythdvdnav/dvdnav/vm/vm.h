@@ -31,9 +31,9 @@ typedef struct {
 
   DVDDomain_t  domain;
   int       vtsN;         /* 0 is vmgm? */
-  pgc_t    *pgc;          /* either this or 'int pgcN' is enough? */
+  const pgc_t  *pgc;    /* either this or 'int pgcN' is enough? */
   int       pgcN;         /* but provide pgcN for quick lookup */
-  int       pgN;          /* is this needed? can allways fid pgN from cellN? */
+  int       pgN;          /* is this needed? can always fid pgN from cellN? */
   int       cellN;
   int32_t   cell_restart; /* get cell to restart */
   int       blockN;
@@ -67,7 +67,12 @@ typedef struct vm_position_s {
 } vm_position_t;
 
 typedef struct {
+  void *priv;
+  dvdnav_logger_cb logcb;
+  dvdnav_stream_cb streamcb;
   dvd_reader_t *dvd;
+  dvd_reader_stream_cb dvdstreamcb;
+  dvdnav_filesystem_h *dvdreaderfs;
   ifo_handle_t *vmgi;
   ifo_handle_t *vtsi;
   dvd_state_t   state;
@@ -101,7 +106,7 @@ typedef struct {
 #define PTL_REG      registers.SPRM[13]
 
 /* Initialisation & destruction */
-vm_t *vm_new_vm(void);
+vm_t *vm_new_vm(void *, const dvdnav_logger_cb *);
 void  vm_free_vm(vm_t *vm);
 
 /* IFO access */
@@ -114,8 +119,8 @@ dvd_reader_t *vm_get_dvd_reader(vm_t *vm);
 /* Basic Handling */
 int  vm_start(vm_t *vm);
 void vm_stop(vm_t *vm);
-int  vm_reset(vm_t *vm, const char *dvdroot, void *stream,
-              dvdnav_stream_cb *stream_cb);
+int  vm_reset(vm_t *vm, const char *dvdroot, void *priv,
+              dvdnav_stream_cb *stream_cb, dvdnav_filesystem_h *fs);
 
 /* copying and merging  - useful for try-running an operation */
 vm_t *vm_new_copy(vm_t *vm);
@@ -137,7 +142,7 @@ int vm_jump_prev_pg(vm_t *vm);
 int vm_jump_up(vm_t *vm);
 int vm_jump_menu(vm_t *vm, DVDMenuID_t menuid);
 int vm_jump_resume(vm_t *vm);
-int vm_exec_cmd(vm_t *vm, vm_cmd_t *cmd);
+int vm_exec_cmd(vm_t *vm, const vm_cmd_t *cmd);
 
 /* getting information */
 int vm_get_current_menu(vm_t *vm, int *menuid);
@@ -145,7 +150,6 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result);
 int vm_get_audio_stream(vm_t *vm, int audioN);
 int vm_get_subp_stream(vm_t *vm, int subpN, int mode);
 int vm_get_audio_active_stream(vm_t *vm);
-int vm_set_audio_active_stream(vm_t *vm, int audioN);
 int vm_get_subp_active_stream(vm_t *vm, int mode);
 void vm_get_angle_info(vm_t *vm, int *current, int *num_avail);
 #if 0
