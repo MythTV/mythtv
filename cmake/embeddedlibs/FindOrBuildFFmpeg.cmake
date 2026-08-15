@@ -65,6 +65,9 @@ function(find_or_build_ffmpeg)
   if(ANDROID)
     list(APPEND FF_ARGS --enable-mediacodec --enable-jni)
   endif()
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc|powerpc")
+    list(APPEND FF_ARGS $<IF:$<BOOL:${ENABLE_ALTIVEC}>,--enable-altivec,--disable-altivec>)
+  endif()
 
   #
   # Do the lame libraries already exist, or will they exist by the time FFmpeg

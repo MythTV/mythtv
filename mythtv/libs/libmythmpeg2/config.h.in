@@ -15,9 +15,7 @@
 #cmakedefine01 HAVE_MMX
 #endif
 
-// Still need to figure this one out
-#ifndef HAVE_ALTIVEC
 #cmakedefine01 HAVE_ALTIVEC
-#endif
+#cmakedefine01 HAVE_ALTIVEC_H
 
 #endif /* CONFIG_H */

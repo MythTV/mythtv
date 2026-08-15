@@ -19,7 +19,14 @@ include(CMakePushCheckState)
 #
 # Check for existence of include files
 #
-check_include_file(altivec.h HAVE_ALTIVEC_H)
+if(ENABLE_ALTIVEC)
+  check_include_file(altivec.h HAVE_ALTIVEC_H)
+  # libmythmpeg2 uses both HAVE_ALTIVEC and HAVE_ALTIVEC_H
+  set(HAVE_ALTIVEC ${HAVE_ALTIVEC_H})
+else()
+  set(HAVE_ALTIVEC_H OFF)
+  set(HAVE_ALTIVEC OFF)
+endif()
 check_include_file(byteswap.h HAVE_BYTESWAP_H)
 check_include_file(cdio/paranoia.h HAVE_CDIO_PARANOIA_H)
 check_include_file(cdio/paranoia/paranoia.h HAVE_CDIO_PARANOIA_PARANOIA_H)

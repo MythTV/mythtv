@@ -173,6 +173,10 @@ endif()
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "i686")
   list(APPEND CXXFLAGS "-msse")
   list(APPEND CFLAGS "-msse")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc|powerpc")
+  if(ENABLE_ALTIVEC)
+    list(APPEND CFLAGS -maltivec -mabi=altivec)
+  endif()
 endif()
 
 #

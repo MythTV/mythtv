@@ -104,6 +104,7 @@ option(ENABLE_MMAL "Enable hardware accelerated decoding on Raspberry Pi" ON)
 option(ENABLE_NVDEC "Enable (CUVID) hardware accelerated video decoding" ON)
 option(ENABLE_VAAPI "Enable VAAPI hardware accelerated video decoding" ON)
 option(ENABLE_VDPAU "Enable NVidia VDPAU hardware acceleration." ON)
+option(ENABLE_ALTIVEC "Enable AltiVec SIMD extension for PPC architecture." ON)
 
 #
 # Backend Video Collection Methods

@@ -17,12 +17,6 @@
 #define JDK_HOME  @JDK_HOME@
 #define JAVA_ARCH @JAVA_ARCH@
 
-/* For libmythmpeg2 */
-#cmakedefine01 ARCH_ALPHA
-#cmakedefine01 ARCH_PPC
-#cmakedefine01 ARCH_SPARC
-#cmakedefine01 ARCH_X86
-
 /* For MythTV */
 #cmakedefine01 CONFIG_AIRPLAY
 #cmakedefine01 CONFIG_APPLEREMOTE
@@ -86,8 +80,6 @@
 #cmakedefine01 CONFIG_X11
 
 /* For MythTV */
-#cmakedefine01 HAVE_ALTIVEC
-#cmakedefine01 HAVE_ALTIVEC_H
 #cmakedefine01 HAVE_BDJ_J2ME
 #cmakedefine01 HAVE_BIGENDIAN
 #cmakedefine01 HAVE_BYTESWAP_H
