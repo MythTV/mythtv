@@ -456,7 +456,6 @@ set(HEADERS_TO_INSTALL2
     visualisations/goom/graphic.h
     visualisations/goom/ifs.h
     visualisations/goom/lines.h
-    visualisations/goom/mathtools.h
     visualisations/goom/mmx.h
     visualisations/goom/tentacle3d.h
     visualisations/goom/v3d.h)

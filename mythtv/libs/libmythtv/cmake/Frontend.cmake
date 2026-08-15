@@ -298,7 +298,6 @@ if(TARGET any_opengl)
             visualisations/goom/lines.h
             visualisations/goom/drawmethods.h
             visualisations/goom/mmx.h
-            visualisations/goom/mathtools.h
             visualisations/goom/surf3d.h
             visualisations/goom/tentacle3d.h
             visualisations/goom/v3d.h
