@@ -50,14 +50,13 @@ void RTPPacketBuffer::PushDataPacket(const UDPPacket &udp_packet)
     {
         while (m_unorderedPackets.size() > kLowWaterMark)
         {
-            QMap<uint64_t, RTPDataPacket>::iterator it =
-                m_unorderedPackets.begin();
+            uint64_t key2 = m_unorderedPackets.firstKey();
+            RTPDataPacket packet2 = m_unorderedPackets.take(key2);
 /*
             LOG(VB_RECORD, LOG_DEBUG, QString("Popping %1 as %2")
-                .arg((*it).GetSequenceNumber()).arg(it.key()));
+                .arg(packet2.GetSequenceNumber()).arg(key2));
 */
-            m_availablePackets.push_back(*it);
-            m_unorderedPackets.erase(it);
+            m_availablePackets.push_back(packet2);
         }
     }
 }
