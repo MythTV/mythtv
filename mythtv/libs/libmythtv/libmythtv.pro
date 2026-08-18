@@ -729,7 +729,6 @@ using_frontend {
             HEADERS += visualisations/goom/ifs.h
             HEADERS += visualisations/goom/lines.h
             HEADERS += visualisations/goom/drawmethods.h
-            HEADERS += visualisations/goom/mmx.h
             HEADERS += visualisations/goom/surf3d.h
             HEADERS += visualisations/goom/tentacle3d.h
             HEADERS += visualisations/goom/v3d.h
@@ -744,8 +743,7 @@ using_frontend {
             SOURCES += visualisations/goom/ifs_display.cpp
             SOURCES += visualisations/goom/lines.cpp
             SOURCES += visualisations/goom/surf3d.cpp
-            SOURCES += visualisations/goom/zoom_filter_mmx.cpp
-            SOURCES += visualisations/goom/zoom_filter_xmmx.cpp
+            SOURCES += visualisations/goom/zoom_filter_sse2.cpp
             SOURCES += visualisations/videovisualgoom.cpp
         }
     }
