@@ -80,24 +80,18 @@ void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
 	{
 #endif /* Q_PROCESSOR_X86 */
 	for (int i = 0; i < nbpt; i += increment) {
-		int     x = points[i].x & 0x7fffffff;
-		int     y = points[i].y & 0x7fffffff;
+		int     x = points[i].x;
+		int     y = points[i].y;
 
-		if ((x < width) && (y < height)) {
+		if ((x < width) && (y < height) && (x > 0) && (y > 0)) {
 			int     pos = x + (y * width);
-			int     tra = 0;
 			auto *bra = (unsigned char *) &back[pos];
 			auto *dra = (unsigned char *) &data[pos];
 			auto *cra = (unsigned char *) &couleursl;
 
 			for (int j = 0; j < 4; j++) {
-				tra = *cra;
-				tra += *bra;
-				tra = std::min(tra, 255);
-				*dra = tra;
-				++dra;
-				++cra;
-				++bra;
+				dra[j] = cra[j] + bra[j];
+				if (dra[j] < cra[j]) dra[j] = 255U;
 			}
 		}
 	}
