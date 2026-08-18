@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <numbers>
 
 // Qt
 #include <QtGlobal>
@@ -1769,7 +1770,7 @@ Piano::Piano()
     for (uint key = 0; key < kPianoNumKeys; key++)
     {
         // This is constant through time
-        m_pianoData[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+        m_pianoData[key].coeff = (goertzel_data)(2.0 * cos(2.0 * std::numbers::pi * current_freq / sample_rate));
 
         // Want 20 whole cycles of the current waveform at least
         double samples_required = sample_rate/current_freq * 20.0;

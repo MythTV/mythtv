@@ -364,7 +364,6 @@ inc2.path = $${PREFIX}/include/mythtv/libmythtv/visualisations/goom
 inc2.files  = visualisations/goom/filters.h
 inc2.files += visualisations/goom/goomconfig.h
 inc2.files += visualisations/goom/goom_core.h
-inc2.files += visualisations/goom/goom_tools.h
 inc2.files += visualisations/goom/graphic.h
 inc2.files += visualisations/goom/ifs.h
 inc2.files += visualisations/goom/lines.h
@@ -734,7 +733,6 @@ using_frontend {
             HEADERS += visualisations/goom/filters.h
             HEADERS += visualisations/goom/goomconfig.h
             HEADERS += visualisations/goom/goom_core.h
-            HEADERS += visualisations/goom/goom_tools.h
             HEADERS += visualisations/goom/graphic.h
             HEADERS += visualisations/goom/ifs.h
             HEADERS += visualisations/goom/lines.h

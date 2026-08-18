@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <cstdlib>
+#include <numbers>
 
 #include "v3d.h"
 #include "surf3d.h"
 #include "goom_core.h"
-#include "goom_tools.h"
 #include "goomconfig.h"
 #include "tentacle3d.h"
 
@@ -87,7 +87,7 @@ int evolutecolor (unsigned int src,unsigned int dest, unsigned int mask, unsigne
 static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle) {
 	static float s_distT = 10.0F;
 	static float s_distT2 = 0.0F;
-	static float s_rot = 0.0F; // entre 0 et 2 * M_PI
+	static float s_rot = 0.0F; // entre 0 et 2 * std::numbers::pi_v<float>
 	static int s_happens = 0;
 	static int s_lock = 0;
 
@@ -112,28 +112,28 @@ static void pretty_move (float lcycle, float *dist,float *dist2, float *rotangle
 	*dist = s_distT = (tmp + (3.0F*s_distT))/4.0F;
 
 	if (!s_happens){
-		tmp = (M_PI_F*sinf(lcycle)/32)+(3*M_PI_F/2);
+		tmp = (std::numbers::pi_v<float>*sinf(lcycle)/32)+(3*std::numbers::pi_v<float>/2);
 	}
 	else {
 		static bool s_rotation {false};
 		s_rotation = !rand_bool(500) ? s_rotation : rand_bool();
 		if (s_rotation)
-			lcycle *= 2.0F*M_PI_F;
+			lcycle *= 2.0F*std::numbers::pi_v<float>;
 		else
-			lcycle *= -1.0F*M_PI_F;
-		tmp = lcycle - ((M_PI_F*2.0F) * floorf(lcycle/(M_PI_F*2.0F)));
+			lcycle *= -1.0F*std::numbers::pi_v<float>;
+		tmp = lcycle - ((std::numbers::pi_v<float>*2.0F) * floorf(lcycle/(std::numbers::pi_v<float>*2.0F)));
 	}
 	
-	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+(2.0F*M_PI_F)))) {
-		s_rot = (tmp + (15.0F*(s_rot+(2*M_PI_F)))) / 16.0F;
-		if (s_rot>2.0F*M_PI_F)
-			s_rot -= 2.0F*M_PI_F;
+	if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot+(2.0F*std::numbers::pi_v<float>)))) {
+		s_rot = (tmp + (15.0F*(s_rot+(2*std::numbers::pi_v<float>)))) / 16.0F;
+		if (s_rot>2.0F*std::numbers::pi_v<float>)
+			s_rot -= 2.0F*std::numbers::pi_v<float>;
 		*rotangle = s_rot;
 	}
-	else if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot-(2.0F*M_PI_F)))) {
-		s_rot = (tmp + (15.0F*(s_rot-(2.0F*M_PI_F)))) / 16.0F;
+	else if (fabsf(tmp-s_rot) > fabsf(tmp-(s_rot-(2.0F*std::numbers::pi_v<float>)))) {
+		s_rot = (tmp + (15.0F*(s_rot-(2.0F*std::numbers::pi_v<float>)))) / 16.0F;
 		if (s_rot<0.0F)
-			s_rot += 2.0F*M_PI_F;
+			s_rot += 2.0F*std::numbers::pi_v<float>;
 		*rotangle = s_rot;
 	}
 	else {
