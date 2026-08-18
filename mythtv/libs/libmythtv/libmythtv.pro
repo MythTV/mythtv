@@ -130,6 +130,7 @@ HEADERS += driveroption.h
 HEADERS += mythhdrvideometadata.h
 HEADERS += mythhdrtracker.h
 HEADERS += scantype.h
+HEADERS += sse2.h
 
 SOURCES += bytereader.cpp
 SOURCES += recordinginfo.cpp

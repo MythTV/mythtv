@@ -154,6 +154,7 @@ add_library(
   signalmonitorvalue.h
   sourceutil.cpp
   sourceutil.h
+  sse2.h
   transporteditor.cpp
   transporteditor.h
   tv.cpp
