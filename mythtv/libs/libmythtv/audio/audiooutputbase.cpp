@@ -34,6 +34,7 @@ extern "C" {
 #include "libmythbase/compat.h"
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythtv/sse2.h"
 
 #include "audioconvert.h"
 #include "audiooutputbase.h"
@@ -251,32 +252,6 @@ static int DownmixFrames(int channels_in, int  channels_out,
 
     return frames;
 }
-
-#ifdef Q_PROCESSOR_X86
-// Check cpuid for SSE2 support on x86 / x86_64
-static inline bool sse2_check()
-{
-#ifdef Q_PROCESSOR_X86_64
-    return true;
-#else
-    static int has_sse2 = -1;
-    if (has_sse2 != -1)
-        return (bool)has_sse2;
-    __asm__(
-        // -fPIC - we may not clobber ebx/rbx
-        "push       %%ebx               \n\t"
-        "mov        $1, %%eax           \n\t"
-        "cpuid                          \n\t"
-        "and        $0x4000000, %%edx   \n\t"
-        "shr        $26, %%edx          \n\t"
-        "pop        %%ebx               \n\t"
-        :"=d"(has_sse2)
-        ::"%eax","%ecx"
-    );
-    return (bool)has_sse2;
-#endif
-}
-#endif //Q_PROCESSOR_X86
 
 /**
  * Returns true if the processor supports MythTV's optimized SIMD for AudioConvert.
