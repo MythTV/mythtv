@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "surf3d.h"
+#include "drawmethods.h"
 
 #ifndef __cpp_size_t_suffix
 #include <libmythbase/sizetliteral.h>
@@ -51,9 +52,6 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	return g;
 }
 
-//#undef HAVE_MMX
-#include "drawmethods.h"
-
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
 	v2d v2 {};
 	
@@ -81,7 +79,6 @@ void grid3d_draw (grid3d *g, int color, int colorlow,
 					&& ((v2x.x != -666) || (v2x.y!=-666))) {
 				draw_line(buf,v2x.x,v2x.y,v2.x,v2.y, colorlow, W, H);
 				draw_line(back,v2x.x,v2x.y,v2.x,v2.y, color, W, H);
-				DRAWMETHOD_DONE();
 			}
 			v2x = v2;
 		}
