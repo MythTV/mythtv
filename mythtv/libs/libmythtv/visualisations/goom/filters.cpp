@@ -18,9 +18,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <numbers>
 
 #include "filters.h"
-#include "goom_tools.h"
 #include "goomconfig.h"
 #include "graphic.h"
 #include "zoom_filters.h"

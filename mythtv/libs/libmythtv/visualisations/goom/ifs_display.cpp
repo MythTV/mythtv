@@ -11,8 +11,6 @@
 #include "mmx.h"
 #endif
 
-#include "goom_tools.h"
-
 /* NOLINTNEXTLINE(readability-non-const-parameter) */
 void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
 						int increment)

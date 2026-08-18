@@ -451,7 +451,6 @@ set(HEADERS_TO_INSTALL2
     visualisations/goom/drawmethods.h
     visualisations/goom/filters.h
     visualisations/goom/goom_core.h
-    visualisations/goom/goom_tools.h
     visualisations/goom/goomconfig.h
     visualisations/goom/graphic.h
     visualisations/goom/ifs.h

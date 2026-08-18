@@ -292,7 +292,6 @@ if(TARGET any_opengl)
     PRIVATE visualisations/goom/filters.h
             visualisations/goom/goomconfig.h
             visualisations/goom/goom_core.h
-            visualisations/goom/goom_tools.h
             visualisations/goom/graphic.h
             visualisations/goom/ifs.h
             visualisations/goom/lines.h
