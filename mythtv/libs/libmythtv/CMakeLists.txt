@@ -447,17 +447,7 @@ set(HEADERS_TO_INSTALL1
     playgroup.h
     )
 
-set(HEADERS_TO_INSTALL2
-    visualisations/goom/drawmethods.h
-    visualisations/goom/filters.h
-    visualisations/goom/goom_core.h
-    visualisations/goom/goomconfig.h
-    visualisations/goom/graphic.h
-    visualisations/goom/ifs.h
-    visualisations/goom/lines.h
-    visualisations/goom/mmx.h
-    visualisations/goom/tentacle3d.h
-    visualisations/goom/v3d.h)
+set(HEADERS_TO_INSTALL2 visualisations/goom/goom_core.h)
 
 install(TARGETS mythtv LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

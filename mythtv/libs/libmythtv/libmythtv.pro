@@ -361,16 +361,7 @@ inc.files += recordingtypes.h
 INSTALLS += inc
 
 inc2.path = $${PREFIX}/include/mythtv/libmythtv/visualisations/goom
-inc2.files  = visualisations/goom/filters.h
-inc2.files += visualisations/goom/goomconfig.h
-inc2.files += visualisations/goom/goom_core.h
-inc2.files += visualisations/goom/graphic.h
-inc2.files += visualisations/goom/ifs.h
-inc2.files += visualisations/goom/lines.h
-inc2.files += visualisations/goom/drawmethods.h
-inc2.files += visualisations/goom/mmx.h
-inc2.files += visualisations/goom/tentacle3d.h
-inc2.files += visualisations/goom/v3d.h
+inc2.files  = visualisations/goom/goom_core.h
 
 INSTALLS += inc2
 
