@@ -9,28 +9,22 @@
 #if HAVE_MMX
 #include "mmx.h"
 
-#define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
+#define DRAWMETHOD_PLUS(_dest,_col) \
 {\
-movd_m2r (_backbuf, mm0); \
+movd_m2r (_dest, mm0); \
 paddusb_m2r (_col, mm0); \
-movd_r2m (mm0, _out); \
+movd_r2m (mm0, _dest); \
 }
 
 #else
-#define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
+#define DRAWMETHOD_PLUS(_dest,_col) \
 {\
-      int tra=0;\
-      int i=0;\
-      unsigned char *bra = (unsigned char*)&(_backbuf);\
-      unsigned char *dra = (unsigned char*)&(_out);\
-      unsigned char *cra = (unsigned char*)&(_col);\
-      for (;i<4;i++) {\
-				tra = *cra;\
-				tra += *bra;\
-				if (tra>255) tra=255;\
-				*dra = tra;\
-				++dra;++cra;++bra;\
-			}\
+	unsigned char *dra = (unsigned char*)&(_dest);\
+	unsigned char *cra = (unsigned char*)&(_col);\
+	for (int i = 0; i < 4; i++) {\
+		dra[i] += cra[i];\
+		if (dra[i] < cra[i]) dra[i] = 255U;\
+	}\
 }
 #endif
 
@@ -43,7 +37,7 @@ movd_r2m (mm0, _out); \
 #endif
 
 #ifndef DRAWMETHOD
-#define DRAWMETHOD DRAWMETHOD_PLUS(*p,*p,col)
+#define DRAWMETHOD DRAWMETHOD_PLUS(*p,col)
 
 static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx, int screeny) {
     int     x = 0;	// am, tmp
