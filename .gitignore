@@ -67,3 +67,6 @@ CMakeUserPresets.json
 libsinstall-*
 cppcheck.html
 cppcheck.xml
+log
+log-*
+success-*

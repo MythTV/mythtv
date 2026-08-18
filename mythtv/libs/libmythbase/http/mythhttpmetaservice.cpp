@@ -1,6 +1,9 @@
-// Qt
-#include <QMetaClassInfo>
+// C++
 #include <algorithm>
+
+// Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
+#include <QMetaClassInfo>
 
 // MythTV
 #include "mythlogging.h"

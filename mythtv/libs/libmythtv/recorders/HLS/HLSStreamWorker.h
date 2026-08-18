@@ -1,6 +1,7 @@
 #ifndef HLS_SEGMENT_WORKER_H
 #define HLS_SEGMENT_WORKER_H
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QWaitCondition>
 #include <QMutex>
 

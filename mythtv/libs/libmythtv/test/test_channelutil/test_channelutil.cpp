@@ -1,7 +1,5 @@
 #include "test_channelutil.h"
 
-#include <iostream>
-
 #include <QTest>
 
 Q_DECLARE_METATYPE(ChannelChangeDirection);

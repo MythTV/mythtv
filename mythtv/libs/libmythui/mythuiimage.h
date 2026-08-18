@@ -1,6 +1,7 @@
 #ifndef MYTHUI_IMAGE_H_
 #define MYTHUI_IMAGE_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QHash>
 #include <QMutex>

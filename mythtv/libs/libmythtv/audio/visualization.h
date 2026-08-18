@@ -9,6 +9,7 @@
 
 #include <chrono>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 
 class Visualization

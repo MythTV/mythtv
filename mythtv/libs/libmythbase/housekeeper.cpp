@@ -52,6 +52,7 @@
 #include <chrono>
 #include <utility>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
 
 #include "mythevent.h"

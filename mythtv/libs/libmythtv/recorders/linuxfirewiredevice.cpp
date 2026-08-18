@@ -28,6 +28,7 @@
 #include <thread> // for sleep_for
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 
 // MythTV headers

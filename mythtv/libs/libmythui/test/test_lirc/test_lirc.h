@@ -1,6 +1,8 @@
 #ifndef LIBMYTHUI_TEST_LIRC_H
 #define LIBMYTHUI_TEST_LIRC_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QObject>

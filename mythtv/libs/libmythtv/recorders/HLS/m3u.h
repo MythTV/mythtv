@@ -3,6 +3,7 @@
 
 #include <cinttypes>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 

@@ -19,6 +19,8 @@
  */
 #include <iostream>
 #include <QtGlobal>
+#include <QChar> // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonObject>

@@ -24,6 +24,8 @@
 #define QAndroidJniObject QJniObject
 #endif
 #endif
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QApplication>
 #include <QDir>
 #include <QEvent>

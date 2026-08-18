@@ -8,8 +8,9 @@
 #ifndef MYTHCOMMFLAG_TEST_COMMFLAG_MISC_H
 #define MYTHCOMMFLAG_TEST_COMMFLAG_MISC_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
 
 class TestCommFlagMisc : public QObject
 {

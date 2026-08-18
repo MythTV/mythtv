@@ -12,6 +12,7 @@
 #include <string_view>
 #include <vector>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QString>
 

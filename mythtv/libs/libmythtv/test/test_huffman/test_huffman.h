@@ -1,6 +1,8 @@
 #ifndef LIBMYTHTV_TEST_HUFFMAN_H
 #define LIBMYTHTV_TEST_HUFFMAN_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QObject>
 
 class TestHuffman: public QObject

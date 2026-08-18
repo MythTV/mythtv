@@ -20,8 +20,11 @@
 #ifndef LIBMYTHMETADATA_TEST_LYRICS_H
 #define LIBMYTHMETADATA_TEST_LYRICS_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 #include <iostream>
+
 #include "libmythmetadata/lyricsdata.h"
 
 class TestLyrics : public QObject

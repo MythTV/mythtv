@@ -1,6 +1,7 @@
 #ifndef LIRC_H_
 #define LIRC_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QString>
 #include <QObject>

@@ -1,6 +1,7 @@
 #ifndef MYTHDBCON_H_
 #define MYTHDBCON_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QSqlDatabase>
 #include <QSqlRecord>
 #include <QSqlError>

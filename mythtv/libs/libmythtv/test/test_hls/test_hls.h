@@ -6,6 +6,8 @@
  * See the file LICENSE for licensing information.
  */
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 class TestHls : public QObject

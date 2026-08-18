@@ -20,6 +20,8 @@
 #ifndef LIBMYTHTV_TEST_EITFIXUPS_H
 #define LIBMYTHTV_TEST_EITFIXUPS_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythtv/eithelper.h" /* for FixupValue */

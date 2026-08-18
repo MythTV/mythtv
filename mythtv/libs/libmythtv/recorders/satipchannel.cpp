@@ -2,6 +2,7 @@
 #include <utility>
 
 // Qt includes
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
 #include <QString>
 

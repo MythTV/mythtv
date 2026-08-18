@@ -1,4 +1,5 @@
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaType>
 #include <QStringList>
 #include <QTimer>

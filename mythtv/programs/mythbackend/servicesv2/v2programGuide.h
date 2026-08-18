@@ -13,6 +13,7 @@
 #ifndef V2PROGRAMGUIDE_H_
 #define V2PROGRAMGUIDE_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 

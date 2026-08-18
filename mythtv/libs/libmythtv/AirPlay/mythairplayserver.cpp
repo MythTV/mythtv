@@ -7,6 +7,8 @@
 #include <chrono>
 #include <vector>
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTcpSocket>
 #include <QNetworkInterface>
 #include <QCoreApplication>

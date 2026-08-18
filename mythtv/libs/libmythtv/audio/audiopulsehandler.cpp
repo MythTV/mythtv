@@ -1,5 +1,6 @@
 #include <thread>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
 #include <QString>
 #include <QMutex>

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 #include <QStringList>

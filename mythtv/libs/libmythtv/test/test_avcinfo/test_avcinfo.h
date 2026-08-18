@@ -20,6 +20,8 @@
 #ifndef LIBMYTHTV_TEST_AVCINFO_H
 #define LIBMYTHTV_TEST_AVCINFO_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 class TestAvcInfo : public QObject

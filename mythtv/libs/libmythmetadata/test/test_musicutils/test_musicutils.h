@@ -20,8 +20,9 @@
 #ifndef LIBMYTHMETADATA_TEST_MUSICUTILS_H
 #define LIBMYTHMETADATA_TEST_MUSICUTILS_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
 
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/musicutils.h"

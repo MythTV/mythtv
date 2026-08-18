@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <sys/time.h> // For gettimeofday
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaType>
 
 

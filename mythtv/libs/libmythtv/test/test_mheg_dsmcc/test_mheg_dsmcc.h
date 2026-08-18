@@ -20,8 +20,9 @@
 #ifndef LIBMYTHTV_TEST_MHEG_DSMCC_H
 #define LIBMYTHTV_TEST_MHEG_DSMCC_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
 
 #include "libmythtv/mheg/dsmcc.h"
 

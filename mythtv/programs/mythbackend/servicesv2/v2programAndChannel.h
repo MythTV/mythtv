@@ -11,6 +11,7 @@
 #ifndef V2PROGRAMANDCHANNEL_H_
 #define V2PROGRAMANDCHANNEL_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 

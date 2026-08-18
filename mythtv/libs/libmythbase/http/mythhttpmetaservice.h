@@ -2,6 +2,7 @@
 #define MYTHHTTPMETASERVICE_H
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaObject>
 
 // MythTV

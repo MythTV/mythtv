@@ -3,6 +3,7 @@
 
 // qt
 #include <QtGlobal>
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QUrl>
 #include <QString>
 #include <QElapsedTimer>

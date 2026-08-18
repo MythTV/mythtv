@@ -11,6 +11,7 @@
 #include "libmythbase/mythconfig.h"
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QNetworkInterface>
 #include <QNetworkProxy>
 

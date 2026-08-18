@@ -21,7 +21,7 @@
 #define MYTHBACKEND_TEST_RECORDINGEXTENDER_H
 
 #include <QTest>
-#include <iostream>
+
 #include "recordingextender.h"
 
 class TestRecordingExtender : public RecordingExtender

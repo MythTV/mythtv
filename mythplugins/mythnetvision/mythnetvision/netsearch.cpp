@@ -1,4 +1,5 @@
 // qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QFileInfo>
 #include <QImageReader>

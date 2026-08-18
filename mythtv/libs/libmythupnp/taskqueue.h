@@ -18,6 +18,7 @@
 #include <map>
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 #include <QString>
 

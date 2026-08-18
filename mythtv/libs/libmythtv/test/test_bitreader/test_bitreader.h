@@ -29,6 +29,8 @@ For more information, please refer to <https://unlicense.org>
 #ifndef LIBMYTHTV_TEST_BITREADER_H
 #define LIBMYTHTV_TEST_BITREADER_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythtv/bitreader.h"

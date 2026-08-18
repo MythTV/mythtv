@@ -21,7 +21,9 @@
 #define LIBMYTHTV_TEST_PROGRAMINFO_H
 
 #include <array>
-#include <iostream>
+
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythbase/mythcorecontext.h"

@@ -4,6 +4,7 @@
 #include <vector> // For std::vector
 
 // QT headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 
 // MythTV headers

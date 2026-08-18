@@ -3,6 +3,7 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
 #include <QtSystemDetection>
 #endif
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QNetworkInterface> // for QNetworkInterface::allAddresses ()
 #include <QCoreApplication>
 #include <QWaitCondition>

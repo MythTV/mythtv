@@ -2,6 +2,7 @@
 #include <algorithm>
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaProperty>
 #if QT_VERSION < QT_VERSION_CHECK(6,11,0)
 #include <QSequentialIterable>

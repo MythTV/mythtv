@@ -3,6 +3,7 @@
 #include <QtSystemDetection>
 #endif
 #include <QAtomicInt>
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 #include <QMutexLocker>
 #include <QWaitCondition>

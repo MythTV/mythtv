@@ -2,6 +2,7 @@
 #define SCHEDULEDRECORDING_H
 
 #include "mythtvexp.h"
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include "recordinginfo.h"
 

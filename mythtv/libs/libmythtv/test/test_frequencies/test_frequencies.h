@@ -20,8 +20,9 @@
 #ifndef LIBMYTHTV_TEST_FREQUENCIES_H
 #define LIBMYTHTV_TEST_FREQUENCIES_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
 
 #include "libmythtv/frequencies.h"
 #include "libmythtv/frequencytables.h"

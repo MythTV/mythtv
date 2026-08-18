@@ -1,6 +1,7 @@
 #ifndef UNZIPUTIL_H_
 #define UNZIPUTIL_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QString>
 

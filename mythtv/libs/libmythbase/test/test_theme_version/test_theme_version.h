@@ -8,7 +8,10 @@
 #ifndef LIBMYTHBASE_TEST_THEME_VERSION_H
 #define LIBMYTHBASE_TEST_THEME_VERSION_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
+
 #include "mythversion.h"
 
 class TestThemeVersion : public QObject

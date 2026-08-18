@@ -11,6 +11,7 @@
 #ifndef V2BACKENDSTATUS_H_
 #define V2BACKENDSTATUS_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 #include <QVariantList>

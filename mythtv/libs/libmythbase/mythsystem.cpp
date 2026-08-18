@@ -25,6 +25,7 @@
 #include <csignal> // for SIGXXX
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QIODevice>
 #include <QStringList>

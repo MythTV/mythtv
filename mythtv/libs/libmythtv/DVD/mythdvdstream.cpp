@@ -3,6 +3,7 @@
  */
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
 #include <QtGlobal>
 #include <QtAlgorithms>

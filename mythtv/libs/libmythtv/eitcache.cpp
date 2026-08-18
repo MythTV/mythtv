@@ -5,6 +5,7 @@
  * License: GPL v2
  */
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 
 #include "libmythbase/mythdate.h"

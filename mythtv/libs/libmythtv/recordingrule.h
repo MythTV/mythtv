@@ -2,6 +2,7 @@
 #define RECORDING_RULE_H
 
 // QT
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QDate>
 #include <QTime>

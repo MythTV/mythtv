@@ -20,6 +20,8 @@
 #ifndef LIBMYTHTV_TEST_MPEGTABLES_H
 #define LIBMYTHTV_TEST_MPEGTABLES_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 /* test data */

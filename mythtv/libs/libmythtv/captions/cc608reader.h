@@ -5,6 +5,7 @@
 #include <utility>
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 
 // MythTV headers

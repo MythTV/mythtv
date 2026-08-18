@@ -36,6 +36,8 @@
 
 // Qt
 #include <QtGlobal>
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QtEndian>
 #include <QDateTime>
 #if QT_VERSION < QT_VERSION_CHECK(6,11,0)

@@ -20,6 +20,8 @@
 #ifndef LIBMYTHMETADATA_TEST_VIDEOMETADATA_H
 #define LIBMYTHMETADATA_TEST_VIDEOMETADATA_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythmetadata/metadatafactory.h"

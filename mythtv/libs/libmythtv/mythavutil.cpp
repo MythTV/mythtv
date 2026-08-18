@@ -8,6 +8,7 @@
 
 // Qt
 #include <QtGlobal>
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutexLocker>
 #include <QFile>
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)

@@ -20,8 +20,10 @@
 #ifndef LIBMYTHMETADATA_TEST_METADATAGRABBER_H
 #define LIBMYTHMETADATA_TEST_METADATAGRABBER_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
+
 #include "libmythmetadata/musicmetadata.h"
 #include "libmythmetadata/metadatagrabber.h"
 

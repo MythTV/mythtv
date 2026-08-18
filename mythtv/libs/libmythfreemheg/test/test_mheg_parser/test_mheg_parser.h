@@ -8,8 +8,10 @@
 #ifndef LIBMYTHFREEMHEG_TEST_MHEG_PARSER_H
 #define LIBMYTHFREEMHEG_TEST_MHEG_PARSER_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
+
 //#include "recordingextender.h"
 
 class TestMhegParser : public QObject

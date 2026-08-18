@@ -20,8 +20,10 @@
 #ifndef MYTHFRONTEND_TEST_VIDEOLIST_H
 #define MYTHFRONTEND_TEST_VIDEOLIST_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
+
 #include "libmythmetadata/videometadata.h"
 #include "videolist.h"
 

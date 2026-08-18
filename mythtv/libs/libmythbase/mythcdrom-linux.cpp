@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <QtGlobal>
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 
 #include "mythcdrom.h"

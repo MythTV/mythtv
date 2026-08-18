@@ -1,3 +1,4 @@
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QNetworkAddressEntry>
 #include <QReadWriteLock>
 #include <QWriteLocker>

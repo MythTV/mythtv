@@ -13,6 +13,7 @@
 #ifndef XSD_H
 #define XSD_H
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QString>

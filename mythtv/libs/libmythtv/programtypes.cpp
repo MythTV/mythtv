@@ -4,6 +4,7 @@
 #include <deque>
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QMutex>
 #include <QObject>

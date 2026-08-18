@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <vector>
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 
 #include "audiooutputbase.h"

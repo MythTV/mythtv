@@ -1,6 +1,7 @@
 #ifndef MYTHUIANIMATION_H
 #define MYTHUIANIMATION_H
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QVariantAnimation>
 

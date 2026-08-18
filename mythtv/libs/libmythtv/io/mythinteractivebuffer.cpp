@@ -2,6 +2,7 @@
 #include <cstdio>
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QWriteLocker>
 
 // Mythtv

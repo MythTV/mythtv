@@ -9,6 +9,7 @@
 #include <sys/vfs.h>
 #endif
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMutex>
 #include <QFile>
 #include <QMap>

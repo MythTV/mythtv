@@ -13,6 +13,7 @@
 #ifndef SERVICEHOST_H_
 #define SERVICEHOST_H_
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QMap>

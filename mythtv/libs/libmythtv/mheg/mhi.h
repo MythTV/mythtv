@@ -10,6 +10,7 @@
 #include <vector>
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QWaitCondition>
 #include <QRunnable>
 #include <QString>

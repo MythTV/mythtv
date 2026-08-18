@@ -23,6 +23,8 @@
 #include <chrono> // for milliseconds
 #include <thread> // for sleep_for
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "mythtimer.h"

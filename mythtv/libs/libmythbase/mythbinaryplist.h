@@ -2,6 +2,8 @@
 #define PLIST_H
 
 // Qt
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QVariant>
 #include <QXmlStreamWriter>
 

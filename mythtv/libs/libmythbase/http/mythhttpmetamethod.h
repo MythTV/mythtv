@@ -5,6 +5,7 @@
 #include <memory>
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QMetaMethod>
 
 // MythTV

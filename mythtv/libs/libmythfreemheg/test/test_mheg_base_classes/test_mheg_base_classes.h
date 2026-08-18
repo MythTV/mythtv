@@ -6,8 +6,9 @@
  *  See the file LICENSE_FSF for licensing information.
  */
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
 
 class TestMhegBaseClasses : public QObject
 {

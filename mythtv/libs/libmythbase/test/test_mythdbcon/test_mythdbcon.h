@@ -20,8 +20,10 @@
 #ifndef LIBMYTHBASE_TEST_MYTHDBCON_H
 #define LIBMYTHBASE_TEST_MYTHDBCON_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
-#include <iostream>
+
 #include "mythdbcon.h"
 
 class TestDbCon : public QObject

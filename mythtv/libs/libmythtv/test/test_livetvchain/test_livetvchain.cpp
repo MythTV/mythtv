@@ -1,7 +1,5 @@
 #include "test_livetvchain.h"
 
-#include <iostream>
-
 #include <QTest>
 
 #include "libmythbase/mythcorecontext.h"

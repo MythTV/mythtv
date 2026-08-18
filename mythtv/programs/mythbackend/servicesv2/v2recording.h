@@ -12,6 +12,7 @@
 #define V2RECORDING_H_
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QString>
 

@@ -1,6 +1,8 @@
 #ifndef LIBMYTHTV_TEST_LIVETVCHAIN_H
 #define LIBMYTHTV_TEST_LIVETVCHAIN_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QObject>
 #include <QString>
 

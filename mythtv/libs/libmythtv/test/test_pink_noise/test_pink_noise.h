@@ -22,6 +22,8 @@
 
 #include <array>
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythtv/audio/pink.h"

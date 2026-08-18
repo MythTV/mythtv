@@ -5,6 +5,7 @@
 #include <utility>
 
 // qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDate>
 #include <QDateTime>
 #include <QDomElement>

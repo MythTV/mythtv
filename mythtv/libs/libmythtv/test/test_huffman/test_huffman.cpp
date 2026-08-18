@@ -1,7 +1,6 @@
 #include "test_huffman.h"
 
 #include <fcntl.h>
-#include <iostream>
 
 #include <QTest>
 

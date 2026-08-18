@@ -17,6 +17,7 @@ static constexpr pthread_t PTHREAD_NULL { nullptr };
 #else
 static constexpr int PTHREAD_NULL { 0 };
 #endif
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
 #include <QFileInfo>
 #include <QEvent>

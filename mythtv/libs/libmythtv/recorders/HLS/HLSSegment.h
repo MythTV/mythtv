@@ -9,6 +9,7 @@
 #include <openssl/aes.h>
 #endif // CONFIG_LIBCRYPTO
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QString>
 #include <QUrl>

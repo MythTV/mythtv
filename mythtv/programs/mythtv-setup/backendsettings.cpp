@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 // Qt
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QNetworkInterface>
 
 // MythTV

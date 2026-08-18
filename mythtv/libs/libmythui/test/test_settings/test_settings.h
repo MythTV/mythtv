@@ -1,6 +1,8 @@
 #ifndef LIBMYTHUI_TEST_SETTINGS_H
 #define LIBMYTHUI_TEST_SETTINGS_H
 
+#include <QChar>     // Fix Qt6 GCC SFINAE warning
+#include <QBitArray> // Fix Qt6 GCC SFINAE warning
 #include <QTest>
 
 #include "libmythui/standardsettings.h"

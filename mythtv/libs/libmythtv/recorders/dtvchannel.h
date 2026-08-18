@@ -12,6 +12,7 @@
 #include <vector>
 
 // Qt headers
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QReadWriteLock>
 #include <QString>
 #include <QMutex>

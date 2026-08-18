@@ -1,6 +1,7 @@
 #ifndef HLS_READER_H
 #define HLS_READER_H
 
+#include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QByteArray>
 #include <QMap>
 #include <QMutex>
