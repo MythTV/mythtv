@@ -219,7 +219,6 @@ goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 			int y2 = (int) (pt->y + (sina * line->amplitude * data[i]));
 
 			draw_line ((int *)p, x1, y1, x2, y2, color, line->screenX, line->screenY);
-			DRAWMETHOD_DONE ();
 
 			x1 = x2;
 			y1 = y2;

@@ -1,23 +1,12 @@
 #ifndef DRAWMETHODS_H
 #define DRAWMETHODS_H
 
-#include "goomconfig.h"
-#include "libmythbase/mythconfig.h"
+#include "libmythtv/sse2.h"
 
 #define DRAWMETHOD_NORMAL(adr,col) {*(adr) = (col);}
+#define DRAWMETHOD_OR(adr,col) {*(adr)|=(col);}
 
-#if HAVE_MMX
-#include "mmx.h"
-
-#define DRAWMETHOD_PLUS(_dest,_col) \
-{\
-movd_m2r (_dest, mm0); \
-paddusb_m2r (_col, mm0); \
-movd_r2m (mm0, _dest); \
-}
-
-#else
-#define DRAWMETHOD_PLUS(_dest,_col) \
+#define DRAWMETHOD_PLUS_C(_dest,_col) \
 {\
 	unsigned char *dra = (unsigned char*)&(_dest);\
 	unsigned char *cra = (unsigned char*)&(_col);\
@@ -26,26 +15,38 @@ movd_r2m (mm0, _dest); \
 		if (dra[i] < cra[i]) dra[i] = 255U;\
 	}\
 }
-#endif
 
-#define DRAWMETHOD_OR(adr,col) {*(adr)|=(col);}
-
-#if HAVE_MMX
-#define DRAWMETHOD_DONE() {__asm__ __volatile__ ("emms");}
+#ifdef Q_PROCESSOR_X86
+#define DRAWMETHOD_PLUS(_dest,_col) \
+	if (sse2_check()) \
+	{ \
+		__asm__ volatile ( \
+			"movd 		%[color], 	%%xmm1	\n\t" \
+			"movd 		%[in], 		%%xmm0	\n\t" \
+			"paddusb 	%%xmm1, 	%%xmm0	\n\t" \
+			"movd 		%%xmm0, 	%[out]	\n\t" \
+			: [out] "=m" (_dest) \
+			: [in] "m" (_dest), [color] "m" (_col)\
+			: "xmm0", "xmm1"  \
+			); \
+	} \
+	else \
+	{ \
+		DRAWMETHOD_PLUS_C(_dest, _col); \
+	}
 #else
-#define DRAWMETHOD_DONE() {}
+#define DRAWMETHOD_PLUS(_dest,_col) DRAWMETHOD_PLUS_C((_dest),(_col))
 #endif
 
 #ifndef DRAWMETHOD
 #define DRAWMETHOD DRAWMETHOD_PLUS(*p,col)
 
-static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx, int screeny) {
+inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int screenx, int screeny) {
     int     x = 0;	// am, tmp
     int     y = 0;
     int     dx = 0;
     int     dy = 0;
     int    *p = nullptr;
-
 
 	if ((y1 < 0) || (y2 < 0) || (x1 < 0) || (x2 < 0) || (y1 >= screeny) || (y2 >= screeny) || (x1 >= screenx) || (x2 >= screenx)) 
 			return;
@@ -163,5 +164,11 @@ static void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 	}
 }
 #endif
+
+#undef DRAWMETHOD
+#undef DRAWMETHOD_NORMAL
+#undef DRAWMETHOD_OR
+#undef DRAWMETHOD_PLUS
+#undef DRAWMETHOD_PLUS_C
 
 #endif // DRAWMETHODS_H
