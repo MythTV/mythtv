@@ -110,7 +110,7 @@ bool performActualUpdate(
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    LOG(VB_GENERAL, LOG_CRIT, QString("Upgrading to %1 schema version %2")
+    LOG(VB_GENERAL, LOG_NOTICE, QString("Upgrading to %1 schema version %2")
         .arg(component, version));
 
     if (!performUpdateSeries(component, updates))

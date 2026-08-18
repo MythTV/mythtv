@@ -420,9 +420,6 @@ static bool tryUpgradeTVDatabaseSchema(bool upgradeAllowed, bool upgradeIfNoUI, 
     if (schema_wizard->Compare() == 0) // DB schema is what we need it to be..
         return true;
 
-    if (!upgradeAllowed)
-        LOG(VB_GENERAL, LOG_WARNING, "Not allowed to upgrade the database.");
-
     if (informSystemd)
         db_sd_notify("waiting for user input");
     // Pop up messages, questions, warnings, etc.
