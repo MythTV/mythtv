@@ -24,56 +24,17 @@
 #include "goomconfig.h"
 #include "graphic.h"
 #include "zoom_filters.h"
-#include "libmythbase/mythconfig.h"
 #include "libmythbase/mythrandom.h"
 #ifndef __cpp_size_t_suffix
 #include <libmythbase/sizetliteral.h>
 #endif
+#include "libmythtv/sse2.h"
 
 static constexpr int8_t EFFECT_DISTORS    { 4 };
 static constexpr int8_t EFFECT_DISTORS_SL { 2 };
 
 extern volatile uint32_t resolx;
 extern volatile uint32_t c_resoly;
-
-/* Prototype to keep gcc from spewing warnings */
-static void select_zoom_filter (void);
-
-#if HAVE_MMX
-
-static int zf_use_xmmx = 0;
-static int zf_use_mmx = 0;
-
-static void select_zoom_filter (void) {
-	static int s_firsttime = 1;
-	if (s_firsttime){
-		if (zoom_filter_xmmx_supported()) {
-			zf_use_xmmx = 1;
-			printf ("Extended MMX detected. Using the fastest method !\n");
-		}
-		else if (zoom_filter_mmx_supported()) {
-			zf_use_mmx = 1;
-			printf ("MMX detected. Using fast method !\n");
-		}
-		else {
-			printf ("Too bad ! No MMX detected.\n");
-		}
-		s_firsttime = 0;
-	}
-}
-
-#else /* !HAVE_MMX */
-
-static void select_zoom_filter (void) {
-	static int firsttime = 1;
-	if (firsttime) {
-		printf ("No MMX support compiled in\n");
-		firsttime = 0;
-	}
-}
-
-#endif /* HAVE_MMX */
-
 
 uint32_t mmx_zoom_size;
 
@@ -505,7 +466,6 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
 		if (s_firstTime) {
 			s_firstTime = 0;
 			generatePrecalCoef ();
-			select_zoom_filter ();
 
 #ifdef __cpp_size_t_suffix
 			brutS.resize(2Z * resx * resy);
@@ -643,16 +603,13 @@ zoomFilterFastRGB (unsigned int * pix1, unsigned int * pix2, ZoomFilterData * zf
 	zoom_width = prevX;
 	mmx_zoom_size = prevX * prevY;
 
-#if HAVE_MMX
-	if (zf_use_xmmx) {
-            zoom_filter_xmmx (prevX, prevY,expix1, expix2,
-                              brutS, brutD, buffratio, precalCoef);
-	} else if (zf_use_mmx) {
-		zoom_filter_mmx (prevX, prevY,expix1, expix2,
+#ifdef Q_PROCESSOR_X86
+	if (sse2_check()) {
+		zoom_filter_sse2(prevX, prevY,expix1, expix2,
                                  brutS, brutD, buffratio, precalCoef);
 	} else {
             c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
-        }
+	}
 #else
 	c_zoom (expix1, expix2, prevX, prevY, brutS, brutD);
 #endif
