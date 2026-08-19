@@ -46,7 +46,6 @@ class ProfileDialog : public MythScreenType
     MythUIText             *m_newSizeText     {nullptr};
 
     MythUIButtonList       *m_profileBtnList  {nullptr};
-    MythUICheckBox         *m_enabledCheck    {nullptr};
     MythUIButton           *m_okButton        {nullptr};
 };
 

@@ -38,7 +38,6 @@ class META_PUBLIC VideoScanner : public QObject
 
   private:
     class VideoScannerThread *m_scanThread {nullptr};
-    bool                      m_cancel     {false};
 };
 
 class META_PUBLIC VideoScanChanges : public QEvent

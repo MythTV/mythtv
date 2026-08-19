@@ -250,7 +250,6 @@ class MusicPlayer : public QObject, public MythObservable
     float        m_playSpeed          {1.0F};
 
     // notification
-    bool m_showScannerNotifications   {true};
     QMap<QString, int>  m_notificationMap;
 
     // radio stuff

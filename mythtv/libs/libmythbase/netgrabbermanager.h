@@ -134,7 +134,6 @@ class MBASE_PUBLIC GrabberManager : public QObject
     QTimer                        *m_timer        {nullptr};
     GrabberScript::scriptList      m_scripts;
     std::chrono::hours             m_updateFreq   {24h};
-    uint                           m_runningCount {0};
     bool                           m_refreshAll   {false};
 };
 

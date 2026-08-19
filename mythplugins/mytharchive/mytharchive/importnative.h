@@ -135,8 +135,6 @@ class ImportNative : public MythScreenType
     MythUIButton *m_finishButton          {nullptr};
     MythUIButton *m_prevButton            {nullptr};
     MythUIButton *m_cancelButton          {nullptr};
-
-    bool          m_isValidXMLSelected    {false};
 };
 
 #endif

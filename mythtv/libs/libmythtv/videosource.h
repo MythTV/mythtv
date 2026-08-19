@@ -492,7 +492,7 @@ class SatIPDeviceID : public MythUITextEditSetting
     void SetTuner(const QString& /*tuner*/);
 
   private:
-    const CaptureCard &m_parent;
+    [[maybe_unused]] const CaptureCard &m_parent;
 };
 
 class SatIPDeviceAttribute : public GroupSetting
@@ -729,7 +729,7 @@ class FirewireModel : public CaptureCardComboBoxSetting
     void SetGUID(const QString &_guid);
 
   private:
-    const FirewireGUID *m_guid {nullptr};
+    [[maybe_unused]] const FirewireGUID *m_guid {nullptr};
 };
 
 class FirewireDesc : public GroupSetting
@@ -744,7 +744,7 @@ class FirewireDesc : public GroupSetting
     void SetGUID(const QString &_guid);
 
   private:
-    const FirewireGUID *m_guid {nullptr};
+    [[maybe_unused]] const FirewireGUID *m_guid {nullptr};
 };
 
 class CaptureCardGroup : public GroupSetting
@@ -1103,7 +1103,7 @@ class CetonDeviceID : public MythUITextEditSetting
     QString m_ip;
     QString m_card;
     QString m_tuner;
-    const CaptureCard &m_parent;
+    [[maybe_unused]] const CaptureCard &m_parent;
 };
 #endif // CONFIG_CETON
 

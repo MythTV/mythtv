@@ -205,8 +205,6 @@ class CriteriaRowEditor : public MythScreenType
     MythUIButton *m_value1Button         {nullptr};
     MythUIButton *m_value2Button         {nullptr};
 
-    MythUIText   *m_andText              {nullptr};
-
     MythUIButton *m_cancelButton         {nullptr};
     MythUIButton *m_saveButton           {nullptr};
 };

@@ -29,10 +29,6 @@ class MPLUGIN_PUBLIC ZMMiniPlayer : public ZMLivePlayer
 
   private:
     QTimer      *m_displayTimer {nullptr};
-
-    MythUIText  *m_monitorText  {nullptr};
-    MythUIText  *m_statusText   {nullptr};
-    MythUIImage *m_image        {nullptr};
 };
 
 #endif

@@ -95,7 +95,7 @@ class SCRConfig : public DiseqcConfigBase
     SCRConfig(DiSEqCDevSCR &scr, StandardSetting* parent);
 
   private:
-    DiSEqCDevSCR &m_scr;
+    [[maybe_unused]] DiSEqCDevSCR &m_scr;
 };
 
 class LNBTypeSetting;

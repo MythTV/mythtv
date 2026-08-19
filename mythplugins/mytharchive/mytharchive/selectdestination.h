@@ -65,7 +65,6 @@ class SelectDestination : public MythScreenType
     MythUICheckBox    *m_createISOCheck      {nullptr};
     MythUICheckBox    *m_doBurnCheck         {nullptr};
     MythUICheckBox    *m_eraseDvdRwCheck     {nullptr};
-    MythUIText        *m_createISOText       {nullptr};
     MythUIText        *m_doBurnText          {nullptr};
     MythUIText        *m_eraseDvdRwText      {nullptr};
 };

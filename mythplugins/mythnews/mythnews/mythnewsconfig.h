@@ -36,7 +36,6 @@ class MythNewsConfig : public MythScreenType
     MythUIButtonList   *m_siteList       {nullptr};
 
     MythUIText         *m_helpText       {nullptr};
-    MythUIText         *m_contextText    {nullptr};
     int                 m_updateFreq     {30};
 
   private slots:

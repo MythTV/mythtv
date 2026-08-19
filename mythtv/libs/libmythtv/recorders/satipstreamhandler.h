@@ -110,7 +110,6 @@ class SatIPDataReadHelper : public QObject
   private:
     SatIPStreamHandler *m_streamHandler   {nullptr};
     QUdpSocket         *m_socket          {nullptr};
-    int                 m_timer           {0};
     uint                m_sequenceNumber  {0};
     uint                m_count           {0};
     bool                m_valid           {false};
