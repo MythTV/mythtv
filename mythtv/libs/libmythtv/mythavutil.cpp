@@ -423,7 +423,12 @@ MythStreamInfoList::MythStreamInfoList(const QString& filename)
             }
             if (desc != nullptr)
                 info.m_codecName = desc->name;
-            info.m_duration  = stream->duration * stream->time_base.num / stream->time_base.den;
+            if (stream->duration != AV_NOPTS_VALUE)
+                info.m_duration  = stream->duration * stream->time_base.num / stream->time_base.den;
+            else if (ctx->duration != AV_NOPTS_VALUE)
+                info.m_duration  = ctx->duration / AV_TIME_BASE;
+            else
+                info.m_duration  = 0;
             if (info.m_codecType == 'V')
             {
                 if (codecpar != nullptr)
