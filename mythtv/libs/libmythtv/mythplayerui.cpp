@@ -464,7 +464,20 @@ void MythPlayerUI::VideoStart()
     if (hasForcedTextTrack)
         SetTrack(kTrackTypeRawText, forcedTrackNumber);
     else
-        SetCaptionsEnabled(m_captionsEnabledbyDefault, false);
+    {
+        switch (m_captionsEnabledbyDefault)
+        {
+            case 0:     // Captions off
+                SetCaptionsEnabled(false, false);
+                break;
+            case 1:     // Captions on
+                SetCaptionsEnabled(true, false);
+                break;
+            default:    // Last captions state
+                SetCaptionsEnabled(m_lastCaptionsEnabled, false);
+                break;
+        }
+    }
 
     m_osdLock.unlock();
 

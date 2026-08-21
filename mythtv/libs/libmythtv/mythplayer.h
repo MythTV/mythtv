@@ -459,7 +459,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     TeletextReader m_ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
-    bool      m_captionsEnabledbyDefault  {false};
+    uint      m_captionsEnabledbyDefault  {0}; // 0=off, 1=on, 2=last
+    bool      m_lastCaptionsEnabled       {false};
     bool      m_enableForcedSubtitles     {false};
     bool      m_disableForcedSubtitles    {false};
     bool      m_allowForcedSubtitles      {true};
