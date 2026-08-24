@@ -1017,14 +1017,12 @@ QMap<QString, QString> *AudioOutputALSA::GetDevices(const char *type)
     {
           char *name = snd_device_name_get_hint(*n, "NAME");
           char *desc = snd_device_name_get_hint(*n, "DESC");
-          QString nameStr(name);
-          QString descStr(desc);
+          if (name && desc && (strcmp(name, "null") != 0))
+              alsadevs->insert(name, desc);
           // To avoid a memory leak, the return value from snd_device_name_get_hint()
           // should be freed when no longer needed.
           free(name);   // NOLINT(cppcoreguidelines-no-malloc)
           free(desc);   // NOLINT(cppcoreguidelines-no-malloc)
-          if (!nameStr.isEmpty() && !descStr.isEmpty() && (nameStr != "null"))
-              alsadevs->insert(nameStr, descStr);
           n++;
     }
     snd_device_name_free_hint(hints);
