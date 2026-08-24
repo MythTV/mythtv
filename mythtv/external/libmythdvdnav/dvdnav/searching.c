@@ -129,21 +129,16 @@ static dvdnav_status_t dvdnav_scan_admap(dvdnav_t *this, int32_t domain, uint32_
   return DVDNAV_STATUS_ERR;
 }
 
-dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
-                                            uint64_t time, uint8_t search_to_nearest_cell) {
+dvdnav_status_t dvdnav_time_search(dvdnav_t *this,
+                                   uint64_t time) {
 
   uint64_t target = time;
   uint64_t length = 0;
-  uint64_t cell_length = 0;
-  uint64_t prev_length = 0;
   uint32_t first_cell_nr, last_cell_nr, cell_nr;
   int32_t found;
-  uint64_t offset = 0;
-  float diff2 = 1.0;
 
   cell_playback_t *cell;
   dvd_state_t *state;
-  dvdnav_status_t result;
 
   if(this->position_current.still != 0) {
     printerr("Cannot seek in a still frame.");
@@ -178,19 +173,17 @@ dvdnav_status_t dvdnav_absolute_time_search(dvdnav_t *this,
     cell =  &(state->pgc->cell_playback[cell_nr-1]);
     if(cell->block_type == BLOCK_TYPE_ANGLE_BLOCK && cell->block_mode != BLOCK_MODE_FIRST_CELL)
       continue;
-    cell_length = dvdnav_convert_time(&cell->playback_time);
-    length += cell_length;
-    if (target <= length) {
-      offset = (cell->last_sector - cell->first_sector);
-      diff2  = ((double)target - (double)prev_length) / (double)cell_length;
-      offset = (diff2 * offset);
-      target = cell->first_sector;
-      if (!search_to_nearest_cell)
-        target += offset;
+    length = dvdnav_convert_time(&cell->playback_time);
+    if (target >= length) {
+      target -= length;
+    } else {
+      /* FIXME: there must be a better way than interpolation */
+      target = target * (cell->last_sector - cell->first_sector + 1) / length;
+      target += cell->first_sector;
+
       found = 1;
       break;
     }
-    prev_length = length;
   }
 
   if(found) {

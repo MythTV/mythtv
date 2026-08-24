@@ -191,7 +191,7 @@ long long MythDVDBuffer::Seek(long long Time)
     else
     {
         m_seektime = mpeg::chrono::pts(Time);
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime.count(), 0);
+        dvdRet = dvdnav_time_search(m_dvdnav, m_seektime.count());
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("DVD Playback Seek() time: %1; seekSpeed: %2")
