@@ -1797,14 +1797,14 @@ int InternalUDFReadBlocksRaw( const dvd_reader_t *ctx, uint32_t lb_number,
     return -1;
   }
 
-  ret = ctx->dvdinput_seek( ctx->rd->dev, (int) lb_number, encrypted & DVDCSS_SEEK_KEY );
+  ret = ctx->dvdinput_seek( ctx->rd->dev, (int) lb_number );
   if( ret != (int) lb_number ) {
     Log1( ctx, "Can't seek to block %u", lb_number );
     return ret;
   }
 
   ret = ctx->dvdinput_read( ctx->rd->dev, (char *) data,
-                       (int) block_count, encrypted & DVDINPUT_READ_DECRYPT );
+                       (int) block_count, encrypted  );
   return ret;
 }
 
@@ -1860,7 +1860,7 @@ static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
 
     if( offset < dvd_file->title_sizes[ i ] ) {
       if( ( offset + block_count ) <= dvd_file->title_sizes[ i ] ) {
-        off = ctx->dvdinput_seek( dvd_file->title_devs[ i ], (int)offset, DVDINPUT_NOFLAGS );
+        off = ctx->dvdinput_seek( dvd_file->title_devs[ i ], (int)offset );
         if( off < 0 || off != (int)offset ) {
           Log1( ctx, "Can't seek to block %u", offset );
           return off < 0 ? off : 0;
@@ -1874,7 +1874,7 @@ static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
          * (This is only true if you try and read >1GB at a time) */
 
         /* Read part 1 */
-        off = ctx->dvdinput_seek( dvd_file->title_devs[ i ], (int)offset, DVDINPUT_NOFLAGS );
+        off = ctx->dvdinput_seek( dvd_file->title_devs[ i ], (int)offset );
         if( off < 0 || off != (int)offset ) {
           Log1( ctx, "Can't seek to block %u", offset );
           return off < 0 ? off : 0;
@@ -1890,7 +1890,7 @@ static int DVDReadBlocksPath( const dvd_file_t *dvd_file, unsigned int offset,
           return ret;
 
         /* Read part 2 */
-        off = ctx->dvdinput_seek( dvd_file->title_devs[ i + 1 ], 0, DVDINPUT_NOFLAGS );
+        off = ctx->dvdinput_seek( dvd_file->title_devs[ i + 1 ], 0 );
         if( off < 0 || off != 0 ) {
           Log1( ctx, "Can't seek to block %d", 0 );
           return off < 0 ? off : 0;

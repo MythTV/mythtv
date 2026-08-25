@@ -179,9 +179,9 @@ static dvd_input_t css_open(void *priv, dvd_logger_cb *logcb,
 /**
  * seek into the device.
  */
-static int css_seek(dvd_input_t dev, int blocks, int flags)
+static int css_seek(dvd_input_t dev, int blocks)
 {
-  return DVDcss_seek(dev->dvdcss, blocks, flags);
+  return DVDcss_seek(dev->dvdcss, blocks, DVDINPUT_NOFLAGS);
 }
 
 /**
@@ -293,7 +293,7 @@ static dvd_input_t file_open(void *priv, dvd_logger_cb *logcb,
 /**
  * seek into the device.
  */
-static int file_seek(dvd_input_t dev, int blocks, int flags UNUSED)
+static int file_seek(dvd_input_t dev, int blocks)
 {
   int pos = -1;
 
@@ -371,7 +371,7 @@ static int file_read(dvd_input_t dev, void *buffer, int blocks,
     if(read_bytes == 0) {
       /* Nothing more to read.  Return all of the whole blocks, if any.
        * Adjust the file position back to the previous block boundary. */
-      int ret = file_seek(dev, dev->ipos + blocks_read, DVDINPUT_NOFLAGS);
+      int ret = file_seek(dev, dev->ipos + blocks_read);
       if(ret < 0)
         return ret;
 
