@@ -141,11 +141,8 @@ else() # POSIX
     )
 endif()
 
-# Don't allow the hidden visibility flag for this target.
-# A private function from libdvdread is used: InternalUDFReadBlocksRaw().
-set_property(TARGET mythdvdnav PROPERTY C_VISIBILITY_PRESET)
-#target_compile_definitions(mythdvdnav PRIVATE DVDREAD_API_EXPORT)
-#target_compile_definitions(mythdvdnav PRIVATE DVDNAV_API_EXPORT)
+target_compile_definitions(mythdvdnav PRIVATE DVDREAD_API_EXPORT)
+target_compile_definitions(mythdvdnav PRIVATE DVDNAV_API_EXPORT)
 
 # libdvdcss
 set(_NEEDS_DLFCN ON)
