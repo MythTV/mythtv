@@ -184,8 +184,9 @@
             "inherits": [ "android-v7-qt6", "ci-sibling-build" ],
             "displayName": "Fire Stick 4K Max qt6 (separate lib install)",
             "cacheVariables": {
-                "ANDROID_MIN_SDK_VERSION": "25",
-                "ANDROID_TARGET_SDK_VERSION": "28"
+                "ANDROID_MIN_SDK_VERSION": "26",
+                "ANDROID_TARGET_SDK_VERSION": "36",
+                "ANDROID_PLATFORM": "android-36"
             }
         },
         {
@@ -210,8 +211,9 @@
             "inherits": [ "android-v8-qt6", "ci-sibling-build" ],
             "displayName": "Nvidia Shield qt6 (separate lib install)",
             "cacheVariables": {
-                "ANDROID_MIN_SDK_VERSION": "25",
-                "ANDROID_TARGET_SDK_VERSION": "29"
+                "ANDROID_MIN_SDK_VERSION": "26",
+                "ANDROID_TARGET_SDK_VERSION": "36",
+                "ANDROID_PLATFORM": "android-36"
             }
         },
 
