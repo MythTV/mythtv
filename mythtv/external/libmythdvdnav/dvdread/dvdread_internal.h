@@ -68,7 +68,7 @@ struct dvd_reader_s
                                    const char *, dvd_reader_stream_cb *,
                                    dvd_reader_filesystem_h *);
     int         (*dvdinput_close) (dvd_input_t);
-    int         (*dvdinput_seek)  (dvd_input_t, int, int);
+    int         (*dvdinput_seek)  (dvd_input_t, int);
     int         (*dvdinput_title) (dvd_input_t, int);
     int         (*dvdinput_read)  (dvd_input_t, void *, int, int);
     /* run to initialize DVD-Audio encryption */

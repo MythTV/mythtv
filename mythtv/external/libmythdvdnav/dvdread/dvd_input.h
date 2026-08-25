@@ -29,7 +29,6 @@
 #define DVDINPUT_NOFLAGS         0
 
 #define DVDINPUT_READ_DECRYPT    (1 << 0)
-#define DVDCSS_SEEK_KEY          (1 << 1)
 
 extern void        dvdinput_set_stream(dvd_input_t, dvd_type_t);
 /**
