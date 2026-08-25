@@ -433,17 +433,23 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
   if(logcb)
     ctx->logcb = *logcb;
 
+  /* Try to open libdvdcss or fall back to standard functions */
+  have_css = dvdinput_setup( ctx, &ctx->logcb, type );
+
   // open files using the provided filesystem implementation
   if (fs != NULL && ppath != NULL)
   {
     ctx->fs = fs;
     dvdinput_setup_builtin(ctx, &ctx->logcb);
-    /* DVDOpenFiles only opens a directory tree, so reject anything else */
+    /* If the path is not a directory, assume it is an image file. */
     if( ctx->fs->stat( ctx->fs, ppath, &fileinfo ) < 0 ||
         ( fileinfo.st_mode & DVD_S_IFMT ) != DVD_S_IFDIR )
     {
-      free(ctx);
-      return NULL;
+      ctx->rd = DVDOpenImageFile( ctx, ppath, NULL, have_css );
+      if(!ctx->rd)
+          return DVDFreeContext(ctx);
+      cpxm_init_condition( ctx, type, have_css );
+      return ctx;
     }
     ctx->rd = DVDOpenPath(ppath);
     if (!ctx->rd)
@@ -471,7 +477,6 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
   /* Try to open DVD using stream_cb functions */
   if( priv != NULL && stream_cb != NULL )
   {
-    have_css = dvdinput_setup( ctx, &ctx->logcb, type );
     ctx->rd = DVDOpenImageFile( ctx, NULL, stream_cb, have_css );
     if(!ctx->rd)
         return DVDFreeContext(ctx);
@@ -486,8 +491,6 @@ static dvd_reader_t *DVDOpenCommon( void *priv,
   if( path == NULL )
     goto DVDOpen_error;
 
-  /* Try to open libdvdcss or fall back to standard functions */
-  have_css = dvdinput_setup( ctx, &ctx->logcb, type );
 
 #if defined(_WIN32) || defined(__OS2__)
   /* Strip off the trailing \ if it is not a drive */
