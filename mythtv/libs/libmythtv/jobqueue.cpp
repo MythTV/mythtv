@@ -12,10 +12,12 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
 #include <QtSystemDetection>
 #endif
+#ifndef PTHREAD_NULL
 #ifdef Q_OS_BSD4
 static constexpr pthread_t PTHREAD_NULL { nullptr };
 #else
 static constexpr int PTHREAD_NULL { 0 };
+#endif
 #endif
 #include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
