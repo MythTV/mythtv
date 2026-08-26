@@ -17,11 +17,9 @@
 
 #define LOC      QString("ScreenSaverAndroid: ")
 
-#define MODE 1
 MythScreenSaverAndroid::MythScreenSaverAndroid(QObject *Parent)
   : MythScreenSaver(Parent)
 {
-    //jint keepScreenOn = QAndroidJniObject::getStaticObjectField<jint>("android/view/WindowManager/", "ACTION_CALL");
 }
 
 MythScreenSaverAndroid::~MythScreenSaverAndroid()
@@ -36,23 +34,18 @@ void MythScreenSaverAndroid::Disable()
 #else
     QJniObject activity = QNativeInterface::QAndroidApplication::context();
 #endif
-    LOG(VB_GENERAL, LOG_INFO, LOC + "disable");
-    if (activity.isValid()) {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "disable 1");
-#if MODE
-        activity.callMethod<void>("setSuspendSleep", "()V");
-#else
-        QAndroidJniObject window = activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
-
-        if (window.isValid()) {
-            const int FLAG_KEEP_SCREEN_ON = 128;
-            //QAndroidJniObject keepScreenOn = QAndroidJniObject::fromString("WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON");
-            window.callObjectMethod("addFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
-            //window.callMethod<void>("addFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
-            LOG(VB_GENERAL, LOG_INFO, LOC + "disable 2");
-        }
-#endif
+    if (!activity.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Screen Saver Disable: activity is not valid");
+        return;
     }
+    QAndroidJniObject::callStaticMethod<void>(
+        "org/mythtv/Utility",
+        "setSuspendSleep",
+        "(Landroid/app/Activity;)V",
+        activity.object()
+    );
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Screen Saver Disabled");
 }
 
 void MythScreenSaverAndroid::Restore()
@@ -62,22 +55,18 @@ void MythScreenSaverAndroid::Restore()
 #else
     QJniObject activity = QNativeInterface::QAndroidApplication::context();
 #endif
-    LOG(VB_GENERAL, LOG_INFO, LOC + "restore");
-    if (activity.isValid()) {
-        LOG(VB_GENERAL, LOG_INFO, LOC + "restore 1");
-#if MODE
-        activity.callMethod<void>("setAllowSleep", "()V");
-#else
-        QAndroidJniObject window = activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
-        if (window.isValid()) {
-            const int FLAG_KEEP_SCREEN_ON = 128;
-            //QAndroidJniObject keepScreenOn = QAndroidJniObject::fromString("WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON");
-            window.callObjectMethod("clearFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
-            //window.callMethod<void>("clearFlags", "(I)V", FLAG_KEEP_SCREEN_ON);
-            LOG(VB_GENERAL, LOG_INFO, LOC + "restore 2");
-        }
-#endif
+    if (!activity.isValid())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC + "Screen Saver Restore: activity is not valid");
+        return;
     }
+    QAndroidJniObject::callStaticMethod<void>(
+        "org/mythtv/Utility",
+        "setAllowSleep",
+        "(Landroid/app/Activity;)V",
+        activity.object()
+    );
+    LOG(VB_GENERAL, LOG_INFO, LOC + "Screen Saver Restored");
 }
 
 void MythScreenSaverAndroid::Reset()
