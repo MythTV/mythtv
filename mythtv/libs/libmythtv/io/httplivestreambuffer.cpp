@@ -1334,6 +1334,7 @@ public:
         // Interrupt on-going downloads of all stream playlists
         int streams = m_parent->NumStreams();
         QStringList listurls;
+        listurls.reserve(streams);
         for (int i = 0; i < streams; i++)
         {
             HLSStream *hls = m_parent->GetStream(i);
@@ -1857,7 +1858,11 @@ int HLSRingBuffer::ParseDecimalValue(const QString &line, int &target)
             break;
     if (i == p + 1)
         return RET_ERROR;
-    target = line.mid(p+1, i - p - 1).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    target = line.midRef(p+1, i - p - 1).toInt();
+#else
+    target = QStringView(line).mid(p+1, i - p - 1).toInt();
+#endif
     return RET_OK;
 }
 

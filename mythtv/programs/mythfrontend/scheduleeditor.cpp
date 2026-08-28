@@ -1550,6 +1550,7 @@ QStringList MetadataOptions::GetSupportedImageExtensionFilter()
     QStringList ret;
 
     QList<QByteArray> exts = QImageReader::supportedImageFormats();
+    ret.reserve(exts.size());
     for (const auto & ext : std::as_const(exts))
     {
         ret.append(QString("*.").append(ext));
@@ -2321,7 +2322,7 @@ void FilterOptMixin::Save()
         MythUIButtonListItem *button = m_filtersList->GetItemAt(idx);
         if (button != nullptr &&
             button->state() == MythUIButtonListItem::FullChecked)
-            filter_mask |= (1 << button->GetData().value<uint32_t>());
+            filter_mask |= (1 << button->GetData().toUInt());
     }
     m_rule->m_filter = filter_mask;
 }

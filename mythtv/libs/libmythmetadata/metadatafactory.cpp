@@ -439,15 +439,17 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     QList<PersonInfo> actors = lookup->GetPeople(kPersonActor);
     QList<PersonInfo> gueststars = lookup->GetPeople(kPersonGuestStar);
 
+    actors.reserve(actors.size() + gueststars.size());
     for (const auto& actor : std::as_const(gueststars))
         actors.append(actor);
 
-    VideoMetadata::cast_list cast;
     QStringList cl;
-
+    cl.reserve(actors.size());
     for (const auto& actor : std::as_const(actors))
         cl.append(actor.name);
 
+    VideoMetadata::cast_list cast;
+    cast.reserve(cl.size());
     for (const auto& name : std::as_const(cl))
     {
         QString cn = name.trimmed();
@@ -462,7 +464,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     // Genres
     VideoMetadata::genre_list video_genres;
     QStringList genres = lookup->GetCategories();
-
+    video_genres.reserve(genres.size());
     for (const auto& str : std::as_const(genres))
     {
         QString genre_name = str.trimmed();
@@ -477,7 +479,7 @@ void MetadataFactory::OnVideoResult(MetadataLookup *lookup)
     // Countries
     VideoMetadata::country_list video_countries;
     QStringList countries = lookup->GetCountries();
-
+    video_countries.reserve(countries.size());
     for (const auto& str : std::as_const(countries))
     {
         QString country_name = str.trimmed();

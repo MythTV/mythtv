@@ -164,6 +164,7 @@ void VideoScannerThread::run()
 
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
     QStringList imageExtensions;
+    imageExtensions.reserve(image_types.size());
     for (const auto & format : std::as_const(image_types))
         imageExtensions.push_back(QString(format));
 
@@ -205,7 +206,7 @@ void VideoScannerThread::run()
                                  m_delList));
 
         QStringList slist;
-
+        slist.reserve(m_addList.size() + m_movList.size() + m_delList.size());
         for (int id : std::as_const(m_addList))
             slist << QString("added::%1").arg(id);
         for (int id : std::as_const(m_movList))

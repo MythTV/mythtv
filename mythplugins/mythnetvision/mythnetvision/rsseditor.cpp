@@ -39,6 +39,7 @@ namespace
         QStringList ret;
 
         QList<QByteArray> exts = QImageReader::supportedImageFormats();
+        ret.reserve(exts.size());
         for (const auto & ext : std::as_const(exts))
             ret.append(QString("*.").append(ext));
 

@@ -273,6 +273,7 @@ uint64_t MythDisplayMode::FindBestScreen(const DisplayModeMap& Map,
 QString MythDisplayMode::ToString() const
 {
     QStringList rates;
+    rates.reserve(m_refreshRates.size());
     for (auto rate : m_refreshRates)
         rates << QString::number(rate, 'f', 2);
     return QObject::tr("%1x%2@%3Hz").arg(m_width).arg(m_height).arg(rates.join(", "));

@@ -1792,7 +1792,7 @@ void ProgramInfo::ToMap(InfoMap &progMap,
     {
         // This relies upon the translation established in the
         // definition of StorageGroup::kSpecialGroups.
-        // clazy:exclude=tr-non-literal
+        // clazy:exclude-next-line=tr-non-literal
         progMap["storagegroup"] = QObject::tr(m_storageGroup.toUtf8().constData());
     }
     else
@@ -2949,6 +2949,7 @@ QStringList ProgramInfo::QueryDVDBookmark(
             }
             else
             {
+                fields.reserve(5);
                 // Legacy bookmark
                 for(int i = 1; i < 5; i++)
                     fields.append(query.value(i).toString());
@@ -5535,6 +5536,9 @@ QString ProgramInfo::i18n(const QString &msg)
     std::call_once(init_done, init_tr);
 
     QByteArray msg_arr = msg.toLatin1();
+    // The following translation should only ever be called for
+    // strings that were previously initialized by the init_tr
+    // function.  clazy:exclude-next-line=tr-non-literal
     QString msg_i18n = QObject::tr(msg_arr.constData());
     QByteArray msg_i18n_arr = msg_i18n.toLatin1();
     return (msg_arr == msg_i18n_arr) ? msg : msg_i18n;

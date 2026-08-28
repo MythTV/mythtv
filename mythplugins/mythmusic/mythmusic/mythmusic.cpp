@@ -618,6 +618,7 @@ static void handleMedia(MythMediaDevice *cd, bool forcePlayback)
     // Create list of new tracks
     QList<int> songList;
     const int tracks = gMusicData->m_all_music->getCDTrackCount();
+    songList.reserve(tracks);
     for (track = 1; track <= tracks; track++)
     {
         MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(track);
@@ -766,6 +767,7 @@ static void handleCDMedia(MythMediaDevice *cd, bool forcePlayback)
 
         QList<int> songList;
 
+        songList.reserve(gMusicData->m_all_music->getCDTrackCount());
         for (int x = 1; x <= gMusicData->m_all_music->getCDTrackCount(); x++)
         {
             MusicMetadata *mdata = gMusicData->m_all_music->getCDMetadata(x);

@@ -1077,6 +1077,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         const QString& message = listline[1];
         QStringList extra( listline[2] );
+        extra.reserve(listline.size() - 2);
         for (int i = 3; i < listline.size(); i++)
             extra << listline[i];
         MythEvent me(message, extra);
@@ -1172,6 +1173,7 @@ void MainServer::customEvent(QEvent *e)
             {
                 QByteArray data = file.readAll();
                 QStringList extra("OK");
+                extra.reserve(7 + std::max(0, me->ExtraDataCount()-4));
                 extra.push_back(QString::number(recordingID));
                 extra.push_back(msg);
                 extra.push_back(datetime);
@@ -1221,6 +1223,7 @@ void MainServer::customEvent(QEvent *e)
             const QString& msg       = me->ExtraData(2);
 
             QStringList extra("ERROR");
+            extra.reserve(3 + std::max(0, me->ExtraDataCount()-4));
             extra.push_back(pginfokey);
             extra.push_back(msg);
             for (uint i = 4 ; i < (uint) me->ExtraDataCount(); i++)
@@ -1550,6 +1553,7 @@ void MainServer::customEvent(QEvent *e)
     {
         // Make a local copy of the list, upping the refcount as we go..
         std::vector<PlaybackSock *> localPBSList;
+        localPBSList.reserve(m_playbackList.size());
         m_sockListLock.lockForRead();
         for (auto & pbs : m_playbackList)
         {
@@ -4050,6 +4054,7 @@ void MainServer::HandleQueryFindFile(QStringList &slist, PlaybackSock *pbs)
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
+            fileList.reserve(filteredFiles.size());
             for (const QString& file : std::as_const(filteredFiles))
             {
                 fileList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),
@@ -6105,9 +6110,11 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
     if (updateDatabase)
         images->dumpToDatabase();
 
+    strlist.reserve(2 + (6 * images->getImageCount()));
     strlist << "OK";
     strlist.append(QString("%1").arg(images->getImageCount()));
 
+    QStringList paramList;
     for (uint x = 0; x < images->getImageCount(); x++)
     {
         AlbumArtImage *image = images->getImageAt(x);
@@ -6121,9 +6128,10 @@ void MainServer::HandleMusicFindAlbumArt(const QStringList &slist, PlaybackSock 
         // if this is an embedded image update the cached image
         if (image->m_embedded)
         {
-            QStringList paramList;
-            paramList.append(QString("--songid='%1'").arg(mdata->ID()));
-            paramList.append(QString("--imagetype='%1'").arg(image->m_imageType));
+            paramList.clear();
+            paramList.reserve(2);
+            paramList.append(QString("--songid='%1'").arg(mdata->ID()));           // clazy:exclude=reserve-candidates
+            paramList.append(QString("--imagetype='%1'").arg(image->m_imageType)); // clazy:exclude=reserve-candidates
 
             QString command = GetAppBinDir() + "mythutil --extractimage " + paramList.join(" ");
             QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
@@ -6822,6 +6830,7 @@ void MainServer::HandleMusicGetLyricGrabbers(const QStringList &/*slist*/, Playb
 
     grabbers.sort();
 
+    strlist.reserve(1 + grabbers.count());
     strlist << "OK";
 
     for (int x = 0; x < grabbers.count(); x++)
@@ -7094,6 +7103,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 
     const QString& message = slist[1];
     QStringList extra_data;
+    extra_data.reserve(slist.size() - 2);
     for (uint i = 2; i < (uint) slist.size(); i++)
         extra_data.push_back(slist[i]);
 

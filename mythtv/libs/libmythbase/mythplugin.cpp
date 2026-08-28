@@ -240,6 +240,7 @@ void MythPluginManager::DestroyAllPlugins(void)
 QStringList MythPluginManager::EnumeratePlugins(void)
 {
     QStringList ret;
+    ret.reserve(m_dict.size());
     for (auto *it : std::as_const(m_dict))
         ret << it->getName();
     return ret;

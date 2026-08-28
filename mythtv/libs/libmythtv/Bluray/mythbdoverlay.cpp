@@ -26,6 +26,7 @@ void MythBDOverlay::SetPalette(const BD_PG_PALETTE_ENTRY *Palette)
         return;
 
     QVector<QRgb> rgbpalette;
+    rgbpalette.reserve(256);
     for (int i = 0; i < 256; i++)
     {
         int y  = Palette[i].Y;

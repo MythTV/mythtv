@@ -378,6 +378,7 @@ void LIRC::Process(const QByteArray &data)
 
         std::vector<LircKeycodeEvent*> keyReleases;
 
+        keyReleases.reserve(a.count());
         for (int i = 0; i < a.count(); i++)
         {
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)

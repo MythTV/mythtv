@@ -273,7 +273,7 @@ void LyricsData::loadLyrics(const QString &xmlData)
     itemList = itemNode.toElement().elementsByTagName("lyric");
 
     QStringList lyrics;
-
+    lyrics.reserve(itemList.count());
     for (int x = 0; x < itemList.count(); x++)
     {
         QDomNode lyricNode = itemList.at(x);
@@ -291,6 +291,9 @@ void LyricsData::loadLyrics(const QString &xmlData)
                     lyric.remove(0,match.capturedLength(1));
                     match = kTimeCode.match(lyric);
                 }
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+                lyrics.reserve(lyrics.capacity() + times.size());
+#endif
                 for (const auto &time : std::as_const(times))
                     lyrics.append(time + lyric);
             }

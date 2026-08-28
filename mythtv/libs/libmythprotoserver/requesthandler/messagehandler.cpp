@@ -58,6 +58,7 @@ bool MessageHandler::HandleInbound(SocketHandler *sock, QStringList &slist)
 
     const QString& message = slist[1];
     QStringList extra_data;
+    extra_data.reserve(slist.size() - 2);
     for (uint i = 2; i < (uint) slist.size(); i++)
         extra_data.push_back(slist[i]);
 

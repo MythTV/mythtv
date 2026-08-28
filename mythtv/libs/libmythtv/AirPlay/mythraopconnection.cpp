@@ -930,7 +930,11 @@ void MythRAOPConnection::readClient(void)
             m_incomingHeaders.append(line);
             if (line.contains("Content-Length:"))
             {
-                m_incomingSize = line.mid(line.indexOf(" ") + 1).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                m_incomingSize = line.midRef(line.indexOf(" ") + 1).toInt();
+#else
+                m_incomingSize = QStringView(line).mid(line.indexOf(" ") + 1).toInt();
+#endif
             }
             line = stream.readLine();
         }

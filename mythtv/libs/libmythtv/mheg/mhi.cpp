@@ -950,7 +950,11 @@ int MHIContext::GetChannelIndex(const QString &str)
         {
             // I haven't seen this yet so this is untested.
             bool ok = false;
-            int channelNo = str.mid(14).toInt(&ok); // Decimal integer
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int channelNo = str.midRef(14).toInt(&ok); // Decimal integer
+#else
+            int channelNo = QStringView(str).mid(14).toInt(&ok); // Decimal integer
+#endif
             if (!ok)
                 break;
             MSqlQuery query(MSqlQuery::InitCon());
@@ -1706,6 +1710,7 @@ void MHIDLA::DrawArcSector(int /*x*/, int /*y*/, int /*width*/, int /*height*/,
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
 struct lineSeg { int m_yBottom, m_yTop, m_xBottom; float m_slope; };
+Q_DECLARE_TYPEINFO(lineSeg, Q_PRIMITIVE_TYPE);
 
 void MHIDLA::DrawPoly(bool isFilled, const MHPointVec& xArray, const MHPointVec& yArray)
 {

@@ -62,7 +62,12 @@ MythHTTPServer::MythHTTPServer()
     // the paths we want for sub-directories
     static const QStringList s_dirs = { "/assets/", "/3rdParty/", "/css/", "/images/", "/apps/", "/xslt/" };
     m_config.m_filePaths.clear();
+
+    // Build a list of directories.  Start the list with enough entries
+    // to handle a current install, preventing multiple allocations.
+    static constexpr int approximate_count {60};
     QStringList dirs;
+    dirs.reserve(approximate_count);
     for (const auto & dir : s_dirs)
     {
         dirs.append(dir);
@@ -546,6 +551,7 @@ QStringList MythHTTPServer::BuildAddressList(QHostInfo& Info)
     QString hostname = Info.hostName();
     QStringList results;
     auto ipaddresses = Info.addresses();
+    results.reserve(ipaddresses.count() + 1);
     for(auto & address : ipaddresses)
     {
         QString result = MythHTTP::AddressToString(address);

@@ -196,7 +196,7 @@ QList<MythUIType *> MythUIType::GetAllDescendants(void)
 
     for (const auto & item :std::as_const(m_childrenList))
     {
-        descendants += item;
+        descendants += item;  // clazy:exclude=reserve-candidates
         descendants += item->GetAllDescendants();
     }
     return descendants;

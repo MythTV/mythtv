@@ -311,6 +311,7 @@ MetadataLookup* MetadataDownload::findBestMatch(MetadataLookupList list,
     }
 
     // Build a list of all the titles
+    titles.reserve(list.size());
     for (const auto& lkup : std::as_const(list))
     {
         QString title = lkup->GetTitle();

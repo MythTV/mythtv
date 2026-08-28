@@ -1015,6 +1015,7 @@ void CommandLineArg::Convert(void)
         {
             QVariantList vlist = m_stored.toList();
             QStringList slist;
+            slist.reserve(vlist.size());
             for (const auto& item : std::as_const(vlist))
                 slist << QString::fromLocal8Bit(item.toByteArray());
             m_stored = QVariant(slist);

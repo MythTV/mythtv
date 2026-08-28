@@ -123,6 +123,7 @@ void MythVAAPIInteropGLX::InitPictureAttributes(MythVideoColourSpace* ColourSpac
     va_status = vaQueryDisplayAttributes(m_vaDisplay, attribs, &actual);
     CHECK_ST;
 
+    supported.reserve(actual);
     for (int i = 0; i < actual; i++)
     {
         int type = attribs[i].type;

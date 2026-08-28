@@ -511,7 +511,7 @@ MythPlayerUI* MythCodecContext::GetPlayerUI(AVCodecContext *Context)
     MythPlayerUI* result = nullptr;
     auto* decoder = reinterpret_cast<AvFormatDecoder*>(Context->opaque);
     if (decoder)
-        result = dynamic_cast<MythPlayerUI*>(decoder->GetPlayer());
+        result = qobject_cast<MythPlayerUI*>(decoder->GetPlayer());
     return result;
 }
 

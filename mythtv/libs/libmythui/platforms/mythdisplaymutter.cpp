@@ -500,16 +500,22 @@ void MythDisplayMutter::UpdateResources()
             .arg(crtc.height).arg(crtc.x).arg(crtc.y).arg(crtc.currentmode));
     }
 
+    QStringList possiblecrtcs;
+    QStringList modes;
+    QStringList props;
     args[2].value<QDBusArgument>() >> m_outputs;
     for (auto & output : m_outputs)
     {
-        QStringList possiblecrtcs;
+        possiblecrtcs.clear();
+        possiblecrtcs.reserve(output.possible_crtcs.size());
         for (auto poss : std::as_const(output.possible_crtcs))
             possiblecrtcs.append(QString::number(poss));
-        QStringList modes;
+        modes.clear();
+        modes.reserve(output.modes.size());
         for (auto mode : std::as_const(output.modes))
             modes.append(QString::number(mode));
-        QStringList props;
+        props.clear();
+        props.reserve(output.properties.size());
         for (const auto& prop : std::as_const(output.properties))
             props.append(QString("%1:%2").arg(prop.first, prop.second.variant().toString()));
         LOG(VB_GENERAL, LOG_DEBUG, LOC +

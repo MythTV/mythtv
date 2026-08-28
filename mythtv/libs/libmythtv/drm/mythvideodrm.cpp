@@ -23,7 +23,7 @@ MythVideoDRM::MythVideoDRM(MythVideoColourSpace* ColourSpace)
     if (m_colourSpace)
         m_colourSpace->IncrRef();
 
-    if (auto *drmdisplay = HasMythMainWindow() ? dynamic_cast<MythDisplayDRM*>(GetMythMainWindow()->GetDisplay()) : nullptr; drmdisplay)
+    if (auto *drmdisplay = HasMythMainWindow() ? qobject_cast<MythDisplayDRM*>(GetMythMainWindow()->GetDisplay()) : nullptr; drmdisplay)
     {
         if (m_device = drmdisplay->GetDevice(); m_device && m_device->Atomic() && m_device->Authenticated())
         {

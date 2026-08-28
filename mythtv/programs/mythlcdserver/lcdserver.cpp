@@ -173,7 +173,7 @@ QStringList LCDServer::parseCommand(QString &command)
         }
         else if (!bInString && c == ' ')
         {
-            tokens.append(s);
+            tokens.append(s); // clazy:exclude=reserve-candidates
             s = "";
         }
         else

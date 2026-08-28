@@ -103,6 +103,7 @@ void MythTranslation::reload()
     if (LanguageChanged())
     {
         QStringList keys;
+        keys.reserve(d.m_translators.size());
         for (TransMap::Iterator it = d.m_translators.begin();
              it != d.m_translators.end();
              ++it)

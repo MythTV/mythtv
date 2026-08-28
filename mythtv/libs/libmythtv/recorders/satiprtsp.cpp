@@ -58,6 +58,7 @@ bool SatIPRTSP::sendMessage(const QString& msg, QStringList *additionalheaders)
     }
 
     QStringList requestHeaders;
+    requestHeaders.reserve(4 + (additionalheaders ? additionalheaders->size() : 0));
     requestHeaders.append(QString("%1 %2 RTSP/1.0").arg(msg, m_requestUrl.toString()));
     requestHeaders.append(QString("User-Agent: MythTV Sat>IP client"));
     requestHeaders.append(QString("CSeq: %1").arg(++m_cseq));

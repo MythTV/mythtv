@@ -206,7 +206,11 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
     if (result.startsWith("OK:"))
     {
         bool ok = false;
-        int percent = result.mid(3).toInt(&ok);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        int percent = result.midRef(3).toInt(&ok);
+#else
+        int percent = QStringView(result).mid(3).toInt(&ok);
+#endif
         if (!ok)
         {
             LOG(VB_CHANNEL, LOG_ERR, LOC + QString

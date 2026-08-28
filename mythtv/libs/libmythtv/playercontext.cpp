@@ -408,7 +408,11 @@ QString PlayerContext::GetFilters(const QString &baseFilters) const
             if (!filters.isEmpty() && (!filters.endsWith(",")))
                 filters += ",";
 
-            filters += chanFilters.mid(1);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            filters += chanFilters.midRef(1);
+#else
+            filters += QStringView(chanFilters).mid(1);
+#endif
         }
     }
 

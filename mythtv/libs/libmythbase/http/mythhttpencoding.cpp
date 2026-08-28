@@ -48,7 +48,11 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
             if (auto index2 = qual.lastIndexOf("="); index2 > -1)
             {
                 bool ok = false;
-                auto newquality = qual.mid(index2 + 1).toFloat(&ok);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                auto newquality = qual.midRef(index2 + 1).toFloat(&ok);
+#else
+                auto newquality = QStringView(qual).mid(index2 + 1).toFloat(&ok);
+#endif
                 if (ok)
                     quality = newquality;
             }
@@ -63,6 +67,7 @@ QStringList MythHTTPEncoding::GetMimeTypes(const QString &Accept)
     // Build the final result. This will pass through invalid types - which should
     // be handled by the consumer (e.g. wildcard specifiers are not handled).
     QStringList result;
+    result.reserve(weightings.size());
     for (const auto & weight : weightings)
         result.append(weight.second);
 

@@ -80,7 +80,13 @@ QString MythExternRecApp::sanitize_var(const QString & var)
     while ((p1 = cleaned.indexOf("[{")) != -1)
     {
         p2 = cleaned.indexOf("}]", p1);
-        if (cleaned.mid(p1, p2 - p1).indexOf('%') == -1)
+        if (
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            cleaned.midRef(p1, p2 - p1).indexOf('%') == -1
+#else
+            QStringView(cleaned).mid(p1, p2 - p1).indexOf('%') == -1
+#endif
+            )
         {
             // Just remove the '[{' and '}]'
             cleaned = cleaned.remove(p2, 2);

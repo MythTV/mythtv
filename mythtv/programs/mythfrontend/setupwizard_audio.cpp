@@ -239,8 +239,7 @@ AudioOutputSettings AudioSetupWizard::UpdateCapabilities(bool restore, bool AC3)
 
     if (m_speakerNumberButtonList->GetItemCurrent() != nullptr)
     {
-        cur_speakers = m_speakerNumberButtonList->GetItemCurrent()->GetData()
-                                      .value<int>();
+        cur_speakers = m_speakerNumberButtonList->GetItemCurrent()->GetData().toInt();
     }
     m_maxspeakers = std::max(cur_speakers, m_maxspeakers);
     if (restore)
@@ -353,8 +352,7 @@ void AudioSetupWizard::save(void)
     gCoreContext->SaveBoolSetting("PassThruDeviceOverride", false);
     gCoreContext->SaveSetting("PassThruOutputDevice", QString());
 
-    int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData()
-                               .value<int>();
+    int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData().toInt();
     gCoreContext->SaveSetting("MaxChannels", channels);
 
     QString device =
@@ -409,8 +407,7 @@ void AudioSetupWizard::toggleSpeakers(void)
 
     AudioOutputSettings settings = UpdateCapabilities(false);
     QString out = m_audioDeviceButtonList->GetItemCurrent()->GetText();
-    int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData()
-                        .value<int> ();
+    int channels = m_speakerNumberButtonList->GetItemCurrent()->GetData().toInt();
 
     m_testThread =
         new AudioTestThread(this, out, out, channels, settings, false);

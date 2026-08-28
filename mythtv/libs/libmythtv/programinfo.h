@@ -12,8 +12,9 @@
 #if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
 #include <QtSystemDetection>
 #endif
-#include <QStringList>
 #include <QDateTime>
+#include <QStringList>
+#include <QTypeInfo>
 
 // MythTV headers
 #include "libmythbase/autodeletedeque.h"
@@ -870,6 +871,7 @@ class MTV_PUBLIC ProgramInfo
   public:
     QDateTime       m_previewUpdate;
 };
+Q_DECLARE_TYPEINFO(ProgramInfo::MarkupEntry,Q_RELOCATABLE_TYPE);
 
 // Class for specifying the desired grouping behavior when querying
 // for program data.  Note that title and starttime are always used in

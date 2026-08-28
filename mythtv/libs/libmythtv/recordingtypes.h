@@ -64,7 +64,7 @@ enum RecordingDupMethodType : std::uint8_t
     kDupCheckNone     = 0x01,
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
-    kDupCheckSubDesc  = 0x06,
+    kDupCheckSubDesc  = 0x06, // clazy:exclude=unexpected-flag-enumerator-value
     kDupCheckSubThenDesc = 0x08
 }; // note stored in uint8_t in ProgramInfo
 MTV_PUBLIC QString toString(RecordingDupMethodType rectype);

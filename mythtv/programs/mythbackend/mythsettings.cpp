@@ -477,6 +477,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
 #define LOC QString("parse_dom(%1@~%2), error: ") \
             .arg(filename).arg(e.lineNumber())
 
+    QStringList data_list;
+    QStringList display_list;
     bool mFoundGroup = false;
 
     QDomNode n = element.firstChild();
@@ -542,8 +544,8 @@ bool parse_dom(MythSettingList &settings, const QDomElement &element,
                 return false;
             }
 
-            QStringList data_list;
-            QStringList display_list;
+            data_list.clear();
+            display_list.clear();
             if ((MythSetting::kComboBox == dtype) ||
                 (MythSetting::kSelect   == dtype))
             {

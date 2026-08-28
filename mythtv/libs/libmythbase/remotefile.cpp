@@ -185,6 +185,7 @@ MythSocket *RemoteFile::openSocket(bool control)
     }
     else
     {
+        strlist.reserve(3 + m_possibleAuxFiles.size());
         strlist.push_back(QString("ANN FileTransfer %1 %2 %3 %4")
                           .arg(hostname).arg(static_cast<int>(m_writeMode))
                           .arg(static_cast<int>(m_useReadAhead)).arg(m_timeoutMs.count()));
@@ -1347,6 +1348,7 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
             }
 
             QStringList filteredFiles = files.filter(QRegularExpression(fi.fileName()));
+            strList.reserve(filteredFiles.size());
             for (const QString& file : std::as_const(filteredFiles))
             {
                 strList << MythCoreContext::GenMythURL(gCoreContext->GetHostName(),

@@ -260,6 +260,7 @@ MythHTTPStatus MythHTTPRanges::ParseRanges(const QString& Request, int64_t Total
         if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_INFO))
         {
             QStringList debug;
+            debug.reserve(ranges.size());
             for (const auto & range : ranges)
                 debug.append(QString("%1:%2").arg(range.first).arg(range.second));
             LOG(VB_HTTP, LOG_INFO, LOC + QString("Sorted ranges: %1").arg(debug.join(" ")));
@@ -294,6 +295,7 @@ MythHTTPStatus MythHTTPRanges::ParseRanges(const QString& Request, int64_t Total
     if (VERBOSE_LEVEL_CHECK(VB_HTTP, LOG_INFO))
     {
         QStringList debug;
+        debug.reserve(ranges.size());
         for (const auto & range : ranges)
             debug.append(QString("%1:%2").arg(range.first).arg(range.second));
         LOG(VB_HTTP, LOG_INFO, LOC + QString("Final ranges : %1").arg(debug.join(" ")));

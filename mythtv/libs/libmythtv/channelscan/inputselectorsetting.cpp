@@ -137,7 +137,11 @@ bool InputSelector::Parse(const QString &cardid_inputname,
     if (sep0 < 1)
         return false;
 
-    cardid    = cardid_inputname.left(sep0).toUInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    cardid    = cardid_inputname.leftRef(sep0).toUInt();
+#else
+    cardid    = QStringView(cardid_inputname).left(sep0).toUInt();
+#endif
     inputname = cardid_inputname.mid(sep0 + 1);
 
     return true;

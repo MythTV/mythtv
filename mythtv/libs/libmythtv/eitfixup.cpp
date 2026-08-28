@@ -307,7 +307,11 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event)
     {
         // Parse out the year
         bool ok = false;
-        uint y = event.m_description.mid(position + 1, 4).toUInt(&ok);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        uint y = event.m_description.midRef(position + 1, 4).toUInt(&ok);
+#else
+        uint y = QStringView(event.m_description).mid(position + 1, 4).toUInt(&ok);
+#endif
         if (ok)
         {
             event.m_originalairdate = QDate(y, 1, 1);
@@ -553,6 +557,7 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
              QStringList strListTmp;
              uint nTitle=0;
              int nTitleMax=-1;
+             strListTmp.reserve(strListColon.count());
              for (int i =0; (i<strListColon.count()) && (nTitleMax==-1);i++)
              {
                  const QStringList tmp = strListColon[i].split(" ");
@@ -565,6 +570,8 @@ void EITFixUp::SetUKSubtitle(DBEventEIT &event)
                      nTitleMax=i;
              }
              QString strPartial;
+             strPartial.reserve(nTitleMax);
+             strListEnd.reserve(1 + strListColon.count() - nTitleMax);
              for (int i=0;i<(nTitleMax-1);i++)
                  strPartial+=strListTmp[i]+":";
              if (nTitleMax>0)

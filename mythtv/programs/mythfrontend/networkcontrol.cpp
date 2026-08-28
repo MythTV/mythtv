@@ -870,9 +870,15 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         }
         else if (nc->getArg(2).contains(kSeekTimeRE))
         {
-            int hours   = nc->getArg(2).mid(0, 2).toInt();
-            int minutes = nc->getArg(2).mid(3, 2).toInt();
-            int seconds = nc->getArg(2).mid(6, 2).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int hours   = nc->getArg(2).midRef(0, 2).toInt();
+            int minutes = nc->getArg(2).midRef(3, 2).toInt();
+            int seconds = nc->getArg(2).midRef(6, 2).toInt();
+#else
+            int hours   = QStringView(nc->getArg(2)).mid(0, 2).toInt();
+            int minutes = QStringView(nc->getArg(2)).mid(3, 2).toInt();
+            int seconds = QStringView(nc->getArg(2)).mid(6, 2).toInt();
+#endif
             message = QString("NETWORK_CONTROL SEEK POSITION %1")
                               .arg((hours * 3600) + (minutes * 60) + seconds);
         }

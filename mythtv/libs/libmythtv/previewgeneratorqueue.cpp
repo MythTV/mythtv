@@ -312,6 +312,7 @@ bool PreviewGeneratorQueue::event(QEvent *e)
             }
 
             QStringList list;
+            list.reserve(4 + (*it).m_tokens.size());
             list.push_back(QString::number(recordedingID));
             list.push_back(filename);
             list.push_back(msg);

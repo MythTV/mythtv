@@ -142,11 +142,19 @@ int ExternalRecChannelFetcher::LoadChannels(void)
 
     if (result.startsWith("FOUND"))
     {
-        cnt = result.mid(6).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        cnt = result.midRef(6).toInt();
+#else
+        cnt = QStringView(result).mid(6).toInt();
+#endif
     }
     else if (result.startsWith("OK"))
     {
-        cnt = result.mid(3).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        cnt = result.midRef(3).toInt();
+#else
+        cnt = QStringView(result).mid(3).toInt();
+#endif
     }
     else
     {

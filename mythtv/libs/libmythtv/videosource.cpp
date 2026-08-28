@@ -1823,6 +1823,7 @@ void VBoxDeviceIDList::fillSelections(const QString &cur)
 
     const QString& current = cur;
 
+    devs.reserve(m_deviceList->size());
     for (auto it = m_deviceList->begin(); it != m_deviceList->end(); ++it)
     {
         devs.push_back(it.key());
@@ -4392,6 +4393,8 @@ void SatIPDeviceIDList::fillSelections(const QString &cur)
     const QString& current = cur;
     QString sel;
 
+    names.reserve(m_deviceList->size());
+    devs.reserve(m_deviceList->size());
     SatIPDeviceList::iterator it = m_deviceList->begin();
     for(; it != m_deviceList->end(); ++it)
     {

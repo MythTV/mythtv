@@ -251,6 +251,8 @@ void ScreenSetup::loadData()
 
     ScreenListMap screenListMap = loadScreens();
 
+    QStringList type_strs;
+
     // Fill the inactive screen button list.
     ScreenListMap::const_iterator i = screenListMap.constBegin();
     while (i != screenListMap.constEnd())
@@ -259,7 +261,8 @@ void ScreenSetup::loadData()
         types = si->m_dataTypes;
         si->m_units = ENG_UNITS;
 
-        QStringList type_strs;
+        type_strs.clear();
+        type_strs.reserve(types.size());
         for (const QString& type : std::as_const(types))
         {
             TypeListInfo ti(type);
@@ -484,6 +487,7 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     {
         auto *si = selected->GetData().value<ScreenListInfo *>();
         QStringList type_strs;
+        type_strs.reserve(si->m_types.size());
 
         TypeListMap types;
         // NOLINTNEXTLINE(modernize-loop-convert)
@@ -847,6 +851,7 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const QString &name,
       m_screenListInfo(new ScreenListInfo(*si)),   m_sourceManager(srcman),
       m_retScreen(retScreen)
 {
+    m_types.reserve(si->m_types.size());
     for (const auto & type : std::as_const(si->m_types))
         m_types << type.m_name;
 }

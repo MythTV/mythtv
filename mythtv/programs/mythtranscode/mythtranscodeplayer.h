@@ -6,6 +6,7 @@
 
 class MythTranscodePlayer : public MythPlayer
 {
+    Q_OBJECT
   public:
     explicit MythTranscodePlayer(PlayerContext* Context, PlayerFlags Flags = kNoFlags);
 

@@ -396,6 +396,7 @@ std::chrono::seconds MythDVDBuffer::GetChapterTimes(int Title)
     }
 
     QList<std::chrono::seconds> chapters;
+    chapters.reserve(num);
     // add the start
     chapters.append(0s);
     // don't add the last 'chapter' - which is the title end

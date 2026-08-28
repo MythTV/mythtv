@@ -1407,6 +1407,7 @@ void TV::GetStatus()
             QList<std::chrono::seconds> chapters;
             m_player->GetChapterTimes(chapters);
             QVariantList var;
+            var.reserve(chapters.size());
             for (std::chrono::seconds chapter : std::as_const(chapters))
                 var << QVariant((long long)chapter.count());
             status.insert("chaptertimes", var);
@@ -3243,6 +3244,7 @@ QList<QKeyEvent*> TV::ConvertScreenPressKeyMap(const QString &KeyList)
     QList<QKeyEvent*> keyPressList;
     int i = 0;
     QStringList stringKeyList = KeyList.split(',');
+    keyPressList.reserve(kScreenPressRegionCount);
     for (const auto & str : std::as_const(stringKeyList))
     {
         QKeySequence keySequence(str);
@@ -5898,7 +5900,11 @@ bool TV::ProcessSmartChannel(QString &InputStr)
     if ((size > 2) && (chan.at(size - 1) == chan.at(size - 2)))
     {
         bool ok = false;
-        chan.right(1).toUInt(&ok);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        chan.rightRef(1).toUInt(&ok);
+#else
+        (void)QStringView(chan).right(1).toUInt(&ok);
+#endif
         if (!ok)
         {
             chan = chan.left(chan.length()-1);
@@ -8249,7 +8255,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     else if (Action.startsWith("ADJUSTSTRETCH"))
     {
         bool floatRead = false;
-        float stretch = Action.right(Action.length() - 13).toFloat(&floatRead);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        float stretch = Action.rightRef(Action.length() - 13).toFloat(&floatRead);
+#else
+        float stretch = QStringView(Action).right(Action.length() - 13).toFloat(&floatRead);
+#endif
         if (floatRead &&
             stretch <= 2.0F &&
             stretch >= 0.48F)
@@ -8266,7 +8276,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     }
     else if (Action.startsWith("SELECTSCAN_"))
     {
-        OverrideScan(static_cast<FrameScanType>(Action.right(1).toInt()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        OverrideScan(static_cast<FrameScanType>(Action.rightRef(1).toInt()));
+#else
+        OverrideScan(static_cast<FrameScanType>(QStringView(Action).right(1).toInt()));
+#endif
     }
     else if (Action.startsWith(ACTION_TOGGELAUDIOSYNC))
     {
@@ -8298,7 +8312,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     }
     else if (Action.startsWith("TOGGLEPICCONTROLS"))
     {
-        m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.right(1).toInt() - 1);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_adjustingPictureAttribute = static_cast<PictureAttribute>(Action.rightRef(1).toInt() - 1);
+#else
+        m_adjustingPictureAttribute = static_cast<PictureAttribute>(QStringView(Action).right(1).toInt() - 1);
+#endif
         DoTogglePictureAttribute(kAdjustingPicture_Playback);
     }
     else if (Action == "TOGGLEASPECT")
@@ -8307,7 +8325,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     }
     else if (Action.startsWith("TOGGLEASPECT"))
     {
-        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.right(1).toInt()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(Action.rightRef(1).toInt()));
+#else
+        emit ChangeAspectOverride(static_cast<AspectOverrideMode>(QStringView(Action).right(1).toInt()));
+#endif
     }
     else if (Action == "TOGGLEFILL")
     {
@@ -8315,7 +8337,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
     }
     else if (Action.startsWith("TOGGLEFILL"))
     {
-        emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.right(1).toInt()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        emit ChangeAdjustFill(static_cast<AdjustFillMode>(Action.rightRef(1).toInt()));
+#else
+        emit ChangeAdjustFill(static_cast<AdjustFillMode>(QStringView(Action).right(1).toInt()));
+#endif
     }
     else if (Action == "MENU")
     {
@@ -8443,7 +8469,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
         else if (Action.startsWith("SWITCHTOINPUT_"))
         {
-            m_switchToInputId = Action.mid(14).toUInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            m_switchToInputId = Action.midRef(14).toUInt();
+#else
+            m_switchToInputId = QStringView(Action).mid(14).toUInt();
+#endif
             ScheduleInputChange();
         }
         else if (Action == "EDIT")
@@ -8477,17 +8507,29 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
         else if (Action.startsWith(ACTION_JUMPCHAPTER))
         {
-            int chapter = Action.right(3).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int chapter = Action.rightRef(3).toInt();
+#else
+            int chapter = QStringView(Action).right(3).toInt();
+#endif
             DoJumpChapter(chapter);
         }
         else if (Action.startsWith(ACTION_SWITCHTITLE))
         {
-            int title = Action.right(3).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int title = Action.rightRef(3).toInt();
+#else
+            int title = QStringView(Action).right(3).toInt();
+#endif
             DoSwitchTitle(title);
         }
         else if (Action.startsWith(ACTION_SWITCHANGLE))
         {
-            int angle = Action.right(3).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            int angle = Action.rightRef(3).toInt();
+#else
+            int angle = QStringView(Action).right(3).toInt();
+#endif
             DoSwitchAngle(angle);
         }
         else if (Action == "EDIT")
@@ -8501,7 +8543,11 @@ void TV::OSDDialogEvent(int Result, const QString& Text, QString Action)
         }
         else if (Action.startsWith("TOGGLECOMMSKIP"))
         {
-            SetAutoCommercialSkip(static_cast<CommSkipMode>(Action.right(1).toInt()));
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+            SetAutoCommercialSkip(static_cast<CommSkipMode>(Action.rightRef(1).toInt()));
+#else
+            SetAutoCommercialSkip(static_cast<CommSkipMode>(QStringView(Action).right(1).toInt()));
+#endif
         }
         else if (Action == "QUEUETRANSCODE")
         {

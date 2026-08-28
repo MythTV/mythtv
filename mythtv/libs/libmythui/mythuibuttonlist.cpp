@@ -3142,6 +3142,7 @@ void MythUIButtonList::updateLCD(void)
     auto start = std::max(0, m_selPosition - lcddev->getLCDHeight());
     auto end = std::min(m_itemCount, start + (lcddev->getLCDHeight() * 2));
 
+    menuItems.reserve(end - start);
     for (int r = start; r < end; ++r)
     {
         bool selected = r == GetCurrentPos();

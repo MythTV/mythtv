@@ -521,6 +521,9 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         std::vector<unsigned int> inputids2;
         std::vector<TVState> states;
 
+        inputids2.reserve(inputids.size());
+        states.reserve(inputids.size());
+
         // Stop remote recordings if needed
         for (uint inputid : inputids)
         {
@@ -3493,7 +3496,11 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
     if (m_channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
         // FIXME This is just horrible
-        int dir     = channum.right(channum.length() - 12).toInt();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        int dir     = channum.rightRef(channum.length() - 12).toInt();
+#else
+        int dir     = QStringView(channum).right(channum.length() - 12).toInt();
+#endif
         uint chanid = m_channel->GetNextChannel(0, static_cast<ChannelChangeDirection>(dir));
         channum     = ChannelUtil::GetChanNum(chanid);
     }

@@ -526,6 +526,7 @@ static QStringList to_string_list(const TeletextSubPage &subPage)
 {
     QStringList content;
     // Skip the page header (line 0)
+    content.reserve(subPage.data.size() - 1);
     for (size_t i = 1; i < subPage.data.size(); ++i)
     {
         QString str = decode_teletext(subPage.lang, subPage.data[i]).trimmed();

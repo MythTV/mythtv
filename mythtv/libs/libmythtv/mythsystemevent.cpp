@@ -233,7 +233,11 @@ QString MythSystemEventHandler::EventNameToSetting(const QString &name)
     for (const auto & part : std::as_const(parts))
     {
         result += part.at(0).toUpper();
-        result += part.mid(1);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        result += part.midRef(1);
+#else
+        result += QStringView(part).mid(1);
+#endif
     }
 
     return result;

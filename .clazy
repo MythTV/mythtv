@@ -5,64 +5,153 @@
 // BASE LEVEL
 level1
 
-// Disable these level0 checks
-   no-overloaded-signal
-   // Qt6 removed QStringRef class
-   no-qstring-ref
- 
-// Disable these level1 checks
-   no-qproperty-without-notify
-   no-non-pod-global-static
-   // This appears to have been broken in the latest clazy update.
-   // no-incorrect-emit
+////////////////////////////////////////
+// MANUAL CHECKS - need to be explicitly enabled
 
-//
-// LEVEL2 CHECKS
-//
-   base-class-event
-   function-args-by-ref
-   function-args-by-value
-   global-const-char-pointer
-   old-style-connect
-   returning-void-expression
-   static-pmf
-   virtual-call-ctor
+assert-with-side-effects
+container-inside-loop
+heap-allocated-small-trivial-type
+ifndef-define-typo
+isempty-vs-count
+qhash-with-char-pointer-key
+qproperty-type-mismatch
+qrequiredresult-candidates
+qstring-ref
+qvariant-template-instantiation
+raw-environment-function
+reserve-candidates
+tr-non-literal
+unneeded-cast
+use-arrow-operator-instead-of-data
+use-chrono-in-qtimer
 
-// Not investigated yet
-//   copyable-polymorphic
-//   ctor-missing-parent-argument
-//   implicit-casts
-//   missing-qobject-macro
-//   missing-typeinfo
-     // Qt6 is migrating from QLatin1String to c++ unicode string literals.
-//   qstring-allocations
-//   rule-of-three
+// As of 2026-07-17, this check crashes clazy.
+//
+// compare-member-check
 
+// Not needed. The QT_DISABLE_DEPRECATED_*/QT_ENABLE_STRICT_MODE_UP_TO
+// compile time argument prevents this case.
 //
-// MANUAL CHECKS
+// qbytearray-conversion-to-c-style
+
+// This check isn't useful on the MythTV code base.
 //
-   assert-with-side-effects
-   container-inside-loop
-   isempty-vs-count
-   qhash-with-char-pointer-key
-   raw-environment-function
-   use-chrono-in-qtimer
+// qstring-varargs
+
+// Not needed.  MythTV uses [[maybe_unused]] instead of Q_UNUSED.
+//
+// used-qunused-variable
+
+// Flag potential conflicts with the C++20 keyword 'emit'.  The emit()
+// function is defined in the 'syncscream' header, so changes are not
+// needed until that header file is included by a file.  As of
+// 2026-07-17, there are 733 unique instances of this warning.
+//
+// qt-keyword-emit
+
+// Not needed unless we decide to switch to using Q_EMIT, etc.  As of
+// 2026-07-17, there are 1322 unique uses of the keywords 'emit',
+// 'slots', and 'signals'.
+//
+// qt-keywords
+
+//////////
+
+// As of 2026-07-17, there are 977 unique instances of calls to
+// potentially detaching functions.
+//
+// detaching-member
+
+// As of 2026-07-17, there are xxx instances of this warning.
+//
+// jni-signatures
+
+// As of 2026-07-17, this check is documented but not in the current
+// clang-tidy version 22.
+//
+// modernize-list-initialization
 
 // Only three or four instances, but produce ~90 warnings.
-//   signal-with-return-value
+//
+// signal-with-return-value
 
-// Not investigated yet
-//   detaching-member
-//   heap-allocated-small-trivial-type
-//   ifndef-define-typo
-//   inefficient-qlist
-//   jni-signatures
-//   qproperty-type-mismatch
-//   qrequiredresult-candidates
-//   qt6-deprecated-api-fixes
-//   qt6-qlatin1stringchar-to-u
-//   qvariant-template-instantiation
-//   reserve-candidates
-//   thread-with-slots
-//   tr-non-literal
-//   unneeded-cast
+// As of 2026-07-17, there is 1 instance of this warning.
+//
+// thread-with-slots
+
+// As of 2026-07-17, this generates ~140 errors.
+//   ~40 calls to QObject::disconnect
+//   ~20 calls to ZMServer::send
+//   ~10 calls to QDir::xxx
+//   ~10 calls to MPEGStreamData::DeleteCachedTable
+//   ~10 calls to ImageXXX::UpdateDbImage
+//   lots of one-offs
+// unused-result-check
+
+
+
+////////////////////////////////////////
+// LEVEL0 CHECKS - all enabled by 'level1' statement
+// - disable one check
+
+// MythTV has several instances of overloaded signals
+no-overloaded-signal
+
+
+
+////////////////////////////////////////
+// LEVEL1 CHECKS - all enabled by 'level1' statement
+// - disable two checks
+
+// This flag is designed more for libraries, not executables.  It
+// will, however point out global static variables, so could be
+// temporarily enabled for that reason.
+no-non-pod-global-static
+
+// Only really needed for apps using QML.
+no-qproperty-without-notify
+
+
+
+////////////////////////////////////////
+// LEVEL2 CHECKS - not enabled as a group. May be noisy.
+// - enable some individual checks
+
+base-class-event
+function-args-by-ref
+function-args-by-value
+global-const-char-pointer
+missing-typeinfo
+old-style-connect
+returning-void-expression
+static-pmf
+virtual-call-ctor
+implicit-casts
+
+// As of 2026-07-17, there are 671 unique instances of polymorphic
+// classes that are copyable.
+//
+// copyable-polymorphic
+
+// As of 2026-07-14, the constructors for 606 classes don't take a
+// parent object.
+//
+// ctor-missing-parent-argument
+
+// As of 2026-07-14, there are 361 classes derived from QObject that
+// don't include the Q_OBJECT macro.  This macro isn't required in
+// every derived object, only ones that use certain features.
+//
+// missing-qobject-macro
+
+// Qt6 is migrating from QLatin1String to c++ Unicode string literals.
+// Wait until Qt5 support is removed before using the operator""_s
+// function to create string literals.
+//
+// qstring-allocations
+
+// As of 2026-07-17, there are 86 unique classes that violate the C++
+// rule-of-three/rule-of-five.  These rules are related to object
+// memory management, or lack thereof.
+//
+// rule-of-three

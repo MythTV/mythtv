@@ -48,7 +48,7 @@ void MythXMLPListSerialiser::AddValue(const QString& Name, const QVariant& Value
     if (object)
     {
         QVariant isNull = object->property("isNull");
-        if (isNull.value<bool>())
+        if (isNull.toBool())
             return;
         AddQObject(Name, object);
         return;

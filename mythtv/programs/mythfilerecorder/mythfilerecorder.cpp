@@ -297,7 +297,11 @@ bool Commands::process_command(QString & cmd)
     }
     else if (cmd.startsWith("BlockSize"))
     {
-        m_streamer->BlockSize(cmd.mid(10).toInt());
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        m_streamer->BlockSize(cmd.midRef(10).toInt());
+#else
+        m_streamer->BlockSize(QStringView(cmd).mid(10).toInt());
+#endif
         send_status("OK");
     }
     else if (cmd.startsWith("StartStreaming"))

@@ -482,6 +482,7 @@ bool ServerPool::listen(QStringList addrstr, quint16 port, bool requireall,
                         PoolServerType servertype)
 {
     QList<QHostAddress> addrs;
+    addrs.reserve(addrstr.size());
     for (const auto & str : std::as_const(addrstr))
         addrs << QHostAddress(str);
     return listen(addrs, port, requireall, servertype);
@@ -603,6 +604,7 @@ bool ServerPool::bind(QList<QHostAddress> addrs, quint16 port,
 bool ServerPool::bind(QStringList addrstr, quint16 port, bool requireall)
 {
     QList<QHostAddress> addrs;
+    addrs.reserve(addrstr.size());
     for (const auto & str : std::as_const(addrstr))
         addrs << QHostAddress(str);
     return bind(addrs, port, requireall);

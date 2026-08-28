@@ -178,6 +178,7 @@ namespace
         {
                 QList<QDomNode> result;
                 QDomNodeList unf = elem.elementsByTagNameNS(ns, name);
+                result.reserve(unf.size());
                 for (int i = 0, size = unf.size(); i < size; ++i)
                         if (unf.at(i).parentNode() == elem)
                                 result << unf.at(i);
@@ -284,6 +285,7 @@ private:
          QDomNodeList entries = holder.elementsByTagNameNS(Parse::kMediaRSS,
              "content");
 
+         result.reserve(entries.size());
          for (int i = 0; i < entries.size(); ++i)
          {
              MRSSEntry entry;
@@ -436,6 +438,7 @@ private:
         QList<MRSSThumbnail> result;
         QList<QDomNode> thumbs = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "thumbnail");
+        result.reserve(thumbs.size());
         for (const auto& dom : std::as_const(thumbs))
         {
             QDomElement thumbNode = dom.toElement();
@@ -461,6 +464,7 @@ private:
         QList<QDomNode> credits = GetDirectChildrenNS(element, Parse::kMediaRSS,
            "credit");
 
+        result.reserve(credits.size());
         for (const auto& dom : std::as_const(credits))
         {
             QDomElement creditNode = dom.toElement();
@@ -487,6 +491,7 @@ private:
             QDomNodeList comments = commParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::kMediaRSS,
                 "comment");
+            result.reserve(comments.size());
             for (int i = 0; i < comments.size(); ++i)
             {
                 MRSSComment comment =
@@ -506,6 +511,9 @@ private:
             QDomNodeList responses = respParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::kMediaRSS,
                 "response");
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            result.reserve(result.capacity() + responses.size());
+#endif
             for (int i = 0; i < responses.size(); ++i)
             {
                 MRSSComment comment =
@@ -525,6 +533,9 @@ private:
             QDomNodeList backlinks = backParents.at(0).toElement()
                 .elementsByTagNameNS(Parse::kMediaRSS,
                 "backLink");
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            result.reserve(result.capacity() + backlinks.size());
+#endif
             for (int i = 0; i < backlinks.size(); ++i)
             {
                 MRSSComment comment =
@@ -544,6 +555,7 @@ private:
         QList<QDomNode> links = GetDirectChildrenNS(element, Parse::kMediaRSS,
             "peerLink");
 
+        result.reserve(links.size());
         for (const auto& dom : std::as_const(links))
         {
             QDomElement linkNode = dom.toElement();
@@ -568,6 +580,7 @@ private:
             QDomNodeList scenesNodes = scenesNode.at(0).toElement()
                 .elementsByTagNameNS(Parse::kMediaRSS, "scene");
 
+            result.reserve(scenesNodes.size());
             for (int i = 0; i < scenesNodes.size(); ++i)
             {
                 QDomElement sceneNode = scenesNodes.at(i).toElement();
@@ -1120,6 +1133,7 @@ QList<Enclosure> Parse::GetEnclosures(const QDomElement& entry)
 {
     QList<Enclosure> result;
     QDomNodeList links = entry.elementsByTagName("enclosure");
+    result.reserve(links.size());
     for (int i = 0; i < links.size(); ++i)
     {
         QDomElement link = links.at(i).toElement();

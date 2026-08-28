@@ -146,6 +146,7 @@ static QString LocalSubtitleFilename(QFileInfo &FileInfo)
         baseName = vidFileName.left(suffixPos);
 
     QStringList list;
+    list.reserve(kSubExt.size());
     {
         // The dir listing does not work if the filename has the
         // following chars "[]()" so we convert them to the wildcard '?'
@@ -327,6 +328,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
 
             if (IsSubtitlePossible(extension))
             {
+                auxFiles.reserve(kSubExt.size());
                 for (const auto & ext : kSubExt)
                     auxFiles += baseName + ext;
             }

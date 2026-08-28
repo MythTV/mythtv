@@ -423,7 +423,7 @@ void EditMetadataDialog::ratingSpinChanged(MythUIButtonListItem *item)
 {
     if (item)
     {
-        int rating = item->GetData().value<int>();
+        int rating = item->GetData().toInt();
         s_metadata->setRating(rating);
 
         if (m_ratingState)

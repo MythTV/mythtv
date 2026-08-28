@@ -975,6 +975,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
     catch (...)
     {
         QStringList params;
+        params.reserve(args.Size());
         for (int i = 0; i < args.Size(); ++i)
         {
             MHUnion un;

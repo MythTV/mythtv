@@ -1497,8 +1497,13 @@ void LCDProcClient::scrollMenuText()
                 // Indent this item if nessicary
                 aString += bString.fill(' ', curItem->getIndent());
 
-                aString += curItem->ItemName().mid(curItem->getScrollPos(),
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
                                                    ( m_lcdWidth - lcdStartCol));
+#else
+                aString += QStringView(curItem->ItemName())
+                    .mid(curItem->getScrollPos(), (m_lcdWidth - lcdStartCol));
+#endif
                 aString += "\"";
                 sendToServer(aString);
                 return;
@@ -1608,8 +1613,15 @@ void LCDProcClient::scrollMenuText()
             curItem->incrementScrollPos();
 
             if ((int)curItem->getScrollPos() <= longest_line)
-                aString += curItem->ItemName().mid(curItem->getScrollPos(),
+            {
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+                aString += curItem->ItemName().midRef(curItem->getScrollPos(),
                                                    ( m_lcdWidth-lcdStartCol));
+#else
+                aString += QStringView(curItem->ItemName())
+                    .mid(curItem->getScrollPos(), (m_lcdWidth-lcdStartCol));
+#endif
+            }
 
             aString += "\"";
             sendToServer(aString);
@@ -2073,7 +2085,7 @@ QStringList LCDProcClient::formatScrollerText(const QString &text) const
             formatedLine = formatedLine.replace(( m_lcdWidth - lastSplit) / 2,
                      lastSplit, line.left(lastSplit));
 
-            lines.append(formatedLine);
+            lines.append(formatedLine); // clazy:exclude=reserve-candidates
 
             if (line[lastSplit] == ' ' || line[lastSplit] == '|')
                 line = line.mid(lastSplit + 1);

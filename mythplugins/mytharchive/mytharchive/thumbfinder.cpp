@@ -92,6 +92,7 @@ ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
 {
     // copy thumbList so we can abandon changes if required
     m_thumbList.clear();
+    m_thumbList.reserve(m_archiveItem->thumbList.size());
     for (const auto *item : std::as_const(m_archiveItem->thumbList))
     {
         auto *thumb = new ThumbImage;

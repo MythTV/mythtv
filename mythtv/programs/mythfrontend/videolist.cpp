@@ -632,7 +632,7 @@ MythGenericTree *VideoListImp::buildVideoList(
     {
         m_videoTreeRoot.reset(new MythGenericTree(QObject::tr("Video Home"),
                                                   kRootNode, false));
-        m_videoTreeRoot.data()->addNode(QObject::tr("No files found"),
+        m_videoTreeRoot->addNode(QObject::tr("No files found"),
                                         kNoFilesFound, false);
     }
 

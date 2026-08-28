@@ -330,7 +330,7 @@ MythDRMPtr MythDRMDevice::Create(QScreen *qScreen, const QString &Device,
                                  [[maybe_unused]] bool NeedPlanes)
 {
 #if CONFIG_QTPRIVATEHEADERS
-    auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
+    auto * app = qobject_cast<QGuiApplication *>(QCoreApplication::instance());
     if (qScreen && app && QGuiApplication::platformName().contains("eglfs", Qt::CaseInsensitive))
     {
         int fd = 0;
@@ -927,7 +927,7 @@ void MythDRMDevice::MainWindowReady()
 
 bool MythDRMDevice::QueueAtomics(const MythAtomics& Atomics) const
 {
-    auto * app = dynamic_cast<QGuiApplication *>(QCoreApplication::instance());
+    auto * app = qobject_cast<QGuiApplication *>(QCoreApplication::instance());
     if (!(m_atomic && m_authenticated && app))
         return false;
 

@@ -503,8 +503,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 {
     connect(m_updateTimer, &QTimer::timeout, this, &GuideGrid::updateTimeout);
 
-    for (uint i = 0; i < MAX_DISPLAY_CHANS; i++)
-        m_programs.push_back(nullptr);
+    m_programs.resize(MAX_DISPLAY_CHANS, nullptr);
 
     m_originalStartTime = MythDate::current();
     if (startTime.isValid() &&
@@ -1691,6 +1690,7 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
 
     auto program = proglist->begin();
     std::vector<ProgramInfo*> unknownlist;
+    unknownlist.reserve(m_timeCount);
     bool unknown = false;
     ProgramInfo *proginfo = nullptr;
     for (int x = 0; x < m_timeCount; ++x)

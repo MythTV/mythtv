@@ -146,8 +146,13 @@ static bool retrieve_SeasonEpisode(int& season, int& episode,
     // S##E## as set by mythfilldatabase
     bool okSeason  { false };
     bool okEpisode { false };
-    season = synd.mid(1, eIndex - 1).toInt(&okSeason);
-    episode = synd.mid(eIndex + 1).toInt(&okEpisode);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    season = synd.midRef(1, eIndex - 1).toInt(&okSeason);
+    episode = synd.midRef(eIndex + 1).toInt(&okEpisode);
+#else
+    season = QStringView(synd).mid(1, eIndex - 1).toInt(&okSeason);
+    episode = QStringView(synd).mid(eIndex + 1).toInt(&okEpisode);
+#endif
 
     return okSeason && okEpisode;
 }
@@ -3565,6 +3570,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
     QString forceDeleteStr("0");
 
     QStringList list;
+    list.reserve(3 * m_playList.size());
     for (int id : std::as_const(m_playList))
     {
         ProgramInfo *tmpItem = FindProgramInUILists(id);
@@ -4831,6 +4837,8 @@ void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
     QStringList displayNames("Default");
 
     QStringList list = PlayGroup::GetNames();
+    groupNames.reserve(1 + list.size());
+    displayNames.reserve(1 + list.size());
     for (const auto& name : std::as_const(list))
     {
         displayNames.push_back(name);

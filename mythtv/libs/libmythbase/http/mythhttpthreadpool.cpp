@@ -54,7 +54,7 @@ void MythHTTPThreadPool::AddThread(MythHTTPThread *Thread)
 
 void MythHTTPThreadPool::ThreadFinished()
 {
-    auto * qthread = dynamic_cast<QThread*>(sender());
+    auto * qthread = qobject_cast<QThread*>(sender());
     auto found = std::ranges::find_if(std::as_const(m_threads),
             [&qthread](MythHTTPThread* Thread) { return Thread->qthread() == qthread; });
     if (found == m_threads.cend())

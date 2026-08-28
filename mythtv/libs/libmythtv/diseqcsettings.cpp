@@ -458,7 +458,11 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     QChar postfix = angle.at(angle.length() - 1);
     if (postfix.isLetter())
     {
-        pos = angle.left(angle.length() - 1).toDouble();
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+        pos = angle.leftRef(angle.length() - 1).toDouble();
+#else
+        pos = QStringView(angle).left(angle.length() - 1).toDouble();
+#endif
         if ((translated &&
              (postfix.toUpper() ==
               DeviceTree::tr("W", "Western Hemisphere").at(0))) ||
