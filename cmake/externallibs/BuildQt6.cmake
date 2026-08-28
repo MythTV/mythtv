@@ -229,7 +229,8 @@ function(find_or_build_qt)
 
        # Other android arguments
        -DBUILD_SHARED_LIBS=ON
-       -DCMAKE_BUILD_TYPE=$<IF:$<CONFIG:Debug>,Debug,Release>
+       -DCMAKE_BUILD_TYPE=Release
+       -DQT_BUILD_DOCS=OFF
        -DQT_BUILD_EXAMPLES=OFF
        -DQT_BUILD_TESTS=OFF
        -DQT_USE_CCACHE=ON
@@ -254,10 +255,14 @@ function(find_or_build_qt)
        # class of problems for all devices.
        -DQT_FEATURE_highdpiscaling=OFF
 
-       # Qt6 components
+       # Which Qt6 components should be built.  This set of BUILD_xxx
+       # defines has a one-to-one correspondence to the submodules
+       # (aka directories) in the Qt6 sources.
        -DBUILD_qt3d=OFF
        -DBUILD_qt5compat=OFF
        -DBUILD_qtactiveqt=OFF
+#      -DBUILD_qtbase=ON
+#      -DBUILD_qtcanvaspainter=ON
        -DBUILD_qtcharts=OFF
        -DBUILD_qtcoap=OFF
        -DBUILD_qtconnectivity=OFF
@@ -265,14 +270,17 @@ function(find_or_build_qt)
        -DBUILD_qtdeclarative=OFF
        -DBUILD_qtdoc=OFF
        -DBUILD_qtgraphs=OFF
+       -DBUILD_qtgrpc=OFF
        -DBUILD_qthttpserver=OFF
-#       -DBUILD_qtimageformats=OFF
+#      -DBUILD_qtimageformats=ON
+       -DBUILD_qtlanguageserver=OFF
        -DBUILD_qtlocation=OFF
        -DBUILD_qtlottie=OFF
        -DBUILD_qtmqtt=OFF
        -DBUILD_qtmultimedia=OFF
-#       -DBUILD_qtnetworkauth=OFF
+#      -DBUILD_qtnetworkauth=ON
        -DBUILD_qtopcua=OFF
+       -DBUILD_qtopenapi=OFF
        -DBUILD_qtpositioning=OFF
        -DBUILD_qtquick3d=OFF
        -DBUILD_qtquick3dphysics=OFF
@@ -283,9 +291,10 @@ function(find_or_build_qt)
        -DBUILD_qtsensors=OFF
        -DBUILD_qtserialbus=OFF
        -DBUILD_qtserialport=OFF
-#       -DBUILD_qtshadertools=OFF
+#      -DBUILD_qtshadertools=ON
        -DBUILD_qtspeech=OFF
        -DBUILD_qtsvg=OFF
+       -DBUILD_qttasktree=OFF
        -DBUILD_qttools=OFF
        -DBUILD_qttranslations=OFF
        -DBUILD_qtvirtualkeyboard=OFF

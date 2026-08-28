@@ -43,8 +43,7 @@ function(find_or_build_freetype)
                -DBUILD_SHARED_LIBS:BOOL=ON -DFT_WITH_ZLIB:BOOL=ON
                -DFT_DISABLE_HARFBUZZ:BOOL=ON
     CMAKE_CACHE_ARGS
-      # Never build a "debug" configuration
-      -DCMAKE_BUILD_TYPE:STRING=$<IF:$<CONFIG:Debug>,RelWithDebInfo,$<CONFIG>>
+      -DCMAKE_BUILD_TYPE:STRING=Release
       -DCMAKE_FIND_ROOT_PATH:STRING=${CMAKE_FIND_ROOT_PATH}
       -DCMAKE_JOB_POOL_COMPILE:STRING=compile
       -DCMAKE_JOB_POOL_LINK:STRING=link
