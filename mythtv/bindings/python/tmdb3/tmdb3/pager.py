@@ -67,7 +67,7 @@ class PagedList(Sequence):
             raise IndexError("list index outside range")
         if (index >= len(self._data)) \
                 or isinstance(self._data[index], UnpagedData):
-            self._populatepage(index/self._pagesize + 1)
+            self._populatepage(index//self._pagesize + 1)
         return self._data[index]
 
     def __setitem__(self, index, value):
