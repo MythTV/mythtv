@@ -938,11 +938,15 @@ static int cbs_av1_read_unit(CodedBitstreamContext *ctx,
                                          unit->data_ref);
             if (err < 0)
                 return err;
-    // fall-through
+            av_fallthrough;
     case AV1_OBU_TILE_GROUP:
         {
             AV1RawTileGroup *tile_group = obu->header.obu_type == AV1_OBU_FRAME ? &obu->obu.frame.tile_group
                                                                                 : &obu->obu.tile_group;
+
+            if (!priv->seen_frame_header)
+                return AVERROR_INVALIDDATA;
+
             err = cbs_av1_ref_tile_data(ctx, unit, &gbc,
                                         &tile_group->data_ref,
                                         &tile_group->data,
@@ -1116,7 +1120,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
             err = cbs_av1_write_frame_obu(ctx, pbc, &obu->obu.frame, NULL);
             if (err < 0)
                 goto error;
-    // fall-through
+            av_fallthrough;
     case AV1_OBU_TILE_GROUP:
         {
             AV1RawTileGroup *tile_group = obu->header.obu_type == AV1_OBU_FRAME ? &obu->obu.frame.tile_group

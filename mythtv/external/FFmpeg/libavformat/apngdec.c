@@ -194,11 +194,8 @@ static int apng_read_header(AVFormatContext *s)
         if (acTL_found && ctx->num_play != 1) {
             int64_t size   = avio_size(pb);
             int64_t offset = avio_tell(pb);
-            if (size < 0) {
-                return size;
-            } else if (offset < 0) {
-                return offset;
-            } else if ((ret = ffio_ensure_seekback(pb, size - offset)) < 0) {
+            if (size < 0 || offset < 0 ||
+                (ret = ffio_ensure_seekback(pb, size - offset)) < 0) {
                 av_log(s, AV_LOG_WARNING, "Could not ensure seekback, will not loop\n");
                 ctx->num_play = 1;
             }
@@ -238,7 +235,7 @@ static int apng_read_header(AVFormatContext *s)
     }
 }
 
-static int decode_fctl_chunk(AVFormatContext *s, APNGDemuxContext *ctx, AVPacket *pkt)
+static int decode_fctl_chunk(AVFormatContext *s, APNGDemuxContext *ctx)
 {
     uint32_t sequence_number, width, height, x_offset, y_offset;
     uint16_t delay_num, delay_den;
@@ -341,7 +338,7 @@ static int apng_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (len != APNG_FCTL_CHUNK_SIZE)
             return AVERROR_INVALIDDATA;
 
-        if ((ret = decode_fctl_chunk(s, ctx, pkt)) < 0)
+        if ((ret = decode_fctl_chunk(s, ctx)) < 0)
             return ret;
 
         /* fcTL may be followed by other chunks before fdAT or IDAT */

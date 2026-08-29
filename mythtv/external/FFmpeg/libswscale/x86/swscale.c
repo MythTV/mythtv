@@ -55,6 +55,7 @@ DECLARE_ASM_CONST(8, uint64_t, M24C) = 0x0000FF0000FF0000LL;
 #define RENAME(a) a ## _mmxext
 #include "swscale_template.c"
 #endif
+#endif /* HAVE_INLINE_ASM */
 
 void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
 {
@@ -90,7 +91,6 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
         const int16_t **chrUSrcPtr = (const int16_t **)(void*) chrUPlane->line + firstChrSrcY - chrUPlane->sliceY;
         const int16_t **alpSrcPtr  = (CONFIG_SWSCALE_ALPHA && hasAlpha) ? (const int16_t **)(void*) alpPlane->line + firstLumSrcY - alpPlane->sliceY : NULL;
 
-        int i;
         if (firstLumSrcY < 0 || firstLumSrcY + vLumFilterSize > c->opts.src_h) {
             const int16_t **tmpY = (const int16_t **) lumPlane->tmp;
 
@@ -131,7 +131,7 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
 
         if (flags & SWS_ACCURATE_RND) {
             int s= APCK_SIZE / 8;
-            for (i=0; i<vLumFilterSize; i+=2) {
+            for (int i = 0; i < vLumFilterSize; i += 2) {
                 *(const void**)&lumMmxFilter[s*i              ]= lumSrcPtr[i  ];
                 *(const void**)&lumMmxFilter[s*i+APCK_PTR2/4  ]= lumSrcPtr[i+(vLumFilterSize>1)];
                 lumMmxFilter[s*i+APCK_COEF/4  ]=
@@ -144,7 +144,7 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
                     alpMmxFilter[s*i+APCK_COEF/4+1]= lumMmxFilter[s*i+APCK_COEF/4  ];
                 }
             }
-            for (i=0; i<vChrFilterSize; i+=2) {
+            for (int i = 0; i < vChrFilterSize; i += 2) {
                 *(const void**)&chrMmxFilter[s*i              ]= chrUSrcPtr[i  ];
                 *(const void**)&chrMmxFilter[s*i+APCK_PTR2/4  ]= chrUSrcPtr[i+(vChrFilterSize>1)];
                 chrMmxFilter[s*i+APCK_COEF/4  ]=
@@ -152,7 +152,7 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
                     + (vChrFilterSize>1 ? vChrFilter[chrDstY*vChrFilterSize + i + 1] * (1 << 16) : 0);
             }
         } else {
-            for (i=0; i<vLumFilterSize; i++) {
+            for (int i = 0; i < vLumFilterSize; i++) {
                 *(const void**)&lumMmxFilter[4*i+0]= lumSrcPtr[i];
                 lumMmxFilter[4*i+2]=
                 lumMmxFilter[4*i+3]=
@@ -163,7 +163,7 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
                     alpMmxFilter[4*i+3]= lumMmxFilter[4*i+2];
                 }
             }
-            for (i=0; i<vChrFilterSize; i++) {
+            for (int i = 0; i < vChrFilterSize; i++) {
                 *(const void**)&chrMmxFilter[4*i+0]= chrUSrcPtr[i];
                 chrMmxFilter[4*i+2]=
                 chrMmxFilter[4*i+3]=
@@ -171,20 +171,6 @@ void ff_updateMMXDitherTables(SwsInternal *c, int dstY)
             }
         }
     }
-}
-#endif /* HAVE_INLINE_ASM */
-
-#define YUV2YUVX_FUNC_MMX(opt, step)  \
-void ff_yuv2yuvX_ ##opt(const int16_t *filter, int filterSize, int srcOffset, \
-                           uint8_t *dest, int dstW,  \
-                           const uint8_t *dither, int offset); \
-static void yuv2yuvX_ ##opt(const int16_t *filter, int filterSize, \
-                           const int16_t **src, uint8_t *dest, int dstW, \
-                           const uint8_t *dither, int offset) \
-{ \
-    if(dstW > 0) \
-        ff_yuv2yuvX_ ##opt(filter, filterSize - 1, 0, dest - offset, dstW + offset, dither, offset); \
-    return; \
 }
 
 #define YUV2YUVX_FUNC(opt, step)  \
@@ -198,25 +184,35 @@ static void yuv2yuvX_ ##opt(const int16_t *filter, int filterSize, \
     int remainder = (dstW % step); \
     int pixelsProcessed = dstW - remainder; \
     if(((uintptr_t)dest) & 15){ \
-        yuv2yuvX_mmxext(filter, filterSize, src, dest, dstW, dither, offset); \
+        yuv2yuvX_sse2(filter, filterSize, src, dest, dstW, dither, offset); \
         return; \
     } \
     if(pixelsProcessed > 0) \
         ff_yuv2yuvX_ ##opt(filter, filterSize - 1, 0, dest - offset, pixelsProcessed + offset, dither, offset); \
     if(remainder > 0){ \
-      ff_yuv2yuvX_mmxext(filter, filterSize - 1, pixelsProcessed, dest - offset, pixelsProcessed + remainder + offset, dither, offset); \
+        ff_yuv2yuvX_sse2(filter, filterSize - 1, pixelsProcessed, dest - offset, pixelsProcessed + remainder + offset, dither, offset); \
     } \
     return; \
 }
 
-#if HAVE_MMXEXT_EXTERNAL
-YUV2YUVX_FUNC_MMX(mmxext, 16)
-#endif
+#if HAVE_SSE2_EXTERNAL
+void ff_yuv2yuvX_sse2(const int16_t *filter, int filterSize, int srcOffset,
+                      uint8_t *dest, int dstW,
+                      const uint8_t *dither, int offset);
+static void yuv2yuvX_sse2(const int16_t *filter, int filterSize,
+                          const int16_t **src, uint8_t *dest, int dstW,
+                           const uint8_t *dither, int offset)
+{
+    if (dstW > 0)
+        ff_yuv2yuvX_sse2(filter, filterSize - 1, 0, dest - offset, dstW + offset, dither, offset);
+    return;
+}
 #if HAVE_SSE3_EXTERNAL
 YUV2YUVX_FUNC(sse3, 32)
 #endif
 #if HAVE_AVX2_EXTERNAL
 YUV2YUVX_FUNC(avx2, 64)
+#endif
 #endif
 
 #define SCALE_FUNC(filter_n, from_bpc, to_bpc, opt) \
@@ -267,7 +263,6 @@ void ff_yuv2planeX_ ## size ## _ ## opt(const int16_t *filter, int filterSize, \
     VSCALEX_FUNC(9,  opt); \
     VSCALEX_FUNC(10, opt)
 
-VSCALEX_FUNC(8, mmxext);
 VSCALEX_FUNCS(sse2);
 VSCALEX_FUNCS(sse4);
 VSCALEX_FUNC(16, sse4);
@@ -490,33 +485,102 @@ av_cold void ff_sws_init_range_convert_x86(SwsInternal *c)
 av_cold void ff_sws_init_swscale_x86(SwsInternal *c)
 {
     int cpu_flags = av_get_cpu_flags();
+    enum AVPixelFormat dst_format = c->opts.dst_format;
 
+    c->use_mmx_vfilter = 0;
+
+    if (X86_MMXEXT(cpu_flags)) {
+        if (!is16BPS(dst_format) && !isNBPS(dst_format) && !isSemiPlanarYUV(dst_format)
+            && dst_format != AV_PIX_FMT_GRAYF32BE && dst_format != AV_PIX_FMT_GRAYF32LE
+            && !(c->opts.flags & SWS_BITEXACT)) {
+            if (c->opts.flags & SWS_ACCURATE_RND) {
 #if HAVE_MMXEXT_INLINE
-    if (INLINE_MMXEXT(cpu_flags))
-        sws_init_swscale_mmxext(c);
+                if (!(c->opts.flags & SWS_FULL_CHR_H_INT)) {
+                    switch (c->opts.dst_format) {
+                    case AV_PIX_FMT_RGB32:   c->yuv2packedX = yuv2rgb32_X_ar_mmxext;   break;
+#if HAVE_6REGS
+                    case AV_PIX_FMT_BGR24:   c->yuv2packedX = yuv2bgr24_X_ar_mmxext;   break;
 #endif
-    if(c->use_mmx_vfilter && !(c->opts.flags & SWS_ACCURATE_RND)) {
-#if HAVE_MMXEXT_EXTERNAL
-        if (EXTERNAL_MMXEXT(cpu_flags))
-            c->yuv2planeX = yuv2yuvX_mmxext;
+                    case AV_PIX_FMT_RGB555:  c->yuv2packedX = yuv2rgb555_X_ar_mmxext;  break;
+                    case AV_PIX_FMT_RGB565:  c->yuv2packedX = yuv2rgb565_X_ar_mmxext;  break;
+                    case AV_PIX_FMT_YUYV422: c->yuv2packedX = yuv2yuyv422_X_ar_mmxext; break;
+                    default: break;
+                    }
+                }
 #endif
+            } else {
+#if HAVE_SSE2_EXTERNAL
+                if (EXTERNAL_SSE2(cpu_flags)) {
+                    c->use_mmx_vfilter = 1;
+                    c->yuv2planeX = yuv2yuvX_sse2;
 #if HAVE_SSE3_EXTERNAL
-        if (EXTERNAL_SSE3(cpu_flags))
-            c->yuv2planeX = yuv2yuvX_sse3;
+                    if (EXTERNAL_SSE3(cpu_flags))
+                        c->yuv2planeX = yuv2yuvX_sse3;
 #endif
 #if HAVE_AVX2_EXTERNAL
-        if (EXTERNAL_AVX2_FAST(cpu_flags))
-            c->yuv2planeX = yuv2yuvX_avx2;
+                    if (EXTERNAL_AVX2_FAST(cpu_flags))
+                        c->yuv2planeX = yuv2yuvX_avx2;
+#endif
+                }
+#endif /* HAVE_SSE2_EXTERNAL */
+#if HAVE_MMXEXT_INLINE
+                if (!(c->opts.flags & SWS_FULL_CHR_H_INT)) {
+                    switch (c->opts.dst_format) {
+                    case AV_PIX_FMT_RGB32:   c->yuv2packedX = yuv2rgb32_X_mmxext;   break;
+                    case AV_PIX_FMT_BGR32:   c->yuv2packedX = yuv2bgr32_X_mmxext;   break;
+#if HAVE_6REGS
+                    case AV_PIX_FMT_BGR24:   c->yuv2packedX = yuv2bgr24_X_mmxext;   break;
+#endif
+                    case AV_PIX_FMT_RGB555:  c->yuv2packedX = yuv2rgb555_X_mmxext;  break;
+                    case AV_PIX_FMT_RGB565:  c->yuv2packedX = yuv2rgb565_X_mmxext;  break;
+                    case AV_PIX_FMT_YUYV422: c->yuv2packedX = yuv2yuyv422_X_mmxext; break;
+                    default: break;
+                    }
+                }
+#endif
+            }
+#if HAVE_MMXEXT_INLINE
+            if (!(c->opts.flags & SWS_FULL_CHR_H_INT)) {
+                switch (c->opts.dst_format) {
+                case AV_PIX_FMT_RGB32:
+                    c->yuv2packed1 = yuv2rgb32_1_mmxext;
+                    c->yuv2packed2 = yuv2rgb32_2_mmxext;
+                    break;
+                case AV_PIX_FMT_BGR24:
+                    c->yuv2packed1 = yuv2bgr24_1_mmxext;
+                    c->yuv2packed2 = yuv2bgr24_2_mmxext;
+                    break;
+                case AV_PIX_FMT_RGB555:
+                    c->yuv2packed1 = yuv2rgb555_1_mmxext;
+                    c->yuv2packed2 = yuv2rgb555_2_mmxext;
+                    break;
+                case AV_PIX_FMT_RGB565:
+                    c->yuv2packed1 = yuv2rgb565_1_mmxext;
+                    c->yuv2packed2 = yuv2rgb565_2_mmxext;
+                    break;
+                case AV_PIX_FMT_YUYV422:
+                    c->yuv2packed1 = yuv2yuyv422_1_mmxext;
+                    c->yuv2packed2 = yuv2yuyv422_2_mmxext;
+                    break;
+                default:
+                    break;
+                }
+            }
+#endif
+        }
+#if HAVE_MMXEXT_INLINE
+        if (c->srcBpc == 8 && c->dstBpc <= 14) {
+            // Use the new MMX scaler if the MMXEXT one can't be used (it is faster than the x86 ASM one).
+            if (c->opts.flags & SWS_FAST_BILINEAR && c->canMMXEXTBeUsed) {
+                c->hyscale_fast = ff_hyscale_fast_mmxext;
+                c->hcscale_fast = ff_hcscale_fast_mmxext;
+            } else {
+                c->hyscale_fast = NULL;
+                c->hcscale_fast = NULL;
+            }
+        }
 #endif
     }
-#if ARCH_X86_32 && !HAVE_ALIGNED_STACK
-    // The better yuv2planeX_8 functions need aligned stack on x86-32,
-    // so we use MMXEXT in this case if they are not available.
-    if (EXTERNAL_MMXEXT(cpu_flags)) {
-        if (c->dstBpc == 8 && !c->use_mmx_vfilter)
-            c->yuv2planeX = ff_yuv2planeX_8_mmxext;
-    }
-#endif /* ARCH_X86_32 && !HAVE_ALIGNED_STACK */
 
 #define ASSIGN_SCALE_FUNC2(hscalefn, filtersize, opt1, opt2) do { \
     if (c->srcBpc == 8) { \
@@ -540,12 +604,12 @@ av_cold void ff_sws_init_swscale_x86(SwsInternal *c)
                                      ff_hscale16to19_ ## filtersize ## _ ## opt1; \
     } \
 } while (0)
-#define ASSIGN_VSCALEX_FUNC(vscalefn, opt, do_16_case, condition_8bit) \
+#define ASSIGN_VSCALEX_FUNC(vscalefn, opt, do_16_case) \
 switch(c->dstBpc){ \
     case 16:                          do_16_case;                          break; \
     case 10: if (!isBE(c->opts.dst_format) && !isSemiPlanarYUV(c->opts.dst_format) && !isDataInHighBits(c->opts.dst_format)) vscalefn = ff_yuv2planeX_10_ ## opt; break; \
     case 9:  if (!isBE(c->opts.dst_format)) vscalefn = ff_yuv2planeX_9_  ## opt; break; \
-    case 8: if ((condition_8bit) && !c->use_mmx_vfilter) vscalefn = ff_yuv2planeX_8_  ## opt; break; \
+    case 8: if (!c->use_mmx_vfilter) vscalefn = ff_yuv2planeX_8_  ## opt; break; \
     }
 #define ASSIGN_VSCALE_FUNC(vscalefn, opt) \
     switch(c->dstBpc){ \
@@ -572,8 +636,7 @@ switch(c->dstBpc){ \
     if (EXTERNAL_SSE2(cpu_flags)) {
         ASSIGN_SSE_SCALE_FUNC(c->hyScale, c->hLumFilterSize, sse2, sse2);
         ASSIGN_SSE_SCALE_FUNC(c->hcScale, c->hChrFilterSize, sse2, sse2);
-        ASSIGN_VSCALEX_FUNC(c->yuv2planeX, sse2, ,
-                            HAVE_ALIGNED_STACK || ARCH_X86_64);
+        ASSIGN_VSCALEX_FUNC(c->yuv2planeX, sse2, );
         if (!(c->opts.flags & SWS_ACCURATE_RND))
             ASSIGN_VSCALE_FUNC(c->yuv2plane1, sse2);
 
@@ -622,15 +685,13 @@ switch(c->dstBpc){ \
         ASSIGN_SSE_SCALE_FUNC(c->hyScale, c->hLumFilterSize, sse4, ssse3);
         ASSIGN_SSE_SCALE_FUNC(c->hcScale, c->hChrFilterSize, sse4, ssse3);
         ASSIGN_VSCALEX_FUNC(c->yuv2planeX, sse4,
-                            if (!isBE(c->opts.dst_format)) c->yuv2planeX = ff_yuv2planeX_16_sse4,
-                            HAVE_ALIGNED_STACK || ARCH_X86_64);
+                            if (!isBE(c->opts.dst_format)) c->yuv2planeX = ff_yuv2planeX_16_sse4);
         if (c->dstBpc == 16 && !isBE(c->opts.dst_format) && !(c->opts.flags & SWS_ACCURATE_RND))
             c->yuv2plane1 = ff_yuv2plane1_16_sse4;
     }
 
     if (EXTERNAL_AVX(cpu_flags)) {
-        ASSIGN_VSCALEX_FUNC(c->yuv2planeX, avx, ,
-                            HAVE_ALIGNED_STACK || ARCH_X86_64);
+        ASSIGN_VSCALEX_FUNC(c->yuv2planeX, avx, );
         if (!(c->opts.flags & SWS_ACCURATE_RND))
             ASSIGN_VSCALE_FUNC(c->yuv2plane1, avx);
 
@@ -701,7 +762,8 @@ switch(c->dstBpc){ \
 
 #define INPUT_PLANER_RGB_A_FUNC_CASE_NOBREAK(fmt, name, opt)          \
         case fmt:                                                     \
-            c->readAlpPlanar = ff_planar_##name##_to_a_##opt;
+            c->readAlpPlanar = ff_planar_##name##_to_a_##opt;         \
+            av_fallthrough;
 
 #define INPUT_PLANER_RGBA_YUV_FUNC_CASE(rgb_fmt, rgba_fmt, name, opt) \
         case rgba_fmt:                                                \
