@@ -22,7 +22,7 @@
     use MythTV;
 
 # Some variables we'll use here
-    our ($dest, $format, $usage, $underscores, $live, $rename, $maxlength);
+    our ($dest, $sourcepath, $format, $usage, $underscores, $live, $rename, $maxlength);
     our ($chanid, $starttime, $filename);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
@@ -43,6 +43,7 @@
 
 # Load the cli options
     GetOptions('link|destination|path:s'      => \$dest,
+               'sourcepath=s'                 => \$sourcepath,
                'chanid=s'                     => \$chanid,
                'starttime=s'                  => \$starttime,
                'filename=s'                   => \$filename,
@@ -76,6 +77,15 @@ options:
 
     WARNING: ALL symlinks within the destination directory and its
     subdirectories (recursive) will be removed.
+
+--sourcepath [source path]
+
+    Specify an alternate directory path for the symlink link source.
+    Use case would be if you need to conform to specific path requirements. eg:
+
+    ../../recordings vs. /var/video/recordings
+
+    default: Use full directory path
 
 --chanid chanid
 
@@ -320,6 +330,9 @@ EOF
     $dest ||= "$base_dir/show_names";
 # Alert the user
     vprint("Link destination directory:  $dest");
+    if (defined($sourcepath)) {
+        vprint("Symlink source path:  $sourcepath");
+    }
 # Create nonexistent paths
     unless (-e $dest) {
         mkpath($dest, 0, 0775) or die "Failed to create $dest:  $!\n";
@@ -413,8 +426,15 @@ EOF
             mkpath($directory, 0, 0775)
                 or die "Failed to create $directory:  $!\n";
         }
-        symlink $show->{'local_path'}, "$dest/$name"
-            or die "Can't create symlink $dest/$name:  $!\n";
+    # Generate source of symlink based on user supplied path or full file system path
+        if (defined($sourcepath)) {
+            symlink "$sourcepath/$show->{'basename'}", "$dest/$name"
+                or die "Can't create symlink $dest/$name:  $!\n";
+        }
+        else {
+            symlink $show->{'local_path'}, "$dest/$name"
+                or die "Can't create symlink $dest/$name:  $!\n";
+        }
         vprint("$dest/$name");
     }
 
