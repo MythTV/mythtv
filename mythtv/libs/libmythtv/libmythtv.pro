@@ -130,6 +130,7 @@ HEADERS += driveroption.h
 HEADERS += mythhdrvideometadata.h
 HEADERS += mythhdrtracker.h
 HEADERS += scantype.h
+HEADERS += sse2.h
 
 SOURCES += bytereader.cpp
 SOURCES += recordinginfo.cpp
@@ -361,18 +362,7 @@ inc.files += recordingtypes.h
 INSTALLS += inc
 
 inc2.path = $${PREFIX}/include/mythtv/libmythtv/visualisations/goom
-inc2.files  = visualisations/goom/filters.h
-inc2.files += visualisations/goom/goomconfig.h
-inc2.files += visualisations/goom/goom_core.h
-inc2.files += visualisations/goom/goom_tools.h
-inc2.files += visualisations/goom/graphic.h
-inc2.files += visualisations/goom/ifs.h
-inc2.files += visualisations/goom/lines.h
-inc2.files += visualisations/goom/drawmethods.h
-inc2.files += visualisations/goom/mmx.h
-inc2.files += visualisations/goom/mathtools.h
-inc2.files += visualisations/goom/tentacle3d.h
-inc2.files += visualisations/goom/v3d.h
+inc2.files  = visualisations/goom/goom_core.h
 
 INSTALLS += inc2
 
@@ -735,13 +725,10 @@ using_frontend {
             HEADERS += visualisations/goom/filters.h
             HEADERS += visualisations/goom/goomconfig.h
             HEADERS += visualisations/goom/goom_core.h
-            HEADERS += visualisations/goom/goom_tools.h
             HEADERS += visualisations/goom/graphic.h
             HEADERS += visualisations/goom/ifs.h
             HEADERS += visualisations/goom/lines.h
             HEADERS += visualisations/goom/drawmethods.h
-            HEADERS += visualisations/goom/mmx.h
-            HEADERS += visualisations/goom/mathtools.h
             HEADERS += visualisations/goom/surf3d.h
             HEADERS += visualisations/goom/tentacle3d.h
             HEADERS += visualisations/goom/v3d.h
@@ -756,8 +743,7 @@ using_frontend {
             SOURCES += visualisations/goom/ifs_display.cpp
             SOURCES += visualisations/goom/lines.cpp
             SOURCES += visualisations/goom/surf3d.cpp
-            SOURCES += visualisations/goom/zoom_filter_mmx.cpp
-            SOURCES += visualisations/goom/zoom_filter_xmmx.cpp
+            SOURCES += visualisations/goom/zoom_filter_sse2.cpp
             SOURCES += visualisations/videovisualgoom.cpp
         }
     }

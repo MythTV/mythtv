@@ -8,7 +8,6 @@
 #include "videovisualgoom.h"
 
 // Goom
-#include "goom/goom_tools.h"
 #include "goom/goom_core.h"
 
 VideoVisualGoom::VideoVisualGoom(AudioPlayer* Audio, MythRender* Render, bool HD)

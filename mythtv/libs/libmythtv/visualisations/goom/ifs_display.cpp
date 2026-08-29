@@ -2,16 +2,17 @@
 #include <array>
 #include <cstdint>
 
+#include <QtGlobal>
+#if QT_VERSION >= QT_VERSION_CHECK(6,5,0)
+#include <QtProcessorDetection>
+#endif
+
 #include "ifs.h"
 #include "goomconfig.h"
 #include "libmythbase/mythconfig.h"
 #include "libmythbase/mythrandom.h"
 
-#if HAVE_MMX
-#include "mmx.h"
-#endif
-
-#include "goom_tools.h"
+#include "libmythtv/sse2.h"
 
 /* NOLINTNEXTLINE(readability-non-const-parameter) */
 void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
@@ -54,45 +55,49 @@ void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
 	IFSPoint *points = draw_ifs (&nbpt);
 	nbpt--;
 
-#if HAVE_MMX
-	movd_m2r (couleursl, mm1);
-	punpckldq_r2r (mm1, mm1);
+#ifdef Q_PROCESSOR_X86
+	if (sse2_check())
+	{
+		for (int i = 0; i < nbpt; i += increment) {
+			int     x = points[i].x;
+			int     y = points[i].y;
+
+			if ((x < width) && (y < height) && (x > 0) && (y > 0)) {
+				int     pos = x + (y * width);
+				__asm__ volatile (
+					"movd 		%[color], 	%%xmm1	\n\t"
+					"movd 		%[in], 		%%xmm0	\n\t"
+					"paddusb 	%%xmm1, 	%%xmm0	\n\t"
+					"movd 		%%xmm0, 	%[out]	\n\t"
+					: [out] "=m" (data[pos])
+					: [in] "m" (back[pos]), [color] "m" (couleursl)
+					: "xmm0", "xmm1"
+					);
+			}
+		}
+	}
+	else
+	{
+#endif /* Q_PROCESSOR_X86 */
 	for (int i = 0; i < nbpt; i += increment) {
 		int     x = points[i].x;
 		int     y = points[i].y;
 
 		if ((x < width) && (y < height) && (x > 0) && (y > 0)) {
 			int     pos = x + (y * width);
-			movd_m2r (back[pos], mm0);
-			paddusb_r2r (mm1, mm0);
-			movd_r2m (mm0, data[pos]);
-		}
-	}
-	emms();/*__asm__ __volatile__ ("emms");*/
-#else
-	for (int i = 0; i < nbpt; i += increment) {
-		int     x = points[i].x & 0x7fffffff;
-		int     y = points[i].y & 0x7fffffff;
-
-		if ((x < width) && (y < height)) {
-			int     pos = x + (y * width);
-			int     tra = 0;
 			auto *bra = (unsigned char *) &back[pos];
 			auto *dra = (unsigned char *) &data[pos];
 			auto *cra = (unsigned char *) &couleursl;
 
 			for (int j = 0; j < 4; j++) {
-				tra = *cra;
-				tra += *bra;
-				tra = std::min(tra, 255);
-				*dra = tra;
-				++dra;
-				++cra;
-				++bra;
+				dra[j] = cra[j] + bra[j];
+				if (dra[j] < cra[j]) dra[j] = 255U;
 			}
 		}
 	}
-#endif /* HAVE_MMX */
+#ifdef Q_PROCESSOR_X86
+	}
+#endif
 		s_justChanged--;
 
 	s_col[ALPHA] = s_couleur >> (ALPHA * 8) & 0xff;
