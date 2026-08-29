@@ -20,7 +20,9 @@
 #include "libmythui/mythuiactions.h"
 
 #include "mythdvdbuffer.h"
+#include "mythdvdlogger.h"
 #include "mythdvdplayer.h"
+#include "mythdvdvfs.h"
 #include "tv_actions.h"
 
 #define LOC QString("DVDRB: ")
@@ -191,7 +193,7 @@ long long MythDVDBuffer::Seek(long long Time)
     else
     {
         m_seektime = mpeg::chrono::pts(Time);
-        dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime.count(), 0);
+        dvdRet = dvdnav_time_search(m_dvdnav, m_seektime.count());
     }
 
     LOG(VB_PLAYBACK, LOG_DEBUG, QString("DVD Playback Seek() time: %1; seekSpeed: %2")
@@ -271,7 +273,22 @@ bool MythDVDBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds 
 
     m_safeFilename = Filename;
     m_filename = Filename;
-    dvdnav_status_t res = dvdnav_open(&m_dvdnav, m_filename.toLocal8Bit().constData());
+    dvdnav_status_t res = DVDNAV_STATUS_ERR;
+    if (!m_filename.startsWith("myth://"))
+    {
+        res = dvdnav_open2(&m_dvdnav,
+                           nullptr,
+                           &s_dvdnav_logger,
+                           m_filename.toLocal8Bit().constData());
+    }
+    else
+    {
+        res = dvdnav_open_files(&m_dvdnav,
+                                nullptr,
+                                &s_dvdnav_logger,
+                                m_filename.toLocal8Bit().constData(),
+                                &s_vfs);
+    }
     if (res == DVDNAV_STATUS_ERR)
     {
         m_lastError = tr("Failed to open DVD device at %1").arg(m_filename);
@@ -1887,7 +1904,7 @@ void MythDVDBuffer::SetTrack(uint Type, int TrackNo)
     else if (Type == kTrackTypeAudio)
     {
         m_curAudioTrack = TrackNo;
-        dvdnav_set_active_audio_stream(m_dvdnav, static_cast<int8_t>(TrackNo));
+        dvdnav_set_active_stream(m_dvdnav, static_cast<int8_t>(TrackNo), DVD_AUDIO_STREAM);
     }
 }
 

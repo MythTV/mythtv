@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.20)
 project(
   DVDREAD
-  VERSION 6.0.0
+  VERSION 7.1.1
   LANGUAGES C)
 set(DVDREAD_VERSION_MICRO ${DVDREAD_VERSION_PATCH})
 
-set(DVDNAV_MAJOR 6)
+set(DVDNAV_MAJOR 7)
 set(DVDNAV_MINOR 0)
-set(DVDNAV_SUB 0)
+set(DVDNAV_SUB 1)
 
 #
 # Where to find MythTV provided modules
@@ -50,18 +50,6 @@ foreach(_FLAG IN LISTS CFLAGS)
   endif()
 endforeach()
 
-#
-# Compile this library as a static library on Android because of the circular
-# linking dependency issue with libmythtv (specifically the calls to the
-# MythDVD_* functions).  Cmake only enables PIC code by default on shared
-# libraries, so need to enable PIC on the library later after its defined.
-#
-if(ANDROID OR WIN32)
-  set(LIBRARY_TYPE STATIC)
-else()
-  set(LIBRARY_TYPE SHARED)
-endif()
-
 set(LIBDVDNAV_HEADERS
   dvdnav/dvdnav/dvd_types.h
   dvdnav/dvdnav/dvdnav.h
@@ -69,13 +57,14 @@ set(LIBDVDNAV_HEADERS
   )
 
 set(LIBDVDREAD_HEADERS
+  dvdread/dvdread/attributes.h
   dvdread/dvdread/bitreader.h
+  dvdread/dvdread/dvd_filesystem.h
   dvdread/dvdread/dvd_reader.h
   dvdread/dvdread/dvd_udf.h
   dvdread/dvdread/ifo_print.h
   dvdread/dvdread/ifo_read.h
   dvdread/dvdread/ifo_types.h
-  dvdread/dvdread/mythdvdio.h
   dvdread/dvdread/nav_print.h
   dvdread/dvdread/nav_read.h
   dvdread/dvdread/nav_types.h
@@ -83,7 +72,7 @@ set(LIBDVDREAD_HEADERS
 
 add_library(
   mythdvdnav
-  ${LIBRARY_TYPE}
+  SHARED
   ${LIBDVDNAV_HEADERS}
   dvdnav/dvdnav.c
   dvdnav/dvdnav_internal.h
@@ -97,6 +86,8 @@ add_library(
   dvdnav/vm/decoder.h
   dvdnav/vm/getset.c
   dvdnav/vm/getset.h
+  dvdnav/logger.c
+  dvdnav/logger.h
   dvdnav/vm/play.c
   dvdnav/vm/play.h
   dvdnav/vm/vm.c
@@ -107,6 +98,7 @@ add_library(
   dvdnav/vm/vmcmd.h
   dvdnav/vm/vmget.c
   ${LIBDVDREAD_HEADERS}
+  dvdread/file/filesystem.h
   dvdread/bitreader.c
   dvdread/bswap.h
   dvdread/dvd_input.c
@@ -116,6 +108,8 @@ add_library(
   dvdread/dvdread_internal.h
   dvdread/ifo_print.c
   dvdread/ifo_read.c
+  dvdread/logger.c
+  dvdread/logger.h
   dvdread/md5.c
   dvdread/md5.h
   dvdread/nav_print.c
@@ -126,12 +120,17 @@ if(WIN32)
   set(CMAKE_DL_LIBS dl)
   target_compile_definitions(mythdvdnav PRIVATE WIN32)
   target_sources(mythdvdnav PRIVATE
-    dvdread/win32_dlfcn.h
+    dvdread/file/file_win32.c
+    msvc/contrib/win32_cs.h
+    )
+else() # POSIX
+  target_sources(mythdvdnav PRIVATE
+    dvdread/file/file_posix.c
     )
 endif()
 
-# Don't allow the hidden visibility flag for this target.
-set_property(TARGET mythdvdnav PROPERTY C_VISIBILITY_PRESET)
+target_compile_definitions(mythdvdnav PRIVATE DVDREAD_API_EXPORT)
+target_compile_definitions(mythdvdnav PRIVATE DVDNAV_API_EXPORT)
 
 # libdvdcss
 set(_NEEDS_DLFCN ON)
@@ -141,6 +140,7 @@ if(NOT ANDROID AND NOT WIN32)
     target_link_libraries(mythdvdnav PRIVATE PkgConfig::DVDCSS)
     set(HAVE_DVDCSS_DVDCSS_H 1)
     set(_NEEDS_DLFCN OFF)
+    check_include_file(dvdcss/dvdcpxm.h HAVE_DVDCSS_DVDCPXM_H)
   endif()
 endif()
 if(_NEEDS_DLFCN)
@@ -148,7 +148,9 @@ if(_NEEDS_DLFCN)
   target_link_libraries(mythdvdnav PUBLIC ${CMAKE_DL_LIBS})
 endif()
 
-check_include_file(sys/param.h HAVE_SYS_PARAM_H)
+check_symbol_exists(getmntent_r "mntent.h" HAVE_GETMNTENT_R)
+check_symbol_exists(strerror_r "string.h" HAVE_STRERROR_R)
+check_symbol_exists(strerror_s "string.h" HAVE_STRERROR_S)
 
 # libdvdnav and libdvdread
 check_symbol_exists(gettimeofday "sys/time.h" HAVE_GETTIMEOFDAY)
@@ -168,47 +170,16 @@ target_compile_definitions(mythdvdnav PRIVATE
   HAVE_CONFIG_H
   )
 
-#
-# The MythTV customization to dvdnav adds references to the MythDVD_* functions,
-# which are defined in libs/libmythtv. to allow these symbols to remain
-# undefined while linking mythdvdnav, the "-Wl,--no-undefined" option cannot be
-# a part of the link line. The android toolchain file adds this argument by
-# default, so it needs to be stripped here.
-#
-if(CMAKE_C_COMPILER_ID MATCHES "Clang")
-  if(CMAKE_SHARED_LINKER_FLAGS)
-    string(REGEX REPLACE " -Wl,--no-undefined " " " CMAKE_SHARED_LINKER_FLAGS
-                        ${CMAKE_SHARED_LINKER_FLAGS})
-    string(REGEX REPLACE " -Wl,--no-undefined$" "" CMAKE_SHARED_LINKER_FLAGS
-                        ${CMAKE_SHARED_LINKER_FLAGS})
-  endif()
-
-  # Compiles with clang on Apple specifically need "-undefined dynamic_lookup"
-  # added to the linker flags.  This prevents the linker from failing
-  # immediately with complaints about undefined symbols, and defers the lookup
-  # to the loader.  Its not clear if this helps on Android (since the explicit
-  # opposite has just been removed), but it couldn't hurt.
-  target_link_options(mythdvdnav PRIVATE -undefined dynamic_lookup)
-endif()
-
-#
-# Compile PIC code on android.  The default for PIC code is ON for shared
-# libraries, but on android this library is built as a static library because of
-# the circular linking dependency issue with libmythtv.
-#
-if(ANDROID)
-  set_target_properties(
-    mythdvdnav PROPERTIES POSITION_INDEPENDENT_CODE ON)
-endif()
-
 target_include_directories(
   mythdvdnav
   INTERFACE ${CMAKE_INSTALL_INCLUDEDIR}/mythtv
   PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/dvdnav ${CMAKE_CURRENT_SOURCE_DIR}/dvdread
   # for libdvdnav version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/
   ${CMAKE_CURRENT_BINARY_DIR}/dvdnav/dvdnav
   # for libdvdread version.h
+  ${CMAKE_CURRENT_BINARY_DIR}/dvdread
   ${CMAKE_CURRENT_BINARY_DIR}/dvdread/dvdread
   )
 

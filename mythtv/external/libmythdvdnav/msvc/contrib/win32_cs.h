@@ -16,21 +16,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef LIBDVDREAD_IFO_PRINT_H
-#define LIBDVDREAD_IFO_PRINT_H
+#include <stdlib.h>
+#include <windows.h>
 
-#include <inttypes.h>
+static inline wchar_t *_utf8_to_wchar(const char *utf8)
+{
+  wchar_t *wstr;
+  int      wlen;
 
-#include <dvdread/attributes.h>
-#include <dvdread/ifo_types.h>
-
-DVDREAD_API void ifo_print(dvd_reader_t *dvd, int title);
-DVDREAD_API void dvdread_print_time(dvd_time_t *dtime);
-
-/* DVD-Audio ifo prints */
-DVDREAD_API void ifoPrint_AMGI_MAT(amgi_mat_t *amgi_mat);
-DVDREAD_API void ifoPrint_TIF(tracks_info_table_t *tracks_info_table);
-DVDREAD_API void ifoPrint_ATSI_MAT(atsi_mat_t *atsi_mat);
-DVDREAD_API void ifoPrint_TT(atsi_title_table_t *atsi_title_table);
-
-#endif /* LIBDVDREAD_IFO_PRINT_H */
+  wlen = MultiByteToWideChar (CP_UTF8, 0, utf8, -1, NULL, 0);
+  if (wlen < 1) {
+    return NULL;
+  }
+  wstr = (wchar_t*)malloc(sizeof(wchar_t) * wlen);
+  if (!wstr ) {
+    return NULL;
+  }
+  if (!MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wstr, wlen)) {
+    free(wstr);
+    return NULL;
+  }
+  return wstr;
+}
