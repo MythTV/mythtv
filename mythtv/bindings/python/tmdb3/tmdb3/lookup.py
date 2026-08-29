@@ -37,6 +37,7 @@ __version__ = "0.3.12"
 # ~ from optparse import OptionParser
 import sys
 import signal
+from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
 
 def print_etree(etostr):
     """lxml.etree.tostring is a bytes object in python3, and a str in python2.
@@ -47,7 +48,6 @@ def timeouthandler(signal, frame):
     raise RuntimeError("Timed out")
 
 def buildSingle(inetref, opts):
-    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
     from MythTV.tmdb3 import Movie, ReleaseType, get_locale
     from MythTV import VideoMetadata
     from lxml import etree
@@ -227,9 +227,17 @@ def buildMovieList(query, opts):
             continue
 
         m = VideoMetadata()
-        for i,j in mapping:
-            if getattr(res, j):
-                setattr(m, i, getattr(res, j))
+        try:
+            for i,j in mapping:
+                if getattr(res, j):
+                    setattr(m, i, getattr(res, j))
+        except TMDBRequestInvalid:
+            # Some candidates returned by search have detail data that has since
+            # been removed or restricted on TMDB (404 on the per-candidate detail
+            # fetch triggered by getattr above). Skip just this candidate rather
+            # than aborting the entire result list.
+            continue
+
         m.inetref = str(res.id)
 
         if res.title:
@@ -289,9 +297,16 @@ def buildTVList(query, opts):
             continue
 
         m = VideoMetadata()
-        for i,j in mapping:
-            if getattr(res, j):
-                setattr(m, i, getattr(res, j))
+        try:
+            for i,j in mapping:
+                if getattr(res, j):
+                    setattr(m, i, getattr(res, j))
+        except TMDBRequestInvalid:
+            # Some candidates returned by search have detail data that has since
+            # been removed or restricted on TMDB (404 on the per-candidate detail
+            # fetch triggered by getattr above). Skip just this candidate rather
+            # than aborting the entire result list.
+            continue
 
         # These need to be strings not ints
         m.inetref = str(res.id)
@@ -347,7 +362,7 @@ def buildEpisode(args, opts):
     episode = None
 
     if season_number > series.number_of_seasons:
-        sys.stdout.write('ERROR: Episode not found: ' + str(args))
+        sys.stdout.write('ERROR: Episode not found: ' + str(args) + '\n')
         return 9
 
     # process seasons backwards because it is more likely
@@ -367,7 +382,7 @@ def buildEpisode(args, opts):
         season_number = season_number - 1
 
     if not episode_number and not episode:
-        sys.stdout.write('ERROR: Episode not found: ' + str(args))
+        sys.stdout.write('ERROR: Episode not found: ' + str(args) + '\n')
         return 9
 
     # reload episode with full details
@@ -379,9 +394,15 @@ def buildEpisode(args, opts):
                ['episode', 'episode_number'], ['releasedate', 'air_date']]
     m = VideoMetadata()
     m.title = series.name
-    for i,j in mapping:
-        if getattr(episode, j):
-            setattr(m, i, getattr(episode, j))
+    try:
+        for i,j in mapping:
+            if getattr(episode, j):
+                setattr(m, i, getattr(episode, j))
+    except TMDBRequestInvalid:
+        # Sometimes episode detail data has been removed or restricted
+        # on TMDB (404 on the detail fetch triggered by getattr above).
+        sys.stdout.write('ERROR: Episode data missing: ' + str(args) + '\n')
+        return 9
 
     # These need to be strings not ints
     m.inetref = inetref
@@ -424,7 +445,6 @@ def buildEpisode(args, opts):
                                     xml_declaration=True)
 
 def buildCollection(inetref, opts):
-    from MythTV.tmdb3.tmdb_exceptions import TMDBRequestInvalid
     from MythTV.tmdb3 import Collection
     from MythTV import VideoMetadata
     from lxml import etree
@@ -466,9 +486,15 @@ def buildTVSeries(inetref, opts):
         ['releasedate','first_air_date']]
     tree = etree.XML('<metadata></metadata>')
     m = VideoMetadata()
-    for i,j in mapping:
-        if getattr(series, j):
-            setattr(m, i, getattr(series, j))
+    try:
+        for i,j in mapping:
+            if getattr(series, j):
+                setattr(m, i, getattr(series, j))
+    except TMDBRequestInvalid:
+        # Sometimes series detail data has been removed or restricted
+        # on TMDB (404 on the detail fetch triggered by getattr above).
+        sys.stdout.write('ERROR: Series data missing: ' + str(args) + '\n')
+        return 9
 
     # These need to be strings not ints
     m.inetref = str(series.id)
