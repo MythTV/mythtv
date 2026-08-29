@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides tweaked dict-type classes."""
 
 from MythTV.exceptions import MythError

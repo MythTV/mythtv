@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Contains static and global variables for MythTV Python Bindings.
@@ -265,7 +264,7 @@ class ERRCODES( object ):
     TZ_CONVERSION_ERROR     = 253
     TZ_VERSION_ERROR        = 254
 
-class MythSchema( object ):
+class MythSchema:
     _schema_value = 'DBSchemaVer'
     _schema_local = SCHEMA_VERSION
     _schema_name = 'Database'
@@ -274,7 +273,7 @@ class MythSchema( object ):
 class VideoSchema( MythSchema ):
     pass
 
-class MusicSchema( object ):
+class MusicSchema:
     _schema_value = 'MusicDBSchemaVer'
     _schema_local = MUSICSCHEMA_VERSION
     _schema_name = 'MythMusic'
