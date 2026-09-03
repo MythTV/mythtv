@@ -424,6 +424,8 @@ def buildSingleItem(inetref, season, episode_id):
 
     # get info for season episodes:
     ep_info = tvmaze.get_episode_information(episode_id)
+    if not ep_info:
+        sys.exit("No matching episode found")
     m = VideoMetadata()
     if show_info.genres is not None and len(show_info.genres) > 0:
         for g in show_info.genres:
@@ -534,6 +536,8 @@ def buildCollection(tvinetref, opts):
         print("Function 'buildCollection' called with argument '%s'" % tvinetref)
 
     show_info = tvmaze.get_show(tvinetref)
+    if not show_info:
+        sys.exit("No matching collection found")
     if opts.debug:
         for k, v in show_info.__dict__.items():
             print(k, " : ", v)

@@ -556,26 +556,29 @@ class Myth4TTVDBv4(object):
 
         gen_episodes = ttvdb.getSeriesEpisodes(inetref, season_type='default', season=season,
                                                episodeNumber=episode, yielded=True)
-        ep = next(gen_episodes)
-        epi_x = ttvdb.getEpisodeExtended(ep.id)
-        for lang in self._select_preferred_langs(epi_x.nameTranslations):
-            translation = ttvdb.getEpisodeTranslation(epi_x.id, lang)
-            epi_x.fetched_translations.append(translation)
-        if self.debug:
-            print("%04d: buildSingle: Episode Information for %s : %s : %s"
-                  % (self._get_ellapsed_time(), inetref, season, episode))
-            _print_class_content(epi_x)
+        try:
+            ep = next(gen_episodes)
+            epi_x = ttvdb.getEpisodeExtended(ep.id)
+            for lang in self._select_preferred_langs(epi_x.nameTranslations):
+                translation = ttvdb.getEpisodeTranslation(epi_x.id, lang)
+                epi_x.fetched_translations.append(translation)
+            if self.debug:
+                print("%04d: buildSingle: Episode Information for %s : %s : %s"
+                      % (self._get_ellapsed_time(), inetref, season, episode))
+                _print_class_content(epi_x)
 
-        # get season information:
-        sea_x = None
-        for s in epi_x.seasons:
-            if s.type.id == ser_x.defaultSeasonType:
-                sea_x = ttvdb.getSeasonExtended(s.id)
-                if self.debug:
-                    print("%04d: buildSingle: Season Information for %s : %s"
-                          % (self._get_ellapsed_time(), inetref, season))
-                    _print_class_content(sea_x)
-                break
+            # get season information:
+            sea_x = None
+            for s in epi_x.seasons:
+                if s.type.id == ser_x.defaultSeasonType:
+                    sea_x = ttvdb.getSeasonExtended(s.id)
+                    if self.debug:
+                        print("%04d: buildSingle: Season Information for %s : %s"
+                              % (self._get_ellapsed_time(), inetref, season))
+                        _print_class_content(sea_x)
+                    break
+        except StopIteration:
+            sys.exit("No matching episode found")
 
         # no we have all extended records for series, season, episode, create xml for them
         self._format_xml(ser_x, sea_x, epi_x)
@@ -605,6 +608,8 @@ class Myth4TTVDBv4(object):
 
         # get data for passed inetref and preferred translations
         ser_x = ttvdb.getSeriesExtended(tvinetref)
+        if not ser_x:
+            sys.exit("No matching collection found")
 
         ser_x.fetched_translations = []
         for lang in self._select_preferred_langs(ser_x.nameTranslations):
