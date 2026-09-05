@@ -2907,7 +2907,7 @@ int MythCommandLineParser::ConfigureLogging(const QString& mask, bool progress)
         verboseMask = static_cast<uint64_t>(toLongLong("verboseint"));
     }
 
-    verboseMask |= VB_STDIO|VB_FLUSH;
+    verboseMask |= VB_FLUSH;
 
     int quiet = toInt("quiet");
     if (std::max(quiet, static_cast<int>(progress)) > 1)

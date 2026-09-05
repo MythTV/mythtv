@@ -37,13 +37,21 @@
 // Application local headers
 #include "mpegutils.h"
 
+inline static void LOG_STDIO(QString message, LogLevel_t level = LOG_ERR)
+{
+    if (logLevel >= level)
+    {
+        std::cout << message.toStdString() << std::endl;
+    }
+}
+
 static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
 {
     QHash<uint,bool> use_pid;
     if (pidsStr.isEmpty())
     {
         if (required)
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+            LOG_STDIO("Missing --pids option");
     }
     else
     {
@@ -57,8 +65,7 @@ static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
         }
         if (required && use_pid.empty())
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                "At least one pid must be specified\n");
+            LOG_STDIO("At least one pid must be specified");
         }
     }
     return use_pid;
@@ -88,7 +95,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
@@ -96,7 +103,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
     if (!srcbuffer)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -109,8 +116,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
              packet_size != (188+16) &&
              packet_size != (188+20))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Invalid packet size %1, must be 188, 204, or 208\n")
+        LOG_STDIO(QString("Invalid packet size %1, must be 188, 204, or 208")
             .arg(packet_size));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
@@ -167,10 +173,9 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
     {
         if (pid_count[i])
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_CRIT,
-                QString("PID 0x%1 -- %2\n")
+            LOG_STDIO(QString("PID 0x%1 -- %2")
                 .arg(i,4,16,QChar('0'))
-                .arg(pid_count[i],11));
+                .arg(pid_count[i],11), LOG_CRIT);
         }
     }
 
@@ -181,14 +186,14 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
 
     if (cmdline.toString("outfile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --outfile option\n");
+        LOG_STDIO("Missing --outfile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString dest = cmdline.toString("outfile");
@@ -202,8 +207,7 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
              packet_size != (188+16) &&
              packet_size != (188+20))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Invalid packet size %1, must be 188, 204, or 208\n")
+        LOG_STDIO(QString("Invalid packet size %1, must be 188, 204, or 208")
             .arg(packet_size));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
@@ -215,14 +219,14 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
     if (!srcbuffer)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
     MythMediaBuffer *destRB = MythMediaBuffer::Create(dest, true);
     if (!destRB)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open output URL\n");
+        LOG_STDIO("Couldn't open output URL");
         delete srcbuffer;
         return GENERIC_EXIT_NOT_OK;
     }
@@ -488,8 +492,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
             }
             else
             {
-                LOG(VB_STDIO|VB_FLUSH, LOG_WARNING,
-                    "Couldn't find PTS stream\n");
+                LOG_STDIO("Couldn't find PTS stream", LOG_WARNING);
             }
         }
     }
@@ -714,7 +717,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
@@ -722,7 +725,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcRB = MythMediaBuffer::Create(src, false);
     if (!srcRB)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -740,7 +743,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         out = MythMediaBuffer::Create(dest, true);
         if (!out)
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open output URL\n");
+            LOG_STDIO("Couldn't open output URL");
             delete srcRB;
             return GENERIC_EXIT_NOT_OK;
         }

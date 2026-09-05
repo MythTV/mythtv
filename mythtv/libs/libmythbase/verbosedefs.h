@@ -158,13 +158,6 @@ VERBOSE_MAP(VB_FLUSH,     0x1000000000ULL, true,
    flush output to the standard output from console
    programs that have debugging enabled.
  */
-VERBOSE_MAP(VB_STDIO,     0x2000000000ULL, true,
-            "")
-/* Please do not add a description for VB_STDIO, it
-   should not be passed in via "-v". It is used to
-   send output to the standard output from console
-   programs that have debugging enabled.
- */
 VERBOSE_MAP(VB_GPU,       0x4000000000ULL, true,
             "GPU OpenGL driver messages")
 VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000ULL, true,

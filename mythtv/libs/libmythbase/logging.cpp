@@ -408,12 +408,6 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 #ifndef Q_OS_ANDROID
     std::string line;
 
-    if (item->m_type & kStandardIO)
-    {
-        line = qPrintable(item->m_message);
-    }
-    else
-    {
 #if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
         if (true) // NOLINT(readability-simplify-boolean-expr)
 #else
@@ -426,7 +420,6 @@ bool LoggerThread::logConsole(LoggingItem *item) const
         {
             line = item->toStringShort();
         }
-    }
 
     std::cout << line << std::flush;
 
@@ -544,7 +537,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
 {
     int type = kMessage;
     type |= (mask & VB_FLUSH) ? kFlush : 0;
-    type |= (mask & VB_STDIO) ? kStandardIO : 0;
     LoggingItem *item = LoggingItem::create(file, function, line, level,
                                             (LoggingType)type);
     if (!item)
