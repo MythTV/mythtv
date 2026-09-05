@@ -38,7 +38,6 @@ enum LoggingType : std::uint8_t {
     kMessage       = 0x01,
     kRegistering   = 0x02,
     kDeregistering = 0x04,
-    kFlush         = 0x08,
     kInitializing  = 0x20,
 };
 

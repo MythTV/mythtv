@@ -55,8 +55,6 @@ int MythExternRecorderCommandLineParser::SetupLogging(const QString& logfile)
         verboseMask = static_cast<uint64_t>(toLongLong("verboseint"));
     }
 
-    verboseMask |= VB_FLUSH;
-
     bool loglong = toBool("loglong");
 
     int facility = GetSyslogFacility();

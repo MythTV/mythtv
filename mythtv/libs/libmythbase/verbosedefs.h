@@ -151,13 +151,6 @@ VERBOSE_MAP(VB_RPLXQUEUE, 0x400000000ULL, true,
             "MPEG2Fix Replex Queue messages")
 VERBOSE_MAP(VB_DECODE,    0x800000000ULL, true,
             "MPEG2Fix Decode messages")
-VERBOSE_MAP(VB_FLUSH,     0x1000000000ULL, true,
-            "")
-/* Please do not add a description for VB_FLUSH, it
-   should not be passed in via "-v". It is used to
-   flush output to the standard output from console
-   programs that have debugging enabled.
- */
 VERBOSE_MAP(VB_GPU,       0x4000000000ULL, true,
             "GPU OpenGL driver messages")
 VERBOSE_MAP(VB_GPUAUDIO,  0x8000000000ULL, true,
