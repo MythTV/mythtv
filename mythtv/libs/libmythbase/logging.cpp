@@ -409,17 +409,17 @@ bool LoggerThread::logConsole(LoggingItem *item) const
     std::string line;
 
 #if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
-        if (true) // NOLINT(readability-simplify-boolean-expr)
+    if (true) // NOLINT(readability-simplify-boolean-expr)
 #else
-        if (m_loglong)
+    if (m_loglong)
 #endif
-        {
-            line = item->toString();
-        }
-        else
-        {
-            line = item->toStringShort();
-        }
+    {
+        line = item->toString();
+    }
+    else
+    {
+        line = item->toStringShort();
+    }
 
     std::cout << line << std::flush;
 
