@@ -19,6 +19,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include <iostream>
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
@@ -36,13 +37,21 @@
 // Application local headers
 #include "mpegutils.h"
 
+inline static void LOG_STDIO(QString message, LogLevel_t level = LOG_ERR)
+{
+    if (logLevel >= level)
+    {
+        std::cout << message.toStdString() << std::endl;
+    }
+}
+
 static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
 {
     QHash<uint,bool> use_pid;
     if (pidsStr.isEmpty())
     {
         if (required)
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --pids option\n");
+            LOG_STDIO("Missing --pids option");
     }
     else
     {
@@ -56,8 +65,7 @@ static QHash<uint,bool> extract_pids(const QString &pidsStr, bool required)
         }
         if (required && use_pid.empty())
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                "At least one pid must be specified\n");
+            LOG_STDIO("At least one pid must be specified");
         }
     }
     return use_pid;
@@ -87,7 +95,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
@@ -95,7 +103,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
     if (!srcbuffer)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -108,8 +116,7 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
              packet_size != (188+16) &&
              packet_size != (188+20))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Invalid packet size %1, must be 188, 204, or 208\n")
+        LOG_STDIO(QString("Invalid packet size %1, must be 188, 204, or 208")
             .arg(packet_size));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
@@ -152,12 +159,12 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 packets")
-            .arg(total_count));
+            .arg(total_count).toStdString() << std::flush;
     }
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     delete[] buffer;
     delete srcbuffer;
@@ -166,10 +173,9 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
     {
         if (pid_count[i])
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_CRIT,
-                QString("PID 0x%1 -- %2\n")
+            LOG_STDIO(QString("PID 0x%1 -- %2")
                 .arg(i,4,16,QChar('0'))
-                .arg(pid_count[i],11));
+                .arg(pid_count[i],11), LOG_CRIT);
         }
     }
 
@@ -180,14 +186,14 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
 
     if (cmdline.toString("outfile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --outfile option\n");
+        LOG_STDIO("Missing --outfile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString dest = cmdline.toString("outfile");
@@ -201,8 +207,7 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
              packet_size != (188+16) &&
              packet_size != (188+20))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Invalid packet size %1, must be 188, 204, or 208\n")
+        LOG_STDIO(QString("Invalid packet size %1, must be 188, 204, or 208")
             .arg(packet_size));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
@@ -214,14 +219,14 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcbuffer = MythMediaBuffer::Create(src, false);
     if (!srcbuffer)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
     MythMediaBuffer *destRB = MythMediaBuffer::Create(dest, true);
     if (!destRB)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open output URL\n");
+        LOG_STDIO("Couldn't open output URL");
         delete srcbuffer;
         return GENERIC_EXIT_NOT_OK;
     }
@@ -268,19 +273,19 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 packets")
-            .arg(total_count));
+            .arg(total_count).toStdString() << std::flush;
     }
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     delete[] buffer;
     delete srcbuffer;
     delete destRB;
 
-    LOG(VB_STDIO|VB_FLUSH, logLevel, QString("Wrote %1 of %2 packets\n")
-        .arg(write_count).arg(total_count));
+    std::cout << QString("Wrote %1 of %2 packets")
+        .arg(write_count).arg(total_count).toStdString() << std::endl;
 
     return GENERIC_EXIT_OK;
 }
@@ -416,7 +421,7 @@ class PrintOutput
         }
         else
         {
-            LOG(VB_STDIO|VB_FLUSH, logLevel, msg);
+            std::cout << msg.toStdString() << std::flush;
         }
     }
 
@@ -487,8 +492,7 @@ class PrintMPEGStreamListener : public MPEGStreamListener, public PrintOutput
             }
             else
             {
-                LOG(VB_STDIO|VB_FLUSH, LOG_WARNING,
-                    "Couldn't find PTS stream\n");
+                LOG_STDIO("Couldn't find PTS stream", LOG_WARNING);
             }
         }
     }
@@ -713,7 +717,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
 {
     if (cmdline.toString("infile").isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --infile option\n");
+        LOG_STDIO("Missing --infile option");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QString src = cmdline.toString("infile");
@@ -721,7 +725,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
     MythMediaBuffer *srcRB = MythMediaBuffer::Create(src, false);
     if (!srcRB)
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open input URL\n");
+        LOG_STDIO("Couldn't open input URL");
         return GENERIC_EXIT_NOT_OK;
     }
 
@@ -739,7 +743,7 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         out = MythMediaBuffer::Create(dest, true);
         if (!out)
         {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Couldn't open output URL\n");
+            LOG_STDIO("Couldn't open output URL");
             delete srcRB;
             return GENERIC_EXIT_NOT_OK;
         }
@@ -804,10 +808,10 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         offset = sd->ProcessData((const unsigned char*)buffer, len);
 
         totalBytes += len - offset;
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 bytes")
-            .arg(totalBytes));
+            .arg(totalBytes).toStdString() << std::flush;
     }
 
     if (use_xml) {
@@ -815,17 +819,18 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         pmsl->Output(QString("</MPEGSections>"));
     }
 
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     if (ptsl->GetFirstPTS() >= 0)
     {
         QTime ot = QTime(0,0,0,0).addMSecs(ptsl->GetElapsedPTS()/90);
 
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
-            QString("First PTS %1, Last PTS %2, elapsed %3 %4\n")
+        std::cout <<
+            QString("First PTS %1, Last PTS %2, elapsed %3 %4")
             .arg(ptsl->GetFirstPTS()).arg(ptsl->GetLastPTS())
             .arg(ptsl->GetElapsedPTS())
-            .arg(ot.toString("hh:mm:ss.zzz")));
+            .arg(ot.toString("hh:mm:ss.zzz"))
+            .toStdString() << std::endl;
     }
 
     delete sd;
