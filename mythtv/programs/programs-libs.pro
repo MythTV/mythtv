@@ -26,12 +26,12 @@ contains (QMAKE_LIBDIR_POST, /usr/local/lib) {
   LIBS += -L/usr/local/lib
 }
 
-LIBS += -lmythswscale
-LIBS += -lmythavformat
-LIBS += -lmythswresample
-LIBS += -lmythavutil
-LIBS += -lmythavcodec
-LIBS += -lmythavfilter
+LIBS += $$mythFFmpegLib(swscale)
+LIBS += $$mythFFmpegLib(avformat)
+LIBS += $$mythFFmpegLib(swresample)
+LIBS += $$mythFFmpegLib(avutil)
+LIBS += $$mythFFmpegLib(avcodec)
+LIBS += $$mythFFmpegLib(avfilter)
 LIBS += -lmythtv-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
