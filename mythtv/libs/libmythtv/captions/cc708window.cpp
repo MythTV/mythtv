@@ -380,7 +380,13 @@ std::vector<CC708String*> CC708Window::GetStrings(void) const
         }
     }
     if (!createdNonblankStrings)
+    {
+        for (auto ptr : list)
+        {
+            delete ptr;
+        }
         list.clear();
+    }
     return list;
 }
 
