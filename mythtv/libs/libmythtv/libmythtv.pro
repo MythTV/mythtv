@@ -1150,7 +1150,7 @@ mingw {
 # Dependencies and required libraries
 # Have them at the end in order to properly resolve on mingw platform
 # where the order is of significance
-LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
+LIBS += -L../../external/FFmpeg/libswresample $$mythFFmpegLib(swresample)
 LIBS += -L../../external/FFmpeg/libavutil
 LIBS += -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat
@@ -1158,11 +1158,11 @@ LIBS += -L../../external/FFmpeg/libswscale
 LIBS += -L../../external/FFmpeg/libavfilter
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythbase
-LIBS += -lmythswscale
-LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
-LIBS += -lmythavfilter
+LIBS += $$mythFFmpegLib(swscale)
+LIBS += $$mythFFmpegLib(avformat)
+LIBS += $$mythFFmpegLib(avcodec)
+LIBS += $$mythFFmpegLib(avutil)
+LIBS += $$mythFFmpegLib(avfilter)
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythbase-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION

@@ -3,6 +3,11 @@ include(settings2.pro)
 CONFIG += $$CCONFIG
 CONFIG += c11 c17 c++20 strict_c strict_c++
 
+# Empty BUILDSUF -> -lmythavcodec (the default).
+defineReplace(mythFFmpegLib) {
+        return(-lmyth$$1$${BUILDSUF})
+}
+
 # Make sure all the Qt header files are marked as system headers
 QMAKE_DEFAULT_INCDIRS += $$[QT_INSTALL_HEADERS]
 INCLUDEPATH += $$[QT_INSTALL_HEADERS]
