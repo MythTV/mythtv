@@ -536,7 +536,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
                    const char *function, QString message)
 {
     int type = kMessage;
-    type |= (mask & VB_FLUSH) ? kFlush : 0;
     LoggingItem *item = LoggingItem::create(file, function, line, level,
                                             (LoggingType)type);
     if (!item)
@@ -558,10 +557,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
             item->DecrRef();
             qLock.relock();
         }
-    }
-    else if (logThread && !logThreadFinished && (type & kFlush))
-    {
-        logThread->flush();
     }
 }
 
