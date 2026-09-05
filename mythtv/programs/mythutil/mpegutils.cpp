@@ -19,6 +19,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  */
+#include <iostream>
 
 // MythTV headers
 #include "libmythbase/exitcodes.h"
@@ -152,12 +153,12 @@ static int pid_counter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 packets")
-            .arg(total_count));
+            .arg(total_count).toStdString() << std::flush;
     }
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     delete[] buffer;
     delete srcbuffer;
@@ -268,19 +269,19 @@ static int pid_filter(const MythUtilCommandLineParser &cmdline)
         {
             offset = 0;
         }
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 packets")
-            .arg(total_count));
+            .arg(total_count).toStdString() << std::flush;
     }
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     delete[] buffer;
     delete srcbuffer;
     delete destRB;
 
-    LOG(VB_STDIO|VB_FLUSH, logLevel, QString("Wrote %1 of %2 packets\n")
-        .arg(write_count).arg(total_count));
+    std::cout << QString("Wrote %1 of %2 packets")
+        .arg(write_count).arg(total_count).toStdString() << std::endl;
 
     return GENERIC_EXIT_OK;
 }
@@ -416,7 +417,7 @@ class PrintOutput
         }
         else
         {
-            LOG(VB_STDIO|VB_FLUSH, logLevel, msg);
+            std::cout << msg.toStdString() << std::flush;
         }
     }
 
@@ -804,10 +805,10 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         offset = sd->ProcessData((const unsigned char*)buffer, len);
 
         totalBytes += len - offset;
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
+        std::cout <<
             QString("\r                                            \r"
                     "Processed %1 bytes")
-            .arg(totalBytes));
+            .arg(totalBytes).toStdString() << std::flush;
     }
 
     if (use_xml) {
@@ -815,17 +816,18 @@ static int pid_printer(const MythUtilCommandLineParser &cmdline)
         pmsl->Output(QString("</MPEGSections>"));
     }
 
-    LOG(VB_STDIO|VB_FLUSH, logLevel, "\n");
+    std::cout << std::endl;
 
     if (ptsl->GetFirstPTS() >= 0)
     {
         QTime ot = QTime(0,0,0,0).addMSecs(ptsl->GetElapsedPTS()/90);
 
-        LOG(VB_STDIO|VB_FLUSH, logLevel,
-            QString("First PTS %1, Last PTS %2, elapsed %3 %4\n")
+        std::cout <<
+            QString("First PTS %1, Last PTS %2, elapsed %3 %4")
             .arg(ptsl->GetFirstPTS()).arg(ptsl->GetLastPTS())
             .arg(ptsl->GetElapsedPTS())
-            .arg(ot.toString("hh:mm:ss.zzz")));
+            .arg(ot.toString("hh:mm:ss.zzz"))
+            .toStdString() << std::endl;
     }
 
     delete sd;
