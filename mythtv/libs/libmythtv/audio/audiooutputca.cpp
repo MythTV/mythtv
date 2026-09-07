@@ -156,6 +156,9 @@ public:
     bool           mStarted       {false};
     bool           mWasDigital    {false};
     AudioDeviceIOProcID mIoProcID {};
+
+    // Cache the hardware layout write-status to keep RenderAudio completely lock-free
+    bool           mLayoutIsReadOnly {false};
 };
 
 // These callbacks communicate with Core Audio.
@@ -370,10 +373,54 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
         memset(aubuf + written_size, 0, size - written_size);
     }
 
-    //Audio received is in SMPTE channel order, reorder to CA unless passthru
-    if (!m_passthru && m_channels == 8)
+    // Verify channel alignment based on audio unit hardware property capabilities
+    if (!m_passthru && (m_channels == 6 || m_channels == 8))
     {
-        ReorderSmpteToCA(aubuf, size / m_outputBytesPerFrame, m_outputFormat);
+        // Check the cached boolean variable flag initialized during OpenAnalog()
+        // Multi-channel AV receivers expose a write-permissive interface over HDMI,
+        // whereas rigid television passthrough sinks or legacy ARC links are read-only.
+        bool hardwareIsSwapped = d->mLayoutIsReadOnly;
+
+        // correct 8 channel swap from  L R C LFE Rls Rrs Ls  Rs
+        //                        to    L R C LFE Ls  Rs  Rls Rrs
+        if (m_channels == 8 && !hardwareIsSwapped)
+        {
+            ReorderSmpteToCA(aubuf, size / m_outputBytesPerFrame, m_outputFormat);
+        }
+        // 7.1 channel on a read-only device (hardwareIsSwapped=true) is an untested
+        // case and may need to be corrected when it can be properly tested.
+        else if (m_channels == 8 && hardwareIsSwapped)
+        {
+            LOG(VB_AUDIO, LOG_INFO, QString("AudioOutputCA::RenderAudio: untested 7.1 channel audio case with read-only audio device. Channels may be swapped."));
+        }
+
+        // Swap Center and LFE memory offsets if the layout scope is read-only
+        if (hardwareIsSwapped)
+        {
+            uint frames = size / m_outputBytesPerFrame;
+            if (m_outputFormat == FORMAT_S16)
+            {
+                short *ptr = (short *)aubuf;
+                for (uint i = 0; i < frames; i++)
+                {
+                    short tmpCenter = *(ptr + 2);
+                    *(ptr + 2)      = *(ptr + 3); // Map LFE to Center track position
+                    *(ptr + 3)      = tmpCenter;  // Map Center to LFE track position
+                    ptr += m_channels;            // Advance dynamically by the active channel count
+                }
+            }
+            else if (m_outputFormat == FORMAT_FLT)
+            {
+                float *ptr = (float *)aubuf;
+                for (uint i = 0; i < frames; i++)
+                {
+                    float tmpCenter = *(ptr + 2);
+                    *(ptr + 2)      = *(ptr + 3);
+                    *(ptr + 3)      = tmpCenter;
+                    ptr += m_channels;
+                }
+            }
+        }
     }
 
     /* update audiotime (m_bufferedBytes is read by GetBufferedOnSoundcard) */
@@ -1062,7 +1109,7 @@ bool CoreAudioData::ChannelsList(AudioDeviceID /*d*/, bool passthru, ChannelsArr
                 if (format.mFormat.mFormatID == 'IAC3' ||
                     format.mFormat.mFormatID == kAudioFormat60958AC3)
                 {
-                    // By default AC3 has 6 (5.1) channels but CoreAudio seems to set mChannelsPerFrame to 2 
+                    // By default AC3 has 6 (5.1) channels but CoreAudio seems to set mChannelsPerFrame to 2
                     // and considers it a "2 channel Encoded Digital Audio"
                     chans[6-1] = true;
                     //	chans[format.mFormat.mChannelsPerFrame-1] = true;
@@ -1293,10 +1340,8 @@ int CoreAudioData::OpenAnalog()
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
             break;
         case 8:
-            // We need
-            // 3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
-            // but doesn't exist, so we'll swap channels later
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+            // L R C LFE Ls Rs Rls Rrs
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_7_1;
             break;
     }
     /* Set new_layout as the layout */
@@ -1393,6 +1438,15 @@ int CoreAudioData::OpenAnalog()
         return false;
     }
     mInitialized = true;
+
+    // Cache hardware layout properties exactly once during initialization to prevent render thread stalls
+    UInt32 propSize = 0;
+    Boolean isWritable = false;
+    if (AudioUnitGetPropertyInfo(mOutputUnit, kAudioUnitProperty_AudioChannelLayout,
+                                 kAudioUnitScope_Output, 0, &propSize, &isWritable) == noErr)
+    {
+        mLayoutIsReadOnly = !isWritable;
+    }
 
     err = AudioOutputUnitStart(mOutputUnit);
     if (err)
@@ -1737,7 +1791,7 @@ void CoreAudioData::ResetStream(AudioStreamID s)
                          .arg(OSS_STATUS(err)));
                     continue;
                 }
-                
+
                 std::this_thread::sleep_for(1s);   // For the change to take effect
             }
         }
