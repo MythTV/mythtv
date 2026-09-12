@@ -313,39 +313,6 @@ void AudioOutputCA::CloseDevice()
         d->CloseAnalog();
 }
 
-template <class AudioDataType>
-static inline void ReorderSmpteToCA(AudioDataType *buf, uint frames)
-{
-    AudioDataType tmpLS;
-    AudioDataType tmpRS;
-    AudioDataType tmpRLs;
-    AudioDataType tmpRRs;
-    AudioDataType *buf2 = nullptr;
-    for (uint i = 0; i < frames; i++)
-    {
-        buf = buf2 = buf + 4;
-        tmpRLs = *buf++;
-        tmpRRs = *buf++;
-        tmpLS = *buf++;
-        tmpRS = *buf++;
-
-        *buf2++ = tmpLS;
-        *buf2++ = tmpRS;
-        *buf2++ = tmpRLs;
-        *buf2++ = tmpRRs;
-    }
-}
-
-static inline void ReorderSmpteToCA(void *buf, uint frames, AudioFormat format)
-{
-    switch(AudioOutputSettings::FormatToBits(format))
-    {
-        case  8: ReorderSmpteToCA((uchar *)buf, frames); break;
-        case 16: ReorderSmpteToCA((short *)buf, frames); break;
-        default: ReorderSmpteToCA((int   *)buf, frames); break;
-    }
-}
-
 /** Object-oriented part of callback */
 bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
                                 int size, unsigned long long timestamp)
@@ -370,10 +337,54 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
         memset(aubuf + written_size, 0, size - written_size);
     }
 
-    //Audio received is in SMPTE channel order, reorder to CA unless passthru
-    if (!m_passthru && m_channels == 8)
+    // Verify channel alignment based on audio unit hardware property capabilities
+    if (!m_passthru && (m_channels == 6 || m_channels == 8))
     {
-        ReorderSmpteToCA(aubuf, size / m_outputBytesPerFrame, m_outputFormat);
+        bool hardwareIsSwapped = false;
+        Boolean isWritable     = false;
+
+        // Query if the channel layout property scope allows runtime mutations.
+        // Multi-channel AV receivers expose a write-permissive interface over HDMI,
+        // whereas rigid television passthrough sinks or legacy ARC links return false.
+        OSStatus writeCheckErr = AudioUnitGetPropertyInfo(d->mOutputUnit,
+                                                          kAudioUnitProperty_AudioChannelLayout,
+                                                          kAudioUnitScope_Output,
+                                                          0,
+                                                          nullptr,
+                                                          &isWritable);
+
+        if (writeCheckErr == noErr && !isWritable)
+        {
+            hardwareIsSwapped = true;
+        }
+
+        // Swap Center and LFE memory offsets if the layout scope is read-only
+        if (hardwareIsSwapped)
+        {
+            uint frames = size / m_outputBytesPerFrame;
+            if (m_outputFormat == FORMAT_S16)
+            {
+                short *ptr = (short *)aubuf;
+                for (uint i = 0; i < frames; i++)
+                {
+                    short tmpCenter = *(ptr + 2);
+                    *(ptr + 2)      = *(ptr + 3); // Map LFE to Center track position
+                    *(ptr + 3)      = tmpCenter;  // Map Center to LFE track position
+                    ptr += m_channels;            // Advance dynamically by the active channel count
+                }
+            }
+            else if (m_outputFormat == FORMAT_FLT)
+            {
+                float *ptr = (float *)aubuf;
+                for (uint i = 0; i < frames; i++)
+                {
+                    float tmpCenter = *(ptr + 2);
+                    *(ptr + 2)      = *(ptr + 3);
+                    *(ptr + 3)      = tmpCenter;
+                    ptr += m_channels;
+                }
+            }
+        }
     }
 
     /* update audiotime (m_bufferedBytes is read by GetBufferedOnSoundcard) */
@@ -1288,10 +1299,8 @@ int CoreAudioData::OpenAnalog()
             new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_5_1;
             break;
         case 8:
-            // We need
-            // 3F4-LFE        L   R   C    LFE  Rls  Rrs  LS   RS
-            // but doesn't exist, so we'll swap channels later
-            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_MPEG_7_1_A; // L R C LFE Ls Rs Lc Rc
+            // L R C LFE Ls Rs Lc Rc
+            new_layout.mChannelLayoutTag = kAudioChannelLayoutTag_AudioUnit_7_1;
             break;
     }
     /* Set new_layout as the layout */

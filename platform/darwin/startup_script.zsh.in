@@ -16,6 +16,7 @@ fi
 # get the location of the APP_BUNDLE
 APP_DIR=$(realpath "$BASE_DIR/../..")
 RSRC_DIR=$APP_DIR/Contents/Resources
+PLUGIN_DIR=$APP_DIR/Contents/PlugIns
 
 # Add the App Bundle's executables to the search path
 export PATH=$BASE_DIR:$RSRC_DIR/bin:$PATH
@@ -34,6 +35,10 @@ export MYTHTVDIR="$RSRC_DIR"
 
 # Automatically trust the mariadb server ssl certificate
 export MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+
+# Define the runtime path to the bundled database authentication plugins
+export MARIADB_PLUGIN_DIR="$PLUGIN_DIR/mariadb"
+export MYSQL_PLUGIN_DIR="$PLUGIN_DIR/mariadb"
 
 cd $BASE_DIR
 ./@APP_EXE_NAME@ $@
