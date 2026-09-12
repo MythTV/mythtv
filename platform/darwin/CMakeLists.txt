@@ -424,6 +424,33 @@ if(MYTH_BUILD_PLUGINS)
     COMMAND ${CMAKE_COMMAND} -E create_symlink "../../../PlugIns" ${RSRC_MYTHLIB_DIR}/plugins)
 endif()
 
+# mariadb requires caching_sha2_password.so which does not
+# automatically get copied in by macdeployqt
+# locate it in case it is needed
+find_file(MARIADB_SHA2_PLUGIN
+  NAMES caching_sha2_password.so
+  PATHS ${PKGMGR_LIB_DIR} /usr/local/lib
+  PATH_SUFFIXES mariadb/plugin plugin mysql/plugin
+)
+
+if(MARIADB_SHA2_PLUGIN)
+  message(VERBOSE "  Bundling database auth plugin: ${MARIADB_SHA2_PLUGIN}")
+  set(DB_BUNDLE_PLUGIN_DIR "${PLUGINS_DIR}/mariadb/")
+
+  add_custom_command(
+    TARGET ${APP_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DB_BUNDLE_PLUGIN_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${MARIADB_SHA2_PLUGIN}" "${DB_BUNDLE_PLUGIN_DIR}/"
+    COMMENT "  Copying in database auth plugin caching_sha2_password.so"
+  )
+  list(APPEND QT_DARWIN_EXTRAS "-executable=${DB_BUNDLE_PLUGIN_DIR}/caching_sha2_password.so")
+else()
+  # Fail only if we are explicitly linking against MariaDB and the plugin is missing
+  if(DARWIN_EXTRA_LIBS MATCHES "mariadb")
+    message(FATAL_ERROR "Critical dependency missing: MariaDB is active but failed to locate caching_sha2_password.so for bundling.")
+  endif()
+endif()
+
 #
 # create a portable python framework. This needs to be done after the App
 # bundle variables and structure is established
