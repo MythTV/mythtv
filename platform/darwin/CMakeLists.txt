@@ -94,6 +94,58 @@ list(APPEND CMAKE_FIND_ROOT_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 #
 list(REMOVE_DUPLICATES CMAKE_FIND_ROOT_PATH)
 
+# Locate the correct MariaDB / MySQL version used for the QT MYSQL plugin
+# Use this to locate the respective db's plugin directory
+# This is necessary as MySQL/MariaDB bundle some plugins as *.so libraries.
+# macdeployqt does not automatically copy these in, so we need to manually
+# add these files later.
+find_package(Qt6 REQUIRED COMPONENTS Sql)
+# find the QT MYSQL driver
+get_target_property(QT_MYSQL_DRIVER_PATH Qt6::QMYSQLDriverPlugin LOCATION)
+
+# use otool to locate the linked database or client framework
+# Sadly, this was not apparent in any QT cmake variables
+execute_process(
+    COMMAND otool -L "${QT_MYSQL_DRIVER_PATH}"
+    OUTPUT_VARIABLE OTOOL_OUTPUT
+    ERROR_QUIET
+)
+string(TOLOWER "${OTOOL_OUTPUT}" QT_MYSQL_DEPENDENCIES)
+if(QT_MYSQL_DEPENDENCIES MATCHES "mariadb")
+    set(QT_MYSQL_PROVIDER "mariadb")
+elseif(QT_MYSQL_DEPENDENCIES MATCHES "mysql")
+    set(QT_MYSQL_PROVIDER "mysql")
+else()
+    message(FATAL_ERROR "Could not find a valid QT MYSQL driver.")
+endif()
+
+# search for the base keyword extractiung the exact full version from the otool output
+if(OTOOL_OUTPUT MATCHES "\n[ \t]+([^\t\n ]*(mariadb|mysql)[^\t\n ]*\\.dylib)")
+    set(DB_PLUGIN_DIR "${CMAKE_MATCH_1}")
+else()
+    message(FATAL_ERROR "Could not find a valid database link path inside otool!")
+endif()
+
+# located the db driver dylib
+string(REGEX REPLACE "(libmysqlclient|libmariadb).*$" "" DB_PLUGIN_DIR "${DB_PLUGIN_DIR}")
+
+# handle any macports / homebrew specific pathing
+if(MACPORTS)
+    # Drops the trailing /mysql/ folder to back out to /opt/local/lib/mysql8/
+    get_filename_component(DB_PLUGIN_DIR "${DB_PLUGIN_DIR}" DIRECTORY)
+    set(DB_PLUGIN_DIR "${DB_PLUGIN_DIR}/plugin")
+else()
+    # process Homebrew substitutions
+    if(DB_PLUGIN_DIR MATCHES "@@HOMEBREW_PREFIX@@")
+        string(REPLACE "@@HOMEBREW_PREFIX@@" "${PKGMGR_PREFIX}" DB_PLUGIN_DIR "${DB_PLUGIN_DIR}")
+    endif()
+    if(QT_MYSQL_PROVIDER MATCHES "mariadb")
+        set(DB_PLUGIN_DIR "${DB_PLUGIN_DIR}mariadb/plugin")
+    else()
+        set(DB_PLUGIN_DIR "${DB_PLUGIN_DIR}plugin")
+    endif()
+endif()
+
 #
 # Set any package manger specific variables
 #
@@ -422,6 +474,34 @@ if(MYTH_BUILD_PLUGINS)
     TARGET ${APP_NAME} POST_BUILD
     COMMENT "  Creating mythplugins symlinks"
     COMMAND ${CMAKE_COMMAND} -E create_symlink "../../../PlugIns" ${RSRC_MYTHLIB_DIR}/plugins)
+endif()
+
+
+# Add any MySQL/MariaDB plugins - these should be .so files and will get missed by
+# macdeployqt
+set(DB_BUNDLE_PLUGIN_DIR "${PLUGINS_DIR}/${DB_PROVIDER}/plugin")
+file(GLOB DB_SO_FILES "${DB_PLUGIN_DIR}/*.so")
+
+if(DB_SO_FILES)
+  message(VERBOSE "  Bundling database plugins for Qt driver (${DB_PROVIDER})")
+  add_custom_command(
+    TARGET ${APP_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DB_BUNDLE_PLUGIN_DIR}"
+    COMMENT "  Creating database plugin directory"
+  )
+  foreach(DB_PLUGIN IN LISTS DB_SO_FILES)
+    # Extract the individual filename (e.g. dialog.so) to populate your target name variable
+    get_filename_component(DB_TARGET_NAME "${DB_PLUGIN}" NAME)
+    add_custom_command(
+      TARGET ${APP_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${DB_BUNDLE_PLUGIN_DIR}"
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DB_PLUGIN}" "${DB_BUNDLE_PLUGIN_DIR}/"
+      COMMENT "  Copying in database plugin ${DB_TARGET_NAME}"
+    )
+    list(APPEND QT_DARWIN_EXTRAS "-executable=${DB_BUNDLE_PLUGIN_DIR}/${DB_TARGET_NAME}")
+  endforeach()
+else()
+    message(WARNING "No .so files found inside database plugin directory: ${DB_PLUGIN_DIR}")
 endif()
 
 #
