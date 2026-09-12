@@ -63,7 +63,7 @@ installLibs(){
       #check if it is already installed in the framewrk, if so update the link
       needsCopy=false
       recurse=false
-      inAPPlib=$(find "$APP_FMWK_DIR" "$APP_PLUGINS_DIR" -name "$lib" -print -quit)
+      inAPPlib=$(find "$APP_FMWK_DIR" "$APP_PLUGINS_DIR"* -name "$lib" -print -quit)
       case $inAPPlib in
         *Frameworks*|*PlugIns*)
           newLink="@executable_path/../${inAPPlib#$APP_CONTENTS_DIR/}"
