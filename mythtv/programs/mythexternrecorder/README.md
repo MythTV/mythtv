@@ -60,7 +60,7 @@ In addition to user-defined variables, several built-in variables are automatica
 * **TITLE** – Episode title
 * **SUBTITLE** – Episode subtitle
 
-> **NOTE**
+> **NOTE:**
 > These variables are only populated during the tuning process. If your configuration does not define `[TUNER]/command` or `[TUNER]/channels`, they will be unavailable.
 
 If a `[TUNER]/channels` file is used (see below), a `URL` variable may also be defined individually for each channel.
@@ -86,6 +86,7 @@ command = "[?taskset -c {CORE1}?][?,{CORE2}?][?,{CORE3}?][?,{CORE4}?] /usr/local
 
 * **command** (required) – Specifies the system command to execute. This command must produce a transport stream.
 * **desc** (optional) – Used in the `mythbackend` log files to identify this recorder instance. In addition to the `mythbackend` log, `mythexternrecorder` creates its own independent log file, named using this description if provided. If desc is not provided, then the log file will be the same name as the config file but with a log extension.
+* **shell** (optional) - If defined, all commands will be run via this shell. **NOTE:** except for [INCLUDE]/files and [RECORDER]/desc, when a shell is specified, variables are **not** expanded by mythexternrecorder and the varaibles are instead injected into the shells environment. Be sure to use your shell's syntax for dealing with any variables.
 
 ```toml
 [RECORDER]
@@ -248,6 +249,7 @@ DEVICE="roku2"
 TUNER="/usr/local/bin/stb-control --device roku2"
 CODEC="hevc_qsv --p010"
 LOG="-v 4"
+REC="/usr/local/bin/magewell2ts -m -b {BOARD} -i {INPUT} -c {CODEC} {LOG}"
 
 [TOUCH.VERIFY]
 delay="05:00"
@@ -263,16 +265,10 @@ files = [
 ```
 **magewell-2.toml**
 ```toml
-[RECORDER]
-command = """
-/usr/local/bin/magewell2ts --mux [?--board {BOARD} ?]--input {INPUT} --codec {CODEC} {LOG} --quality 21
-"""
-command_lowquality = """
-/usr/local/bin/magewell2ts --mux [?--board {BOARD} ?]--input {INPUT} --codec {CODEC} {LOG} --quality 25
-"""
-command_highquality = """
-/usr/local/bin/magewell2ts --mux [?--board {BOARD} ?]--input {INPUT} --codec {CODEC} {LOG} --quality 16
-"""
+[Recorder]
+command_default     = "{REC} -q 22"
+command_lowquality  = "{REC} -q 25"
+command_highquality = "{REC} -q 16"
 desc = "{DEVICE}+[?{BOARD}-?]{INPUT}-{SOURCE}"
 
 [TUNER]
@@ -342,10 +338,84 @@ URL="{DEVICE}:5004/auto/v32.3"
 If you are okay with giving myth exclusive access to the HDHomeRun tunner, then this tool will auto-create the configuration and channel files for you:
 https://github.com/jpoet/hdhr-externrec-tool
 
+---
+### Using a shell
+**magewell-1-3-2.toml**
+```toml
+[Variables]
+INPUT=3
+SOURCE=2
+DEVICE="onn1"
+TUNER="/usr/local/bin/stb-control --device onn1"
+CODEC="hevc_qsv --p010"
+LOG="-v 4"
+
+[INCLUDE]
+files = [
+    "magewell-{SOURCE}-shell.toml",
+]
+```
+
+**magewell-2-shell.toml**
+```toml
+[Recorder]
+command_default     = "/usr/local/bin/magewell2ts -m -i $INPUT -c $CODEC $LOG -q 21"
+command_lowquality  = "/usr/local/bin/magewell2ts -m -i $INPUT -c $CODEC $LOG -q 25"
+command_highquality = "/usr/local/bin/magewell2ts -m -i $INPUT -c $CODEC $LOG -q 16"
+desc = "{DEVICE}+[?{BOARD}-?]{INPUT}-{SOURCE}[?-{INPUTNAME}?]"
+shell = "/usr/bin/bash"
+
+[Tuner]
+channels = "YTTV-channels.toml"
+command = """
+$TUNER --link "$URL"
+"""
+recfinished="$TUNER --reset"
+newepisode="touch /tmp/newepisode"
+timeout = 90000
+
+[Touch.internet]
+delay="00:30"
+frequency="00:35"
+command="/usr/local/bin/stb-control --device $DEVICE --check-internet"
+damaged_on_failure=true
+log_level="DEBUG"
+```
+
+**NOTE:**: When using a shell you need to be careful with any variable definitions. When not using a shell, mythexternrecorder does recursive espansion of the variables, but that doesn't happen with a shell.
+
 ----
 ## INI
 The previous version of this program used INI style configuration files. Those are still supported but are deprecated. They also lake some of the features that the toml config files support.
 
+----
+## Logs
+A log file is created in the directory specified by the --logpath. When run via mythbackend, this will automatically be the same path that mythtv uses. The file name will be 'recorder-' followed by [RECORDER]/desc (if it is specified), with the .log extension. If [RECORDER]/desc is not specified, then the name of the config file is used.
+
+Important messages (e.g. NOTICE level or greater) are also passed along to mythbackend and will show up in its log file.
+
+You may want to setup log rotation. For example, in /etc/logrotate.d, create a mythtv file with
+```
+/var/log/mythtv/recorder*.log {
+        daily
+        size 100k
+        rotate 10
+        missingok
+        ifempty
+        nocreate
+#        nocompress
+        sharedscripts
+        su mythtv mythtv
+        createolddir 0755 mythtv mythtv
+        olddir /var/log/mythtv/old
+        postrotate
+                find /var/log/mythtv/old -name "recorder*.log*" -type f -mtime \
++10 -delete
+        endscript
+}
+```
+
+----
 ## Links
 
 - https://github.com/bennettpeter/MythTV-LeanCapture

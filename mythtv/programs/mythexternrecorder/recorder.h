@@ -87,6 +87,7 @@ class Recorder : public QObject
     bool nextChannel(const QJsonObject& params);
 
     void processVariablesInMessage(const QJsonObject& message);
+    void variablesToEnv(void);
 
     // Thread management helpers
     void StderrLine(const QString& line);
@@ -122,4 +123,7 @@ class Recorder : public QObject
     std::unique_ptr<PosixProcess> m_streamProcess;
 
     std::function<void(const QString&, const QVariantMap&)> m_mainEvent;
+
+    QString             m_shell;
+    QProcessEnvironment m_env;
 };

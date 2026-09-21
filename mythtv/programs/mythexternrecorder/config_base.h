@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 struct ChannelInfo
@@ -32,6 +33,8 @@ struct TouchConfig
 class ExternConfig
 {
   public:
+    using VarContainer = std::unordered_map<std::string, std::string>;
+
     virtual ~ExternConfig() = default;
 
     bool failed(void) const { return m_fatal; }
@@ -39,6 +42,7 @@ class ExternConfig
     [[nodiscard]]
     virtual bool hasTable(const std::string& table) const = 0;
 
+    virtual const VarContainer& allVariables() const = 0;
     virtual void updateVariable(std::string_view key,
                                 std::string_view value) = 0;
 
@@ -49,11 +53,12 @@ class ExternConfig
 
     [[nodiscard]]
     virtual std::optional<std::string> getValue(std::string_view table,
-                                        std::string_view key) const = 0;
+                                                std::string_view key,
+                                                bool expand) const = 0;
 
     [[nodiscard]]
     std::string getValue(std::string_view table, std::string_view key,
-                         const std::string& defaultValue) const;
+                         const std::string& defaultValue, bool expand) const;
 
     [[nodiscard]]
     virtual std::string expandVars(std::string value) const = 0;
@@ -66,7 +71,7 @@ class ExternConfig
      */
     [[nodiscard]]
     virtual std::optional<std::string>
-      getChannelValue(std::string_view key) const = 0;
+      getChannelValue(std::string_view key, bool expand) const = 0;
 
     // Channel enumeration.
     virtual bool loadChannels(void) = 0;
@@ -84,4 +89,5 @@ class ExternConfig
 
   protected:
     std::map<std::string, TouchConfig> m_touch;
+    VarContainer m_variables;
 };

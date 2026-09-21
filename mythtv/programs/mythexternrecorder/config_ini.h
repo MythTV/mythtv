@@ -21,6 +21,9 @@ class ExternIniConfig : public ExternConfig
     [[nodiscard]]
     bool hasTable(const std::string& table) const override;
 
+    const VarContainer& allVariables(void) const override {
+        return m_variables;
+    }
     void updateVariable(std::string_view key, std::string_view value) override;
 
     [[nodiscard]]
@@ -32,13 +35,14 @@ class ExternIniConfig : public ExternConfig
 
     [[nodiscard]]
     std::optional<std::string> getValue(std::string_view table,
-                                        std::string_view key) const override;
+                                        std::string_view key,
+                                        bool expand) const override;
 
     bool loadChannels(void) override;
 
     [[nodiscard]]
     std::optional<std::string>
-    getChannelValue(std::string_view key) const override;
+      getChannelValue(std::string_view key, bool expand) const override;
 
     [[nodiscard]]
     std::size_t channelCount() const noexcept override;
@@ -75,18 +79,15 @@ class ExternIniConfig : public ExternConfig
                                    std::string_view key) const;
 
     [[nodiscard]]
-    std::optional<std::string> getRawValue(const QSettings &settings,
-                                           std::string_view section,
-                                           std::string_view key) const;
-
-    [[nodiscard]]
     std::optional<std::string> getValue(const QSettings &settings,
                                         std::string_view section,
-                                        std::string_view key) const;
+                                        std::string_view key,
+                                        bool expand) const;
 
     [[nodiscard]]
     std::optional<std::string> getChannelValue(const ChannelEntry &channel,
-                                               std::string_view key) const;
+                                               std::string_view key,
+                                               bool expand) const;
 
     [[nodiscard]]
     std::optional<ChannelInfo> makeChannelInfo(const QSettings &settings,
@@ -107,6 +108,4 @@ class ExternIniConfig : public ExternConfig
     std::vector<ChannelEntry> m_channels;
     mutable std::size_t m_channelIndex{0};
     mutable bool m_channelIterValid{false};
-
-    std::unordered_map<std::string, std::string> m_variables;
 };

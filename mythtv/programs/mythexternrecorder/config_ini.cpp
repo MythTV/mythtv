@@ -142,9 +142,10 @@ static std::string normalizeKey(std::string_view key)
 }
 
 std::optional<std::string>
-  ExternIniConfig::getRawValue(const QSettings &settings,
-                               std::string_view section,
-                               std::string_view key) const
+  ExternIniConfig::getValue(const QSettings &settings,
+                            std::string_view section,
+                            std::string_view key,
+                            bool expand) const
 {
     if (section == "VARIABLES")
     {
@@ -161,26 +162,16 @@ std::optional<std::string>
     if (!actualKey)
         return std::nullopt;
 
-    return settings.value(*actualKey).toString().toStdString();
-}
-
-std::optional<std::string>
-  ExternIniConfig::getValue(const QSettings &settings,
-                            std::string_view section,
-                            std::string_view key) const
-{
-    const auto value = getRawValue(settings, section, key);
-
-    if (!value)
-        return std::nullopt;
-
-    return expandVars(*value);
+    return expand
+        ? expandVars(settings.value(*actualKey).toString().toStdString())
+        : settings.value(*actualKey).toString().toStdString();
 }
 
 std::optional<std::string> ExternIniConfig::getValue(std::string_view table,
-                                                     std::string_view key) const
+                                                     std::string_view key,
+                                                     bool expand) const
 {
-    return getValue(m_settings, table, key);
+    return getValue(m_settings, table, key, expand);
 }
 
 void ExternIniConfig::updateVariable(std::string_view key,
@@ -193,12 +184,12 @@ void ExternIniConfig::updateVariable(std::string_view key,
 
 bool ExternIniConfig::variableExists(std::string_view name) const
 {
-    return getRawValue(m_settings, "VARIABLES", name).has_value();
+    return getValue(m_settings, "VARIABLES", name, false).has_value();
 }
 
 std::string ExternIniConfig::expandVariable(std::string_view name) const
 {
-    const auto value = getRawValue(m_settings, "VARIABLES", name);
+    const auto value = getValue(m_settings, "VARIABLES", name, false);
 
     if (!value)
         return {};
@@ -332,7 +323,7 @@ std::string ExternIniConfig::expandVars(std::string value) const
 
 bool ExternIniConfig::loadChannels(void)
 {
-    const auto filename = getValue(m_settings, "TUNER", "channels");
+    const auto filename = getValue(m_settings, "TUNER", "channels", true);
 
     if (!filename)
         return true;
@@ -404,29 +395,33 @@ std::optional<ChannelInfo>
      */
     info.number = section.toStdString();
 
-    if (const auto value = getValue(settings, section.toStdString(), "channum"))
+    if (const auto value = getValue(settings, section.toStdString(), "channum",
+                                    false))
         info.number = *value;
 
-    if (const auto value = getValue(settings, section.toStdString(), "name"))
+    if (const auto value = getValue(settings, section.toStdString(), "name",
+                                    false))
         info.name = *value;
 
     if (const auto value =
-        getValue(settings, section.toStdString(), "callsign"))
+        getValue(settings, section.toStdString(), "callsign", false))
     {
         info.callsign = *value;
     }
 
-    if (const auto value = getValue(settings, section.toStdString(), "xmltvid"))
+    if (const auto value = getValue(settings, section.toStdString(), "xmltvid",
+                                    false))
         info.xmltvid = *value;
 
-    if (const auto value = getValue(settings, section.toStdString(), "icon"))
+    if (const auto value = getValue(settings, section.toStdString(), "icon",
+                                    false))
         info.icon = *value;
 
     return info;
 }
 
 std::optional<std::string>
-  ExternIniConfig::getChannelValue(std::string_view key) const
+  ExternIniConfig::getChannelValue(std::string_view key, bool expand) const
 {
     if (!m_channelSettings)
         return std::nullopt;
@@ -438,15 +433,17 @@ std::optional<std::string>
     else if (key == "newepisode")
         key = "newepisodecommand";
 
-    if (auto channel = getValue(m_settings, "VARIABLES", "callsign"))
+    if (auto channel = getValue(m_settings, "VARIABLES", "callsign", false))
     {
-        if (const auto value = getValue(*m_channelSettings, *channel, key))
+        if (const auto value = getValue(*m_channelSettings, *channel, key,
+                                        expand))
             return value;
     }
 
-    if (auto channel = getValue(m_settings, "VARIABLES", "channum"))
+    if (auto channel = getValue(m_settings, "VARIABLES", "channum", false))
     {
-        if (const auto value = getValue(*m_channelSettings, *channel, key))
+        if (const auto value = getValue(*m_channelSettings, *channel, key,
+                                        expand))
             return value;
     }
 
