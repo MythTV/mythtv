@@ -809,9 +809,9 @@ void ExternalStreamHandler::run(void)
 
         if (len < TS_PACKET_SIZE)
         {
-            if (m_xon && data_short_err++ == 0)
-                LOG(VB_RECORD, LOG_INFO, LOC + "Waiting for a full TS packet.");
-            std::this_thread::sleep_for(50us);
+            if (m_xon)
+                ++data_short_err;
+            std::this_thread::sleep_for(3ms);
             continue;
         }
         if (data_short_err)
