@@ -207,6 +207,8 @@ When you click **[Start Scan]**, The`[TUNER]/channels file will be parsed and us
 
 > **IMPORTANT**
 > TOML requires that all strings be quoted. It accepts both single and double quotes (`'` and `"`), as well as multi-line quotes (`'''` and `"""`), which work well if the system command itself needs to include quotation marks.
+>
+> If section names have an unquoted dot (.) in them, that is interpreted as a sub-section. This means that the channels.toml file can have [31] but not [31.1], so for something like 31.1 it must be ['31.1'] or ["31.1"]
 
 ---
 ### Twitch
@@ -320,15 +322,15 @@ hdhr-externrec-tool --quiet --hdhr HDHR-10A04F10 --channels "/home/mythtv/etc"
 
 **1043FFFF-channels.toml**
 ```toml
-[32.1]
+['32.1']
 NAME="TeleX"
 URL="{DEVICE}:5004/auto/v32.1"
 
-[32.2]
+['32.2']
 NAME="Primo"
 URL="{DEVICE}:5004/auto/v32.2"
 
-[32.3]
+['32.3']
 NAME="Buzzr"
 URL="{DEVICE}:5004/auto/v32.3"
 ```
