@@ -1541,6 +1541,7 @@ HAVE_LIST="
     vdpau_x11
     libbluray
     libudfread
+    tomlplusplus
 "
 
 # options emitted with CONFIG_ prefix but not available on the command line
@@ -1648,6 +1649,7 @@ USING_LIST='
     waylandextras
     qtprivateheaders
     qtwebengine
+    tomlplusplus
 '
 
 CMDLINE_SELECT="
@@ -5042,6 +5044,19 @@ enabled asi && check_cc <<EOF || disable asi
 int main(void) { return 1; }
 EOF
 
+# Check for tomlplusplus support
+if enabled backend; then
+    check_cxx <<EOF && enable tomlplusplus || disable tomlplusplus
+#include <toml++/toml.h>
+int main(void) {
+    toml::table tbl;
+    return tbl.empty() ? 0 : 1;
+}
+EOF
+else
+    disable tomlplusplus
+fi
+
 if enabled systemd_notify ; then
     if check_pkg_config systemd_notify libsystemd-daemon systemd/sd-daemon.h sd_notify ; then
         require_pkg_config systemd_notify libsystemd-daemon systemd/sd-daemon.h sd_notify
@@ -5947,6 +5962,7 @@ if enabled backend; then
   echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
   echo "DVEO ASI support          ${asi-no}"
+  echo "tomlplusplus support      ${tomlplusplus-no}"
   echo
 fi
 
