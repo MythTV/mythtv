@@ -49,13 +49,14 @@ ExternalSignalMonitor::ExternalSignalMonitor(int db_cardnum,
 {
     LOG(VB_CHANNEL, LOG_INFO, LOC + "ctor");
     m_streamHandler = ExternalStreamHandler::Get(m_channel->GetDevice(),
-                                                  m_channel->GetInputID(),
-                                                  m_channel->GetMajorID());
+                                                 m_channel->GetInputID(),
+                                                 m_channel->GetMajorID(),
+                                                 "sigmon");
     if (!m_streamHandler || m_streamHandler->HasError())
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
         if (m_streamHandler)
-            ExternalStreamHandler::Return(m_streamHandler, m_inputid);
+            ExternalStreamHandler::Return(m_streamHandler, m_inputid, "sigmon");
     }
     else
     {
@@ -75,7 +76,7 @@ ExternalSignalMonitor::~ExternalSignalMonitor()
     LOG(VB_CHANNEL, LOG_INFO, LOC + "dtor");
     ExternalSignalMonitor::Stop();
     if (m_streamHandler)
-        ExternalStreamHandler::Return(m_streamHandler, m_inputid);
+        ExternalStreamHandler::Return(m_streamHandler, m_inputid, "sigmon");
 }
 
 /** \fn ExternalSignalMonitor::Stop(void)
@@ -88,7 +89,7 @@ void ExternalSignalMonitor::Stop(void)
     SignalMonitor::Stop();
     if (GetStreamData())
     {
-        m_streamHandler->StopStreaming();
+        m_streamHandler->StopStreaming("sigmon done");
         m_streamHandler->RemoveListener(GetStreamData());
     }
     m_streamHandlerStarted = false;
@@ -174,7 +175,9 @@ void ExternalSignalMonitor::UpdateValues(void)
         if (!m_streamHandlerStarted)
         {
             m_streamHandler->AddListener(GetStreamData());
-            m_streamHandler->StartStreaming(false);
+            m_streamHandler->StartStreaming(false,
+                                            m_channel->GetProfileName(),
+                                            "signalmon start");
             m_streamHandlerStarted = true;
         }
     }
@@ -195,6 +198,11 @@ bool ExternalSignalMonitor::HasLock(void)
         ("HasLock: invalid response '%1'").arg(result));
     if (!result.startsWith("WARN"))
         m_error = QString("HasLock: invalid response '%1'").arg(result);
+
+    m_error = result;
+    LOG(VB_CHANNEL, LOG_ERR, LOC + m_error);
+    m_updateDone = true;
+
     return false;
 }
 
@@ -221,10 +229,15 @@ int ExternalSignalMonitor::GetSignalStrengthPercent(void)
         return percent;
     }
     LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-        ("GetSignalStrengthPercent: invalid response '%1'").arg(result));
+        ("GetSignalStrengthPercent: Failed '%1'").arg(result));
     if (!result.startsWith("WARN"))
         m_error = QString("GetSignalStrengthPercent: invalid response '%1'")
                 .arg(result);
+
+    m_error = result;
+    LOG(VB_CHANNEL, LOG_ERR, LOC + m_error);
+    m_updateDone = true;
+
     return -1;
 }
 
@@ -247,7 +260,7 @@ std::chrono::seconds ExternalSignalMonitor::GetLockTimeout(void)
         return timeout;
     }
     LOG(VB_CHANNEL, LOG_ERR, LOC + QString
-        ("GetLockTimeout: invalid response '%1'").arg(result));
+        ("GetLockTimeout: Failed '%1'").arg(result));
     if (!result.startsWith("WARN"))
         m_error = QString("GetLockTimeout: invalid response '%1'").arg(result);
     return -1s;

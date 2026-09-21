@@ -2971,6 +2971,13 @@ void TVRec::StopLiveTV(void)
     m_tvChain = nullptr;
 }
 
+QString TVRec::GetProfileName(void) const
+{
+    return (m_curRecording
+            ? m_curRecording->GetProgramRecordingProfile()
+            : "");
+}
+
 /** \fn TVRec::PauseRecorder(void)
  *  \brief Tells "recorder" to pause, used for channel and input changes.
  *

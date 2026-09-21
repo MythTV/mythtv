@@ -42,10 +42,17 @@ bool ExternalChannel::Open(void)
         return false;
 
     m_streamHandler = ExternalStreamHandler::Get(m_device, GetInputID(),
-                                                  GetMajorID());
-    if (!m_streamHandler || m_streamHandler->HasError())
+                                                 GetMajorID(), "channel");
+    if (!m_streamHandler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
+        Close();
+        return false;
+    }
+    if (m_streamHandler->HasError())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Open failed: %1").arg(m_streamHandler->ErrorString()));
         Close();
         return false;
     }
@@ -61,7 +68,7 @@ void ExternalChannel::Close()
 
     if (ExternalChannel::IsOpen())
     {
-        ExternalStreamHandler::Return(m_streamHandler, GetInputID());
+        ExternalStreamHandler::Return(m_streamHandler, GetInputID(), "channel");
         m_streamHandler = nullptr;
     }
 }

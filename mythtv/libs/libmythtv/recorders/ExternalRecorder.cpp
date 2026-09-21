@@ -86,7 +86,7 @@ void ExternalRecorder::run(void)
     m_streamData->AddWritingListener(this);
     m_streamHandler->AddListener(m_streamData, false, true);
 
-    StartStreaming();
+    StartStreaming("recording");
 
     while (IsRecordingRequested() && !IsErrored())
     {
@@ -124,7 +124,7 @@ void ExternalRecorder::run(void)
         }
     }
 
-    StopStreaming();
+    StopStreaming("finished");
 
     m_streamHandler->RemoveListener(m_streamData);
     m_streamData->RemoveWritingListener(this);
@@ -150,8 +150,9 @@ bool ExternalRecorder::Open(void)
     ResetForNewFile();
 
     m_streamHandler = ExternalStreamHandler::Get(m_channel->GetDevice(),
-                                                  m_channel->GetInputID(),
-                                                  m_channel->GetMajorID());
+                                                 m_channel->GetInputID(),
+                                                 m_channel->GetMajorID(),
+                                                 "recorder");
 
     if (m_streamHandler)
     {
@@ -162,7 +163,8 @@ bool ExternalRecorder::Open(void)
         else
         {
             ExternalStreamHandler::Return(m_streamHandler,
-                                          (m_tvrec ? m_tvrec->GetInputId() : -1));
+                                  (m_tvrec ? m_tvrec->GetInputId() : -1),
+                                          "recorder");
 
             return false;
         }
@@ -180,7 +182,8 @@ void ExternalRecorder::Close(void)
 
     if (IsOpen())
         ExternalStreamHandler::Return(m_streamHandler,
-                                      (m_tvrec ? m_tvrec->GetInputId() : -1));
+                                      (m_tvrec ? m_tvrec->GetInputId() : -1),
+                                      "recorder");
 
     LOG(VB_RECORD, LOG_INFO, LOC + "Close() -- end");
 }
@@ -195,7 +198,7 @@ bool ExternalRecorder::PauseAndWait(std::chrono::milliseconds timeout)
             LOG(VB_RECORD, LOG_INFO, LOC + "PauseAndWait pause");
 
             m_streamHandler->RemoveListener(m_streamData);
-            StopStreaming();
+            StopStreaming("pause");
 
             m_paused = true;
             m_pauseWait.wakeAll();
@@ -218,7 +221,7 @@ bool ExternalRecorder::PauseAndWait(std::chrono::milliseconds timeout)
 
         m_paused = false;
         m_streamHandler->AddListener(m_streamData);
-        StartStreaming();
+        StartStreaming("resume");
     }
 
     // Always wait a little bit, unless woken up
@@ -227,13 +230,16 @@ bool ExternalRecorder::PauseAndWait(std::chrono::milliseconds timeout)
     return IsPaused(true);
 }
 
-bool ExternalRecorder::StartStreaming(void)
+bool ExternalRecorder::StartStreaming(const QString& reason)
 {
-    LOG(VB_RECORD, LOG_INFO, LOC + "StartStreaming");
-    return m_streamHandler && m_streamHandler->StartStreaming(true);
+    QString profile = m_curRecording->GetProgramRecordingProfile();
+    LOG(VB_RECORD, LOG_INFO, LOC +
+        QString("StartStreaming w/profile %1").arg(profile));
+    return m_streamHandler && m_streamHandler->StartStreaming(true, profile,
+                                                              reason);
 }
 
-bool ExternalRecorder::StopStreaming(void)
+bool ExternalRecorder::StopStreaming(const QString& reason)
 {
-    return (m_streamHandler && m_streamHandler->StopStreaming());
+    return (m_streamHandler && m_streamHandler->StopStreaming(reason));
 }

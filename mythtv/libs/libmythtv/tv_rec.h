@@ -234,6 +234,9 @@ class MTV_PUBLIC TVRec : public SignalMonitorListener, public QRunnable
     uint GetInputId(void) const { return m_inputId; }
     uint GetParentId(void) const { return m_parentId; }
     uint GetMajorId(void) { return m_parentId ? m_parentId : m_inputId; }
+
+    QString GetProfileName(void) const;
+
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
