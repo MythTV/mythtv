@@ -714,7 +714,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
         utime(outname.toLocal8Bit().constData(), &times);
     }
 
-    delete[] data;
+    free(data);
 
     m_programInfo.MarkAsInUse(false, kPreviewGeneratorInUseID);
 
