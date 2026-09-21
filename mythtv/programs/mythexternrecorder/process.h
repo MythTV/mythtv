@@ -40,14 +40,16 @@ class Process : public QObject
      * Start a process asynchronously.
      * Returns false if the process could not be started.
      */
-    bool start(const QString& command);
+    bool start(const QString& command, QProcessEnvironment& env,
+               const QString& shell_path = "");
     static bool startDetached(const QString& command);
 
     /*
      * Execute a process synchronously.
      * Returns true if the process exited successfully.
      */
-    bool execute(const QString& command);
+    bool execute(const QString& command, QProcessEnvironment& env,
+                 const QString& shell_path = "");
 
     /*
      * Wait for a background process to complete.
@@ -103,7 +105,7 @@ class Process : public QObject
 
     const QString& errorString() const
     {
-        return m_errorString;
+        return m_errstr;
     }
 
     int exitCode() const
@@ -145,7 +147,6 @@ class Process : public QObject
 
   private:
     void reset();
-    void setState(State state);
 
   private:
     QString m_description;
@@ -164,7 +165,7 @@ class Process : public QObject
     QProcess::ProcessError m_error
     {QProcess::UnknownError};
 
-    QString m_errorString;
+    QString m_errstr;
 
     QDateTime m_started;
     QDateTime m_finished;

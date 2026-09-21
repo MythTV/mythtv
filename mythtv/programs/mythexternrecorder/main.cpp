@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
 
     // Init logging
     std::string desc = config->getValue("RECORDER", "desc",
-                                         confFile.stem().string());
+                                        confFile.stem().string(), true);
     QString logFile = logPath + QString("/recorder-%1.log")
-                       .arg(QString::fromStdString(desc));
+                      .arg(QString::fromStdString(desc));
 
     cmdline.SetupLogging(logFile);
 

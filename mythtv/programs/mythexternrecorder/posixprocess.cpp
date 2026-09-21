@@ -1,25 +1,26 @@
 #include <QProcess>
 #include <QStandardPaths>
-#include <spawn.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <vector>
+
+#include <algorithm>
 #include <chrono>
-#include <thread>
+#include <fcntl.h>
 #include <filesystem>
 #include <fstream>
+#include <signal.h>
+#include <spawn.h>
 #include <string>
-#include <algorithm>
+#include <sys/wait.h>
+#include <thread>
+#include <unistd.h>
+#include <vector>
 
 #include "posixprocess.h"
 
 #include "libmythbase/mythlogging.h"
 
-extern char **environ;
+extern char** environ;
 
-PosixProcess::~PosixProcess()
+PosixProcess::~PosixProcess(void)
 {
     this->terminate();
 }
@@ -56,35 +57,57 @@ static std::vector<std::string> getProcCmdline(pid_t pid)
     return args;
 }
 
-static bool matchCmdline(const std::vector<std::string>& procArgs, const QStringList& targetArgs)
+static bool matchCmdline(const std::vector<std::string>& procArgs,
+                         const QString& targetCmd)
 {
-    if (procArgs.empty() || targetArgs.isEmpty())
+    if (procArgs.empty() || targetCmd.isEmpty())
         return false;
 
-    if (procArgs.size() != static_cast<size_t>(targetArgs.size()))
-        return false;
+    QString target = targetCmd.trimmed();
 
-    for (size_t i = 1; i < procArgs.size(); ++i)
+    // Is this process running directly?
+    QString directCmd;
+    for (size_t idx = 0; idx < procArgs.size(); ++idx)
     {
-        if (procArgs[i] != targetArgs[static_cast<qsizetype>(i)].toStdString())
-            return false;
+        if (idx > 0)
+            directCmd.append(' ');
+        directCmd.append(QString::fromStdString(procArgs[idx]));
     }
 
-    std::string procExec = procArgs[0];
-    std::string targetExec = targetArgs[0].toStdString();
-
-    if (procExec == targetExec)
+    // If it's an exact match...
+    if (directCmd.trimmed() == target)
         return true;
 
-    auto procBase = std::filesystem::path(procExec).filename().string();
-    auto targetBase = std::filesystem::path(targetExec).filename().string();
-    return procBase == targetBase;
+    // Running in a shell?
+    // [0] -> "/bin/sh", [1] -> "-c", [2] -> "actual command payload"
+    if (procArgs.size() >= 3)
+    {
+        std::string baseExec =
+            std::filesystem::path(procArgs[0]).filename().string();
+        std::string flag = procArgs[1];
+
+        // Check if the binary is a common shell executing a string command
+        if ((baseExec == "sh" || baseExec == "bash" || baseExec == "zsh" ||
+             baseExec == "dash" || baseExec == "cmd.exe") &&
+            (flag == "-c" || flag == "/c"))
+        {
+            if (QString::fromStdString(procArgs[2]).trimmed() == target)
+                return true;
+        }
+    }
+
+    return false;
 }
 
-void PosixProcess::killMatchingProcesses(const QStringList& args)
+void PosixProcess::killMatchingProcesses(const QString& targetCmd)
 {
     pid_t myPid = getpid();
+    pid_t parentPid = getppid();
+
     std::error_code ec;
+
+    if (targetCmd.isEmpty())
+        return;
 
     for (const auto& entry : std::filesystem::directory_iterator("/proc", ec))
     {
@@ -92,8 +115,11 @@ void PosixProcess::killMatchingProcesses(const QStringList& args)
             continue;
 
         std::string filename = entry.path().filename().string();
-        if (filename.empty() || !std::all_of(filename.begin(), filename.end(), ::isdigit))
+        if (filename.empty() ||
+            !std::all_of(filename.begin(), filename.end(), ::isdigit))
+        {
             continue;
+        }
 
         pid_t pid = 0;
         try
@@ -105,109 +131,126 @@ void PosixProcess::killMatchingProcesses(const QStringList& args)
             continue;
         }
 
-        if (pid <= 1 || pid == myPid)
+        if (pid <= 1 || pid == myPid || pid == parentPid)
             continue;
 
         auto procArgs = getProcCmdline(pid);
-        if (matchCmdline(procArgs, args))
+        if (matchCmdline(procArgs, targetCmd))
         {
             LOG(VB_RECORD, LOG_WARNING,
-                QString("Found running process with identical arguments (PID %1): %2 -> terminating")
-                .arg(pid).arg(args.join(' ')));
+                QString("Found running process matching command string (PID "
+                        "%1): -> terminating")
+                    .arg(pid));
 
             kill(pid, SIGTERM);
 
-            for (int i = 0; i < 20; ++i)
+            // Poll process state without waitpid (since it's not our child)
+            for (int idx = 0; idx < 20; ++idx)
             {
-                int status = 0;
-                pid_t wr = waitpid(pid, &status, WNOHANG);
-                if (wr == pid || kill(pid, 0) != 0)
-                    break;
+                if (kill(pid, 0) != 0 && errno == ESRCH)
+                    break; // Process is officially dead
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
 
             if (kill(pid, 0) == 0)
             {
                 LOG(VB_RECORD, LOG_WARNING,
-                    QString("Process PID %1 did not exit after SIGTERM, killing with SIGKILL")
-                    .arg(pid));
+                    QString("PID %1 stubborn, issuing SIGKILL").arg(pid));
                 kill(pid, SIGKILL);
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                int status = 0;
-                waitpid(pid, &status, WNOHANG);
             }
         }
     }
 }
 
-LaunchResult PosixProcess::launch(const QString& command)
+LaunchResult PosixProcess::launch(const QString& command,
+                                  const QProcessEnvironment& env,
+                                  const QString& shellPath)
 {
     if (m_pid > 0 || m_stdoutFd >= 0 || m_stderrFd >= 0)
-    {
         terminate();
-    }
 
-    m_args = QProcess::splitCommand(command);
+    killMatchingProcesses(command);
 
-    if (m_args.isEmpty())
+    QString progPath;
+    QStringList finalArgs;
+
+    if (!shellPath.isEmpty())
     {
-        LOG(VB_RECORD, LOG_ERR, QString("Failed to split '%1' into args")
-            .arg(command));
-        return {false, QString("Failed to split '%1' into args").arg(command)};
-    }
+        progPath = shellPath;
 
-    killMatchingProcesses(m_args);
-
-    LOG(VB_RECORD, LOG_INFO, QString("Launching %1").arg(m_args.join(' ')));
-
-    QString execProgram = m_args[0];
-    if (execProgram.contains('/'))
-    {
-        if (access(execProgram.toLocal8Bit().constData(), X_OK) != 0)
+        // Ensure the shell binary exists/is executable
+        if (access(progPath.toLocal8Bit().constData(), X_OK) != 0)
         {
-            QString errStr = QString("Executable '%1' not found or not executable: %2")
-                             .arg(execProgram, QString::fromLocal8Bit(strerror(errno)));
+            QString errStr =
+                QString("Specified shell '%1' not found or not executable")
+                    .arg(shellPath);
             LOG(VB_RECORD, LOG_ERR, errStr);
             return {false, errStr};
         }
+
+        finalArgs.push_back(shellPath);
+        // POSIX shells use -c to execute a string string
+        finalArgs.push_back("-c");
+        // The entire command string is one argument
+        finalArgs.push_back(command);
     }
     else
     {
-        QString foundPath = QStandardPaths::findExecutable(execProgram);
-        if (foundPath.isEmpty())
+        // Run without shell
+        m_args = QProcess::splitCommand(command);
+        if (m_args.isEmpty())
         {
-            QString errStr = QString("Executable '%1' not found in PATH").arg(execProgram);
-            LOG(VB_RECORD, LOG_ERR, errStr);
-            return {false, errStr};
+            LOG(VB_RECORD, LOG_ERR,
+                QString("Failed to split '%1' into args").arg(command));
+            return {false,
+                    QString("Failed to split '%1' into args").arg(command)};
         }
+
+        QString execProg = m_args[0];
+
+        if (execProg.contains('/'))
+        {
+            if (access(execProg.toLocal8Bit().constData(), X_OK) != 0)
+            {
+                QString err_str =
+                    QString("Executable '%1' not found or not executable: %2")
+                        .arg(execProg,
+                             QString::fromLocal8Bit(strerror(errno)));
+                LOG(VB_RECORD, LOG_ERR, err_str);
+                return {false, err_str};
+            }
+
+            progPath = execProg;
+        }
+        else
+        {
+            progPath = QStandardPaths::findExecutable(execProg);
+            if (progPath.isEmpty())
+            {
+                QString err_str =
+                    QString("Executable '%1' not found in PATH").arg(execProg);
+                LOG(VB_RECORD, LOG_ERR, err_str);
+                return {false, err_str};
+            }
+        }
+
+        finalArgs = m_args;
     }
 
-    int stdoutPipe[2];
-    int stderrPipe[2];
+    QString fullCommandLine = finalArgs.join("\" \"");
+    if (!fullCommandLine.isEmpty())
+        fullCommandLine = "\"" + fullCommandLine + "\"";
 
-    if (pipe2(stdoutPipe, O_CLOEXEC) < 0)
-    {
-        QString errStr = QString("Failed to create stdout pipe: %1")
-                         .arg(QString::fromLocal8Bit(strerror(errno)));
-        LOG(VB_RECORD, LOG_ERR, errStr);
-        return {false, errStr};
-    }
+    LOG(VB_RECORD, LOG_INFO, QString("Launching: %1").arg(fullCommandLine));
 
-    if (pipe2(stderrPipe, O_CLOEXEC) < 0)
-    {
-        QString errStr = QString("Failed to create stderr pipe: %1")
-                         .arg(QString::fromLocal8Bit(strerror(errno)));
-        LOG(VB_RECORD, LOG_ERR, errStr);
-        close(stdoutPipe[0]);
-        close(stdoutPipe[1]);
-        return {false, errStr};
-    }
-
+    // Convert strings for argv
     std::vector<QByteArray> storage;
-    storage.reserve(m_args.size());
-
+    storage.reserve(finalArgs.size());
     std::vector<char*> argv;
-    for (const QString& arg : m_args)
+    argv.reserve(finalArgs.size() + 1);
+
+    for (const QString& arg : finalArgs)
         storage.push_back(arg.toLocal8Bit());
 
     for (QByteArray& arg : storage)
@@ -215,28 +258,74 @@ LaunchResult PosixProcess::launch(const QString& command)
 
     argv.push_back(nullptr);
 
+    // convert strings for envp
+    QStringList envList = env.toStringList();
+    std::vector<QByteArray> env_storage;
+    env_storage.reserve(envList.size());
+    std::vector<char*> envp;
+    envp.reserve(envList.size() + 1);
+
+    for (const QString& env_var : envList)
+        env_storage.push_back(env_var.toLocal8Bit());
+
+    for (QByteArray& env_var : env_storage)
+        envp.push_back(env_var.data());
+
+    envp.push_back(nullptr);
+
+    int stdoutPipe[2];
+    int stderrPipe[2];
+
+    if (pipe2(stdoutPipe, O_CLOEXEC) < 0)
+    {
+        QString errStr = QString("Failed to create stdout pipe: %1")
+                             .arg(QString::fromLocal8Bit(strerror(errno)));
+        LOG(VB_RECORD, LOG_ERR, errStr);
+        return {false, errStr};
+    }
+
+    if (pipe2(stderrPipe, O_CLOEXEC) < 0)
+    {
+        QString errStr = QString("Failed to create stderr pipe: %1")
+                             .arg(QString::fromLocal8Bit(strerror(errno)));
+        LOG(VB_RECORD, LOG_ERR, errStr);
+        close(stdoutPipe[0]);
+        close(stdoutPipe[1]);
+        return {false, errStr};
+    }
+
+    // Actions
     posix_spawn_file_actions_t actions;
     posix_spawn_file_actions_init(&actions);
 
-    // Child stdout -> pipe write end
+    // Map child stdout -> pipe write end
     posix_spawn_file_actions_adddup2(&actions, stdoutPipe[1], STDOUT_FILENO);
 
-    // Child stderr -> pipe write end
+    // Map child stderr -> pipe write end
     posix_spawn_file_actions_adddup2(&actions, stderrPipe[1], STDERR_FILENO);
 
-    // Child does not need pipe read ends open
+    // Child only writes to the pipes)
     posix_spawn_file_actions_addclose(&actions, stdoutPipe[0]);
     posix_spawn_file_actions_addclose(&actions, stderrPipe[0]);
+
+    // Child uses the duplicated STDOUT/STDERR
     posix_spawn_file_actions_addclose(&actions, stdoutPipe[1]);
     posix_spawn_file_actions_addclose(&actions, stderrPipe[1]);
 
-    pid_t pid;
-    int spawnrc = posix_spawnp(&pid, argv[0], &actions, nullptr, argv.data(),
-                              environ);
+    posix_spawnattr_t attr;
+    posix_spawnattr_init(&attr);
+    posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETPGROUP);
+    posix_spawnattr_setpgroup(&attr, 0);
 
+    // Spawn process
+    pid_t pid;
+    int spawnrc = posix_spawn(&pid, progPath.toLocal8Bit().constData(),
+                              &actions, &attr, argv.data(), envp.data());
+
+    posix_spawnattr_destroy(&attr);
     posix_spawn_file_actions_destroy(&actions);
 
-    // Parent does not write to these pipes
+    // Cleanup parent
     close(stdoutPipe[1]);
     close(stderrPipe[1]);
 
@@ -244,8 +333,9 @@ LaunchResult PosixProcess::launch(const QString& command)
     {
         close(stdoutPipe[0]);
         close(stderrPipe[0]);
-        LOG(VB_RECORD, LOG_ERR, QString("posix_spawnp failed: %1 (%2)")
-            .arg(command, QString::fromLocal8Bit(strerror(spawnrc))));
+        LOG(VB_RECORD, LOG_ERR,
+            QString("posix_spawnp failed: %1 (%2)")
+                .arg(command, QString::fromLocal8Bit(strerror(spawnrc))));
         return {false, QString::fromLocal8Bit(strerror(spawnrc))};
     }
 
@@ -271,21 +361,24 @@ bool PosixProcess::isRunning(void)
         // Process has terminated
         if (WIFEXITED(status))
         {
+            m_exitCode = WEXITSTATUS(status);
             LOG(VB_RECORD, LOG_INFO,
                 QString("Stream process '%1' exited with status %2")
-                .arg(m_args.join(' ')).arg(WEXITSTATUS(status)));
+                    .arg(m_args.join(' '))
+                    .arg(WEXITSTATUS(status)));
         }
         else if (WIFSIGNALED(status))
         {
             LOG(VB_RECORD, LOG_INFO,
                 QString("Stream process '%1' killed by signal %2")
-                .arg(m_args.join(' ')).arg(WTERMSIG(status)));
+                    .arg(m_args.join(' '))
+                    .arg(WTERMSIG(status)));
         }
         else
         {
             LOG(VB_RECORD, LOG_INFO,
                 QString("Stream process '%1' died for unknown reason")
-                .arg(m_args.join(' ')));
+                    .arg(m_args.join(' ')));
         }
         m_pid = -1;
         return false;
@@ -310,15 +403,13 @@ void PosixProcess::terminate(void)
         return;
     }
 
-    LOG(VB_RECORD, LOG_INFO,
-        QString("terminate '%1'").arg(m_args.join(' ')));
+    LOG(VB_RECORD, LOG_INFO, QString("terminate '%1'").arg(m_args.join(' ')));
 
-    kill(m_pid, SIGTERM);
+    // A negative PID targets the process group ID
+    kill(-m_pid, SIGTERM);
 
     int status = 0;
-
-    auto deadline = std::chrono::steady_clock::now()
-                    + std::chrono::seconds(1);
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
 
     for (;;)
     {
@@ -332,7 +423,10 @@ void PosixProcess::terminate(void)
 
         if (std::chrono::steady_clock::now() >= deadline)
         {
-            kill(m_pid, SIGKILL);
+            // A negative PID targets the process group ID
+            kill(-m_pid, SIGKILL);
+
+            // Blocking wait on the primary child to finish total cleanup
             waitpid(m_pid, &status, 0);
             break;
         }
@@ -342,47 +436,4 @@ void PosixProcess::terminate(void)
 
     m_pid = -1;
     closeFds();
-}
-
-
-bool PosixProcess::checkStatus(void)
-{
-    if (m_pid <= 0)
-        return false;
-
-    int status = 0;
-    pid_t result = waitpid(m_pid, &status, 0);
-
-    if (result == m_pid)
-    {
-        m_pid = -1;
-        if (WIFEXITED(status))
-        {
-            int exit_code = WEXITSTATUS(status);
-            LOG(VB_RECORD, LOG_INFO,
-                QString("Stream process exited with status %1")
-                .arg(exit_code));
-            return (exit_code == 0);
-        }
-        if (WIFSIGNALED(status))
-        {
-            LOG(VB_RECORD, LOG_INFO,
-                QString("Stream process killed by signal %1")
-                .arg(WTERMSIG(status)));
-            return false;
-        }
-        LOG(VB_RECORD, LOG_INFO,
-            "Stream process died for unknown reason");
-        return false;
-    }
-
-    if (result < 0 && errno == ECHILD)
-    {
-        m_pid = -1;
-        return false;
-    }
-
-    LOG(VB_RECORD, LOG_WARNING,
-        QString("Expected pid %1 but got %2").arg(m_pid).arg(result));
-    return false;
 }

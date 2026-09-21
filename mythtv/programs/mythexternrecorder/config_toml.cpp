@@ -32,9 +32,9 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
     }
 
     m_section["VARIABLES"] = getSectionName(m_root, "VARIABLES");
-    auto& var_section = m_section.at("VARIABLES");
+    auto& varSection = m_section.at("VARIABLES");
     // Make sure a VARIABLES section exists
-    m_root.emplace<toml::table>(var_section);
+    m_root.emplace<toml::table>(varSection);
 
     m_basePath = filename.parent_path();
 
@@ -44,7 +44,31 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
         return;
     }
 
+    const auto& sectionName = m_section.at("VARIABLES");
+    const auto* variables = m_root[sectionName].as_table();
+    if (variables)
+    {
+        for (const auto& [k, v] : *variables)
+        {
+            std::string strvalue;
+
+            v.visit([&strvalue](auto&& el)
+            {
+                if constexpr (toml::is_string<decltype(el)>)
+                    strvalue = *el;
+                else if constexpr (toml::is_integer<decltype(el)>)
+                    strvalue = std::to_string(*el);
+                else if constexpr (toml::is_boolean<decltype(el)>)
+                    strvalue = (*el) ? "true" : "false";
+                else if constexpr (toml::is_floating_point<decltype(el)>)
+                    strvalue = std::to_string(*el);
+            });
+            m_variables[std::string(k.str())] = strvalue;
+        }
+    }
+
     m_section["RECORDER"] = getSectionName(m_root, "RECORDER");
+
     // A RECORDER section must exist
     auto& recSection = m_section.at("RECORDER");
     if (!m_root.contains(recSection) || !m_root[recSection].is_table())
@@ -613,12 +637,15 @@ void ExternTomlConfig::updateVariable(std::string_view key,
         return;
 
     std::lock_guard<std::mutex> lock(m_mutex);
+
     variables->insert_or_assign(key, std::string(value));
+    m_variables[std::string(key)] = std::string(value);
 }
 
 std::optional<std::string>
   ExternTomlConfig::getValue(const toml::table& tbl,
-                             std::string_view keyName) const
+                             std::string_view keyName,
+                             bool expand) const
 {
     const toml::node* val = nullptr;
     for (const auto& [k, n] : tbl)
@@ -636,7 +663,9 @@ std::optional<std::string>
         return std::nullopt;
 
     if (const auto* vs = val->as_string())
-        return expandVars(std::string(vs->get()));
+        return (expand
+                ? expandVars(std::string(vs->get()))
+                : std::string(vs->get()));
     if (const auto* vi = val->as_integer())
         return std::to_string(vi->get());
     if (const auto* vb = val->as_boolean())
@@ -647,18 +676,19 @@ std::optional<std::string>
 
 std::optional<std::string>
   ExternTomlConfig::getValue(std::string_view tableName,
-                             std::string_view keyName) const
+                             std::string_view keyName,
+                             bool expand) const
 {
     const auto& section = m_section.at(std::string(tableName));
     const auto* targetTable = m_root[section].as_table();
     if (!targetTable)
         return std::nullopt;
 
-    return getValue(*targetTable, keyName);
+    return getValue(*targetTable, keyName, expand);
 }
 
 std::optional<std::string>
-  ExternTomlConfig::getChannelValue(std::string_view key) const
+    ExternTomlConfig::getChannelValue(std::string_view key, bool expand) const
 {
     const auto* channels = m_root["channels"].as_table();
 
@@ -676,17 +706,17 @@ std::optional<std::string>
             if (!table)
                 return std::nullopt;
 
-            return getValue(*table, key);
+            return getValue(*table, key, expand);
         };
 
 
-    if (auto channel = getValue("VARIABLES", "callsign"))
+    if (auto channel = getValue("VARIABLES", "callsign", expand))
     {
         if (const auto value = findInChannel(*channel))
             return value;
     }
 
-    if (auto channel = getValue("VARIABLES", "channum"))
+    if (auto channel = getValue("VARIABLES", "channum", expand))
     {
         if (const auto value = findInChannel(*channel))
             return value;

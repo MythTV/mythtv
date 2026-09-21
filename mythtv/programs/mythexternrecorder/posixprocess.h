@@ -20,37 +20,19 @@ class PosixProcess
     PosixProcess& operator=(const PosixProcess&) = delete;
     ~PosixProcess(void);
 
-    LaunchResult launch(const QString& command);
-
-    void terminate(void);
-    bool checkStatus(void);
+    LaunchResult launch(const QString& command,
+                        const QProcessEnvironment& env,
+                        const QString& shell_path = "");
 
     bool isRunning(void);
+    void terminate(void);
 
-    bool valid() const
-    {
-        return m_pid > 0;
-    }
-
-    pid_t pid(void) const
-    {
-        return m_pid;
-    }
-
-    bool hasStdout() const
-    {
-        return m_stdoutFd >= 0;
-    }
-
-    bool hasStderr() const
-    {
-        return m_stderrFd >= 0;
-    }
-
-    int stdoutFd(void) const
-    {
-        return m_stdoutFd;
-    }
+    int   exitCode(void) const { return m_exitCode; }
+    bool  valid() const        { return m_pid > 0; }
+    pid_t pid(void) const      { return m_pid; }
+    bool  hasStdout() const    { return m_stdoutFd >= 0; }
+    bool  hasStderr() const    { return m_stderrFd >= 0; }
+    int   stdoutFd(void) const { return m_stdoutFd; }
 
     int takeStderrFd(void)
     {
@@ -61,9 +43,10 @@ class PosixProcess
 
   private:
     void closeFds(void);
-    void killMatchingProcesses(const QStringList& args);
+    void killMatchingProcesses(const QString& comamnd);
 
     pid_t m_pid {-1};
+    int   m_exitCode {0};
     int   m_stdoutFd {-1};
     int   m_stderrFd {-1};
     QStringList m_args;

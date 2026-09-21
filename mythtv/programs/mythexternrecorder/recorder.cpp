@@ -32,6 +32,7 @@ Recorder::Recorder(QObject *parent, std::unique_ptr<ExternConfig> config,
     : QObject(parent)
     , m_config(std::move(config))
     , m_defaultDesc(std::move(desc))
+    , m_env(QProcessEnvironment::systemEnvironment())
 {
     // Initialize handlers map
     m_handlers.insert(normalizeCommand("APIVersion"),
@@ -97,6 +98,9 @@ Recorder::Recorder(QObject *parent, std::unique_ptr<ExternConfig> config,
     m_handlers.insert(normalizeCommand("NextChannel"),
                       [this](const QJsonObject &params) -> bool
                       { return nextChannel(params); });
+
+    m_shell = QString::fromStdString(m_config->getValue("RECORDER",
+                                                        "shell", "", false));
 }
 
 Recorder::~Recorder(void)
@@ -336,8 +340,8 @@ QString Recorder::getTunerValue(const QString& searchKey,
     const std::string key = searchKey.toStdString();
     std::optional<std::string> value;
 
-    if ((value = m_config->getChannelValue(key)) ||
-        (value = m_config->getValue("TUNER", key)))
+    if ((value = m_config->getChannelValue(key, m_shell.isEmpty())) ||
+        (value = m_config->getValue("TUNER", key, m_shell.isEmpty())))
     {
         return QString::fromStdString(*value);
     }
@@ -366,7 +370,8 @@ bool Recorder::version(const QJsonObject &params)
 bool Recorder::description(const QJsonObject &params)
 {
     const std::string desc =
-        m_config->getValue("RECORDER", "desc", m_defaultDesc.toStdString());
+        m_config->getValue("RECORDER", "desc",
+                           m_defaultDesc.toStdString(), true);
     QJsonObject response = {{"status", "OK"},
                             {"message", QString::fromStdString(desc)}};
 
@@ -383,8 +388,10 @@ bool Recorder::hasTuner(const QJsonObject &params)
     }
     else
     {
-        const auto tuneCmd  = m_config->getValue("TUNER", "command", "");
-        const auto tuneChan = m_config->getValue("TUNER", "channels", "");
+        const auto tuneCmd  = m_config->getValue("TUNER", "command",
+                                                 "", false);
+        const auto tuneChan = m_config->getValue("TUNER", "channels",
+                                                   "", false);
 
         if (!tuneCmd.empty())
         {
@@ -772,14 +779,15 @@ bool Recorder::startStreaming(const QJsonObject &params)
     }
 
     std::string key = profile.empty() ? "command" : "command_" + profile;
-    std::string streamCmd = m_config->getValue("RECORDER", key, "");
+    std::string streamCmd = m_config->getValue("RECORDER", key,
+                                               "", m_shell.isEmpty());
     if (streamCmd.empty() && !profile.empty())
     {
         LOG(VB_RECORD, LOG_INFO,
             QString("[RECORDER]/%1 not provided, Using [RECORDER]/command")
             .arg(QString::fromStdString(key)));
         key = "command";
-        streamCmd = m_config->getValue("RECORDER", key, "");
+        streamCmd = m_config->getValue("RECORDER", key, "", m_shell.isEmpty());
     }
 
     if (streamCmd.empty())
@@ -925,7 +933,8 @@ void Recorder::channelInfo(const QJsonObject &params,
 
 bool Recorder::loadChannels(const QJsonObject &params)
 {
-    std::string scanCmd = m_config->getValue("SCANNER", "command", "");
+    std::string scanCmd = m_config->getValue("SCANNER", "command",
+                                             "", m_shell.isEmpty());
     if (!scanCmd.empty())
     {
         LOG(VB_CHANNEL, LOG_INFO, "Populate channels");
@@ -953,6 +962,18 @@ bool Recorder::nextChannel(const QJsonObject &params)
 {
     channelInfo(params, m_config->nextChannel());
     return true;
+}
+
+void Recorder::variablesToEnv(void)
+{
+    const ExternConfig::VarContainer& vars = m_config->allVariables();
+
+    for (const auto& [key, value] : vars) {
+        m_env.insert(
+            QString::fromStdString(key),
+            QString::fromStdString(value)
+        );
+    }
 }
 
 void Recorder::executeCommand(QString command, QString desc, bool background,
@@ -1044,9 +1065,12 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
     // Track the running process
     m_processes.insert(desc, myProcess);
 
+    if (!m_shell.isEmpty())
+        variablesToEnv();
+
     if (background)
     {
-        if (!myProcess->start(command))
+        if (!myProcess->start(command, m_env, m_shell))
         {
             LOG(VB_RECORD, LOG_ERR,
                 QString("Error starting background %1 command").arg(desc));
@@ -1067,7 +1091,7 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
         LOG(VB_RECORD, logLvl,
             QString("Executing foreground command: %1").arg(command));
 
-        bool result = myProcess->execute(command);
+        bool result = myProcess->execute(command, m_env);
 
         LOG(VB_RECORD, LOG_WARNING,
             QString("Foreground execute returned: %1 succeeded=%2")
@@ -1128,7 +1152,7 @@ void Recorder::StderrLine(const QString &line)
     QString message = line;
     bool send;
 
-    for (const auto &info : levels)
+    for (const auto& info : levels)
     {
         if (!lower.startsWith(info.prefix))
             continue;
@@ -1242,8 +1266,11 @@ void Recorder::stderrLoop(int fd)
 
 void Recorder::streamLoop(QString command)
 {
+    if (!m_shell.isEmpty())
+        variablesToEnv();
+
     // Launch POSIX child process
-    auto res = m_streamProcess->launch(command);
+    auto res = m_streamProcess->launch(command, m_env, m_shell);
     if (!res.ok)
     {
         LOG(VB_RECORD, LOG_ERR,
@@ -1262,7 +1289,10 @@ void Recorder::streamLoop(QString command)
     const int stderrFd = m_streamProcess->takeStderrFd();
     m_stderrThread = std::thread(&Recorder::stderrLoop, this, stderrFd);
 
+
+#if defined(Q_OS_LINUX)
     pthread_setname_np(m_stderrThread.native_handle(), "stream-stderr");
+#endif
 
     std::vector<uint8_t> buffer(static_cast<size_t>(m_blockSize));
     int stdoutInputFd = m_streamProcess->stdoutFd();
@@ -1313,21 +1343,31 @@ void Recorder::streamLoop(QString command)
     }
 
     bool wasStreaming = m_isStreaming.load();
-    if (wasStreaming)
-    {
-        // Process terminated unexpectedly while we were still supposed to be
-        // streaming
-        LOG(VB_RECORD, LOG_ERR,
-            "Stream process terminated prematurely while streaming");
-        QJsonObject context = {{"command", "STATUS"}};
-        QJsonObject response = {
-            {"status", "ERR"},
-            {"message", "Stream process terminated prematurely"}};
-        sendResponse(context, response, LOG_ERR);
-    }
 
     m_isStreaming.store(false);
 
+    bool processStillRunning = m_streamProcess->isRunning();
+
+    if (wasStreaming)
+    {
+        if (!processStillRunning)
+        {
+            LOG(VB_RECORD, LOG_ERR, "Stream process died unexpectedly.");
+
+            QJsonObject context = {{"command", "STATUS"}};
+            QJsonObject response = {
+                {"status", "ERR"},
+                {"message", "Stream process crashed or exited unexpectedly."}};
+            sendResponse(context, response, LOG_ERR);
+        }
+        else
+        {
+            LOG(VB_RECORD, LOG_ERR,
+             "Stream process is still running, but stdout closed prematurely.");
+        }
+    }
+
+    // Clean up the process group if it's somehow still alive
     if (m_streamProcess && m_streamProcess->pid() > 0)
         m_streamProcess->terminate();
 

@@ -23,6 +23,9 @@ class ExternTomlConfig : public ExternConfig
     [[nodiscard]]
     bool hasTable(const std::string& table) const override;
 
+    const VarContainer& allVariables(void) const override {
+        return m_variables;
+    }
     void updateVariable(std::string_view key, std::string_view value) override;
 
     [[nodiscard]]
@@ -64,13 +67,16 @@ class ExternTomlConfig : public ExternConfig
 
     [[nodiscard]]
     std::optional<std::string> getValue(const toml::table& tbl,
-                                        std::string_view keyName) const;
+                                        std::string_view keyName,
+                                        bool expand) const;
 
     [[nodiscard]]
     virtual std::optional<std::string> getValue(std::string_view table,
-                                        std::string_view key) const override;
+                                                std::string_view key,
+                                                bool expand) const override;
 
-    std::optional<std::string> getChannelValue(std::string_view key) const override;
+    std::optional<std::string> getChannelValue(std::string_view key,
+                                               bool expand) const override;
 
     [[nodiscard]]
     std::size_t channelCount() const noexcept override;
