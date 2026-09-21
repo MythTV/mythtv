@@ -20,10 +20,10 @@ INCLUDEPATH += ../../../../libs
 
 QMAKE_CFLAGS += -w
 
-LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
-LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
-LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
+LIBS += -L../../../../external/FFmpeg/libswresample $$mythFFmpegLib(swresample)
+LIBS += -L../../../../external/FFmpeg/libavutil $$mythFFmpegLib(avutil)
+LIBS += -L../../../../external/FFmpeg/libavcodec $$mythFFmpegLib(avcodec)
+LIBS += -L../../../../external/FFmpeg/libavformat $$mythFFmpegLib(avformat)
 LIBS += -L../../../../libs/libmythbase -lmythbase-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
