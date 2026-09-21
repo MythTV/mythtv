@@ -83,7 +83,6 @@ endif()
 #
 # Install the MythTV version where the python bindings can find it.
 #
-set(MYTHTV_INSTALL_PREFIX "${MYTH_RUN_PREFIX}")
 configure_file(setup.cfg.in setup.cfg @ONLY)
 configure_file(MythTV/_versions.py.in MythTV/_versions.py @ONLY)
 configure_file(MythTV/services_api/mythversions.py.in
@@ -154,4 +153,3 @@ unset(PIP_OPTIONS)
 unset(WHEEL_DIR)
 unset(ROOT_FLAGS)
 unset(PREFIX_FLAGS)
-unset(MYTHTV_INSTALL_PREFIX)
