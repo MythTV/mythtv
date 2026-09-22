@@ -28,6 +28,7 @@
 #include <inttypes.h>
 #include <zlib.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
@@ -481,12 +482,13 @@ static void epic_free_pixel_cache(ePICPixHash *hash)
 static inline int is_pixel_on_stack(const ePICContext *dc, uint32_t pix)
 {
     int i;
+    int n = FFMIN(dc->stack_pos, EPIC_PIX_STACK_SIZE);
 
-    for (i = 0; i < dc->stack_pos; i++)
+    for (i = 0; i < n; i++)
         if (dc->stack[i] == pix)
             break;
 
-    return i != dc->stack_pos;
+    return i != n;
 }
 
 #define TOSIGNED(val) (((val) >> 1) ^ -((val) & 1))
@@ -661,7 +663,7 @@ static int epic_decode_run_length(ePICContext *dc, int x, int y, int tile_width,
                         break;
                     }
                 }
-                /* fall through */
+                av_fallthrough;
             default:
                 NWneW = 1;
                 old_WWneW = WWneW;

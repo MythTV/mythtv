@@ -105,7 +105,7 @@ static const int8_t c47_mv[256][2] = {
     {  -6,  43 }, {   1,  43 }, {   0,   0 }, {   0,   0 }, {   0,   0 },
 };
 
-/* codec37/48 motion vector tables: 3x 510 bytes/255 x-y pairs */
+/* codec37/48 motion vector tables: 3x 512 bytes/256 x-y pairs */
 static const int8_t c37_mv[] = {
     0,   0,   1,   0,   2,   0,   3,   0,   5,   0,
     8,   0,  13,   0,  21,   0,  -1,   0,  -2,   0,
@@ -158,6 +158,7 @@ static const int8_t c37_mv[] = {
     0, -21,   1, -21,   2, -21,   3, -21,   5, -21,
     8, -21,  13, -21,  21, -21,  -1, -21,  -2, -21,
    -3, -21,  -5, -21,  -8, -21, -13, -21, -17, -21,
+    0,   0,
     0,   0,  -8, -29,   8, -29, -18, -25,  17, -25,
     0, -23,  -6, -22,   6, -22, -13, -19,  12, -19,
     0, -18,  25, -18, -25, -17,  -5, -17,   5, -17,
@@ -209,6 +210,7 @@ static const int8_t c37_mv[] = {
    -5,  17,   5,  17,  25,  17, -25,  18,   0,  18,
   -12,  19,  13,  19,  -6,  22,   6,  22,   0,  23,
   -17,  25,  18,  25,  -8,  29,   8,  29,   0,  31,
+    0,   0,
     0,   0,  -6, -22,   6, -22, -13, -19,  12, -19,
     0, -18,  -5, -17,   5, -17, -10, -15,  10, -15,
     0, -14,  -4, -13,   4, -13,  19, -13, -19, -12,
@@ -260,6 +262,7 @@ static const int8_t c37_mv[] = {
    19,  12, -19,  13,  -4,  13,   4,  13,   0,  14,
   -10,  15,  10,  15,  -5,  17,   5,  17,   0,  18,
   -12,  19,  13,  19,  -6,  22,   6,  22,   0,  23,
+    0,   0
 };
 
 typedef struct SANMVideoContext {
@@ -636,9 +639,19 @@ static av_cold int decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = ctx->version ? AV_PIX_FMT_RGB565 : AV_PIX_FMT_PAL8;
 
     if (!ctx->version) {
-        // ANIM has no dimensions in the header, distrust the incoming data.
-        avctx->width = avctx->height = 0;
-        ctx->have_dimensions = 0;
+        // ANIM valid range is 2x2 up to 640x480. If the given
+        // width/height are within that range, lock the dimensions
+        // and forego future changes in process_frame_obj().
+        // NOTE: the smush demuxer passes 0/0 since ANM/SAN files
+        //       have no dimension information in their header.
+        if (avctx->width != 0 || avctx->height != 0) {
+            if ((avctx->width < 2) || (avctx->height < 2))
+                return AVERROR_INVALIDDATA;
+            if ((avctx->width <= 640) && (avctx->height <= 480))
+                ctx->have_dimensions = 1;
+            else
+                return AVERROR_INVALIDDATA;
+        }
     } else if (avctx->width > 800 || avctx->height > 600 ||
                avctx->width < 8 || avctx->height < 8) {
         // BL16 valid range is 8x8 - 800x600
@@ -1228,6 +1241,9 @@ static int old_codec37(SANMVideoContext *ctx, GetByteContext *gb, int top, int l
     if (width > ctx->aligned_width)
         return AVERROR_INVALIDDATA;
 
+    if (FFALIGN(height, 4) > ctx->aligned_height)
+        return AVERROR_INVALIDDATA;
+
     if (bytestream2_get_bytes_left(gb) < 16)
         return AVERROR_INVALIDDATA;
 
@@ -1316,9 +1332,8 @@ static int old_codec37(SANMVideoContext *ctx, GetByteContext *gb, int top, int l
                     }
                 }
                 /* 4x4 block copy from prev with MV */
-                code = (code == 0xff) ? 0 : code;
-                mx = c37_mv[(mvoff * 255 + code) * 2];
-                my = c37_mv[(mvoff * 255 + code) * 2 + 1];
+                mx = c37_mv[(mvoff * 256 + code) * 2];
+                my = c37_mv[(mvoff * 256 + code) * 2 + 1];
                 codec37_mv(dst + i, prev + i + mx + my * width,
                            height, width, i + mx, j + my);
                 len--;
@@ -1370,8 +1385,8 @@ static int old_codec37(SANMVideoContext *ctx, GetByteContext *gb, int top, int l
                     for (k = 0; k < 4; k++)
                         memset(dst + i + k * width, t, 4);
                } else {
-                    mx = c37_mv[(mvoff * 255 + code) * 2];
-                    my = c37_mv[(mvoff * 255 + code) * 2 + 1];
+                    mx = c37_mv[(mvoff * 256 + code) * 2];
+                    my = c37_mv[(mvoff * 256 + code) * 2 + 1];
                     codec37_mv(dst + i, prev + i + mx + my * width,
                                height, width, i + mx, j + my);
 
@@ -1549,6 +1564,9 @@ static int old_codec47(SANMVideoContext *ctx, GetByteContext *gb, int top, int l
 
     width = FFALIGN(width, 8);
     if (width > ctx->aligned_width)
+        return AVERROR_INVALIDDATA;
+
+    if (FFALIGN(height, 8) > ctx->aligned_height)
         return AVERROR_INVALIDDATA;
 
     if (bytestream2_get_bytes_left(gb) < 26)
@@ -1746,7 +1764,6 @@ static int codec48_block(GetByteContext *gb, uint8_t *dst, uint8_t *db, int x, i
         for (i = 0; i < 8; i += 4) {
             for (k = 0; k < 8; k += 4) {
                 opc =  bytestream2_get_byteu(gb);
-                opc = (opc == 255) ? 0 : opc;
                 mvofs = c37_mv[opc * 2] + (c37_mv[opc * 2 + 1] * w);
                 if (c48_invalid_mv(x+k, y+i, w, aligned_height, 4, mvofs))
                     continue;
@@ -1787,7 +1804,6 @@ static int codec48_block(GetByteContext *gb, uint8_t *dst, uint8_t *db, int x, i
             for (j = 0; j < 8; j += 2) {
                 ofs = (w * i) + j;
                 opc = bytestream2_get_byteu(gb);
-                opc = (opc == 255) ? 0 : opc;
                 mvofs = c37_mv[opc * 2] + (c37_mv[opc * 2 + 1] * w);
                 if (c48_invalid_mv(x+j, y+i, w, aligned_height, 2, mvofs))
                     continue;
@@ -2018,8 +2034,8 @@ static int process_frame_obj(SANMVideoContext *ctx, GetByteContext *gb,
 
     codec = bytestream2_get_byteu(gb);
     param = bytestream2_get_byteu(gb);
-    left  = bytestream2_get_le16u(gb) + xoff;
-    top   = bytestream2_get_le16u(gb) + yoff;
+    left  = bytestream2_get_le16u(gb);
+    top   = bytestream2_get_le16u(gb);
     w     = bytestream2_get_le16u(gb);
     h     = bytestream2_get_le16u(gb);
     bytestream2_skip(gb, 2);
@@ -2057,11 +2073,6 @@ static int process_frame_obj(SANMVideoContext *ctx, GetByteContext *gb,
             if (w > xres || h > yres)
                 return AVERROR_INVALIDDATA;
             ctx->have_dimensions = 1;
-        } else if (fsc) {
-            /* these codecs work on full frames, trust their dimensions */
-            xres = w;
-            yres = h;
-            ctx->have_dimensions = 1;
         } else {
             /* detect common sizes */
             xres = w + left;
@@ -2092,17 +2103,11 @@ static int process_frame_obj(SANMVideoContext *ctx, GetByteContext *gb,
             }
         }
     } else {
-        if (((w > ctx->width) || (h > ctx->height) || (w * h > ctx->buf_size)) && fsc) {
-            /* correct unexpected overly large frames: this happens
-             * for instance with The Dig's sq1.san video: it has a few
-             * (all black) 640x480 frames halfway in, while the rest is
-             * 320x200.
-             */
-            av_log(ctx->avctx, AV_LOG_WARNING,
-                   "resizing too large fobj: c%d  %d %d @ %d %d\n", codec, w, h, left, top);
-            w = ctx->width;
-            h = ctx->height;
-        }
+        /* for codec37/47/48, return error for frames larger than the canvas, it's also
+         * what the DOS engines do.
+         */
+        if (((w > ctx->width) || (h > ctx->height) || (w * h > ctx->buf_size)) && fsc)
+            return AVERROR_INVALIDDATA;
     }
 
     /* users of codecs>=37 are subversion 2, enforce that for STOR/FTCH */
@@ -2117,6 +2122,9 @@ static int process_frame_obj(SANMVideoContext *ctx, GetByteContext *gb,
         if (!fsc)
             memset(ctx->fbuf, 0, ctx->frm0_size);
     }
+
+    left += xoff;
+    top += yoff;
 
     switch (codec) {
     case 1:

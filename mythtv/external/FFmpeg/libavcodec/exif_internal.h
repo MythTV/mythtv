@@ -34,13 +34,6 @@
 #include "libavutil/frame.h"
 
 #include "exif.h"
-#include "version_major.h"
-
-#if LIBAVCODEC_VERSION_MAJOR < 63
-/* Used by the AVI demuxer */
-int avpriv_exif_decode_ifd(void *logctx, const uint8_t *buf, int size,
-                           int le, int depth, AVDictionary **metadata);
-#endif
 
 /**
  * Compares values in the IFD with data in the provided AVFrame and sets the values
@@ -56,12 +49,39 @@ int ff_exif_sanitize_ifd(void *logctx, const AVFrame *frame, AVExifMetadata *ifd
  * side data types that are included in the frame data, such as possibly an
  * instance of AV_FRAME_DATA_DISPLAYMATRIX. It also sets width and height tags
  * to match those of the AVFrame if they are different.
+ * The *buffer argument must be NULL before calling.
  *
- * Upon error, *buffer will be NULL. The buffer becomes owned by the caller upon
- * success. The *buffer argument must be NULL before calling. If *buffer is NULL
- * upon return then a negative return value indicates an error, and a zero return
- * value indicates that there was no EXIF data to write.
+ * On success, a positive number is returned, and the buffer becomes owned by the caller.
+ * A negative AVERROR return value means that an error occurred.
+ * A zero return value means that there was no EXIF data to write.
+ * In both the negative and zero cases, *buffer will be NULL.
  */
 int ff_exif_get_buffer(void *logctx, const AVFrame *frame, AVBufferRef **buffer, enum AVExifHeaderMode header_mode);
+
+struct AVCodecContext;
+/**
+ * Attach the data buffer to the frame. This is mostly a wrapper for
+ * av_side_data_new_from_buffer, but it checks if the orientation tag is
+ * present in the provided EXIF buffer. If it is, it zeroes it out and
+ * attaches that information as an AV_FRAME_DATA_DISPLAYMATRIX instead
+ * of including it in the AV_FRAME_DATA_EXIF side data buffer.
+ *
+ * *buf is ALWAYS consumed by this function and NULL written in its place, even
+ * on failure.
+ */
+int ff_decode_exif_attach_buffer(struct AVCodecContext *avctx, AVFrame *frame, AVBufferRef **buf,
+                                 enum AVExifHeaderMode header_mode);
+
+/**
+ * Attach an already-parsed EXIF metadata struct to the frame as a side data
+ * buffer. It writes the EXIF IFD into the buffer and attaches the buffer to
+ * the frame.
+ *
+ * If the metadata struct contains an orientation tag, it will be zeroed before
+ * writing, and instead, an AV_FRAME_DATA_DISPLAYMATRIX will be attached in
+ * addition to the AV_FRAME_DATA_EXIF side data.
+ */
+int ff_decode_exif_attach_ifd(struct AVCodecContext *avctx, AVFrame *frame,
+                              const struct AVExifMetadata *ifd);
 
 #endif /* AVCODEC_EXIF_INTERNAL_H */

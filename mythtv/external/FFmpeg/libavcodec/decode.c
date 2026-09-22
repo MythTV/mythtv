@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -48,6 +49,7 @@
 #include "codec_internal.h"
 #include "decode.h"
 #include "exif.h"
+#include "exif_internal.h"
 #include "hwaccel_internal.h"
 #include "hwconfig.h"
 #include "internal.h"
@@ -98,6 +100,9 @@ typedef struct DecodeContext {
     struct {
         FFLCEVCContext *ctx;
         int frame;
+        enum AVPixelFormat format;
+        int base_width;
+        int base_height;
         int width;
         int height;
     } lcevc;
@@ -324,7 +329,9 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
 
     side = av_frame_get_side_data(frame, AV_FRAME_DATA_SKIP_SAMPLES);
     if (side && side->size >= 10) {
-        avci->skip_samples = AV_RL32(side->data);
+        int skip_samples = AV_RL32(side->data);
+        if (skip_samples)
+            avci->skip_samples = skip_samples;
         avci->skip_samples = FFMAX(0, avci->skip_samples);
         discard_padding = AV_RL32(side->data + 4);
         av_log(avctx, AV_LOG_DEBUG, "skip %d / discard %d samples due to side data\n",
@@ -367,12 +374,18 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
                 int64_t diff_ts = av_rescale_q(avci->skip_samples,
                                                (AVRational){1, avctx->sample_rate},
                                                avctx->pkt_timebase);
-                if (frame->pts != AV_NOPTS_VALUE)
-                    frame->pts += diff_ts;
-                if (frame->pkt_dts != AV_NOPTS_VALUE)
-                    frame->pkt_dts += diff_ts;
-                if (frame->duration >= diff_ts)
-                    frame->duration -= diff_ts;
+                if (diff_ts != AV_NOPTS_VALUE) {
+                    if (frame->pts != AV_NOPTS_VALUE)
+                        frame->pts = av_sat_add64(frame->pts, diff_ts);
+                    if (frame->pkt_dts != AV_NOPTS_VALUE)
+                        frame->pkt_dts = av_sat_add64(frame->pkt_dts, diff_ts);
+                    if (frame->duration >= diff_ts)
+                        frame->duration = av_sat_sub64(frame->duration, diff_ts);
+                } else {
+                    frame->pts = AV_NOPTS_VALUE;
+                    frame->pkt_dts = AV_NOPTS_VALUE;
+                    frame->duration = 0;
+                }
             } else
                 av_log(avctx, AV_LOG_WARNING, "Could not update timestamps for skipped samples.\n");
 
@@ -393,7 +406,7 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
                 int64_t diff_ts = av_rescale_q(frame->nb_samples - discard_padding,
                                                (AVRational){1, avctx->sample_rate},
                                                avctx->pkt_timebase);
-                frame->duration = diff_ts;
+                frame->duration = diff_ts == AV_NOPTS_VALUE ? 0 : diff_ts;
             } else
                 av_log(avctx, AV_LOG_WARNING, "Could not update timestamps for discarded samples.\n");
 
@@ -690,6 +703,14 @@ static int decode_receive_frame_internal(AVCodecContext *avctx, AVFrame *frame,
         if (frame->private_ref) {
             FrameDecodeData *fdd = frame->private_ref;
 
+            if (fdd->hwaccel_priv_post_process) {
+                ret = fdd->hwaccel_priv_post_process(avctx, frame);
+                if (ret < 0) {
+                    av_frame_unref(frame);
+                    return ret;
+                }
+            }
+
             if (fdd->post_process) {
                 ret = fdd->post_process(avctx, frame);
                 if (ret < 0) {
@@ -985,7 +1006,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
 enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *avctx,
                                               const enum AVPixelFormat *fmt)
 {
-    const AVPixFmtDescriptor *desc;
     const AVCodecHWConfig *config;
     int i, n;
 
@@ -1012,12 +1032,13 @@ enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *avctx,
     // No device or other setup, so we have to choose from things which
     // don't any other external information.
 
-    // If the last element of the list is a software format, choose it
+    // Choose the first software format
     // (this should be best software format if any exist).
-    for (n = 0; fmt[n] != AV_PIX_FMT_NONE; n++);
-    desc = av_pix_fmt_desc_get(fmt[n - 1]);
-    if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
-        return fmt[n - 1];
+    for (n = 0; fmt[n] != AV_PIX_FMT_NONE; n++) {
+        const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt[n]);
+        if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+            return fmt[n];
+    }
 
     // Finally, traverse the list in order and choose the first entry
     // with no external dependencies (if there is no hardware configuration
@@ -1530,12 +1551,16 @@ int ff_decode_frame_props_from_pkt(const AVCodecContext *avctx,
                                    AVFrame *frame, const AVPacket *pkt)
 {
     static const SideDataMap sd[] = {
-        { AV_PKT_DATA_A53_CC,                     AV_FRAME_DATA_A53_CC },
-        { AV_PKT_DATA_AFD,                        AV_FRAME_DATA_AFD },
-        { AV_PKT_DATA_DYNAMIC_HDR10_PLUS,         AV_FRAME_DATA_DYNAMIC_HDR_PLUS },
-        { AV_PKT_DATA_S12M_TIMECODE,              AV_FRAME_DATA_S12M_TIMECODE },
-        { AV_PKT_DATA_SKIP_SAMPLES,               AV_FRAME_DATA_SKIP_SAMPLES },
-        { AV_PKT_DATA_LCEVC,                      AV_FRAME_DATA_LCEVC },
+        { AV_PKT_DATA_A53_CC,                      AV_FRAME_DATA_A53_CC },
+        { AV_PKT_DATA_AFD,                         AV_FRAME_DATA_AFD },
+        { AV_PKT_DATA_DYNAMIC_HDR10_PLUS,          AV_FRAME_DATA_DYNAMIC_HDR_PLUS },
+        { AV_PKT_DATA_DYNAMIC_HDR_SMPTE_2094_APP5, AV_FRAME_DATA_DYNAMIC_HDR_SMPTE_2094_APP5 },
+        { AV_PKT_DATA_S12M_TIMECODE,               AV_FRAME_DATA_S12M_TIMECODE },
+        { AV_PKT_DATA_SKIP_SAMPLES,                AV_FRAME_DATA_SKIP_SAMPLES },
+        { AV_PKT_DATA_LCEVC,                       AV_FRAME_DATA_LCEVC },
+        { AV_PKT_DATA_IAMF_MIX_GAIN_PARAM,         AV_FRAME_DATA_IAMF_MIX_GAIN_PARAM },
+        { AV_PKT_DATA_IAMF_DEMIXING_INFO_PARAM,    AV_FRAME_DATA_IAMF_DEMIXING_INFO_PARAM },
+        { AV_PKT_DATA_IAMF_RECON_GAIN_INFO_PARAM,  AV_FRAME_DATA_IAMF_RECON_GAIN_INFO_PARAM },
         { AV_PKT_DATA_NB }
     };
 
@@ -1544,22 +1569,24 @@ int ff_decode_frame_props_from_pkt(const AVCodecContext *avctx,
     frame->pts          = pkt->pts;
     frame->duration     = pkt->duration;
 
-    ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, ff_sd_global_map);
-    if (ret < 0)
-        return ret;
+    if (pkt->side_data_elems) {
+        ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, ff_sd_global_map);
+        if (ret < 0)
+            return ret;
 
-    ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, sd);
-    if (ret < 0)
-        return ret;
+        ret = side_data_map(frame, pkt->side_data, pkt->side_data_elems, sd);
+        if (ret < 0)
+            return ret;
 
-    add_metadata_from_side_data(pkt, frame);
+        add_metadata_from_side_data(pkt, frame);
+    }
 
     if (pkt->flags & AV_PKT_FLAG_DISCARD) {
         frame->flags |= AV_FRAME_FLAG_DISCARD;
     }
 
     if (avctx->flags & AV_CODEC_FLAG_COPY_OPAQUE) {
-        int ret = av_buffer_replace(&frame->opaque_ref, pkt->opaque_ref);
+        ret = av_buffer_replace(&frame->opaque_ref, pkt->opaque_ref);
         if (ret < 0)
             return ret;
         frame->opaque = pkt->opaque;
@@ -1610,6 +1637,33 @@ int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame)
         }
         break;
     }
+
+#if CONFIG_LIBLCEVC_DEC
+    AVCodecInternal    *avci = avctx->internal;
+    DecodeContext        *dc = decode_ctx(avci);
+
+    dc->lcevc.frame = dc->lcevc.ctx &&
+                      av_frame_get_side_data(frame, AV_FRAME_DATA_LCEVC);
+
+    if (dc->lcevc.frame) {
+        ret = ff_lcevc_parse_frame(dc->lcevc.ctx, frame, &dc->lcevc.format,
+                                   &dc->lcevc.width, &dc->lcevc.height);
+        if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE))
+            return ret;
+
+        // force get_buffer2() to allocate the base frame using the same dimensions
+        // as the final enhanced frame, in order to prevent reinitializing the buffer
+        // pools unnecessarely
+        if (!ret && dc->lcevc.width && dc->lcevc.height) {
+            dc->lcevc.base_width  = frame->width;
+            dc->lcevc.base_height = frame->height;
+            frame->width  = dc->lcevc.width;
+            frame->height = dc->lcevc.height;
+        } else
+            dc->lcevc.frame = 0;
+    }
+#endif
+
     return 0;
 }
 
@@ -1638,14 +1692,16 @@ static void decode_data_free(AVRefStructOpaque unused, void *obj)
 {
     FrameDecodeData *fdd = obj;
 
-    if (fdd->post_process_opaque_free)
-        fdd->post_process_opaque_free(fdd->post_process_opaque);
+    if (CONFIG_LIBLCEVC_DEC)
+        av_refstruct_unref(&fdd->post_process_opaque);
+    else
+        av_assert1(!fdd->post_process_opaque);
 
     if (fdd->hwaccel_priv_free)
         fdd->hwaccel_priv_free(fdd->hwaccel_priv);
 }
 
-int ff_attach_decode_data(AVFrame *frame)
+int ff_attach_decode_data(AVCodecContext *avctx, AVFrame *frame)
 {
     FrameDecodeData *fdd;
 
@@ -1658,66 +1714,58 @@ int ff_attach_decode_data(AVFrame *frame)
 
     frame->private_ref = fdd;
 
-    return 0;
-}
-
-static void update_frame_props(AVCodecContext *avctx, AVFrame *frame)
-{
 #if CONFIG_LIBLCEVC_DEC
     AVCodecInternal    *avci = avctx->internal;
     DecodeContext        *dc = decode_ctx(avci);
 
-    dc->lcevc.frame = dc->lcevc.ctx && avctx->codec_type == AVMEDIA_TYPE_VIDEO &&
-                      av_frame_get_side_data(frame, AV_FRAME_DATA_LCEVC);
+    if (!dc->lcevc.frame) {
+        dc->lcevc.frame = dc->lcevc.ctx &&
+                          av_frame_get_side_data(frame, AV_FRAME_DATA_LCEVC);
 
-    if (dc->lcevc.frame) {
-        dc->lcevc.width  = frame->width;
-        dc->lcevc.height = frame->height;
-        frame->width  = frame->width  * 2 / FFMAX(frame->sample_aspect_ratio.den, 1);
-        frame->height = frame->height * 2 / FFMAX(frame->sample_aspect_ratio.num, 1);
+        if (dc->lcevc.frame) {
+            int ret = ff_lcevc_parse_frame(dc->lcevc.ctx, frame, &dc->lcevc.format,
+                                           &dc->lcevc.width, &dc->lcevc.height);
+            if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE))
+                return ret;
+
+            if (!ret && dc->lcevc.width && dc->lcevc.height) {
+                dc->lcevc.base_width  = frame->width;
+                dc->lcevc.base_height = frame->height;
+            } else
+                dc->lcevc.frame = 0;
+        }
     }
-#endif
-}
-
-static int attach_post_process_data(AVCodecContext *avctx, AVFrame *frame)
-{
-#if CONFIG_LIBLCEVC_DEC
-    AVCodecInternal    *avci = avctx->internal;
-    DecodeContext        *dc = decode_ctx(avci);
-
     if (dc->lcevc.frame) {
-        FrameDecodeData *fdd = frame->private_ref;
         FFLCEVCFrame *frame_ctx;
         int ret;
 
-        frame_ctx = av_mallocz(sizeof(*frame_ctx));
+        if (fdd->post_process || !dc->lcevc.width || !dc->lcevc.height) {
+            dc->lcevc.frame = 0;
+            return 0;
+        }
+
+        frame_ctx = av_refstruct_pool_get(dc->lcevc.ctx->frame_pool);
         if (!frame_ctx)
             return AVERROR(ENOMEM);
 
-        frame_ctx->frame = av_frame_alloc();
-        if (!frame_ctx->frame) {
-            av_free(frame_ctx);
-            return AVERROR(ENOMEM);
-        }
-
         frame_ctx->lcevc = av_refstruct_ref(dc->lcevc.ctx);
-        frame_ctx->frame->width  = frame->width;
-        frame_ctx->frame->height = frame->height;
-        frame_ctx->frame->format = frame->format;
+        frame_ctx->frame->width  = dc->lcevc.width;
+        frame_ctx->frame->height = dc->lcevc.height;
+        frame_ctx->frame->format = dc->lcevc.format;
+        avctx->bits_per_raw_sample = av_pix_fmt_desc_get(dc->lcevc.format)->comp[0].depth;
 
-        frame->width  = dc->lcevc.width;
-        frame->height = dc->lcevc.height;
+        frame->width  = dc->lcevc.base_width;
+        frame->height = dc->lcevc.base_height;
 
         ret = avctx->get_buffer2(avctx, frame_ctx->frame, 0);
         if (ret < 0) {
-            ff_lcevc_unref(frame_ctx);
+            av_refstruct_unref(&frame_ctx);
             return ret;
         }
 
         validate_avframe_allocation(avctx, frame_ctx->frame);
 
         fdd->post_process_opaque = frame_ctx;
-        fdd->post_process_opaque_free = ff_lcevc_unref;
         fdd->post_process = ff_lcevc_process;
     }
     dc->lcevc.frame = 0;
@@ -1771,7 +1819,6 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
         }
     } else {
         avctx->sw_pix_fmt = avctx->pix_fmt;
-        update_frame_props(avctx, frame);
     }
 
     ret = avctx->get_buffer2(avctx, frame, flags);
@@ -1780,11 +1827,7 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
 
     validate_avframe_allocation(avctx, frame);
 
-    ret = ff_attach_decode_data(frame);
-    if (ret < 0)
-        goto fail;
-
-    ret = attach_post_process_data(avctx, frame);
+    ret = ff_attach_decode_data(avctx, frame);
     if (ret < 0)
         goto fail;
 
@@ -1806,7 +1849,6 @@ fail:
 
 static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 {
-    AVFrame *tmp;
     int ret;
 
     av_assert0(avctx->codec_type == AVMEDIA_TYPE_VIDEO);
@@ -1828,22 +1870,37 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flag
     if ((flags & FF_REGET_BUFFER_FLAG_READONLY) || av_frame_is_writable(frame))
         return ff_decode_frame_props(avctx, frame);
 
-    tmp = av_frame_alloc();
-    if (!tmp)
-        return AVERROR(ENOMEM);
+    uint8_t *data[AV_VIDEO_MAX_PLANES];
+    AVBufferRef *buf[AV_VIDEO_MAX_PLANES];
+    int linesize[AV_VIDEO_MAX_PLANES];
 
-    av_frame_move_ref(tmp, frame);
+    static_assert(AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->data) &&
+                  AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->buf)  &&
+                  AV_VIDEO_MAX_PLANES <= FF_ARRAY_ELEMS(frame->linesize),
+                  "Copying code needs to be adjusted");
+    static_assert(sizeof(frame->linesize[0]) == sizeof(linesize[0]),
+                  "linesize needs to be switched to ptrdiff_t");
+
+    for (int i = 0; i < AV_VIDEO_MAX_PLANES; ++i) {
+        data[i]       = frame->data[i];
+        linesize[i]   = frame->linesize[i];
+        buf[i]        = frame->buf[i];
+        frame->buf[i] = NULL;
+    }
+    av_assert1(!frame->buf[AV_VIDEO_MAX_PLANES] && !frame->extended_buf);
+
+    av_frame_unref(frame);
 
     ret = ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF);
-    if (ret < 0) {
-        av_frame_free(&tmp);
-        return ret;
+    if (ret >= 0) {
+        av_image_copy2(frame->data, frame->linesize,
+                       data, linesize,
+                       frame->format, frame->width, frame->height);
     }
+    for (int i = 0; i < AV_VIDEO_MAX_PLANES; ++i)
+        av_buffer_unref(&buf[i]);
 
-    av_frame_copy(frame, tmp);
-    av_frame_free(&tmp);
-
-    return 0;
+    return ret;
 }
 
 int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
@@ -2091,7 +2148,7 @@ av_cold int ff_decode_preinit(AVCodecContext *avctx)
     if (!(avctx->export_side_data & AV_CODEC_EXPORT_DATA_ENHANCEMENTS)) {
         if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
 #if CONFIG_LIBLCEVC_DEC
-            ret = ff_lcevc_alloc(&dc->lcevc.ctx);
+            ret = ff_lcevc_alloc(&dc->lcevc.ctx, av_log_get_level() + avctx->log_level_offset);
             if (ret < 0 && (avctx->err_recognition & AV_EF_EXPLODE))
                 return ret;
 #endif
@@ -2313,6 +2370,8 @@ av_cold void ff_decode_flush_buffers(AVCodecContext *avctx)
     av_packet_unref(avci->last_pkt_props);
     av_packet_unref(avci->in_pkt);
 
+    dc->pts_correction_num_faulty_pts =
+    dc->pts_correction_num_faulty_dts = 0;
     dc->pts_correction_last_pts =
     dc->pts_correction_last_dts = INT64_MIN;
 
@@ -2338,6 +2397,9 @@ av_cold void ff_decode_internal_sync(AVCodecContext *dst, const AVCodecContext *
     dst_dc->side_data_pref_mask = src_dc->side_data_pref_mask;
 #if CONFIG_LIBLCEVC_DEC
     av_refstruct_replace(&dst_dc->lcevc.ctx, src_dc->lcevc.ctx);
+    dst_dc->lcevc.width = src_dc->lcevc.width;
+    dst_dc->lcevc.height = src_dc->lcevc.height;
+    dst_dc->lcevc.format = src_dc->lcevc.format;
 #endif
 }
 

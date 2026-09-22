@@ -291,7 +291,7 @@ static int remap##ws##_##bits##bit_slice(AVFilterContext *ctx, void *arg, int jo
                                                                                                            \
     av_assert1(s->nb_planes <= AV_VIDEO_MAX_PLANES);                                                       \
                                                                                                            \
-    for (int stereo = 0; stereo < 1 + s->out_stereo > STEREO_2D; stereo++) {                               \
+    for (int stereo = 0; stereo < 1 + (s->out_stereo > STEREO_2D); stereo++) {                               \
         for (int plane = 0; plane < s->nb_planes; plane++) {                                               \
             const unsigned map = s->map[plane];                                                            \
             const int in_linesize  = in->linesize[plane];                                                  \
@@ -308,13 +308,13 @@ static int remap##ws##_##bits##bit_slice(AVFilterContext *ctx, void *arg, int jo
             const int width = s->pr_width[plane];                                                          \
             const int height = s->pr_height[plane];                                                        \
                                                                                                            \
-            const int slice_start = (height *  jobnr     ) / nb_jobs;                                      \
-            const int slice_end   = (height * (jobnr + 1)) / nb_jobs;                                      \
+            const int slice_start = ff_slice_pos(height, jobnr, nb_jobs);                                  \
+            const int slice_end   = ff_slice_pos(height, jobnr + 1, nb_jobs);                              \
                                                                                                            \
             for (int y = slice_start; y < slice_end && !mask; y++) {                                       \
-                const int16_t *const u = r->u[map] + (y - slice_start) * uv_linesize * ws * ws;            \
-                const int16_t *const v = r->v[map] + (y - slice_start) * uv_linesize * ws * ws;            \
-                const int16_t *const ker = r->ker[map] + (y - slice_start) * uv_linesize * ws * ws;        \
+                const int16_t *const u = r->u[map] + (y - slice_start) * (int64_t)uv_linesize * ws * ws;    \
+                const int16_t *const v = r->v[map] + (y - slice_start) * (int64_t)uv_linesize * ws * ws;    \
+                const int16_t *const ker = r->ker[map] + (y - slice_start) * (int64_t)uv_linesize * ws * ws;\
                                                                                                            \
                 s->remap_line(dst + y * out_linesize, width, src, in_linesize, u, v, ker);                 \
             }                                                                                              \
@@ -806,7 +806,7 @@ static inline int ereflectx(int x, int y, int w, int h)
 static inline int reflectx(int x, int y, int w, int h)
 {
     if (y < 0 || y >= h)
-        return w - 1 - x;
+        return av_clip(w - 1 - x, 0, w - 1);
 
     return mod(x, w);
 }
@@ -1867,9 +1867,14 @@ static int stereographic_to_xyz(const V360Context *s,
     const float theta = atanf(r) * 2.f;
     const float sin_theta = sinf(theta);
 
-    vec[0] = x / r * sin_theta;
-    vec[1] = y / r * sin_theta;
-    vec[2] = cosf(theta);
+    if (r > 0.f) {
+        vec[0] = x / r * sin_theta;
+        vec[1] = y / r * sin_theta;
+        vec[2] = cosf(theta);
+    } else {
+        vec[0] = vec[1] = 0.f;
+        vec[2] = 1.f;
+    }
 
     return 1;
 }
@@ -1971,9 +1976,14 @@ static int equisolid_to_xyz(const V360Context *s,
     const float theta = asinf(r) * 2.f;
     const float sin_theta = sinf(theta);
 
-    vec[0] = x / r * sin_theta;
-    vec[1] = y / r * sin_theta;
-    vec[2] = cosf(theta);
+    if (r > 0.f) {
+        vec[0] = x / r * sin_theta;
+        vec[1] = y / r * sin_theta;
+        vec[2] = cosf(theta);
+    } else {
+        vec[0] = vec[1] = 0.f;
+        vec[2] = 1.f;
+    }
 
     return 1;
 }
@@ -4246,8 +4256,8 @@ static int v360_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
         const int height = s->pr_height[p];
         const int in_width = s->inplanewidth[p];
         const int in_height = s->inplaneheight[p];
-        const int slice_start = (height *  jobnr     ) / nb_jobs;
-        const int slice_end   = (height * (jobnr + 1)) / nb_jobs;
+        const int slice_start = ff_slice_pos(height, jobnr, nb_jobs);
+        const int slice_end   = ff_slice_pos(height, jobnr + 1, nb_jobs);
         const int elements = s->elements;
         float du, dv;
         float vec[3];
@@ -4255,9 +4265,9 @@ static int v360_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 
         for (int j = slice_start; j < slice_end; j++) {
             for (int i = 0; i < width; i++) {
-                int16_t *u = r->u[p] + ((j - slice_start) * uv_linesize + i) * elements;
-                int16_t *v = r->v[p] + ((j - slice_start) * uv_linesize + i) * elements;
-                int16_t *ker = r->ker[p] + ((j - slice_start) * uv_linesize + i) * elements;
+                int16_t *u = r->u[p] + ((j - slice_start) * (int64_t)uv_linesize + i) * elements;
+                int16_t *v = r->v[p] + ((j - slice_start) * (int64_t)uv_linesize + i) * elements;
+                int16_t *ker = r->ker[p] + ((j - slice_start) * (int64_t)uv_linesize + i) * elements;
                 uint8_t  *mask8  = (p || !r->mask) ? NULL : r->mask + ((j - slice_start) * s->pr_width[0] + i);
                 uint16_t *mask16 = (p || !r->mask) ? NULL : (uint16_t *)r->mask + ((j - slice_start) * s->pr_width[0] + i);
                 int in_mask, out_mask;
@@ -4266,6 +4276,10 @@ static int v360_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
                     out_mask = s->out_transform(s, j, i, height, width, vec);
                 else
                     out_mask = s->out_transform(s, i, j, width, height, vec);
+                if (!isfinite(vec[0]) || !isfinite(vec[1]) || !isfinite(vec[2])) {
+                    vec[0] = vec[1] = 0.f;
+                    vec[2] = 1.f;
+                }
                 offset_vector(vec, s->h_offset, s->v_offset);
                 normalize_vector(vec);
                 av_assert1(!isnan(vec[0]) && !isnan(vec[1]) && !isnan(vec[2]));
@@ -4293,6 +4307,34 @@ static int v360_slice(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
     }
 
     return 0;
+}
+
+static int get_output_dimension(AVFilterContext *ctx, const char *name,
+                                float val, int *dim)
+{
+    if (!isfinite(val) || val < 1.f || val > INT16_MAX) {
+        av_log(ctx, AV_LOG_ERROR,
+               "Output %s %g is outside the allowed range [1, %d].\n",
+               name, val, INT16_MAX);
+        return AVERROR(EINVAL);
+    }
+
+    *dim = lrintf(val);
+    return 0;
+}
+
+static void projection_min_size(int projection, int *min_w, int *min_h)
+{
+    switch (projection) {
+    case CUBEMAP_3_2:  *min_w = 3; *min_h = 2; break;
+    case CUBEMAP_1_6:  *min_w = 1; *min_h = 6; break;
+    case CUBEMAP_6_1:  *min_w = 6; *min_h = 1; break;
+    case EQUIANGULAR:  *min_w = 5; *min_h = 9; break;
+    case BARREL:       *min_w = 5; *min_h = 2; break;
+    case BARREL_SPLIT: *min_w = 3; *min_h = 4; break;
+    case DUAL_FISHEYE: *min_w = 2; *min_h = 1; break;
+    default:           *min_w = 1; *min_h = 1; break;
+    }
 }
 
 static int config_output(AVFilterLink *outlink)
@@ -4427,7 +4469,7 @@ static int config_output(AVFilterLink *outlink)
         in_offset_h = h;
         break;
     default:
-        av_assert0(0);
+        av_unreachable("All valid cases are handled");
     }
 
     set_dimensions(s->inplanewidth, s->inplaneheight, w, h, desc);
@@ -4449,6 +4491,7 @@ static int config_output(AVFilterLink *outlink)
     case FISHEYE:
         default_ih_fov = 180.f;
         default_iv_fov = 180.f;
+        break;
     default:
         break;
     }
@@ -4464,6 +4507,31 @@ static int config_output(AVFilterLink *outlink)
 
     if (s->in_transpose)
         FFSWAP(int, s->in_width, s->in_height);
+
+    // The remap code stores input coordinates in int16_t
+    if (s->in_width < 1 || s->in_width > INT16_MAX ||
+        s->in_height < 1 || s->in_height > INT16_MAX) {
+        av_log(ctx, AV_LOG_ERROR,
+               "Input dimensions %dx%d are outside the allowed range [1, %d].\n",
+               s->in_width, s->in_height, INT16_MAX);
+        return AVERROR(EINVAL);
+    }
+
+    {
+        int min_w, min_h;
+        const int pw = s->in_transpose ? AV_CEIL_RSHIFT(h, desc->log2_chroma_h)
+                                       : AV_CEIL_RSHIFT(w, desc->log2_chroma_w);
+        const int ph = s->in_transpose ? AV_CEIL_RSHIFT(w, desc->log2_chroma_w)
+                                       : AV_CEIL_RSHIFT(h, desc->log2_chroma_h);
+
+        projection_min_size(s->in, &min_w, &min_h);
+        if (pw < min_w || ph < min_h) {
+            av_log(ctx, AV_LOG_ERROR,
+                   "Input %dx%d is too small for the input projection "
+                   "(requires at least %dx%d per plane).\n", pw, ph, min_w, min_h);
+            return AVERROR(EINVAL);
+        }
+    }
 
     switch (s->in) {
     case EQUIRECTANGULAR:
@@ -4782,11 +4850,17 @@ static int config_output(AVFilterLink *outlink)
     if (s->width > 0 && s->height <= 0 && s->h_fov > 0.f && s->v_fov > 0.f &&
         s->out == FLAT && s->d_fov == 0.f) {
         w = s->width;
-        h = w / tanf(s->h_fov * M_PI / 360.f) * tanf(s->v_fov * M_PI / 360.f);
+        err = get_output_dimension(ctx, "height",
+                                   w / tanf(s->h_fov * M_PI / 360.f) * tanf(s->v_fov * M_PI / 360.f), &h);
+        if (err < 0)
+            return err;
     } else if (s->width <= 0 && s->height > 0 && s->h_fov > 0.f && s->v_fov > 0.f &&
         s->out == FLAT && s->d_fov == 0.f) {
         h = s->height;
-        w = h / tanf(s->v_fov * M_PI / 360.f) * tanf(s->h_fov * M_PI / 360.f);
+        err = get_output_dimension(ctx, "width",
+                                   h / tanf(s->v_fov * M_PI / 360.f) * tanf(s->h_fov * M_PI / 360.f), &w);
+        if (err < 0)
+            return err;
     } else if (s->width > 0 && s->height > 0) {
         w = s->width;
         h = s->height;
@@ -4799,6 +4873,13 @@ static int config_output(AVFilterLink *outlink)
 
         if (s->in_transpose)
             FFSWAP(int, w, h);
+    }
+
+    if (w < 1 || w > INT16_MAX || h < 1 || h > INT16_MAX) {
+        av_log(ctx, AV_LOG_ERROR,
+               "Output dimensions %dx%d are outside the allowed range [1, %d].\n",
+               w, h, INT16_MAX);
+        return AVERROR(EINVAL);
     }
 
     s->width  = w;
@@ -4838,6 +4919,22 @@ static int config_output(AVFilterLink *outlink)
     }
 
     set_dimensions(s->pr_width, s->pr_height, w, h, desc);
+
+    {
+        int min_w, min_h;
+        const int pw = s->out_transpose ? AV_CEIL_RSHIFT(h, desc->log2_chroma_h)
+                                        : AV_CEIL_RSHIFT(w, desc->log2_chroma_w);
+        const int ph = s->out_transpose ? AV_CEIL_RSHIFT(w, desc->log2_chroma_w)
+                                        : AV_CEIL_RSHIFT(h, desc->log2_chroma_h);
+
+        projection_min_size(s->out, &min_w, &min_h);
+        if (pw < min_w || ph < min_h) {
+            av_log(ctx, AV_LOG_ERROR,
+                   "Output %dx%d is too small for the output projection "
+                   "(requires at least %dx%d per plane).\n", pw, ph, min_w, min_h);
+            return AVERROR(EINVAL);
+        }
+    }
 
     switch (s->out_stereo) {
     case STEREO_2D:

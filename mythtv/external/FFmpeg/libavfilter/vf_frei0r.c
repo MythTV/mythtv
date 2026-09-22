@@ -43,6 +43,13 @@
 #include "formats.h"
 #include "video.h"
 
+#ifdef __APPLE__
+/* frei0r plugins use .so on macOS */
+#define FREI0R_SLIBSUF ".so"
+#else
+#define FREI0R_SLIBSUF SLIBSUF
+#endif
+
 typedef f0r_instance_t (*f0r_construct_f)(unsigned int width, unsigned int height);
 typedef void (*f0r_destruct_f)(f0r_instance_t instance);
 typedef void (*f0r_deinit_f)(void);
@@ -137,7 +144,7 @@ static int set_param(AVFilterContext *ctx, f0r_param_info_t info, int index, cha
 
 fail:
     av_log(ctx, AV_LOG_ERROR, "Invalid value '%s' for parameter '%s'.\n",
-           param, info.name);
+           param, info.name ? info.name : "(null)");
     return AVERROR(EINVAL);
 }
 
@@ -150,7 +157,7 @@ static int set_params(AVFilterContext *ctx, const char *params)
         return 0;
 
     for (i = 0; i < s->plugin_info.num_params; i++) {
-        f0r_param_info_t info;
+        f0r_param_info_t info = { 0 };
         char *param;
         int ret;
 
@@ -173,7 +180,7 @@ static int set_params(AVFilterContext *ctx, const char *params)
 
 static int load_path(AVFilterContext *ctx, void **handle_ptr, const char *prefix, const char *name)
 {
-    char *path = av_asprintf("%s%s%s", prefix, name, SLIBSUF);
+    char *path = av_asprintf("%s%s%s", prefix, name, FREI0R_SLIBSUF);
     if (!path)
         return AVERROR(ENOMEM);
     av_log(ctx, AV_LOG_DEBUG, "Looking for frei0r effect in '%s'.\n", path);
@@ -287,7 +294,8 @@ static av_cold int frei0r_init(AVFilterContext *ctx,
     av_log(ctx, AV_LOG_VERBOSE,
            "name:%s author:'%s' explanation:'%s' color_model:%s "
            "frei0r_version:%d version:%d.%d num_params:%d\n",
-           pi->name, pi->author, pi->explanation,
+           pi->name ? pi->name : "(null)", pi->author ? pi->author : "(null)",
+           pi->explanation ? pi->explanation : "(null)",
            pi->color_model == F0R_COLOR_MODEL_BGRA8888 ? "bgra8888" :
            pi->color_model == F0R_COLOR_MODEL_RGBA8888 ? "rgba8888" :
            pi->color_model == F0R_COLOR_MODEL_PACKED32 ? "packed32" : "unknown",

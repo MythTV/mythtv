@@ -23,6 +23,7 @@
 #pragma shader_stage(compute)
 #extension GL_GOOGLE_include_directive : require
 
+#define NB_CONTEXTS 6
 #include "common.glsl"
 #include "ffv1_common.glsl"
 
@@ -37,35 +38,130 @@ layout (set = 1, binding = 2, scalar) writeonly buffer slice_status_buf {
     uint32_t slice_status[];
 };
 
+layout(set = 1, binding = 3) writeonly buffer fltmap_buf {
+    uint fltmap[][4][65536];
+};
+
 shared uint hdr_sym[4 + 4 + 3];
 const int nb_hdr_sym = 4 + codec_planes + 3;
 
-uint get_usymbol(void)
+uint get_usymbol(const uint ctx_off)
 {
-    if (get_rac(rc_state[0]))
+    if (get_rac(rc_state[ctx_off]))
         return 0;
 
     int e = 0;
-    while (get_rac(rc_state[1 + min(e, 9)])) // 1..10
+    while (get_rac(rc_state[ctx_off + 1 + min(e, 9)])) // 1..10
         e++;
 
     uint a = 1;
     for (int i = e - 1; i >= 0; i--) {
         a <<= 1;
-        a |= uint(get_rac(rc_state[22 + min(i, 9)]));  // 22..31
+        a |= uint(get_rac(rc_state[ctx_off + 22 + min(i, 9)]));  // 22..31
     }
 
     return a;
 }
 
-bool decode_slice_header(inout SliceContext sc)
+int get_isymbol(const uint ctx_off)
+{
+    if (get_rac(rc_state[ctx_off]))
+        return 0;
+
+    int e = 0;
+    while (get_rac(rc_state[ctx_off + 1 + min(e, 9)])) // 1..10
+        e++;
+
+    int a = 1;
+    for (int i = e - 1; i >= 0; i--) {
+        a <<= 1;
+        a |= int(get_rac(rc_state[ctx_off + 22 + min(i, 9)]));  // 22..31
+    }
+
+    return get_rac(rc_state[ctx_off + 11 + min(e, 10)]) ? -a : a;
+}
+
+shared int mul[4096 + 1];
+
+int decode_current_mul(uint ctx_off, int mul_count, int64_t i)
+{
+    int ndx = int((i * int64_t(mul_count)) >> 32);
+    if (mul[ndx] < 0)
+        mul[ndx] = int(get_usymbol(ctx_off)) & 0x3FFFFFFF;
+    return mul[ndx];
+}
+
+bool decode_remap(uint slice_idx, inout SliceContext sc)
+{
+    uint end = uint(rct_offset - 1);
+    uint flip_mask = end ^ (end >> 1);
+    uint flip = sc.remap == 2 ? (end >> 1) : 0;
+
+    for (int p = 0; p < color_planes; p++) {
+        int j = 0;
+        int lu = 0;
+
+        [[unroll]]
+        for (int k = 0; k < NB_CONTEXTS*CONTEXT_SIZE; k++)
+            rc_state[k] = uint8_t(128);
+
+        int mul_count = int(get_usymbol(0));
+        if (uint(mul_count) > 4096u)
+            return true;
+        for (int mi = 0; mi < mul_count; mi++)
+            mul[mi] = -1;
+        mul[mul_count] = 1;
+
+        [[unroll]]
+        for (int k = 0; k < NB_CONTEXTS*CONTEXT_SIZE; k++)
+            rc_state[k] = uint8_t(128);
+
+        int current_mul = 1;
+        int64_t i = 0;
+        while (i <= int64_t(end)) {
+            uint run = get_usymbol(uint(lu*3 + 0)*CONTEXT_SIZE);
+            uint run0 = lu != 0 ? 0u  : run;
+            uint run1 = lu != 0 ? run : 1u;
+
+            i += int64_t(run0) * int64_t(current_mul);
+
+            while (run1 > 0u) {
+                run1--;
+                if (current_mul > 1) {
+                    int delta = get_isymbol(uint(lu*3 + 1)*CONTEXT_SIZE);
+                    if (delta <= -current_mul || delta > current_mul/2)
+                        return true;
+                    i += int64_t(current_mul - 1 + delta);
+                }
+                if (i - 1 >= int64_t(end))
+                    break;
+                if (j >= fltmap[slice_idx][p].length())
+                    return true;
+                uint iv = uint(i);
+                fltmap[slice_idx][p][j++] = iv ^ (((iv & flip_mask) != 0u) ? 0u : flip);
+                i++;
+                current_mul = decode_current_mul(uint(2)*CONTEXT_SIZE, mul_count, i);
+            }
+            if (lu != 0)
+                i += int64_t(current_mul);
+            lu ^= int(run == 0u);
+        }
+        if (j == 0)
+            return true;
+        sc.remap_count[p] = j;
+    }
+
+    return false;
+}
+
+bool decode_slice_header(uint slice_idx, inout SliceContext sc)
 {
     [[unroll]]
     for (int i = 0; i < CONTEXT_SIZE; i++)
         rc_state[i] = uint8_t(128);
 
     for (int i = 0; i < nb_hdr_sym; i++)
-        hdr_sym[i] = get_usymbol();
+        hdr_sym[i] = get_usymbol(0);
 
     uint sx = hdr_sym[0];
     uint sy = hdr_sym[1];
@@ -96,11 +192,17 @@ bool decode_slice_header(inout SliceContext sc)
 
     if (version >= 4) {
         sc.slice_reset_contexts = get_rac(rc_state[0]);
-        sc.slice_coding_mode = get_usymbol();
-        if (sc.slice_coding_mode != 1 && colorspace == 1) {
-            sc.slice_rct_coef.g = int(get_usymbol());
-            sc.slice_rct_coef.r = int(get_usymbol());
+        sc.slice_coding_mode = get_usymbol(0);
+        if (sc.slice_coding_mode != 1 && colorspace != 0) {
+            sc.slice_rct_coef.g = int(get_usymbol(0));
+            sc.slice_rct_coef.r = int(get_usymbol(0));
             if (sc.slice_rct_coef.g + sc.slice_rct_coef.r > 4)
+                return true;
+        }
+
+        if (micro_version >= 4) {
+            sc.remap = get_usymbol(0);
+            if (sc.remap != 0 && decode_remap(slice_idx, sc))
                 return true;
         }
     }
@@ -117,7 +219,8 @@ void main(void)
     if (slice_idx == (gl_NumWorkGroups.x*gl_NumWorkGroups.y - 1))
         get_rac_equi();
 
-    decode_slice_header(slice_ctx[slice_idx]);
+    if (decode_slice_header(slice_idx, slice_ctx[slice_idx]))
+        slice_ctx[slice_idx].slice_dim = ivec2(0);
 
     slice_ctx[slice_idx].c = rc;
 

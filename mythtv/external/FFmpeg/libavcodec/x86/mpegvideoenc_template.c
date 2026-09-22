@@ -1,5 +1,5 @@
 /*
- * MPEG video MMX templates
+ * MPEG video DCT template
  *
  * Copyright (c) 2002 Michael Niedermayer <michaelni@gmx.at>
  *
@@ -29,9 +29,9 @@
 #include "libavcodec/mpegutils.h"
 #include "libavcodec/mpegvideoenc.h"
 #include "fdct.h"
+#include "mpegvideoencdsp.h"
 
 #undef SPREADW
-#undef PMAXW
 #undef PMAX
 #undef SAVE_SIGN
 #undef RESTORE_SIGN
@@ -79,7 +79,11 @@ static int RENAME(dct_quantize)(MPVEncContext *const s,
     if (s->dct_error_sum) {
         const int intra = s->c.mb_intra;
         s->dct_count[intra]++;
+#if HAVE_SSE2_EXTERNAL
+        ff_mpv_denoise_dct_sse2(block, s->dct_error_sum[intra], s->dct_offset[intra]);
+#else
         s->mpvencdsp.denoise_dct(block, s->dct_error_sum[intra], s->dct_offset[intra]);
+#endif
     }
 
     if (s->c.mb_intra) {

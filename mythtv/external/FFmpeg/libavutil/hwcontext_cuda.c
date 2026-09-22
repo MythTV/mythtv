@@ -47,8 +47,10 @@ static const enum AVPixelFormat supported_formats[] = {
     AV_PIX_FMT_YUVA420P,
     AV_PIX_FMT_YUV444P,
     AV_PIX_FMT_P010,
+    AV_PIX_FMT_P012,
     AV_PIX_FMT_P016,
     AV_PIX_FMT_P210,
+    AV_PIX_FMT_P212,
     AV_PIX_FMT_P216,
     AV_PIX_FMT_YUV422P,
     AV_PIX_FMT_YUV420P10,
@@ -207,7 +209,7 @@ static int cuda_get_buffer(AVHWFramesContext *ctx, AVFrame *frame)
     if (ctx->sw_format == AV_PIX_FMT_YUV420P) {
         frame->linesize[1] = frame->linesize[2] = frame->linesize[0] / 2;
         frame->data[2]     = frame->data[1];
-        frame->data[1]     = frame->data[2] + frame->linesize[2] * (ctx->height / 2);
+        frame->data[1]     = frame->data[2] + frame->linesize[2] * AV_CEIL_RSHIFT(ctx->height, 1);
     }
 
     frame->format = AV_PIX_FMT_CUDA;

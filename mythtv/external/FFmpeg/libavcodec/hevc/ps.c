@@ -25,12 +25,13 @@
 
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
-#include "golomb.h"
-#include "h2645_vui.h"
+#include "libavutil/refstruct.h"
+
+#include "libavcodec/golomb.h"
+#include "libavcodec/h2645_vui.h"
 #include "data.h"
 #include "ps.h"
-#include "profiles.h"
-#include "libavutil/refstruct.h"
+#include "libavcodec/profiles.h"
 
 static const uint8_t default_scaling_list_intra[] = {
     16, 16, 16, 16, 17, 18, 21, 24,
@@ -61,6 +62,29 @@ static const uint8_t hevc_sub_width_c[] = {
 static const uint8_t hevc_sub_height_c[] = {
     1, 2, 1, 1
 };
+
+static int read_window(HEVCWindow *window, GetBitContext *gb, int chroma_format_idc, int w, int h)
+{
+    int64_t vert_mult  = hevc_sub_height_c[chroma_format_idc];
+    int64_t horiz_mult = hevc_sub_width_c [chroma_format_idc];
+    int64_t left   = get_ue_golomb_long(gb) * horiz_mult;
+    int64_t right  = get_ue_golomb_long(gb) * horiz_mult;
+    int64_t top    = get_ue_golomb_long(gb) * vert_mult;
+    int64_t bottom = get_ue_golomb_long(gb) * vert_mult;
+
+    if (left < 0 || right < 0 || top < 0 || bottom < 0 ||
+        w <= left + right ||
+        h <= top + bottom) {
+        memset(window, 0, sizeof(*window));
+        return AVERROR_INVALIDDATA;
+    }
+
+    window->left_offset   = left;
+    window->right_offset  = right;
+    window->top_offset    = top;
+    window->bottom_offset = bottom;
+    return 0;
+}
 
 static void remove_sps(HEVCParamSets *s, int id)
 {
@@ -610,8 +634,11 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
         }
     }
     vps->num_output_layer_sets = vps->vps_num_layer_sets + vps->num_add_layer_sets;
-    if (vps->num_output_layer_sets != 2)
-        return AVERROR_INVALIDDATA;
+    if (vps->num_output_layer_sets != 2) {
+        av_log(avctx, AV_LOG_WARNING,
+               "Unsupported num_output_layer_sets: %d\n", vps->num_output_layer_sets);
+        return AVERROR_PATCHWELCOME;
+    }
 
     sub_layers_max_present = get_bits1(gb); // vps_sub_layers_max_minus1_present_flag
     if (sub_layers_max_present) {
@@ -677,7 +704,7 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
 
     if (get_ue_golomb_31(gb) != 0 /* vps_num_rep_formats_minus1 */) {
         av_log(avctx, AV_LOG_ERROR, "Unexpected extra rep formats\n");
-        return AVERROR_INVALIDDATA;
+        return AVERROR_PATCHWELCOME;
     }
 
     vps->rep_format.pic_width_in_luma_samples  = get_bits(gb, 16);
@@ -702,12 +729,9 @@ static int decode_vps_ext(GetBitContext *gb, AVCodecContext *avctx, HEVCVPS *vps
     }
 
     if (get_bits1(gb) /* conformance_window_vps_flag */) {
-        int vert_mult  = hevc_sub_height_c[vps->rep_format.chroma_format_idc];
-        int horiz_mult = hevc_sub_width_c[vps->rep_format.chroma_format_idc];
-        vps->rep_format.conf_win_left_offset   = get_ue_golomb(gb) * horiz_mult;
-        vps->rep_format.conf_win_right_offset  = get_ue_golomb(gb) * horiz_mult;
-        vps->rep_format.conf_win_top_offset    = get_ue_golomb(gb) * vert_mult;
-        vps->rep_format.conf_win_bottom_offset = get_ue_golomb(gb) * vert_mult;
+        int ret = read_window(&vps->rep_format.conf_win, gb, vps->rep_format.chroma_format_idc, vps->rep_format.pic_width_in_luma_samples, vps->rep_format.pic_height_in_luma_samples);
+        if (ret < 0)
+            return ret;
     }
 
     vps->max_one_active_ref_layer = get_bits1(gb);
@@ -895,8 +919,23 @@ int ff_hevc_decode_nal_vps(GetBitContext *gb, AVCodecContext *avctx,
     if (vps->vps_max_layers > 1 && get_bits1(gb)) { /* vps_extension_flag */
         int ret = decode_vps_ext(gb, avctx, vps, layer1_id_included);
         if (ret == AVERROR_PATCHWELCOME) {
-            vps->nb_layers = 1;
-            av_log(avctx, AV_LOG_WARNING, "Ignoring unsupported VPS extension\n");
+            /* If alpha layer info was already parsed, preserve it for alpha decoding */
+            if (!(avctx->err_recognition & (AV_EF_BITSTREAM | AV_EF_COMPLIANT)) &&
+                vps->nb_layers == 2 &&
+                vps->layer_id_in_nuh[1] &&
+                (vps->scalability_mask_flag & HEVC_SCALABILITY_AUXILIARY)) {
+                av_log(avctx, AV_LOG_WARNING,
+                       "Broken VPS extension, treating as alpha video\n");
+                /* If alpha layer has no direct dependency on base layer,
+                 * assume poc_lsb_not_present for the alpha layer, so that
+                 * IDR slices on that layer won't read pic_order_cnt_lsb.
+                 * This matches the behavior of Apple VideoToolbox encoders. */
+                if (!vps->num_direct_ref_layers[1])
+                    vps->poc_lsb_not_present |= 1 << 1;
+            } else {
+                vps->nb_layers = 1;
+                av_log(avctx, AV_LOG_WARNING, "Ignoring unsupported VPS extension\n");
+            }
             ret = 0;
         } else if (ret < 0)
             goto err;
@@ -962,12 +1001,7 @@ static void decode_vui(GetBitContext *gb, AVCodecContext *avctx,
         vui->default_display_window_flag = get_bits1(gb);
 
     if (vui->default_display_window_flag) {
-        int vert_mult  = hevc_sub_height_c[sps->chroma_format_idc];
-        int horiz_mult = hevc_sub_width_c[sps->chroma_format_idc];
-        vui->def_disp_win.left_offset   = get_ue_golomb_long(gb) * horiz_mult;
-        vui->def_disp_win.right_offset  = get_ue_golomb_long(gb) * horiz_mult;
-        vui->def_disp_win.top_offset    = get_ue_golomb_long(gb) *  vert_mult;
-        vui->def_disp_win.bottom_offset = get_ue_golomb_long(gb) *  vert_mult;
+        read_window(&vui->def_disp_win, gb, sps->chroma_format_idc, sps->width, sps->height);
 
         if (apply_defdispwin &&
             avctx->flags2 & AV_CODEC_FLAG2_IGNORE_CROP) {
@@ -1280,11 +1314,14 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
         sps->bit_depth             = rf->bit_depth_luma;
         sps->width                 = rf->pic_width_in_luma_samples;
         sps->height                = rf->pic_height_in_luma_samples;
+        if ((ret = av_image_check_size(sps->width,
+                                       sps->height, 0, avctx)) < 0)
+            return ret;
 
-        sps->pic_conf_win.left_offset   = rf->conf_win_left_offset;
-        sps->pic_conf_win.right_offset  = rf->conf_win_right_offset;
-        sps->pic_conf_win.top_offset    = rf->conf_win_top_offset;
-        sps->pic_conf_win.bottom_offset = rf->conf_win_bottom_offset;
+        sps->pic_conf_win.left_offset   = rf->conf_win.left_offset;
+        sps->pic_conf_win.right_offset  = rf->conf_win.right_offset;
+        sps->pic_conf_win.top_offset    = rf->conf_win.top_offset;
+        sps->pic_conf_win.bottom_offset = rf->conf_win.bottom_offset;
 
     } else {
         sps->chroma_format_idc = get_ue_golomb_long(gb);
@@ -1307,12 +1344,9 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
 
         sps->conformance_window = get_bits1(gb);
         if (sps->conformance_window) {
-            int vert_mult  = hevc_sub_height_c[sps->chroma_format_idc];
-            int horiz_mult = hevc_sub_width_c[sps->chroma_format_idc];
-            sps->pic_conf_win.left_offset   = get_ue_golomb_long(gb) * horiz_mult;
-            sps->pic_conf_win.right_offset  = get_ue_golomb_long(gb) * horiz_mult;
-            sps->pic_conf_win.top_offset    = get_ue_golomb_long(gb) *  vert_mult;
-            sps->pic_conf_win.bottom_offset = get_ue_golomb_long(gb) *  vert_mult;
+            ret = read_window(&sps->pic_conf_win, gb, sps->chroma_format_idc, sps->width, sps->height);
+            if (ret < 0)
+                return ret;
 
             if (avctx->flags2 & AV_CODEC_FLAG2_IGNORE_CROP) {
                 av_log(avctx, AV_LOG_DEBUG,
@@ -1986,9 +2020,9 @@ static int pps_scc_extension(GetBitContext *gb, AVCodecContext *avctx,
     pps->pps_curr_pic_ref_enabled_flag = get_bits1(gb);
     if (pps->residual_adaptive_colour_transform_enabled_flag = get_bits1(gb)) {
         pps->pps_slice_act_qp_offsets_present_flag = get_bits1(gb);
-        pps->pps_act_y_qp_offset  = get_se_golomb(gb) - 5;
-        pps->pps_act_cb_qp_offset = get_se_golomb(gb) - 5;
-        pps->pps_act_cr_qp_offset = get_se_golomb(gb) - 3;
+        pps->pps_act_y_qp_offset  = get_se_golomb(gb) - 5U;
+        pps->pps_act_cb_qp_offset = get_se_golomb(gb) - 5U;
+        pps->pps_act_cr_qp_offset = get_se_golomb(gb) - 3U;
 
 #define CHECK_QP_OFFSET(name) (pps->pps_act_ ## name ## _qp_offset <= -12 || \
                                pps->pps_act_ ## name ## _qp_offset >= 12)

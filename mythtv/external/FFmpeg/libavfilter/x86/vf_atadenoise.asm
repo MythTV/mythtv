@@ -20,13 +20,12 @@
 ;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ;******************************************************************************
 
-%if ARCH_X86_64
-
 %include "libavutil/x86/x86util.asm"
+
+%if ARCH_X86_64
 
 SECTION_RODATA
 pw_one:  times 8 dw 1
-pw_ones: times 8 dw 65535
 
 SECTION .text
 
@@ -38,7 +37,7 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse4
-cglobal atadenoise_filter_row8, 8,10,13, src, dst, srcf, w, mid, size, i, j, srcfx, x
+cglobal atadenoise_filter_row8, 6,10,13, src, dst, srcf, w, mid, size, i, j, srcfx, x
     movsxdifnidn    wq, wd
     movsxdifnidn  midq, midd
     movsxdifnidn sizeq, sized
@@ -52,7 +51,7 @@ cglobal atadenoise_filter_row8, 8,10,13, src, dst, srcf, w, mid, size, i, j, src
     movd            m5, r7m
     SPLATW          m5, m5
     pxor            m2, m2
-    mova           m10, [pw_ones]
+    pcmpeqw        m10, m10
 
     .loop:
         mov         iq, midq
@@ -60,10 +59,10 @@ cglobal atadenoise_filter_row8, 8,10,13, src, dst, srcf, w, mid, size, i, j, src
         pxor        m3, m3
         pxor       m11, m11
         movu        m0, [srcq + xq]
+        mova       m12, m10
         punpcklbw   m0, m2
         mova        m7, m0
         mova        m8, [pw_one]
-        mova       m12, [pw_ones]
 
         .loop0:
             inc              iq
@@ -152,7 +151,7 @@ cglobal atadenoise_filter_row8, 8,10,13, src, dst, srcf, w, mid, size, i, j, src
     RET
 
 INIT_XMM sse4
-cglobal atadenoise_filter_row8_serial, 8,10,13, src, dst, srcf, w, mid, size, i, j, srcfx, x
+cglobal atadenoise_filter_row8_serial, 6,10,13, src, dst, srcf, w, mid, size, i, j, srcfx, x
     movsxdifnidn    wq, wd
     movsxdifnidn  midq, midd
     movsxdifnidn sizeq, sized
@@ -166,7 +165,7 @@ cglobal atadenoise_filter_row8_serial, 8,10,13, src, dst, srcf, w, mid, size, i,
     movd            m5, r7m
     SPLATW          m5, m5
     pxor            m2, m2
-    mova           m10, [pw_ones]
+    pcmpeqw        m10, m10
 
     .loop:
         mov         iq, midq
@@ -177,7 +176,7 @@ cglobal atadenoise_filter_row8_serial, 8,10,13, src, dst, srcf, w, mid, size, i,
         punpcklbw   m0, m2
         mova        m7, m0
         mova        m8, [pw_one]
-        mova       m12, [pw_ones]
+        mova       m12, m10
 
         .loop0:
             dec              jq
@@ -210,7 +209,7 @@ cglobal atadenoise_filter_row8_serial, 8,10,13, src, dst, srcf, w, mid, size, i,
             jg .loop0
 
         .end_loop0:
-            mova       m12, [pw_ones]
+            mova       m12, m10
 
         .loop1:
             inc              iq

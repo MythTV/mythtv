@@ -53,6 +53,7 @@ typedef uint64_t FFVulkanExtensions;
 #define FF_VK_EXT_EXPLICIT_MEM_LAYOUT    (1ULL << 20) /* VK_KHR_workgroup_memory_explicit_layout */
 #define FF_VK_EXT_REPLICATED_COMPOSITES  (1ULL << 21) /* VK_EXT_shader_replicated_composites */
 #define FF_VK_EXT_LONG_VECTOR            (1ULL << 22) /* VK_EXT_shader_long_vector */
+#define FF_VK_EXT_INTERNAL_QUEUE_SYNC    (1ULL << 23) /* VK_KHR_internally_synchronized_queues */
 
 /* Video extensions */
 #define FF_VK_EXT_VIDEO_QUEUE            (1ULL << 36) /* VK_KHR_video_queue */
@@ -120,7 +121,7 @@ typedef uint64_t FFVulkanExtensions;
     MACRO(1, 1, FF_VK_EXT_NO_FLAG,              CmdDispatchBase)                                       \
                                                                                          \
     /* Queue */                                                                          \
-    MACRO(1, 1, FF_VK_EXT_NO_FLAG,              GetDeviceQueue)                          \
+    MACRO(1, 1, FF_VK_EXT_NO_FLAG,              GetDeviceQueue2)                         \
     MACRO(1, 1, FF_VK_EXT_NO_FLAG,              QueueSubmit)                             \
     MACRO(1, 1, FF_VK_EXT_NO_FLAG,              QueueSubmit2)                              \
                                                                                          \

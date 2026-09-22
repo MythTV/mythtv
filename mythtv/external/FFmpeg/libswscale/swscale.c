@@ -357,7 +357,6 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
 #if ARCH_X86
     if (   (uintptr_t) dst[0]&15 || (uintptr_t) dst[1]&15 || (uintptr_t) dst[2]&15
         || (uintptr_t)src2[0]&15 || (uintptr_t)src2[1]&15 || (uintptr_t)src2[2]&15
-        ||  dstStride[0]&15 ||  dstStride[1]&15 ||  dstStride[2]&15 ||  dstStride[3]&15
         || srcStride2[0]&15 || srcStride2[1]&15 || srcStride2[2]&15 || srcStride2[3]&15
     ) {
         SwsInternal *const ctx = c->parent ? sws_internal(c->parent) : c;
@@ -513,7 +512,7 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
         if (!enough_lines)
             break;  // we can't output a dstY line so let's try with the next slice
 
-#if HAVE_MMX_INLINE
+#if ARCH_X86 && HAVE_MMX
         ff_updateMMXDitherTables(c, dstY);
         c->dstW_mmx = c->opts.dst_w;
 #endif
@@ -1004,6 +1003,16 @@ static int scale_cascaded(SwsInternal *c,
                              0, dstH0);
     if (ret < 0)
         return ret;
+
+    /* The first stage assembles the full intermediate image from the input,
+     * one slice at a time (it is itself a regular slice-capable context). The
+     * second stage scales that whole intermediate to the output in one step,
+     * so it can only run once the entire source has been consumed. The first
+     * stage resets its slice direction to 0 at end of frame; until then the
+     * intermediate is incomplete and this call produces no output lines. */
+    if (sws_internal(c->cascaded_context[0])->sliceDir != 0)
+        return 0;
+
     ret = scale_internal(c->cascaded_context[1],
                          (const uint8_t * const * )c->cascaded_tmp[0], c->cascaded_tmpStride[0],
                          0, dstH0, dstSlice, dstStride, dstSliceY, dstSliceH);
@@ -1037,6 +1046,8 @@ static int scale_internal(SwsContext *sws,
     if ((srcSliceY  & (macro_height_src - 1)) ||
         ((srcSliceH & (macro_height_src - 1)) && srcSliceY + srcSliceH != sws->src_h) ||
         srcSliceY + srcSliceH > sws->src_h ||
+        srcSliceY < 0 ||
+        srcSliceH < 0 ||
         (isBayer(sws->src_format) && srcSliceH <= 1)) {
         av_log(c, AV_LOG_ERROR, "Slice parameters %d, %d are invalid\n", srcSliceY, srcSliceH);
         return AVERROR(EINVAL);
@@ -1066,7 +1077,7 @@ static int scale_internal(SwsContext *sws,
         return scale_gamma(c, srcSlice, srcStride, srcSliceY, srcSliceH,
                            dstSlice, dstStride, dstSliceY, dstSliceH);
 
-    if (c->cascaded_context[0] && srcSliceY == 0 && srcSliceH == c->cascaded_context[0]->src_h)
+    if (c->cascaded_context[0])
         return scale_cascaded(c, srcSlice, srcStride, srcSliceY, srcSliceH,
                               dstSlice, dstStride, dstSliceY, dstSliceH);
 
@@ -1215,6 +1226,26 @@ void sws_frame_end(SwsContext *sws)
     c->src_ranges.nb_ranges = 0;
 }
 
+static int frame_alloc_buffers(SwsContext *sws, AVFrame *frame)
+{
+    SwsInternal *c = sws_internal(sws);
+    FFFramePool *pool = &c->frame_pool;
+
+    av_assert0(!frame->hw_frames_ctx);
+    const int nb_planes = av_pix_fmt_count_planes(frame->format);
+    for (int i = 0; i < nb_planes; i++) {
+        frame->linesize[i] = pool->linesize[i];
+        frame->buf[i] = av_buffer_pool_get(pool->pools[i]);
+        if (!frame->buf[i]) {
+            av_frame_unref(frame);
+            return AVERROR(ENOMEM);
+        }
+        frame->data[i] = frame->buf[i]->data;
+    }
+
+    return 0;
+}
+
 int sws_frame_start(SwsContext *sws, AVFrame *dst, const AVFrame *src)
 {
     SwsInternal *c = sws_internal(sws);
@@ -1335,7 +1366,7 @@ static int frame_ref(AVFrame *dst, const AVFrame *src)
     /* ref the buffers */
     for (int i = 0; i < FF_ARRAY_ELEMS(src->buf); i++) {
         if (!src->buf[i])
-            continue;
+            break;
         dst->buf[i] = av_buffer_ref(src->buf[i]);
         if (!dst->buf[i])
             return AVERROR(ENOMEM);
@@ -1348,7 +1379,7 @@ static int frame_ref(AVFrame *dst, const AVFrame *src)
 
 int sws_scale_frame(SwsContext *sws, AVFrame *dst, const AVFrame *src)
 {
-    int ret;
+    int ret, allocated = 0;
     SwsInternal *c = sws_internal(sws);
     if (!src || !dst)
         return AVERROR(EINVAL);
@@ -1376,26 +1407,32 @@ int sws_scale_frame(SwsContext *sws, AVFrame *dst, const AVFrame *src)
     if (!src->data[0])
         return 0;
 
-    if (c->graph[FIELD_TOP]->noop &&
-        (!c->graph[FIELD_BOTTOM] || c->graph[FIELD_BOTTOM]->noop) &&
-        src->buf[0] && !dst->buf[0] && !dst->data[0])
-    {
-        /* Lightweight refcopy */
-        ret = frame_ref(dst, src);
-        if (ret < 0)
-            return ret;
-    } else {
-        if (!dst->data[0]) {
-            ret = av_frame_get_buffer(dst, 0);
-            if (ret < 0)
-                return ret;
-        }
+    const SwsGraph *top = c->graph[FIELD_TOP];
+    const SwsGraph *bot = c->graph[FIELD_BOTTOM];
+    if (dst->data[0]) /* user-provided buffers */
+        goto process_frame;
 
-        for (int field = 0; field < 2; field++) {
-            SwsGraph *graph = c->graph[field];
-            ff_sws_graph_run(graph, dst, src);
-            if (!graph->dst.interlaced)
-                break;
+    /* Sanity */
+    memset(dst->buf, 0, sizeof(dst->buf));
+    memset(dst->data, 0, sizeof(dst->data));
+    memset(dst->linesize, 0, sizeof(dst->linesize));
+    dst->extended_data = dst->data;
+
+    if (src->buf[0] && top->noop && (!bot || bot->noop))
+        return frame_ref(dst, src);
+
+    ret = frame_alloc_buffers(sws, dst);
+    if (ret < 0)
+        return ret;
+    allocated = 1;
+
+process_frame:
+    for (int field = 0; field < (bot ? 2 : 1); field++) {
+        ret = ff_sws_graph_run(c->graph[field], dst, src);
+        if (ret < 0) {
+            if (allocated)
+                av_frame_unref(dst);
+            return ret;
         }
     }
 
@@ -1414,6 +1451,9 @@ static int validate_params(SwsContext *ctx)
     VALIDATE(threads,       0, SWS_MAX_THREADS);
     VALIDATE(dither,        0, SWS_DITHER_NB - 1)
     VALIDATE(alpha_blend,   0, SWS_ALPHA_BLEND_NB - 1)
+    VALIDATE(intent,        0, SWS_INTENT_NB - 1);
+    VALIDATE(scaler,        0, SWS_SCALE_NB - 1)
+    VALIDATE(scaler_sub,    0, SWS_SCALE_NB - 1)
     return 0;
 }
 
@@ -1457,6 +1497,8 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
 #endif
     }
 
+    int dst_width = dst->width;
+    const SwsBackend backends = ff_sws_enabled_backends(ctx);
     for (int field = 0; field < 2; field++) {
         SwsFormat src_fmt = ff_fmt_from_frame(src, field);
         SwsFormat dst_fmt = ff_fmt_from_frame(dst, field);
@@ -1468,24 +1510,41 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             goto fail;
         }
 
-        src_ok = ff_test_fmt(&src_fmt, 0);
-        dst_ok = ff_test_fmt(&dst_fmt, 1);
-        if ((!src_ok || !dst_ok) && !ff_props_equal(&src_fmt, &dst_fmt)) {
+        src_ok = ff_test_fmt(backends, &src_fmt, 0);
+        dst_ok = ff_test_fmt(backends, &dst_fmt, 1);
+        if ((!src_ok || !dst_ok) && !ff_fmt_equal(&src_fmt, &dst_fmt)) {
             err_msg = src_ok ? "Unsupported output" : "Unsupported input";
             ret = AVERROR(ENOTSUP);
             goto fail;
         }
 
-        ret = ff_sws_graph_reinit(ctx, &dst_fmt, &src_fmt, field, &s->graph[field]);
+        if (!s->graph[field]) {
+            s->graph[field] = ff_sws_graph_alloc();
+            if (!s->graph[field]) {
+                err_msg = "Failed allocating scaling graph";
+                ret = AVERROR(ENOMEM);
+                goto fail;
+            }
+        }
+
+        ret = ff_sws_graph_reinit(s->graph[field], ctx, &dst_fmt, &src_fmt);
         if (ret < 0) {
             err_msg = "Failed initializing scaling graph";
             goto fail;
         }
 
-        if (s->graph[field]->incomplete && ctx->flags & SWS_STRICT) {
+        const SwsGraph *graph = s->graph[field];
+        if (graph->incomplete && ctx->flags & SWS_STRICT) {
             err_msg = "Incomplete scaling graph";
             ret = AVERROR(EINVAL);
             goto fail;
+        }
+
+        if (!graph->noop) {
+            av_assert0(graph->num_passes);
+            const SwsPass *last_pass = graph->passes[graph->num_passes - 1];
+            const int aligned_w = ff_sws_pass_aligned_width(last_pass, dst->width);
+            dst_width = FFMAX(dst_width, aligned_w);
         }
 
         if (!src_fmt.interlaced) {
@@ -1508,6 +1567,13 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
             ff_sws_graph_free(&s->graph[i]);
 
         return ret;
+    }
+
+    if (!dst->hw_frames_ctx) {
+        ret = ff_frame_pool_video_reinit(&s->frame_pool, dst_width, dst->height,
+                                         dst->format, av_cpu_max_align());
+        if (ret < 0)
+            return ret;
     }
 
     return 0;

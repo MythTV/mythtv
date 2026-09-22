@@ -284,17 +284,19 @@ shared u32vec4 gb_storage[gl_WorkGroupSize.x*gl_WorkGroupSize.y*gl_WorkGroupSize
         gb.cur_smem_pos = 0;                                                    \
     }
 
-#define LOAD64()                                                    \
-    {                                                               \
-        gb.bits = 0;                                                \
-        gb.bits_valid = 0;                                          \
-        u8buf ptr = u8buf(gb.buf);                                  \
-        for (uint i = 0; i < ((4 - uint(gb.buf_start)) & 3); ++i) { \
-            gb.bits |= uint64_t(ptr[i].v) << (56 - i * 8);          \
-            gb.bits_valid += 8;                                     \
-            gb.buf += 1;                                            \
-        }                                                           \
-        FILL_SMEM();                                                \
+#define LOAD64()                                              \
+    {                                                         \
+        gb.bits = 0;                                          \
+        gb.bits_valid = 0;                                    \
+        u8buf ptr = u8buf(gb.buf);                            \
+        uint prefix = (4 - uint(gb.buf)) & 3;                 \
+        for (uint i = 0; i < prefix; ++i) {                   \
+            gb.bits |= uint64_t(ptr[i].v) << (56 - i * 8);    \
+            gb.bits_valid += 8;                               \
+            gb.buf += 1;                                      \
+        }                                                     \
+        FILL_SMEM();                                          \
+        RELOAD32();                                           \
     }
 
 #define RELOAD32()                                                                                  \
@@ -357,6 +359,12 @@ void skip_bits(inout GetBitContext gb, int n)
     if (n > gb.bits_valid)
         RELOAD32()
 
+    gb.bits <<= n;
+    gb.bits_valid -= n;
+}
+
+void skip_bits_unchecked(inout GetBitContext gb, int n)
+{
     gb.bits <<= n;
     gb.bits_valid -= n;
 }

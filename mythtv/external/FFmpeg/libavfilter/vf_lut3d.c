@@ -328,8 +328,8 @@ static int interp_##nbits##_##name##_p##depth(AVFilterContext *ctx, void *arg, i
     const AVFrame *in  = td->in;                                                                       \
     const AVFrame *out = td->out;                                                                      \
     const int direct = out == in;                                                                      \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;                                        \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;                                        \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);                                  \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);                              \
     uint8_t *grow = out->data[0] + slice_start * out->linesize[0];                                     \
     uint8_t *brow = out->data[1] + slice_start * out->linesize[1];                                     \
     uint8_t *rrow = out->data[2] + slice_start * out->linesize[2];                                     \
@@ -426,8 +426,8 @@ static int interp_##name##_pf##depth(AVFilterContext *ctx, void *arg, int jobnr,
     const AVFrame *in  = td->in;                                                                       \
     const AVFrame *out = td->out;                                                                      \
     const int direct = out == in;                                                                      \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;                                        \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;                                        \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);                                  \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);                              \
     uint8_t *grow = out->data[0] + slice_start * out->linesize[0];                                     \
     uint8_t *brow = out->data[1] + slice_start * out->linesize[1];                                     \
     uint8_t *rrow = out->data[2] + slice_start * out->linesize[2];                                     \
@@ -498,8 +498,8 @@ static int interp_##nbits##_##name(AVFilterContext *ctx, void *arg, int jobnr, i
     const uint8_t g = lut3d->rgba_map[G];                                                           \
     const uint8_t b = lut3d->rgba_map[B];                                                           \
     const uint8_t a = lut3d->rgba_map[A];                                                           \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;                                     \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;                                     \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);                               \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);                           \
     uint8_t       *dstrow = out->data[0] + slice_start * out->linesize[0];                          \
     const uint8_t *srcrow = in ->data[0] + slice_start * in ->linesize[0];                          \
     const float lut_max = lut3d->lutsize - 1;                                                       \
@@ -644,7 +644,6 @@ static int parse_dat(AVFilterContext *ctx, FILE *f)
     int ret, i, j, k, size, size2;
 
     lut3d->lutsize = size = 33;
-    size2 = size * size;
 
     NEXT_LINE(skip_line(line));
     if (!strncmp(line, "3DLUTSIZE ", 10)) {
@@ -656,6 +655,7 @@ static int parse_dat(AVFilterContext *ctx, FILE *f)
     ret = allocate_3dlut(ctx, size, 0);
     if (ret < 0)
         return ret;
+    size2 = lut3d->lutsize2;
 
     for (k = 0; k < size; k++) {
         for (j = 0; j < size; j++) {
@@ -681,13 +681,13 @@ static int parse_cube(AVFilterContext *ctx, FILE *f)
 
     while (fgets(line, sizeof(line), f)) {
         if (!strncmp(line, "LUT_3D_SIZE", 11)) {
-            int ret, i, j, k;
+            int ret, i, j, k, size2;
             const int size = strtol(line + 12, NULL, 0);
-            const int size2 = size * size;
 
             ret = allocate_3dlut(ctx, size, 0);
             if (ret < 0)
                 return ret;
+            size2 = lut3d->lutsize2;
 
             for (k = 0; k < size; k++) {
                 for (j = 0; j < size; j++) {
@@ -999,7 +999,6 @@ static int parse_cinespace(AVFilterContext *ctx, FILE *f)
             }
 
             size = size_r;
-            size2 = size * size;
 
             if (prelut_sizes[0] && prelut_sizes[1] && prelut_sizes[2])
                 prelut = 1;
@@ -1007,6 +1006,7 @@ static int parse_cinespace(AVFilterContext *ctx, FILE *f)
             ret = allocate_3dlut(ctx, size, prelut);
             if (ret < 0)
                 goto end;
+            size2 = lut3d->lutsize2;
 
             for (int k = 0; k < size; k++) {
                 for (int j = 0; j < size; j++) {
@@ -1870,8 +1870,8 @@ static int interp_1d_##nbits##_##name##_p##depth(AVFilterContext *ctx,       \
     const AVFrame *in  = td->in;                                             \
     const AVFrame *out = td->out;                                            \
     const int direct = out == in;                                            \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;              \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;              \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);        \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);    \
     uint8_t *grow = out->data[0] + slice_start * out->linesize[0];           \
     uint8_t *brow = out->data[1] + slice_start * out->linesize[1];           \
     uint8_t *rrow = out->data[2] + slice_start * out->linesize[2];           \
@@ -1966,8 +1966,8 @@ static int interp_1d_##name##_pf##depth(AVFilterContext *ctx,                \
     const AVFrame *in  = td->in;                                             \
     const AVFrame *out = td->out;                                            \
     const int direct = out == in;                                            \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;              \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;              \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);        \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);    \
     uint8_t *grow = out->data[0] + slice_start * out->linesize[0];           \
     uint8_t *brow = out->data[1] + slice_start * out->linesize[1];           \
     uint8_t *rrow = out->data[2] + slice_start * out->linesize[2];           \
@@ -2036,8 +2036,8 @@ static int interp_1d_##nbits##_##name(AVFilterContext *ctx, void *arg,       \
     const uint8_t g = lut1d->rgba_map[G];                                    \
     const uint8_t b = lut1d->rgba_map[B];                                    \
     const uint8_t a = lut1d->rgba_map[A];                                    \
-    const int slice_start = (in->height *  jobnr   ) / nb_jobs;              \
-    const int slice_end   = (in->height * (jobnr+1)) / nb_jobs;              \
+    const int slice_start = ff_slice_pos(in->height, jobnr, nb_jobs);        \
+    const int slice_end   = ff_slice_pos(in->height, jobnr + 1, nb_jobs);    \
     uint8_t       *dstrow = out->data[0] + slice_start * out->linesize[0];   \
     const uint8_t *srcrow = in ->data[0] + slice_start * in ->linesize[0];   \
     const float factor = (1 << nbits) - 1;                                   \

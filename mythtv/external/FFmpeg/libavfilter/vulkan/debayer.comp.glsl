@@ -36,6 +36,7 @@ layout(push_constant, std430) uniform pushConstants {
    int crop_y;
    int crop_w;
    int crop_h;
+   vec2 in_dims;
 };
 
 #define LD(xo, yo) \

@@ -646,6 +646,8 @@ Do not skip samples and export skip information as frame side data.
 Do not reset ASS ReadOrder field on flush.
 @item icc_profiles
 Generate/parse embedded ICC profiles from/to colorimetry tags.
+@item fixed_frame_size
+Force audio encoders to use a fixed frame size.
 @end table
 
 @item export_side_data @var{flags} (@emph{decoding/encoding,audio,video,subtitles})

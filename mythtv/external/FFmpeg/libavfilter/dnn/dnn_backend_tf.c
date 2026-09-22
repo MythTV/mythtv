@@ -486,6 +486,7 @@ static void dnn_free_model_tf(DNNModel **model)
         return;
 
     tf_model = (TFModel *)(*model);
+    ff_dnn_wait_requests(tf_model->request_queue, tf_model->ctx->nireq);
     while (ff_safe_queue_size(tf_model->request_queue) != 0) {
         TFRequestItem *item = ff_safe_queue_pop_front(tf_model->request_queue);
         destroy_request_item(&item);
@@ -541,8 +542,8 @@ static DNNModel *dnn_load_model_tf(DnnContext *ctx, DNNFunctionType func_type, A
     }
 
 #if !HAVE_PTHREAD_CANCEL
-    if (ctx->options.async) {
-        ctx->options.async = 0;
+    if (ctx->async) {
+        ctx->async = 0;
         av_log(filter_ctx, AV_LOG_WARNING, "pthread is not supported, roll back to sync.\n");
     }
 #endif

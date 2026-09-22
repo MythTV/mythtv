@@ -19,15 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <time.h>
-
 #include "libavutil/attributes.h"
 #include "libavutil/common.h"
 #include "libavutil/dict.h"
 #include "libavutil/internal.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
-#include "libavutil/time_internal.h"
 
 #include "avformat.h"
 #include "avlanguage.h"
@@ -37,14 +34,7 @@
 #include "asf.h"
 #include "asfcrypt.h"
 
-#define ASF_BOOL                              0x2
-#define ASF_WORD                              0x5
-#define ASF_GUID                              0x6
-#define ASF_DWORD                             0x3
-#define ASF_QWORD                             0x4
-#define ASF_UNICODE                           0x0
 #define ASF_FLAG_BROADCAST                    0x1
-#define ASF_BYTE_ARRAY                        0x1
 #define ASF_TYPE_AUDIO                        0x2
 #define ASF_TYPE_VIDEO                        0x1
 #define ASF_STREAM_NUM                        0x7F
@@ -541,31 +531,15 @@ static int asf_read_properties(AVFormatContext *s, const GUIDParseTable *g)
 {
     ASFContext *asf = s->priv_data;
     AVIOContext *pb = s->pb;
-    time_t creation_time;
+    int64_t creation_time;
 
     avio_rl64(pb); // read object size
     avio_skip(pb, 16); // skip File ID
     avio_skip(pb, 8);  // skip File size
     creation_time = avio_rl64(pb);
     if (!(asf->b_flags & ASF_FLAG_BROADCAST)) {
-        struct tm tmbuf;
-        struct tm *tm;
-        char buf[64];
-
-        // creation date is in 100 ns units from 1 Jan 1601, conversion to s
-        creation_time /= 10000000;
-        // there are 11644473600 seconds between 1 Jan 1601 and 1 Jan 1970
-        creation_time -= 11644473600;
-        tm = gmtime_r(&creation_time, &tmbuf);
-        if (tm) {
-            if (!strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", tm))
-                buf[0] = '\0';
-        } else
-            buf[0] = '\0';
-        if (buf[0]) {
-            if (av_dict_set(&s->metadata, "creation_time", buf, 0) < 0)
-                av_log(s, AV_LOG_WARNING, "av_dict_set failed.\n");
-        }
+        if (ff_dict_set_timestamp(&s->metadata, "creation_time", ff_asf_filetime_to_avtime(creation_time)) < 0)
+            av_log(s, AV_LOG_WARNING, "av_dict_set failed.\n");
     }
     asf->nb_packets  = avio_rl64(pb);
     asf->duration    = avio_rl64(pb) / 10000; // stream duration
@@ -1623,7 +1597,7 @@ static int asf_read_header(AVFormatContext *s)
             break;
         asf->offset = avio_tell(pb);
         if ((ret = ff_get_guid(pb, &guid)) < 0) {
-            if (ret == AVERROR_EOF && asf->data_reached)
+            if (avio_feof(pb) && asf->data_reached)
                 break;
             else
                 goto failed;

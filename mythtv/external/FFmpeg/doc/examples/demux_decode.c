@@ -336,15 +336,17 @@ int main (int argc, char **argv)
 
     if (video_stream) {
         printf("Play the output video file with the command:\n"
-               "ffplay -f rawvideo -pix_fmt %s -video_size %dx%d %s\n",
+               "ffplay -f rawvideo -pixel_format %s -video_size %dx%d %s\n",
                av_get_pix_fmt_name(pix_fmt), width, height,
                video_dst_filename);
     }
 
     if (audio_stream) {
         enum AVSampleFormat sfmt = audio_dec_ctx->sample_fmt;
-        int n_channels = audio_dec_ctx->ch_layout.nb_channels;
+        AVChannelLayout mono = AV_CHANNEL_LAYOUT_MONO;
+        AVChannelLayout *ch_layout = &audio_dec_ctx->ch_layout;
         const char *fmt;
+        char buf[64];
 
         if (av_sample_fmt_is_planar(sfmt)) {
             const char *packed = av_get_sample_fmt_name(sfmt);
@@ -352,15 +354,18 @@ int main (int argc, char **argv)
                    "(%s). This example will output the first channel only.\n",
                    packed ? packed : "?");
             sfmt = av_get_packed_sample_fmt(sfmt);
-            n_channels = 1;
+            ch_layout = &mono;
         }
 
         if ((ret = get_format_from_sample_fmt(&fmt, sfmt)) < 0)
             goto end;
 
+        if ((ret = av_channel_layout_describe(ch_layout, buf, sizeof(buf))) < 0)
+            goto end;
+
         printf("Play the output audio file with the command:\n"
-               "ffplay -f %s -ac %d -ar %d %s\n",
-               fmt, n_channels, audio_dec_ctx->sample_rate,
+               "ffplay -f %s -ch_layout %s -sample_rate %d %s\n",
+               fmt, buf, audio_dec_ctx->sample_rate,
                audio_dst_filename);
     }
 

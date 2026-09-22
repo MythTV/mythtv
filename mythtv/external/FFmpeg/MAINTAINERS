@@ -65,13 +65,13 @@ Communication
 =============
 website                                 (T: https://git.ffmpeg.org/ffmpeg-web) Deby Barbara Lepage
 fate.ffmpeg.org                         (L: fate-admin@ffmpeg.org) (W: https://fate.ffmpeg.org) (P: https://ffmpeg.org/fate.html) (S: https://git.ffmpeg.org/fateserver) Timo Rothenpieler
-Trac bug tracker                        (W: https://trac.ffmpeg.org) Alexander Strasser, Michael Niedermayer, Carl Eugen Hoyos
+Trac bug tracker                    [X] (W: https://trac.ffmpeg.org) Alexander Strasser, Michael Niedermayer, Carl Eugen Hoyos
+Forgejo issue tracker                   (W: https://code.ffmpeg.org/FFmpeg/FFmpeg/issues)
 Patchwork                           [2] (W: https://patchwork.ffmpeg.org) Andriy Gelman
 mailing lists                           (W: https://ffmpeg.org/contact.html#MailingLists) Baptiste Coudurier
 Twitter                                 Reynaldo H. Verdejo Pinochet
 Launchpad                               Timothy Gu
 ffmpeg-security                     [2] (L: ffmpeg-security@ffmpeg.org) (W: https://ffmpeg.org/security.html) Michael Niedermayer, Reimar Doeffinger
-
 
 libavutil
 =========
@@ -93,6 +93,7 @@ Other:
   hash                                  Reimar Doeffinger
   hwcontext_cuda*                       Timo Rothenpieler
   hwcontext_d3d12va*                    Wu Jianhua
+  hwcontext_oh*                         Zhao Zhili
   hwcontext_vulkan*                 [2] Lynne
   intfloat*                             Michael Niedermayer
   integer.c, integer.h                  Michael Niedermayer
@@ -158,7 +159,7 @@ Codecs:
   asv*                                  Michael Niedermayer
   atrac3plus*                           Maxim Poliakovski
   audiotoolbox*                         rcombs
-  avs2*                                 Huiwen Ren
+  avs2*                                 Huiwen Ren, Zhao Zhili
   bgmc.c, bgmc.h                        Thilo Borgmann
   binkaudio.c                           Peter Ross
   cavs*                                 Stefan Gehrer
@@ -232,7 +233,7 @@ Codecs:
   msvideo1.c                            Mike Melanson
   nuv.c                                 Reimar Doeffinger
   nvdec*, nvenc*                        Timo Rothenpieler
-  omx.c                                 Martin Storsjo, Aman Gupta
+  oh*                                   Zhao Zhili
   opus*                                 Rostislav Pehlivanov
   pcx.c                                 Ivo van Poorten
   pgssubdec.c                           Reimar Doeffinger
@@ -243,6 +244,7 @@ Codecs:
   qtrle.c                               Mike Melanson
   ra144.c, ra144.h, ra288.c, ra288.h    Roberto Togni
   resample2.c                           Michael Niedermayer
+  rkmppenc*                             Zhao Zhili
   rl2.c                                 Sascha Sommer
   rpza.c                                Roberto Togni
   rtjpeg.c, rtjpeg.h                    Reimar Doeffinger
@@ -250,7 +252,6 @@ Codecs:
   sanm.c                                Manuel Lauss
   smc.c                                 Mike Melanson
   snow*                                 Michael Niedermayer, Loren Merritt
-  sonic.c                               Alex Beregszaszi
   speedhq.c                             Steinar H. Gunderson
   srt*                                  Aurelien Jacobs
   sunrast.c                             Ivo van Poorten
@@ -317,6 +318,10 @@ libavfilter
 ===========
 
 Generic parts:
+
+  Framework and orphaned filters        Nicolas George
+  (except hardware acceleration)
+
   graphdump.c                           Nicolas George
 
   motion_estimation.c                   Davinder Singh
@@ -348,7 +353,9 @@ Filters:
   vf_minterpolate.c                     Davinder Singh
   vf_readvitc.c                         Tobias Rapp (CC t.rapp at noa-archive dot com)
   vf_scale.c                        [2] Michael Niedermayer
+  vf_scale_vt.c                         Zhao Zhili
   vf_tonemap_opencl.c                   Ruiling Song
+  vf_transpose_vt.c                     Zhao Zhili
   vf_yadif.c                        [2] Michael Niedermayer
   vf_xfade_vulkan.c                 [2] Marvin Scholz (CC <epirat07@gmail.com>)
 
@@ -406,7 +413,9 @@ Muxers/Demuxers:
   flvenc.c                              Michael Niedermayer, Steven Liu
   gxf.c                                 Reimar Doeffinger
   gxfenc.c                              Baptiste Coudurier
+  hls.c                                 Kacper Michajłow
   hlsenc.c                              Christian Suloway, Steven Liu
+  hxvs.c                                Zhao Zhili
   iamf*                             [2] James Almer
   idcin.c                               Mike Melanson
   idroqdec.c                            Mike Melanson
@@ -442,9 +451,9 @@ Muxers/Demuxers:
   nsvdec.c                              Francois Revol
   nut*                                  Michael Niedermayer
   nuv.c                                 Reimar Doeffinger
-  oggdec.c, oggdec.h                    David Conrad
-  oggenc.c                              Baptiste Coudurier
-  oggparse*.c                           David Conrad
+  oggdec.c, oggdec.h                    David Conrad, Romain Beauxis
+  oggenc.c                              Baptiste Coudurier, Romain Beauxis
+  oggparse*.c                           David Conrad, Romain Beauxis
   oma.c                                 Maxim Poliakovski
   pp_bnk.c                              Zane van Iperen
   psxstr.c                              Mike Melanson

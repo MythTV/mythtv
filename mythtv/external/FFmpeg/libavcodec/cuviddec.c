@@ -164,9 +164,17 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
         avctx->height = cuinfo.display_area.bottom - cuinfo.display_area.top;
     }
 
-    // target width/height need to be multiples of two
-    cuinfo.ulTargetWidth = avctx->width = (avctx->width + 1) & ~1;
-    cuinfo.ulTargetHeight = avctx->height = (avctx->height + 1) & ~1;
+    // NVDEC target dimensions must be even-aligned for internal surface allocation.
+    // For chroma-subsampled formats (420/422), the output dimensions must also be
+    // even. For monochrome/444, keep the original output dimensions and only
+    // even-align the NVDEC target — the frame copy will crop to avctx dimensions.
+    cuinfo.ulTargetWidth  = (avctx->width + 1) & ~1;
+    cuinfo.ulTargetHeight = (avctx->height + 1) & ~1;
+    if (format->chroma_format == cudaVideoChromaFormat_420 ||
+        format->chroma_format == cudaVideoChromaFormat_422) {
+        avctx->width  = cuinfo.ulTargetWidth;
+        avctx->height = cuinfo.ulTargetHeight;
+    }
 
     // aspect ratio conversion, 1:1, depends on scaled resolution
     cuinfo.target_rect.left = 0;
@@ -191,18 +199,10 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
         break;
     case 2: // 10-bit
         if (chroma_444) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            pix_fmts[1] = AV_PIX_FMT_YUV444P16;
-#else
             pix_fmts[1] = AV_PIX_FMT_YUV444P10MSB;
-#endif
 #ifdef NVDEC_HAVE_422_SUPPORT
         } else if (format->chroma_format == cudaVideoChromaFormat_422) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            pix_fmts[1] = AV_PIX_FMT_P216;
-#else
             pix_fmts[1] = AV_PIX_FMT_P210;
-#endif
 #endif
         } else {
             pix_fmts[1] = AV_PIX_FMT_P010;
@@ -211,25 +211,13 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
         break;
     case 4: // 12-bit
         if (chroma_444) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            pix_fmts[1] = AV_PIX_FMT_YUV444P16;
-#else
             pix_fmts[1] = AV_PIX_FMT_YUV444P12MSB;
-#endif
 #ifdef NVDEC_HAVE_422_SUPPORT
         } else if (format->chroma_format == cudaVideoChromaFormat_422) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            pix_fmts[1] = AV_PIX_FMT_P216;
-#else
             pix_fmts[1] = AV_PIX_FMT_P212;
 #endif
-#endif
         } else {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            pix_fmts[1] = AV_PIX_FMT_P016;
-#else
             pix_fmts[1] = AV_PIX_FMT_P012;
-#endif
         }
         caps = &ctx->caps12;
         break;
@@ -345,6 +333,7 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_NV12;
         break;
     case AV_PIX_FMT_P010:
+    case AV_PIX_FMT_P012:
     case AV_PIX_FMT_P016:
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_P016;
         break;
@@ -352,6 +341,8 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
     case AV_PIX_FMT_NV16:
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_NV16;
         break;
+    case AV_PIX_FMT_P210:
+    case AV_PIX_FMT_P212:
     case AV_PIX_FMT_P216:
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_P216;
         break;
@@ -359,6 +350,8 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
     case AV_PIX_FMT_YUV444P:
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_YUV444;
         break;
+    case AV_PIX_FMT_YUV444P10MSB:
+    case AV_PIX_FMT_YUV444P12MSB:
     case AV_PIX_FMT_YUV444P16:
         cuinfo.OutputFormat = cudaVideoSurfaceFormat_YUV444_16Bit;
         break;
@@ -644,12 +637,17 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
             }
         } else if (avctx->pix_fmt == AV_PIX_FMT_NV12      ||
                    avctx->pix_fmt == AV_PIX_FMT_P010      ||
+                   avctx->pix_fmt == AV_PIX_FMT_P012      ||
                    avctx->pix_fmt == AV_PIX_FMT_P016      ||
 #ifdef NVDEC_HAVE_422_SUPPORT
                    avctx->pix_fmt == AV_PIX_FMT_NV16      ||
+                   avctx->pix_fmt == AV_PIX_FMT_P210      ||
+                   avctx->pix_fmt == AV_PIX_FMT_P212      ||
                    avctx->pix_fmt == AV_PIX_FMT_P216      ||
 #endif
                    avctx->pix_fmt == AV_PIX_FMT_YUV444P   ||
+                   avctx->pix_fmt == AV_PIX_FMT_YUV444P10MSB ||
+                   avctx->pix_fmt == AV_PIX_FMT_YUV444P12MSB ||
                    avctx->pix_fmt == AV_PIX_FMT_YUV444P16) {
             unsigned int offset = 0;
             AVFrame *tmp_frame = av_frame_alloc();
@@ -916,7 +914,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
     if (probe_desc && probe_desc->nb_components)
         probed_bit_depth = probe_desc->comp[0].depth;
 
-    if (probe_desc && !probe_desc->log2_chroma_w && !probe_desc->log2_chroma_h)
+    if (probe_desc && probe_desc->nb_components > 1 && !probe_desc->log2_chroma_w && !probe_desc->log2_chroma_h)
         is_yuv444 = 1;
 
 #ifdef NVDEC_HAVE_422_SUPPORT
@@ -927,18 +925,10 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
     // Pick pixel format based on bit depth and chroma sampling.
     switch (probed_bit_depth) {
     case 10:
-#if FF_API_NVDEC_OLD_PIX_FMTS
-        pix_fmts[1] = is_yuv444 ? AV_PIX_FMT_YUV444P16 : (is_yuv422 ? AV_PIX_FMT_P216 : AV_PIX_FMT_P010);
-#else
         pix_fmts[1] = is_yuv444 ? AV_PIX_FMT_YUV444P10MSB : (is_yuv422 ? AV_PIX_FMT_P210 : AV_PIX_FMT_P010);
-#endif
         break;
     case 12:
-#if FF_API_NVDEC_OLD_PIX_FMTS
-        pix_fmts[1] = is_yuv444 ? AV_PIX_FMT_YUV444P16 : (is_yuv422 ? AV_PIX_FMT_P216 : AV_PIX_FMT_P016);
-#else
         pix_fmts[1] = is_yuv444 ? AV_PIX_FMT_YUV444P12MSB : (is_yuv422 ? AV_PIX_FMT_P212 : AV_PIX_FMT_P012);
-#endif
         break;
     default:
         pix_fmts[1] = is_yuv444 ? AV_PIX_FMT_YUV444P : (is_yuv422 ? AV_PIX_FMT_NV16 : AV_PIX_FMT_NV12);
@@ -1103,7 +1093,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
     // Skip first 4 bytes of AV1CodecConfigurationRecord to keep configOBUs
     // only, otherwise cuvidParseVideoData report unknown error.
     if (avctx->codec->id == AV_CODEC_ID_AV1 &&
-            extradata_size > 4 &&
+            extradata_size >= 4 &&
             extradata[0] & 0x80) {
         extradata += 4;
         extradata_size -= 4;

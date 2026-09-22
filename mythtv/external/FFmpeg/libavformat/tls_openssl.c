@@ -20,9 +20,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/mem.h"
+#include "config_components.h"
+
 #include "network.h"
 #include "os_support.h"
+#include "libavutil/time.h"
 #include "libavutil/random_seed.h"
 #include "url.h"
 #include "tls.h"
@@ -32,7 +34,12 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/x509v3.h>
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include <string.h>
 
+#define DTLS_HANDSHAKE_TIMEOUT_US 30000000
 /**
  * Convert an EVP_PKEY to a PEM string.
  */
@@ -529,8 +536,9 @@ static int url_bio_bread(BIO *b, char *buf, int len)
 {
     TLSContext *c = BIO_get_data(b);
     TLSShared *s = &c->tls_shared;
-    int ret = ffurl_read(c->tls_shared.is_dtls ? c->tls_shared.udp : c->tls_shared.tcp, buf, len);
+    int ret = ffurl_read(s->is_dtls ? s->udp : s->tcp, buf, len);
     if (ret >= 0) {
+#if CONFIG_UDP_PROTOCOL
         if (s->is_dtls && s->listen && !c->dest_addr_len) {
             int err_ret;
 
@@ -542,6 +550,7 @@ static int url_bio_bread(BIO *b, char *buf, int len)
             }
             av_log(c, AV_LOG_TRACE, "Set UDP remote addr on UDP socket, now 'connected'\n");
         }
+#endif
 
         return ret;
     }
@@ -623,30 +632,62 @@ static void openssl_info_callback(const SSL *ssl, int where, int ret) {
 
 static int dtls_handshake(URLContext *h)
 {
-    int ret = 1, r0, r1;
     TLSContext *c = h->priv_data;
+    int ret, err;
+    int timeout_ms;
+    struct timeval timeout;
+    int64_t timeout_start = av_gettime_relative();
+    int sockfd = ffurl_get_file_handle(c->tls_shared.udp);
+    struct pollfd pfd = { .fd = sockfd, .events = POLLIN, .revents = 0 };
 
-    c->tls_shared.udp->flags &= ~AVIO_FLAG_NONBLOCK;
+    /* Force NONBLOCK mode to handle DTLS retransmissions */
+    c->tls_shared.udp->flags |= AVIO_FLAG_NONBLOCK;
 
-    r0 = SSL_do_handshake(c->ssl);
-    if (r0 <= 0) {
-        r1 = SSL_get_error(c->ssl, r0);
-
-        if (r1 != SSL_ERROR_WANT_READ && r1 != SSL_ERROR_WANT_WRITE && r1 != SSL_ERROR_ZERO_RETURN) {
-            av_log(c, AV_LOG_ERROR, "Handshake failed, r0=%d, r1=%d\n", r0, r1);
-            ret = print_ssl_error(h, r0);
+    for (;;) {
+        if (av_gettime_relative() - timeout_start > DTLS_HANDSHAKE_TIMEOUT_US) {
+            ret = AVERROR(ETIMEDOUT);
             goto end;
         }
-    } else {
-        av_log(c, AV_LOG_TRACE, "Handshake success, r0=%d\n", r0);
-    }
 
+        ret = SSL_do_handshake(c->ssl);
+        if (ret == 1) {
+            av_log(c, AV_LOG_TRACE, "Handshake success\n");
+            break;
+        }
+        err = SSL_get_error(c->ssl, ret);
+        if (err != SSL_ERROR_WANT_READ && err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_ZERO_RETURN) {
+            av_log(c, AV_LOG_ERROR, "Handshake failed, ret=%d, err=%d\n", ret, err);
+            ret = print_ssl_error(h, ret);
+            goto end;
+        }
+
+        timeout_ms = 1000;
+        if (DTLSv1_get_timeout(c->ssl, &timeout))
+            timeout_ms = timeout.tv_sec * 1000 + timeout.tv_usec / 1000;
+
+        ret = poll(&pfd, 1, timeout_ms);
+        if (ret > 0 && (pfd.revents & POLLIN))
+            continue;
+        if (!ret) {
+            if (DTLSv1_handle_timeout(c->ssl) < 0) {
+                ret = AVERROR(EIO);
+                goto end;
+            }
+            continue;
+        }
+        if (ret < 0) {
+            ret = ff_neterrno();
+            goto end;
+        }
+    }
     /* Check whether the handshake is completed. */
     if (SSL_is_init_finished(c->ssl) != TLS_ST_OK)
         goto end;
 
     ret = 0;
 end:
+    if (!(h->flags & AVIO_FLAG_NONBLOCK))
+        c->tls_shared.udp->flags &= ~AVIO_FLAG_NONBLOCK;
     return ret;
 }
 
@@ -734,43 +775,52 @@ fail:
     return ret;
 }
 
-/**
- * Once the DTLS role has been negotiated - active for the DTLS client or passive for the
- * DTLS server - we proceed to set up the DTLS state and initiate the handshake.
- */
-static int dtls_start(URLContext *h, const char *url, int flags, AVDictionary **options)
+static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **options)
 {
     TLSContext *c = h->priv_data;
     TLSShared *s = &c->tls_shared;
-    int ret = 0;
-    s->is_dtls = 1;
+    int ret;
 
     if (!c->tls_shared.external_sock) {
-        if ((ret = ff_tls_open_underlying(&c->tls_shared, h, url, options)) < 0) {
-            av_log(c, AV_LOG_ERROR, "Failed to connect %s\n", url);
-            return ret;
-        }
+        if ((ret = ff_tls_open_underlying(&c->tls_shared, h, uri, options)) < 0)
+            goto fail;
+    } else if (!s->host) {
+        if ((ret = ff_tls_parse_host(s, s->underlying_host, sizeof(s->underlying_host), NULL, uri)) < 0)
+            goto fail;
     }
 
-    c->ctx = SSL_CTX_new(s->listen ? DTLS_server_method() : DTLS_client_method());
+    // We want to support all versions of TLS >= 1.0, but not the deprecated
+    // and insecure SSLv2 and SSLv3.  Despite the name, TLS_*_method()
+    // enables support for all versions of SSL and TLS, and we then disable
+    // support for the old protocols immediately after creating the context.
+    if (s->is_dtls)
+        c->ctx = SSL_CTX_new(s->listen ? DTLS_server_method() : DTLS_client_method());
+    else
+        c->ctx = SSL_CTX_new(s->listen ? TLS_server_method() : TLS_client_method());
     if (!c->ctx) {
-        ret = AVERROR(ENOMEM);
+        av_log(h, AV_LOG_ERROR, "%s\n", openssl_get_error(c));
+        ret = AVERROR(EIO);
         goto fail;
     }
-
+    if (!s->is_dtls) {
+        if (!SSL_CTX_set_min_proto_version(c->ctx, TLS1_VERSION)) {
+            av_log(h, AV_LOG_ERROR, "Failed to set minimum TLS version to TLSv1\n");
+            ret = AVERROR_EXTERNAL;
+            goto fail;
+        }
+    }
     ret = openssl_init_ca_key_cert(h);
     if (ret < 0) goto fail;
 
-    /* Note, this doesn't check that the peer certificate actually matches the requested hostname. */
     if (s->verify)
         SSL_CTX_set_verify(c->ctx, SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 
-    if (s->use_srtp) {
+    if (s->is_dtls && s->use_srtp) {
         /**
          * The profile for OpenSSL's SRTP is SRTP_AES128_CM_SHA1_80, see ssl/d1_srtp.c.
          * The profile for FFmpeg's SRTP is SRTP_AES128_CM_HMAC_SHA1_80, see libavformat/srtp.c.
          */
-        const char* profiles = "SRTP_AES128_CM_SHA1_80";
+        const char *profiles = "SRTP_AES128_CM_SHA1_80";
         if (SSL_CTX_set_tlsext_use_srtp(c->ctx, profiles)) {
             av_log(c, AV_LOG_ERROR, "Init SSL_CTX_set_tlsext_use_srtp failed, profiles=%s, %s\n",
                 profiles, openssl_get_error(c));
@@ -779,48 +829,94 @@ static int dtls_start(URLContext *h, const char *url, int flags, AVDictionary **
         }
     }
 
-    /* The ssl should not be created unless the ctx has been initialized. */
     c->ssl = SSL_new(c->ctx);
     if (!c->ssl) {
-        ret = AVERROR(ENOMEM);
+        av_log(h, AV_LOG_ERROR, "%s\n", openssl_get_error(c));
+        ret = AVERROR(EIO);
         goto fail;
     }
-
-    if (!s->listen && !s->numerichost)
-        SSL_set_tlsext_host_name(c->ssl, s->host);
-
-    /* Setup the callback for logging. */
     SSL_set_ex_data(c->ssl, 0, c);
     SSL_CTX_set_info_callback(c->ctx, openssl_info_callback);
 
-    /**
-     * We have set the MTU to fragment the DTLS packet. It is important to note that the
-     * packet is split to ensure that each handshake packet is smaller than the MTU.
-     */
-    if (s->mtu <= 0)
-        s->mtu = 1096;
-    SSL_set_options(c->ssl, SSL_OP_NO_QUERY_MTU);
-    SSL_set_mtu(c->ssl, s->mtu);
-    DTLS_set_link_mtu(c->ssl, s->mtu);
+    if (s->is_dtls) {
+        /**
+         * We have set the MTU to fragment the DTLS packet. It is important to note that the
+         * packet is split to ensure that each handshake packet is smaller than the MTU.
+         */
+        if (s->mtu <= 0)
+            s->mtu = 1096;
+        SSL_set_options(c->ssl, SSL_OP_NO_QUERY_MTU);
+        SSL_set_mtu(c->ssl, s->mtu);
+        DTLS_set_link_mtu(c->ssl, s->mtu);
+    }
+
     init_bio_method(h);
+    if (!s->listen) {
+        // Pin a numeric host to the certificate's iPAddress SAN and everything else
+        // to the hostname. Classify s->host with the same AI_NUMERICHOST rule tls.c
+        // uses and hand OpenSSL the binary address, so legacy numeric forms (e.g.
+        // 2130706433) are pinned as IPs instead of falling back to hostname matching.
+        // A verifyhost=<name> override leaves s->host non-numeric and binds by name.
+        struct addrinfo hints = { .ai_flags = AI_NUMERICHOST }, *ai = NULL;
+        int is_numeric_host = !getaddrinfo(s->host, NULL, &hints, &ai);
+        int ok;
 
-    /* This seems to be necessary despite explicitly setting client/server method above. */
-    if (s->listen)
-        SSL_set_accept_state(c->ssl);
-    else
-        SSL_set_connect_state(c->ssl);
-
-    /* The SSL_do_handshake can't be called if DTLS hasn't prepare for udp. */
-    if (!c->tls_shared.external_sock) {
-        ret = dtls_handshake(h);
-        // Fatal SSL error, for example, no available suite when peer is DTLS 1.0 while we are DTLS 1.2.
-        if (ret < 0) {
-            av_log(c, AV_LOG_ERROR, "Failed to drive SSL context, ret=%d\n", ret);
-            return AVERROR(EIO);
+        // By default OpenSSL does too lax wildcard matching
+        SSL_set_hostflags(c->ssl, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+        if (is_numeric_host) {
+            void *addr = ai->ai_family == AF_INET6 ?
+                (void *)&((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr :
+                (void *)&((struct sockaddr_in  *)ai->ai_addr)->sin_addr;
+            ok = X509_VERIFY_PARAM_set1_ip(SSL_get0_param(c->ssl), addr,
+                                           ai->ai_family == AF_INET6 ? 16 : 4);
+        } else {
+            ok = SSL_set1_host(c->ssl, s->host);
+        }
+        if (ai)
+            freeaddrinfo(ai);
+        if (!ok) {
+            av_log(h, AV_LOG_ERROR, "Failed to set %s for TLS/SSL verification: %s\n",
+                is_numeric_host ? "IP" : "hostname", openssl_get_error(c));
+            ret = AVERROR_EXTERNAL;
+            goto fail;
+        }
+        // SNI MUST NOT carry a literal IP address (RFC 6066 sec. 3); suppress it for
+        // numeric transport hosts, matching the GnuTLS backend.
+        if (!s->numerichost && !SSL_set_tlsext_host_name(c->ssl, s->host)) {
+            av_log(h, AV_LOG_ERROR, "Failed to set hostname for SNI: %s\n", openssl_get_error(c));
+            ret = AVERROR_EXTERNAL;
+            goto fail;
         }
     }
 
-    av_log(c, AV_LOG_VERBOSE, "Setup ok, MTU=%d\n", c->tls_shared.mtu);
+    if (s->is_dtls) {
+        /* This seems to be necessary despite explicitly setting client/server method above. */
+        if (s->listen)
+            SSL_set_accept_state(c->ssl);
+        else
+            SSL_set_connect_state(c->ssl);
+
+        /* The SSL_do_handshake can't be called if DTLS hasn't prepared for udp. */
+        if (!c->tls_shared.external_sock) {
+            ret = dtls_handshake(h);
+            // Fatal SSL error, for example, no available suite when peer is DTLS 1.0 while we are DTLS 1.2.
+            if (ret < 0) {
+                av_log(c, AV_LOG_ERROR, "Failed to drive SSL context, ret=%d\n", ret);
+                return AVERROR(EIO);
+            }
+        }
+        av_log(c, AV_LOG_VERBOSE, "Setup ok, MTU=%d\n", c->tls_shared.mtu);
+    } else {
+        ret = s->listen ? SSL_accept(c->ssl) : SSL_connect(c->ssl);
+        if (ret == 0) {
+            av_log(h, AV_LOG_ERROR, "Unable to negotiate TLS/SSL session\n");
+            ret = AVERROR(EIO);
+            goto fail;
+        } else if (ret < 0) {
+            ret = print_ssl_error(h, ret);
+            goto fail;
+        }
+    }
 
     return 0;
 fail:
@@ -828,73 +924,12 @@ fail:
     return ret;
 }
 
-static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **options)
+static int dtls_open(URLContext *h, const char *uri, int flags, AVDictionary **options)
 {
     TLSContext *c = h->priv_data;
     TLSShared *s = &c->tls_shared;
-    int ret;
-
-    if ((ret = ff_tls_open_underlying(s, h, uri, options)) < 0)
-        goto fail;
-
-    // We want to support all versions of TLS >= 1.0, but not the deprecated
-    // and insecure SSLv2 and SSLv3.  Despite the name, TLS_*_method()
-    // enables support for all versions of SSL and TLS, and we then disable
-    // support for the old protocols immediately after creating the context.
-    c->ctx = SSL_CTX_new(s->listen ? TLS_server_method() : TLS_client_method());
-    if (!c->ctx) {
-        av_log(h, AV_LOG_ERROR, "%s\n", openssl_get_error(c));
-        ret = AVERROR(EIO);
-        goto fail;
-    }
-    if (!SSL_CTX_set_min_proto_version(c->ctx, TLS1_VERSION)) {
-        av_log(h, AV_LOG_ERROR, "Failed to set minimum TLS version to TLSv1\n");
-        ret = AVERROR_EXTERNAL;
-        goto fail;
-    }
-    ret = openssl_init_ca_key_cert(h);
-    if (ret < 0) goto fail;
-
-    if (s->verify)
-        SSL_CTX_set_verify(c->ctx, SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
-    c->ssl = SSL_new(c->ctx);
-    if (!c->ssl) {
-        av_log(h, AV_LOG_ERROR, "%s\n", openssl_get_error(c));
-        ret = AVERROR(EIO);
-        goto fail;
-    }
-    SSL_set_ex_data(c->ssl, 0, c);
-    SSL_CTX_set_info_callback(c->ctx, openssl_info_callback);
-    init_bio_method(h);
-    if (!s->listen && !s->numerichost) {
-        // By default OpenSSL does too lax wildcard matching
-        SSL_set_hostflags(c->ssl, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
-        if (!SSL_set1_host(c->ssl, s->host)) {
-            av_log(h, AV_LOG_ERROR, "Failed to set hostname for TLS/SSL verification: %s\n",
-                openssl_get_error(c));
-            ret = AVERROR_EXTERNAL;
-            goto fail;
-        }
-        if (!SSL_set_tlsext_host_name(c->ssl, s->host)) {
-            av_log(h, AV_LOG_ERROR, "Failed to set hostname for SNI: %s\n", openssl_get_error(c));
-            ret = AVERROR_EXTERNAL;
-            goto fail;
-        }
-    }
-    ret = s->listen ? SSL_accept(c->ssl) : SSL_connect(c->ssl);
-    if (ret == 0) {
-        av_log(h, AV_LOG_ERROR, "Unable to negotiate TLS/SSL session\n");
-        ret = AVERROR(EIO);
-        goto fail;
-    } else if (ret < 0) {
-        ret = print_ssl_error(h, ret);
-        goto fail;
-    }
-
-    return 0;
-fail:
-    tls_close(h);
-    return ret;
+    s->is_dtls = 1;
+    return tls_open(h, uri, flags, options);
 }
 
 static int tls_read(URLContext *h, uint8_t *buf, int size)
@@ -986,7 +1021,7 @@ static const AVClass dtls_class = {
 
 const URLProtocol ff_dtls_protocol = {
     .name           = "dtls",
-    .url_open2      = dtls_start,
+    .url_open2      = dtls_open,
     .url_handshake  = dtls_handshake,
     .url_close      = tls_close,
     .url_read       = tls_read,

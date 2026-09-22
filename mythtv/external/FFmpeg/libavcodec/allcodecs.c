@@ -28,13 +28,9 @@
 #include <string.h>
 
 #include "config.h"
-#include "libavutil/avassert.h"
-#include "libavutil/thread.h"
-#include "avcodec.h"
 #include "codec.h"
 #include "codec_id.h"
 #include "codec_internal.h"
-#include "codec_desc.h"
 
 extern const FFCodec ff_a64multi_encoder;
 extern const FFCodec ff_a64multi5_encoder;
@@ -252,6 +248,7 @@ extern const FFCodec ff_pbm_encoder;
 extern const FFCodec ff_pbm_decoder;
 extern const FFCodec ff_pcx_encoder;
 extern const FFCodec ff_pcx_decoder;
+extern const FFCodec ff_pdv_encoder;
 extern const FFCodec ff_pdv_decoder;
 extern const FFCodec ff_pfm_encoder;
 extern const FFCodec ff_pfm_decoder;
@@ -355,14 +352,6 @@ extern const FFCodec ff_utvideo_decoder;
 extern const FFCodec ff_v210_encoder;
 extern const FFCodec ff_v210_decoder;
 extern const FFCodec ff_v210x_decoder;
-#if FF_API_V408_CODECID
-extern const FFCodec ff_v308_encoder;
-extern const FFCodec ff_v308_decoder;
-extern const FFCodec ff_v408_encoder;
-extern const FFCodec ff_v408_decoder;
-extern const FFCodec ff_v410_encoder;
-extern const FFCodec ff_v410_decoder;
-#endif
 extern const FFCodec ff_vb_decoder;
 extern const FFCodec ff_vbn_encoder;
 extern const FFCodec ff_vbn_decoder;
@@ -395,6 +384,7 @@ extern const FFCodec ff_vqc_decoder;
 extern const FFCodec ff_vvc_decoder;
 extern const FFCodec ff_wbmp_decoder;
 extern const FFCodec ff_wbmp_encoder;
+extern const FFCodec ff_webp_anim_decoder;
 extern const FFCodec ff_webp_decoder;
 extern const FFCodec ff_wcmv_decoder;
 extern const FFCodec ff_wrapped_avframe_encoder;
@@ -538,9 +528,6 @@ extern const FFCodec ff_shorten_decoder;
 extern const FFCodec ff_sipr_decoder;
 extern const FFCodec ff_siren_decoder;
 extern const FFCodec ff_smackaud_decoder;
-extern const FFCodec ff_sonic_encoder;
-extern const FFCodec ff_sonic_decoder;
-extern const FFCodec ff_sonic_ls_encoder;
 extern const FFCodec ff_tak_decoder;
 extern const FFCodec ff_truehd_encoder;
 extern const FFCodec ff_truehd_decoder;
@@ -780,11 +767,10 @@ extern const FFCodec ff_pcm_mulaw_at_encoder;
 extern const FFCodec ff_pcm_mulaw_at_decoder;
 extern const FFCodec ff_qdmc_at_decoder;
 extern const FFCodec ff_qdm2_at_decoder;
-extern FFCodec ff_libaom_av1_encoder;
+extern const FFCodec ff_libaom_av1_encoder;
 /* preferred over libaribb24 */
 extern const FFCodec ff_libaribcaption_decoder;
 extern const FFCodec ff_libaribb24_decoder;
-extern const FFCodec ff_libcelt_decoder;
 extern const FFCodec ff_libcodec2_encoder;
 extern const FFCodec ff_libcodec2_decoder;
 extern const FFCodec ff_libdav1d_decoder;
@@ -828,7 +814,7 @@ extern const FFCodec ff_libvorbis_encoder;
 extern const FFCodec ff_libvorbis_decoder;
 extern const FFCodec ff_libvpx_vp8_encoder;
 extern const FFCodec ff_libvpx_vp8_decoder;
-extern FFCodec ff_libvpx_vp9_encoder;
+extern const FFCodec ff_libvpx_vp9_encoder;
 extern const FFCodec ff_libvpx_vp9_decoder;
 extern const FFCodec ff_libvvenc_encoder;
 /* preferred over libwebp */
@@ -837,7 +823,7 @@ extern const FFCodec ff_libwebp_encoder;
 extern const FFCodec ff_libx262_encoder;
 extern const FFCodec ff_libx264_encoder;
 extern const FFCodec ff_libx264rgb_encoder;
-extern FFCodec ff_libx265_encoder;
+extern const FFCodec ff_libx265_encoder;
 extern const FFCodec ff_libxeve_encoder;
 extern const FFCodec ff_libxevd_decoder;
 extern const FFCodec ff_libxavs_encoder;
@@ -883,7 +869,6 @@ extern const FFCodec ff_h264_mf_encoder;
 extern const FFCodec ff_h264_nvenc_encoder;
 extern const FFCodec ff_h264_oh_decoder;
 extern const FFCodec ff_h264_oh_encoder;
-extern const FFCodec ff_h264_omx_encoder;
 extern const FFCodec ff_h264_qsv_encoder;
 extern const FFCodec ff_h264_v4l2m2m_encoder;
 extern const FFCodec ff_h264_vaapi_encoder;
@@ -918,7 +903,6 @@ extern const FFCodec ff_mpeg2_vaapi_encoder;
 extern const FFCodec ff_mpeg4_cuvid_decoder;
 extern const FFCodec ff_mpeg4_mediacodec_decoder;
 extern const FFCodec ff_mpeg4_mediacodec_encoder;
-extern const FFCodec ff_mpeg4_omx_encoder;
 extern const FFCodec ff_mpeg4_v4l2m2m_encoder;
 extern const FFCodec ff_prores_videotoolbox_encoder;
 extern const FFCodec ff_vc1_cuvid_decoder;
@@ -954,52 +938,10 @@ const FFCodec * codec_list[] = {
 #include "libavcodec/codec_list.c"
 #endif
 
-static AVOnce av_codec_static_init = AV_ONCE_INIT;
-static void av_codec_init_static(void)
-{
-    int dummy;
-    for (int i = 0; codec_list[i]; i++) {
-        /* Backward compatibility with deprecated public fields */
-        const FFCodec *codec = codec_list[i];
-        if (!codec->get_supported_config)
-            continue;
-
-FF_DISABLE_DEPRECATION_WARNINGS
-        switch (codec->p.type) {
-        case AVMEDIA_TYPE_VIDEO:
-            if (!codec->p.pix_fmts)
-                codec->get_supported_config(NULL, &codec->p,
-                                            AV_CODEC_CONFIG_PIX_FORMAT, 0,
-                                            (const void **) &codec->p.pix_fmts,
-                                            &dummy);
-            break;
-        case AVMEDIA_TYPE_AUDIO:
-            codec->get_supported_config(NULL, &codec->p,
-                                        AV_CODEC_CONFIG_SAMPLE_FORMAT, 0,
-                                        (const void **) &codec->p.sample_fmts,
-                                        &dummy);
-            codec->get_supported_config(NULL, &codec->p,
-                                        AV_CODEC_CONFIG_SAMPLE_RATE, 0,
-                                        (const void **) &codec->p.supported_samplerates,
-                                        &dummy);
-            codec->get_supported_config(NULL, &codec->p,
-                                        AV_CODEC_CONFIG_CHANNEL_LAYOUT, 0,
-                                        (const void **) &codec->p.ch_layouts,
-                                        &dummy);
-            break;
-        default:
-            break;
-        }
-FF_ENABLE_DEPRECATION_WARNINGS
-    }
-}
-
 const AVCodec *av_codec_iterate(void **opaque)
 {
     uintptr_t i = (uintptr_t)*opaque;
     const FFCodec *c = codec_list[i];
-
-    ff_thread_once(&av_codec_static_init, av_codec_init_static);
 
     if (c) {
         *opaque = (void*)(i + 1);
@@ -1020,7 +962,6 @@ static enum AVCodecID remap_deprecated_codec_id(enum AVCodecID id)
 static const AVCodec *find_codec(enum AVCodecID id, int (*x)(const AVCodec *))
 {
     const AVCodec *p, *experimental = NULL;
-    av_unused const AVCodecDescriptor *desc = avcodec_descriptor_get(id);
     void *i = 0;
 
     id = remap_deprecated_codec_id(id);
@@ -1029,7 +970,6 @@ static const AVCodec *find_codec(enum AVCodecID id, int (*x)(const AVCodec *))
         if (!x(p))
             continue;
         if (p->id == id) {
-            av_assert1(!desc || !(desc->props & AV_CODEC_PROP_ENHANCEMENT));
             if (p->capabilities & AV_CODEC_CAP_EXPERIMENTAL && !experimental) {
                 experimental = p;
             } else

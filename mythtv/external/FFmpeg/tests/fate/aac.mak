@@ -65,10 +65,12 @@ fate-aac-ap05_48: REF = $(SAMPLES)/aac/ap05_48.s16
 FATE_AAC += fate-aac-fd_2_c1_ms_0x01
 fate-aac-fd_2_c1_ms_0x01: CMD = pcm -i $(TARGET_SAMPLES)/aac/Fd_2_c1_Ms_0x01.mp4
 fate-aac-fd_2_c1_ms_0x01: REF = $(SAMPLES)/aac/Fd_2_c1_Ms_0x01.s16
+fate-aac-fd_2_c1_ms_0x01: SIZE_TOLERANCE = 3052
 
 FATE_AAC += fate-aac-fd_2_c1_ms_0x04
 fate-aac-fd_2_c1_ms_0x04: CMD = pcm -i $(TARGET_SAMPLES)/aac/Fd_2_c1_Ms_0x04.mp4
 fate-aac-fd_2_c1_ms_0x04: REF = $(SAMPLES)/aac/Fd_2_c1_Ms_0x04.s16
+fate-aac-fd_2_c1_ms_0x04: SIZE_TOLERANCE = 3436
 
 FATE_AAC += fate-aac-er_ad6000np_44_ep0
 fate-aac-er_ad6000np_44_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_ad6000np_44_ep0.mp4
@@ -77,14 +79,57 @@ fate-aac-er_ad6000np_44_ep0: REF = $(SAMPLES)/aac/er_ad6000np_44.s16
 FATE_AAC += fate-aac-er_eld1001np_44_ep0
 fate-aac-er_eld1001np_44_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_eld1001np_44_ep0.mp4
 fate-aac-er_eld1001np_44_ep0: REF = $(SAMPLES)/aac/er_eld1001np_44.s16
+fate-aac-er_eld1001np_44_ep0: SIZE_TOLERANCE = 110
 
 FATE_AAC += fate-aac-er_eld2000np_48_ep0
 fate-aac-er_eld2000np_48_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_eld2000np_48_ep0.mp4
 fate-aac-er_eld2000np_48_ep0: REF = $(SAMPLES)/aac/er_eld2000np_48_ep0.s16
+fate-aac-er_eld2000np_48_ep0: SIZE_TOLERANCE = 128
 
 FATE_AAC += fate-aac-er_eld2100np_48_ep0
 fate-aac-er_eld2100np_48_ep0: CMD = pcm -i $(TARGET_SAMPLES)/aac/er_eld2100np_48_ep0.mp4
 fate-aac-er_eld2100np_48_ep0: REF = $(SAMPLES)/aac/er_eld2100np_48.s16
+
+# USAC (xHE-AAC); the samples and references are from the ISO/IEC 23003-3
+# conformance suite, except for xhe_target_level, which was encoded by exhale
+FATE_AAC_USAC += fate-aac-usac-fd_1_c1_0x03
+fate-aac-usac-fd_1_c1_0x03: CMD = pcm -i $(TARGET_SAMPLES)/aac/usac/Fd_1_c1_0x03.mp4
+fate-aac-usac-fd_1_c1_0x03: REF = $(SAMPLES)/aac/usac/Fd_1_c1_0x03.s16
+
+FATE_AAC_USAC += fate-aac-usac-fd_1_c1_0x04
+fate-aac-usac-fd_1_c1_0x04: CMD = pcm -i $(TARGET_SAMPLES)/aac/usac/Fd_1_c1_0x04.mp4
+fate-aac-usac-fd_1_c1_0x04: REF = $(SAMPLES)/aac/usac/Fd_1_c1_0x04.s16
+
+FATE_AAC_USAC += fate-aac-usac-fd_2_c1_0x03
+fate-aac-usac-fd_2_c1_0x03: CMD = pcm -i $(TARGET_SAMPLES)/aac/usac/Fd_2_c1_0x03.mp4
+fate-aac-usac-fd_2_c1_0x03: REF = $(SAMPLES)/aac/usac/Fd_2_c1_0x03.s16
+
+FATE_AAC_USAC += fate-aac-usac-fd_2_c1_0x05
+fate-aac-usac-fd_2_c1_0x05: CMD = pcm -i $(TARGET_SAMPLES)/aac/usac/Fd_2_c1_0x05.mp4
+fate-aac-usac-fd_2_c1_0x05: REF = $(SAMPLES)/aac/usac/Fd_2_c1_0x05.s16
+
+FATE_AAC_USAC += fate-aac-usac-fd_2_c1_tns_0x04
+fate-aac-usac-fd_2_c1_tns_0x04: CMD = pcm -i $(TARGET_SAMPLES)/aac/usac/Fd_2_c1_Tns_0x04.mp4
+fate-aac-usac-fd_2_c1_tns_0x04: REF = $(SAMPLES)/aac/usac/Fd_2_c1_Tns_0x04.s16
+
+FATE_AAC_USAC += fate-aac-usac-ln-16
+fate-aac-usac-ln-16: CMD = pcm -target_level -16 -i $(TARGET_SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03.mp4
+fate-aac-usac-ln-16: REF = $(SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03__Lou-16.s16
+
+FATE_AAC_USAC += fate-aac-usac-ln-24
+fate-aac-usac-ln-24: CMD = pcm -target_level -24 -i $(TARGET_SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03.mp4
+fate-aac-usac-ln-24: REF = $(SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03__Lou-24.s16
+
+FATE_AAC_USAC += fate-aac-usac-ln-31
+fate-aac-usac-ln-31: CMD = pcm -target_level -31 -i $(TARGET_SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03.mp4
+fate-aac-usac-ln-31: REF = $(SAMPLES)/aac/usac/Ext_2_c1_Ln_0x03__Lou-31.s16
+
+FATE_AAC_USAC += fate-aac-usac-target-level
+fate-aac-usac-target-level: CMD = pcm -target_level -24 -i $(TARGET_SAMPLES)/aac/usac/xhe_target_level.m4a
+fate-aac-usac-target-level: REF = $(SAMPLES)/aac/usac/xhe_target_level.s16
+fate-aac-usac-target-level: SIZE_TOLERANCE = 512
+
+FATE_AAC += $(FATE_AAC_USAC)
 
 FATE_AAC_FIXED += fate-aac-fixed-al04_44
 fate-aac-fixed-al04_44: CMD = pcm -c aac_fixed -i $(TARGET_SAMPLES)/aac/al04_44.mp4
@@ -137,10 +182,12 @@ fate-aac-fixed-er_ad6000np_44_ep0: REF = $(SAMPLES)/aac/er_ad6000np_44.s16
 FATE_AAC_FIXED += fate-aac-fixed-er_eld1001np_44_ep0
 fate-aac-fixed-er_eld1001np_44_ep0: CMD = pcm -c aac_fixed -i $(TARGET_SAMPLES)/aac/er_eld1001np_44_ep0.mp4
 fate-aac-fixed-er_eld1001np_44_ep0: REF = $(SAMPLES)/aac/er_eld1001np_44.s16
+fate-aac-fixed-er_eld1001np_44_ep0: SIZE_TOLERANCE = 110
 
 FATE_AAC_FIXED += fate-aac-fixed-er_eld2000np_48_ep0
 fate-aac-fixed-er_eld2000np_48_ep0: CMD = pcm -c aac_fixed -i $(TARGET_SAMPLES)/aac/er_eld2000np_48_ep0.mp4
 fate-aac-fixed-er_eld2000np_48_ep0: REF = $(SAMPLES)/aac/er_eld2000np_48_ep0.s16
+fate-aac-fixed-er_eld2000np_48_ep0: SIZE_TOLERANCE = 128
 
 fate-aac-ct%: CMD = pcm -i $(TARGET_SAMPLES)/aac/CT_DecoderCheck/$(@:fate-aac-ct-%=%)
 fate-aac-ct%: REF = $(SAMPLES)/aac/CT_DecoderCheck/aacPlusv2.wav
@@ -156,7 +203,7 @@ FATE_AAC_CT = sbr_bc-ps_i.3gp  \
 
 FATE_AAC += $(FATE_AAC_CT:%=fate-aac-ct-%)
 
-FATE_AAC_ENCODE += fate-aac-aref-encode
+FATE_AAC_ENCODE-$(call TRANSCODE, AAC, ADTS AAC, WAV_MUXER WAV_DEMUXER PCM_S16LE_DECODER ARESAMPLE_FILTER) += fate-aac-aref-encode
 fate-aac-aref-encode: ./tests/data/asynth-44100-2.wav
 fate-aac-aref-encode: CMD = enc_dec_pcm adts wav s16le $(REF) -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 512k -fflags +bitexact -flags +bitexact
 fate-aac-aref-encode: CMP = stddev
@@ -167,67 +214,53 @@ fate-aac-aref-encode: SIZE_TOLERANCE = 2464
 fate-aac-aref-encode: FUZZ = 89
 
 FATE_AAC_ENCODE += fate-aac-ln-encode
-fate-aac-ln-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 512k -fflags +bitexact -flags +bitexact
+fate-aac-ln-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 512k -fflags +bitexact -flags +bitexact
 fate-aac-ln-encode: CMP = stddev
 fate-aac-ln-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-ln-encode: CMP_SHIFT = -4096
 fate-aac-ln-encode: CMP_TARGET = 72
-fate-aac-ln-encode: SIZE_TOLERANCE = 3560
 fate-aac-ln-encode: FUZZ = 30
 
 FATE_AAC_ENCODE += fate-aac-ln-encode-128k
-fate-aac-ln-encode-128k: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050 -fflags +bitexact -flags +bitexact
+fate-aac-ln-encode-128k: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_is 0 -aac_pns 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050 -fflags +bitexact -flags +bitexact
 fate-aac-ln-encode-128k: CMP = stddev
 fate-aac-ln-encode-128k: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-ln-encode-128k: CMP_SHIFT = -4096
 fate-aac-ln-encode-128k: CMP_TARGET = 622
-fate-aac-ln-encode-128k: SIZE_TOLERANCE = 3560
 fate-aac-ln-encode-128k: FUZZ = 10
 
 FATE_AAC_ENCODE += fate-aac-pns-encode
-fate-aac-pns-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 1 -aac_is 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050  -fflags +bitexact -flags +bitexact
+fate-aac-pns-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 1 -aac_is 0 -aac_ms 0 -aac_tns 0 -b:a 128k -cutoff 22050  -fflags +bitexact -flags +bitexact
 fate-aac-pns-encode: CMP = stddev
 fate-aac-pns-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-pns-encode: CMP_SHIFT = -4096
 fate-aac-pns-encode: CMP_TARGET = 655
-fate-aac-pns-encode: SIZE_TOLERANCE = 3560
 fate-aac-pns-encode: FUZZ = 74
 
 FATE_AAC_ENCODE += fate-aac-tns-encode
-fate-aac-tns-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_tns 1 -aac_is 0 -aac_pns 0 -aac_ms 0 -b:a 128k -cutoff 22050  -fflags +bitexact -flags +bitexact
+fate-aac-tns-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_tns 1 -aac_is 0 -aac_pns 0 -aac_ms 0 -b:a 128k -cutoff 22050  -fflags +bitexact -flags +bitexact
 fate-aac-tns-encode: CMP = stddev
 fate-aac-tns-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-tns-encode: CMP_SHIFT = -4096
 fate-aac-tns-encode: CMP_TARGET = 637
 fate-aac-tns-encode: FUZZ = 7
-fate-aac-tns-encode: SIZE_TOLERANCE = 3560
 
 FATE_AAC_ENCODE += fate-aac-is-encode
-fate-aac-is-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 0 -aac_is 1 -aac_ms 0 -b:a 128k -aac_tns 0 -cutoff 22050 -fflags +bitexact -flags +bitexact
+fate-aac-is-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 0 -aac_is 1 -aac_ms 0 -b:a 128k -aac_tns 0 -cutoff 22050 -fflags +bitexact -flags +bitexact
 fate-aac-is-encode: CMP = stddev
 fate-aac-is-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-is-encode: CMP_SHIFT = -4096
 fate-aac-is-encode: CMP_TARGET = 514
-fate-aac-is-encode: SIZE_TOLERANCE = 3560
 fate-aac-is-encode: FUZZ = 10
 
 FATE_AAC_ENCODE += fate-aac-ms-encode
-fate-aac-ms-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 0 -aac_is 0 -aac_ms 1 -aac_tns 0 -b:a 128k -cutoff 22050 -fflags +bitexact -flags +bitexact
+fate-aac-ms-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav -c:a aac -aac_coder fast -aac_pns 0 -aac_is 0 -aac_ms 1 -aac_tns 0 -b:a 128k -cutoff 22050 -fflags +bitexact -flags +bitexact
 fate-aac-ms-encode: CMP = stddev
 fate-aac-ms-encode: REF = $(SAMPLES)/audio-reference/luckynight_2ch_44kHz_s16.wav
-fate-aac-ms-encode: CMP_SHIFT = -4096
 fate-aac-ms-encode: CMP_TARGET = 558
-fate-aac-ms-encode: SIZE_TOLERANCE = 3560
 fate-aac-ms-encode: FUZZ = 15
 
 #Ticket1784
 FATE_AAC_ENCODE += fate-aac-yoraw-encode
-fate-aac-yoraw-encode: CMD = enc_dec_pcm adts wav s16le $(TARGET_SAMPLES)/audio-reference/yo.raw-short.wav -c:a aac -aac_coder fast -fflags +bitexact -flags +bitexact
+fate-aac-yoraw-encode: CMD = enc_dec_pcm mp4 wav s16le $(TARGET_SAMPLES)/audio-reference/yo.raw-short.wav -c:a aac -aac_coder fast -fflags +bitexact -flags +bitexact
 fate-aac-yoraw-encode: CMP = stddev
 fate-aac-yoraw-encode: REF = $(SAMPLES)/audio-reference/yo.raw-short.wav
-fate-aac-yoraw-encode: CMP_SHIFT = -12288
 fate-aac-yoraw-encode: CMP_TARGET = 226
-fate-aac-yoraw-encode: SIZE_TOLERANCE = 3560
 fate-aac-yoraw-encode: FUZZ = 17
 
 FATE_AAC_LATM += fate-aac-latm_000000001180bc60
@@ -251,7 +284,7 @@ FATE_AAC_ALL = $(FATE_AAC-yes) $(FATE_AAC_LATM-yes) $(FATE_AAC_FIXED-yes)
 $(FATE_AAC_ALL): CMP  = oneoff
 $(FATE_AAC_ALL): FUZZ = 2
 
-FATE_AAC_ENCODE-$(call TRANSCODE, AAC, ADTS AAC, WAV_MUXER WAV_DEMUXER PCM_S16LE_DECODER ARESAMPLE_FILTER) += $(FATE_AAC_ENCODE)
+FATE_AAC_ENCODE-$(call TRANSCODE, AAC, MP4 MOV, WAV_MUXER WAV_DEMUXER PCM_S16LE_DECODER ARESAMPLE_FILTER) += $(FATE_AAC_ENCODE)
 
 FATE_AAC_BSF-$(call FRAMECRC, AAC MATROSKA, AAC, AAC_PARSER AAC_ADTSTOASC_BSF MATROSKA_MUXER) += fate-aac-autobsf-adtstoasc
 

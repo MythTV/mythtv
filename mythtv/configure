@@ -3054,7 +3054,11 @@ if test "$cpu" = host; then
                             q
                         }" $TMPE
             }
-            cpu=$(check_native -march || check_native -mcpu)
+            if cpu=$(check_native -march); then
+                native_cpuflags="-march=native"
+            elif cpu=$(check_native -mcpu); then
+                native_cpuflags="-mcpu=native"
+            fi
         ;;
         clang)
             check_native(){
@@ -3065,7 +3069,7 @@ if test "$cpu" = host; then
                             q
                         }" $TMPE
             }
-            cpu=$(check_native -march)
+            cpu=$(check_native -march) && native_cpuflags="-march=native"
         ;;
     esac
 
@@ -3629,6 +3633,9 @@ EOF
 fi
 
 if [ "$cpu" != generic ]; then
+    # For --cpu=host, use the compiler's =native for codegen. $cpu is
+    # only the resolved name used for feature gating above.
+    test -n "$native_cpuflags" && cpuflags=$native_cpuflags
     add_cflags  $cpuflags
     add_asflags $cpuflags
     add_cxxflags $cpuflags
@@ -5727,6 +5734,11 @@ ffmpeg_optenableif() {
     done
 }
 
+if [ -n "$native_cpuflags" ]; then
+    cpu_detected="$cpu"
+    cpu="host"
+fi
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
@@ -5736,6 +5748,10 @@ ffmpeg_optset ar nm ranlib
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
+
+if [ -n "$native_cpuflags" ]; then
+    cpu="$cpu_detected"
+fi
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni

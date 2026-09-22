@@ -26,6 +26,9 @@
 *.spv
 *.spv.c
 *.spv.gz
+*.gen.asm
+*.gen.c
+*.gen.S
 *.ptx
 *.ptx.c
 *.ptx.gz
@@ -37,6 +40,9 @@
 /ffmpeg
 /ffplay
 /ffprobe
+/checkasm_config_generated.asm
+/checkasm_config_generated.h
+/checkasm_header_config_generated.h
 /config.asm
 /config.h
 /config_components.asm

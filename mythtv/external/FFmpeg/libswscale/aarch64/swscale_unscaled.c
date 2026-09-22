@@ -27,15 +27,13 @@
         c->yuv2rgb_v2g_coeff,                                                               \
         c->yuv2rgb_u2b_coeff,                                                               \
 
-#define DECLARE_FF_YUVX_TO_RGBX_FUNCS(ifmt, ofmt)                                           \
+#define DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(ifmt, ofmt)                                     \
 int ff_##ifmt##_to_##ofmt##_neon(int w, int h,                                              \
-                                 uint8_t *dst, int linesize,                                \
-                                 const uint8_t *srcY, int linesizeY,                        \
-                                 const uint8_t *srcU, int linesizeU,                        \
-                                 const uint8_t *srcV, int linesizeV,                        \
-                                 const int16_t *table,                                      \
                                  int y_offset,                                              \
-                                 int y_coeff);                                              \
+                                 int y_coeff,                                               \
+                                 const int16_t *table,                                      \
+                                 const uint8_t *const src[], const int srcStride[],         \
+                                 uint8_t *dst, int linesize);                               \
                                                                                             \
 static int ifmt##_to_##ofmt##_neon_wrapper(SwsInternal *c, const uint8_t *const src[],      \
                                            const int srcStride[], int srcSliceY,            \
@@ -44,24 +42,21 @@ static int ifmt##_to_##ofmt##_neon_wrapper(SwsInternal *c, const uint8_t *const 
     const int16_t yuv2rgb_table[] = { YUV_TO_RGB_TABLE };                                   \
                                                                                             \
     return ff_##ifmt##_to_##ofmt##_neon(c->opts.src_w, srcSliceH,                           \
-                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
-                                        src[0], srcStride[0],                               \
-                                        src[1], srcStride[1],                               \
-                                        src[2], srcStride[2],                               \
-                                        yuv2rgb_table,                                      \
                                         c->yuv2rgb_y_offset >> 6,                           \
-                                        c->yuv2rgb_y_coeff);                                \
+                                        c->yuv2rgb_y_coeff,                                 \
+                                        yuv2rgb_table,                                      \
+                                        src, srcStride,                                     \
+                                        dst[0] + srcSliceY * dstStride[0],                  \
+                                        dstStride[0]);                                      \
 }                                                                                           \
 
-#define DECLARE_FF_YUVX_TO_GBRP_FUNCS(ifmt, ofmt)                                           \
+#define DECLARE_FF_YUVX_TO_PLANAR_RGB_FUNCS(ifmt, ofmt)                                     \
 int ff_##ifmt##_to_##ofmt##_neon(int w, int h,                                              \
-                                 uint8_t *dst, int linesize,                                \
-                                 const uint8_t *srcY, int linesizeY,                        \
-                                 const uint8_t *srcU, int linesizeU,                        \
-                                 const uint8_t *srcV, int linesizeV,                        \
-                                 const int16_t *table,                                      \
                                  int y_offset,                                              \
                                  int y_coeff,                                               \
+                                 const int16_t *table,                                      \
+                                 const uint8_t *const src[], const int srcStride[],         \
+                                 uint8_t *dst0, int linesize0,                              \
                                  uint8_t *dst1, int linesize1,                              \
                                  uint8_t *dst2, int linesize2);                             \
                                                                                             \
@@ -72,111 +67,48 @@ static int ifmt##_to_##ofmt##_neon_wrapper(SwsInternal *c, const uint8_t *const 
     const int16_t yuv2rgb_table[] = { YUV_TO_RGB_TABLE };                                   \
                                                                                             \
     return ff_##ifmt##_to_##ofmt##_neon(c->opts.src_w, srcSliceH,                           \
-                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
-                                        src[0], srcStride[0],                               \
-                                        src[1], srcStride[1],                               \
-                                        src[2], srcStride[2],                               \
-                                        yuv2rgb_table,                                      \
                                         c->yuv2rgb_y_offset >> 6,                           \
                                         c->yuv2rgb_y_coeff,                                 \
+                                        yuv2rgb_table,                                      \
+                                        src, srcStride,                                     \
+                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
                                         dst[1] + srcSliceY * dstStride[1], dstStride[1],    \
                                         dst[2] + srcSliceY * dstStride[2], dstStride[2]);   \
 }                                                                                           \
 
 #define DECLARE_FF_YUVX_TO_ALL_RGBX_FUNCS(yuvx)                                             \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, argb)                                                   \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, rgba)                                                   \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, abgr)                                                   \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, bgra)                                                   \
-DECLARE_FF_YUVX_TO_GBRP_FUNCS(yuvx, gbrp)                                                   \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, rgb24)                                                  \
-DECLARE_FF_YUVX_TO_RGBX_FUNCS(yuvx, bgr24)                                                  \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, argb)                                             \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgba)                                             \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, abgr)                                             \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgra)                                             \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgb24)                                            \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgr24)                                            \
+DECLARE_FF_YUVX_TO_PLANAR_RGB_FUNCS(yuvx, gbrp)                                             \
 
+DECLARE_FF_YUVX_TO_ALL_RGBX_FUNCS(nv12)
+DECLARE_FF_YUVX_TO_ALL_RGBX_FUNCS(nv21)
 DECLARE_FF_YUVX_TO_ALL_RGBX_FUNCS(yuv420p)
 DECLARE_FF_YUVX_TO_ALL_RGBX_FUNCS(yuv422p)
 
-#define DECLARE_FF_YUVA420P_TO_RGBX_FUNCS(ofmt)                                            \
-int ff_yuva420p_to_##ofmt##_neon(int w, int h,                                              \
-                                 uint8_t *dst, int linesize,                                \
-                                 const uint8_t *srcY, int linesizeY,                        \
-                                 const uint8_t *srcU, int linesizeU,                        \
-                                 const uint8_t *srcV, int linesizeV,                        \
-                                 const int16_t *table,                                      \
-                                 int y_offset, int y_coeff,                                 \
-                                 const uint8_t *srcA, int linesizeA);                       \
-                                                                                            \
-static int yuva420p_to_##ofmt##_neon_wrapper(SwsInternal *c,                                \
-                                             const uint8_t *const src[],                    \
-                                             const int srcStride[], int srcSliceY,          \
-                                             int srcSliceH, uint8_t *const dst[],           \
-                                             const int dstStride[]) {                       \
-    const int16_t yuv2rgb_table[] = { YUV_TO_RGB_TABLE };                                   \
-                                                                                            \
-    return ff_yuva420p_to_##ofmt##_neon(c->opts.src_w, srcSliceH,                           \
-                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
-                                        src[0], srcStride[0],                               \
-                                        src[1], srcStride[1],                               \
-                                        src[2], srcStride[2],                               \
-                                        yuv2rgb_table,                                      \
-                                        c->yuv2rgb_y_offset >> 6,                           \
-                                        c->yuv2rgb_y_coeff,                                 \
-                                        src[3], srcStride[3]);                              \
-}
+#define DECLARE_FF_YUVX_TO_ALL_RGB16_FUNCS(yuvx)                                            \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgb565le)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgr565le)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgb555le)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgr555le)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgb565be)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgr565be)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, rgb555be)                                         \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuvx, bgr555be)                                         \
 
-DECLARE_FF_YUVA420P_TO_RGBX_FUNCS(argb)
-DECLARE_FF_YUVA420P_TO_RGBX_FUNCS(rgba)
-DECLARE_FF_YUVA420P_TO_RGBX_FUNCS(abgr)
-DECLARE_FF_YUVA420P_TO_RGBX_FUNCS(bgra)
+DECLARE_FF_YUVX_TO_ALL_RGB16_FUNCS(nv12)
+DECLARE_FF_YUVX_TO_ALL_RGB16_FUNCS(nv21)
+DECLARE_FF_YUVX_TO_ALL_RGB16_FUNCS(yuv420p)
+DECLARE_FF_YUVX_TO_ALL_RGB16_FUNCS(yuv422p)
 
-#define DECLARE_FF_NVX_TO_RGBX_FUNCS(ifmt, ofmt)                                            \
-int ff_##ifmt##_to_##ofmt##_neon(int w, int h,                                              \
-                                 uint8_t *dst, int linesize,                                \
-                                 const uint8_t *srcY, int linesizeY,                        \
-                                 const uint8_t *srcC, int linesizeC,                        \
-                                 const int16_t *table,                                      \
-                                 int y_offset,                                              \
-                                 int y_coeff);                                              \
-                                                                                            \
-static int ifmt##_to_##ofmt##_neon_wrapper(SwsInternal *c, const uint8_t *const src[],      \
-                                           const int srcStride[], int srcSliceY,            \
-                                           int srcSliceH, uint8_t *const dst[],             \
-                                           const int dstStride[]) {                         \
-    const int16_t yuv2rgb_table[] = { YUV_TO_RGB_TABLE };                                   \
-                                                                                            \
-    return ff_##ifmt##_to_##ofmt##_neon(c->opts.src_w, srcSliceH,                           \
-                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
-                                        src[0], srcStride[0], src[1], srcStride[1],         \
-                                        yuv2rgb_table,                                      \
-                                        c->yuv2rgb_y_offset >> 6,                           \
-                                        c->yuv2rgb_y_coeff);                                \
-}                                                                                           \
-
-#define DECLARE_FF_NVX_TO_GBRP_FUNCS(ifmt, ofmt)                                            \
-int ff_##ifmt##_to_##ofmt##_neon(int w, int h,                                              \
-                                 uint8_t *dst, int linesize,                                \
-                                 const uint8_t *srcY, int linesizeY,                        \
-                                 const uint8_t *srcC, int linesizeC,                        \
-                                 const int16_t *table,                                      \
-                                 int y_offset,                                              \
-                                 int y_coeff,                                               \
-                                 uint8_t *dst1, int linesize1,                              \
-                                 uint8_t *dst2, int linesize2);                             \
-                                                                                            \
-static int ifmt##_to_##ofmt##_neon_wrapper(SwsInternal *c, const uint8_t *const src[],      \
-                                           const int srcStride[], int srcSliceY,            \
-                                           int srcSliceH, uint8_t *const dst[],             \
-                                           const int dstStride[]) {                         \
-    const int16_t yuv2rgb_table[] = { YUV_TO_RGB_TABLE };                                   \
-                                                                                            \
-    return ff_##ifmt##_to_##ofmt##_neon(c->opts.src_w, srcSliceH,                           \
-                                        dst[0] + srcSliceY * dstStride[0], dstStride[0],    \
-                                        src[0], srcStride[0], src[1], srcStride[1],         \
-                                        yuv2rgb_table,                                      \
-                                        c->yuv2rgb_y_offset >> 6,                           \
-                                        c->yuv2rgb_y_coeff,                                 \
-                                        dst[1] + srcSliceY * dstStride[1], dstStride[1],    \
-                                        dst[2] + srcSliceY * dstStride[2], dstStride[2]);   \
-}                                                                                           \
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuva420p, argb)
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuva420p, rgba)
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuva420p, abgr)
+DECLARE_FF_YUVX_TO_PACKED_RGB_FUNCS(yuva420p, bgra)
 
 void ff_nv24_to_yuv420p_chroma_neon(uint8_t *dst1, int dstStride1,
                                     uint8_t *dst2, int dstStride2,
@@ -205,23 +137,11 @@ static int nv24_to_yuv420p_neon_wrapper(SwsInternal *c, const uint8_t *const src
     return srcSliceH;
 }
 
-#define DECLARE_FF_NVX_TO_ALL_RGBX_FUNCS(nvx)                                               \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, argb)                                                     \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, rgba)                                                     \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, abgr)                                                     \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, bgra)                                                     \
-DECLARE_FF_NVX_TO_GBRP_FUNCS(nvx, gbrp)                                                     \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, rgb24)                                                    \
-DECLARE_FF_NVX_TO_RGBX_FUNCS(nvx, bgr24)                                                    \
-
-DECLARE_FF_NVX_TO_ALL_RGBX_FUNCS(nv12)
-DECLARE_FF_NVX_TO_ALL_RGBX_FUNCS(nv21)
-
 /* We need a 16 pixel width alignment. This constraint can easily be removed
  * for input reading but for the output which is 4-bytes per pixel (RGBA) the
  * assembly might be writing as much as 4*15=60 extra bytes at the end of the
  * line, which won't fit the 32-bytes buffer alignment. */
-#define SET_FF_NVX_TO_RGBX_FUNC(ifmt, IFMT, ofmt, OFMT, accurate_rnd) do {                  \
+#define SET_FF_YUVX_TO_RGBX_FUNC(ifmt, IFMT, ofmt, OFMT, accurate_rnd) do {                 \
     if (c->opts.src_format == AV_PIX_FMT_##IFMT                                             \
         && c->opts.dst_format == AV_PIX_FMT_##OFMT                                          \
         && !(c->opts.src_h & 1)                                                             \
@@ -230,30 +150,54 @@ DECLARE_FF_NVX_TO_ALL_RGBX_FUNCS(nv21)
         c->convert_unscaled = ifmt##_to_##ofmt##_neon_wrapper;                              \
 } while (0)
 
-#define SET_FF_NVX_TO_ALL_RGBX_FUNC(nvx, NVX, accurate_rnd) do {                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, argb, ARGB, accurate_rnd);                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, rgba, RGBA, accurate_rnd);                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, abgr, ABGR, accurate_rnd);                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, bgra, BGRA, accurate_rnd);                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, gbrp, GBRP, accurate_rnd);                            \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, rgb24, RGB24, accurate_rnd);                          \
-    SET_FF_NVX_TO_RGBX_FUNC(nvx, NVX, bgr24, BGR24, accurate_rnd);                          \
+#define SET_FF_YUVX_TO_ALL_RGBX_FUNC(yuvx, YUVX, accurate_rnd) do {                         \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, argb,  ARGB,  accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgba,  RGBA,  accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, abgr,  ABGR,  accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgra,  BGRA,  accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, gbrp,  GBRP,  accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgb24, RGB24, accurate_rnd);                       \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgr24, BGR24, accurate_rnd);                       \
+} while (0)
+
+#define SET_FF_YUVX_TO_ALL_RGB16_FUNC(yuvx, YUVX, accurate_rnd) do {                        \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgb565le, RGB565LE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgr565le, BGR565LE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgb555le, RGB555LE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgr555le, BGR555LE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgb565be, RGB565BE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgr565be, BGR565BE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, rgb555be, RGB555BE, accurate_rnd);                 \
+    SET_FF_YUVX_TO_RGBX_FUNC(yuvx, YUVX, bgr555be, BGR555BE, accurate_rnd);                 \
 } while (0)
 
 static void get_unscaled_swscale_neon(SwsInternal *c) {
     int accurate_rnd = c->opts.flags & SWS_ACCURATE_RND;
 
-    SET_FF_NVX_TO_ALL_RGBX_FUNC(nv12, NV12, accurate_rnd);
-    SET_FF_NVX_TO_ALL_RGBX_FUNC(nv21, NV21, accurate_rnd);
-    SET_FF_NVX_TO_ALL_RGBX_FUNC(yuv420p, YUV420P, accurate_rnd);
-    SET_FF_NVX_TO_ALL_RGBX_FUNC(yuv422p, YUV422P, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuva420p, YUVA420P, argb, ARGB, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuva420p, YUVA420P, rgba, RGBA, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuva420p, YUVA420P, abgr, ABGR, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuva420p, YUVA420P, bgra, BGRA, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb24, RGB24, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr24, BGR24, accurate_rnd);
-    SET_FF_NVX_TO_RGBX_FUNC(yuv420p, YUVA420P, gbrp,  GBRP,  accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGBX_FUNC(nv12,    NV12,    accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGBX_FUNC(nv21,    NV21,    accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGBX_FUNC(yuv420p, YUV420P, accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGBX_FUNC(yuv422p, YUV422P, accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGB16_FUNC(nv12,    NV12,    accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGB16_FUNC(nv21,    NV21,    accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGB16_FUNC(yuv420p, YUV420P, accurate_rnd);
+    SET_FF_YUVX_TO_ALL_RGB16_FUNC(yuv422p, YUV422P, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuva420p, YUVA420P, argb, ARGB, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuva420p, YUVA420P, rgba, RGBA, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuva420p, YUVA420P, abgr, ABGR, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuva420p, YUVA420P, bgra, BGRA, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb24, RGB24, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr24, BGR24, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, gbrp,  GBRP,  accurate_rnd);
+    /* yuva420p -> 16bpp: alpha is dropped, route through yuv420p NEON path */
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb565le, RGB565LE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr565le, BGR565LE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb555le, RGB555LE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr555le, BGR555LE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb565be, RGB565BE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr565be, BGR565BE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, rgb555be, RGB555BE, accurate_rnd);
+    SET_FF_YUVX_TO_RGBX_FUNC(yuv420p, YUVA420P, bgr555be, BGR555BE, accurate_rnd);
 
     if (c->opts.dst_format == AV_PIX_FMT_YUV420P &&
         (c->opts.src_format == AV_PIX_FMT_NV24 || c->opts.src_format == AV_PIX_FMT_NV42) &&
@@ -285,6 +229,14 @@ av_cold SwsFunc ff_yuv2rgb_init_aarch64(SwsInternal *c)
         case AV_PIX_FMT_RGB24: return yuv420p_to_rgb24_neon_wrapper;
         case AV_PIX_FMT_BGR24: return yuv420p_to_bgr24_neon_wrapper;
         case AV_PIX_FMT_GBRP:  return yuv420p_to_gbrp_neon_wrapper;
+        case AV_PIX_FMT_RGB565LE: return yuv420p_to_rgb565le_neon_wrapper;
+        case AV_PIX_FMT_BGR565LE: return yuv420p_to_bgr565le_neon_wrapper;
+        case AV_PIX_FMT_RGB555LE: return yuv420p_to_rgb555le_neon_wrapper;
+        case AV_PIX_FMT_BGR555LE: return yuv420p_to_bgr555le_neon_wrapper;
+        case AV_PIX_FMT_RGB565BE: return yuv420p_to_rgb565be_neon_wrapper;
+        case AV_PIX_FMT_BGR565BE: return yuv420p_to_bgr565be_neon_wrapper;
+        case AV_PIX_FMT_RGB555BE: return yuv420p_to_rgb555be_neon_wrapper;
+        case AV_PIX_FMT_BGR555BE: return yuv420p_to_bgr555be_neon_wrapper;
         }
     } else if (c->opts.src_format == AV_PIX_FMT_YUVA420P) {
         switch (c->opts.dst_format) {
@@ -297,6 +249,15 @@ av_cold SwsFunc ff_yuv2rgb_init_aarch64(SwsInternal *c)
         case AV_PIX_FMT_RGB24: return yuv420p_to_rgb24_neon_wrapper;
         case AV_PIX_FMT_BGR24: return yuv420p_to_bgr24_neon_wrapper;
         case AV_PIX_FMT_GBRP:  return yuv420p_to_gbrp_neon_wrapper;
+        /* 16bpp targets drop alpha, share yuv420p path */
+        case AV_PIX_FMT_RGB565LE: return yuv420p_to_rgb565le_neon_wrapper;
+        case AV_PIX_FMT_BGR565LE: return yuv420p_to_bgr565le_neon_wrapper;
+        case AV_PIX_FMT_RGB555LE: return yuv420p_to_rgb555le_neon_wrapper;
+        case AV_PIX_FMT_BGR555LE: return yuv420p_to_bgr555le_neon_wrapper;
+        case AV_PIX_FMT_RGB565BE: return yuv420p_to_rgb565be_neon_wrapper;
+        case AV_PIX_FMT_BGR565BE: return yuv420p_to_bgr565be_neon_wrapper;
+        case AV_PIX_FMT_RGB555BE: return yuv420p_to_rgb555be_neon_wrapper;
+        case AV_PIX_FMT_BGR555BE: return yuv420p_to_bgr555be_neon_wrapper;
         }
     } else if (c->opts.src_format == AV_PIX_FMT_YUV422P) {
         switch (c->opts.dst_format) {
@@ -307,6 +268,14 @@ av_cold SwsFunc ff_yuv2rgb_init_aarch64(SwsInternal *c)
         case AV_PIX_FMT_RGB24: return yuv422p_to_rgb24_neon_wrapper;
         case AV_PIX_FMT_BGR24: return yuv422p_to_bgr24_neon_wrapper;
         case AV_PIX_FMT_GBRP:  return yuv422p_to_gbrp_neon_wrapper;
+        case AV_PIX_FMT_RGB565LE: return yuv422p_to_rgb565le_neon_wrapper;
+        case AV_PIX_FMT_BGR565LE: return yuv422p_to_bgr565le_neon_wrapper;
+        case AV_PIX_FMT_RGB555LE: return yuv422p_to_rgb555le_neon_wrapper;
+        case AV_PIX_FMT_BGR555LE: return yuv422p_to_bgr555le_neon_wrapper;
+        case AV_PIX_FMT_RGB565BE: return yuv422p_to_rgb565be_neon_wrapper;
+        case AV_PIX_FMT_BGR565BE: return yuv422p_to_bgr565be_neon_wrapper;
+        case AV_PIX_FMT_RGB555BE: return yuv422p_to_rgb555be_neon_wrapper;
+        case AV_PIX_FMT_BGR555BE: return yuv422p_to_bgr555be_neon_wrapper;
         }
     }
     return NULL;

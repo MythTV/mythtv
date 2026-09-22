@@ -908,8 +908,13 @@ static int vorbis_parse_setup_hdr_modes(vorbis_context *vc)
         vorbis_mode *mode_setup = &vc->modes[i];
 
         mode_setup->blockflag     = get_bits1(gb);
-        mode_setup->windowtype    = get_bits(gb, 16); //FIXME check
-        mode_setup->transformtype = get_bits(gb, 16); //FIXME check
+        mode_setup->windowtype    = get_bits(gb, 16);
+        mode_setup->transformtype = get_bits(gb, 16);
+        if (mode_setup->transformtype != 0 || mode_setup->windowtype != 0) {
+            av_log(vc->avctx, AV_LOG_WARNING,
+                   "Invalid mode: windowtype %u, transformtype %u (both must be 0)\n",
+                    mode_setup->windowtype, mode_setup->transformtype);
+        }
         GET_VALIDATED_INDEX(mode_setup->mapping, 8, vc->mapping_count);
 
         ff_dlog(NULL, " %u mode: blockflag %d, windowtype %d, transformtype %d, mapping %d\n",
@@ -1735,6 +1740,10 @@ static int vorbis_parse_audio_packet(vorbis_context *vc, float **floor_ptr)
 
     for (j = vc->audio_channels-1;j >= 0; j--) {
         ch_res_ptr   = vc->channel_residues + res_chan[j] * blocksize / 2;
+        if (no_residue[j]) {
+            memset(ch_res_ptr, 0, (blocksize / 2) * sizeof(float));
+            continue;
+        }
         vc->fdsp->vector_fmul(floor_ptr[j], floor_ptr[j], ch_res_ptr, blocksize / 2);
         mdct_fn(mdct, ch_res_ptr, floor_ptr[j], sizeof(float));
     }

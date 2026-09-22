@@ -372,6 +372,51 @@ static int add_hdr_plus(AVCodecContext *avctx, struct aom_image *img, const AVFr
     return 0;
 }
 
+static int add_hdr_smpte2094_app5(AVCodecContext *avctx, struct aom_image *img,
+                                  const AVFrame *frame)
+{
+    AVFrameSideData *side_data =
+        av_frame_get_side_data(frame, AV_FRAME_DATA_DYNAMIC_HDR_SMPTE_2094_APP5);
+    if (!side_data)
+        return 0;
+
+    size_t payload_size;
+    AVDynamicHDRSmpte2094App5 *hdr = (AVDynamicHDRSmpte2094App5 *)side_data->buf->data;
+    int res = av_dynamic_hdr_smpte2094_app5_to_t35(hdr, NULL, &payload_size);
+    if (res < 0) {
+        log_encoder_error(avctx, "Error finding the size of HDR SMPTE-2094-50");
+        return res;
+    }
+
+    uint8_t *hdr_buf;
+    // Extra bytes for the country code, provider code, provider oriented code.
+    const size_t hdr_buf_size = payload_size + 5;
+    hdr_buf = av_malloc(hdr_buf_size);
+    if (!hdr_buf)
+        return AVERROR(ENOMEM);
+
+    uint8_t *payload = hdr_buf;
+    bytestream_put_byte(&payload, ITU_T_T35_COUNTRY_CODE_US);
+    bytestream_put_be16(&payload, ITU_T_T35_PROVIDER_CODE_SMPTE);
+    bytestream_put_be16(&payload, 0x0001); // provider_oriented_code
+
+    res = av_dynamic_hdr_smpte2094_app5_to_t35(hdr, &payload, &payload_size);
+    if (res < 0) {
+        av_free(hdr_buf);
+        log_encoder_error(avctx, "Error encoding HDR SMPTE-2094-50 from side data");
+        return res;
+    }
+
+    res = aom_img_add_metadata(img, OBU_METADATA_TYPE_ITUT_T35,
+                               hdr_buf, hdr_buf_size, AOM_MIF_ANY_FRAME);
+    av_free(hdr_buf);
+    if (res < 0) {
+        log_encoder_error(avctx, "Error adding HDR SMPTE-2094-50 to aom_img");
+        return res;
+    }
+    return 0;
+}
+
 #if defined(AOM_CTRL_AV1E_GET_NUM_OPERATING_POINTS) && \
     defined(AOM_CTRL_AV1E_GET_SEQ_LEVEL_IDX) && \
     defined(AOM_CTRL_AV1E_GET_TARGET_SEQ_LEVEL_IDX)
@@ -475,7 +520,7 @@ static int set_pix_fmt(AVCodecContext *avctx, aom_codec_caps_t codec_caps,
     switch (avctx->pix_fmt) {
     case AV_PIX_FMT_GRAY8:
         enccfg->monochrome = 1;
-        /* Fall-through */
+        av_fallthrough;
     case AV_PIX_FMT_YUV420P:
         enccfg->g_profile = AV_PROFILE_AV1_MAIN;
         *img_fmt = AOM_IMG_FMT_I420;
@@ -492,7 +537,7 @@ static int set_pix_fmt(AVCodecContext *avctx, aom_codec_caps_t codec_caps,
     case AV_PIX_FMT_GRAY10:
     case AV_PIX_FMT_GRAY12:
         enccfg->monochrome = 1;
-        /* Fall-through */
+        av_fallthrough;
     case AV_PIX_FMT_YUV420P10:
     case AV_PIX_FMT_YUV420P12:
         if (codec_caps & AOM_CODEC_CAP_HIGHBITDEPTH) {
@@ -1324,6 +1369,10 @@ static int aom_encode(AVCodecContext *avctx, AVPacket *pkt,
         res = add_hdr_plus(avctx, rawimg, frame);
         if (res < 0)
             return res;
+
+        res = add_hdr_smpte2094_app5(avctx, rawimg, frame);
+        if (res < 0)
+            return res;
     }
 
     res = aom_codec_encode(&ctx->encoder, rawimg, timestamp, duration, flags);
@@ -1573,7 +1622,7 @@ static const AVClass class_aom = {
     .version    = LIBAVUTIL_VERSION_INT,
 };
 
-FFCodec ff_libaom_av1_encoder = {
+const FFCodec ff_libaom_av1_encoder = {
     .p.name         = "libaom-av1",
     CODEC_LONG_NAME("libaom AV1"),
     .p.type         = AVMEDIA_TYPE_VIDEO,

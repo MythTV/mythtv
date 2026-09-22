@@ -27,7 +27,6 @@
 #include "libavutil/mem_internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
-#include "libavutil/vulkan_spirv.h"
 #include "libavutil/hwcontext_vulkan.h"
 #include "libavutil/vulkan_loader.h"
 #include "libavutil/vulkan.h"
@@ -170,7 +169,7 @@ static int init_slice_data_pipeline(ProresVulkanContext *pv, FFVulkanShader *shd
             .elems      = av_pix_fmt_count_planes(vkctx->frames->sw_format),
         },
     };
-    RET(ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0, 0));
+    ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0);
 
     ff_vk_shader_add_push_const(shd, 0, sizeof(SliceDataInfo), VK_SHADER_STAGE_COMPUTE_BIT);
 
@@ -211,7 +210,7 @@ static int init_alpha_data_pipeline(ProresVulkanContext *pv, FFVulkanShader* shd
             .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    RET(ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0, 0));
+    ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0);
 
     RET(ff_vk_shader_link(vkctx, shd,
                           ff_prores_ks_alpha_data_comp_spv_data,
@@ -261,7 +260,7 @@ static int init_estimate_slice_pipeline(ProresVulkanContext *pv, FFVulkanShader*
             .stages      = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    RET(ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 3, 0, 0));
+    ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 3, 0);
 
     RET(ff_vk_shader_link(vkctx, shd,
                           ff_prores_ks_estimate_slice_comp_spv_data,
@@ -305,7 +304,7 @@ static int init_trellis_node_pipeline(ProresVulkanContext *pv, FFVulkanShader* s
             .stages      = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    RET(ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0, 0));
+    ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 2, 0);
 
     RET(ff_vk_shader_link(vkctx, shd,
                           ff_prores_ks_trellis_node_comp_spv_data,
@@ -351,7 +350,7 @@ static int init_encode_slice_pipeline(ProresVulkanContext *pv, FFVulkanShader* s
             .stages      = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    RET(ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 3, 0, 0));
+    ff_vk_shader_add_descriptor_set(vkctx, shd, desc, 3, 0);
 
     ff_vk_shader_add_push_const(shd, 0, sizeof(EncodeSliceInfo), VK_SHADER_STAGE_COMPUTE_BIT);
 

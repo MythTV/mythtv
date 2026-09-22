@@ -322,44 +322,44 @@ endfunc
 .endm
 
 .macro tr_4x4 in0, in1, in2, in3, out0, out1, out2, out3, shift, tmp0, tmp1, tmp2, tmp3, tmp4
-         vshll.s16      \tmp0, \in0, #6
-         vmull.s16      \tmp2, \in1, d4[1]
-         vmov           \tmp1, \tmp0
-         vmull.s16      \tmp3, \in1, d4[3]
-         vmlal.s16      \tmp0, \in2, d4[0] @e0
-         vmlsl.s16      \tmp1, \in2, d4[0] @e1
-         vmlal.s16      \tmp2, \in3, d4[3] @o0
-         vmlsl.s16      \tmp3, \in3, d4[1] @o1
+        vshll.s16       \tmp0, \in0, #6
+        vmull.s16       \tmp2, \in1, d4[1]
+        vmov            \tmp1, \tmp0
+        vmull.s16       \tmp3, \in1, d4[3]
+        vmlal.s16       \tmp0, \in2, d4[0] @e0
+        vmlsl.s16       \tmp1, \in2, d4[0] @e1
+        vmlal.s16       \tmp2, \in3, d4[3] @o0
+        vmlsl.s16       \tmp3, \in3, d4[1] @o1
 
-         vadd.s32       \tmp4, \tmp0, \tmp2
-         vsub.s32       \tmp0, \tmp0, \tmp2
-         vadd.s32       \tmp2, \tmp1, \tmp3
-         vsub.s32       \tmp1, \tmp1, \tmp3
-         vqrshrn.s32    \out0, \tmp4, #\shift
-         vqrshrn.s32    \out3, \tmp0, #\shift
-         vqrshrn.s32    \out1, \tmp2, #\shift
-         vqrshrn.s32    \out2, \tmp1, #\shift
+        vadd.s32        \tmp4, \tmp0, \tmp2
+        vsub.s32        \tmp0, \tmp0, \tmp2
+        vadd.s32        \tmp2, \tmp1, \tmp3
+        vsub.s32        \tmp1, \tmp1, \tmp3
+        vqrshrn.s32     \out0, \tmp4, #\shift
+        vqrshrn.s32     \out3, \tmp0, #\shift
+        vqrshrn.s32     \out1, \tmp2, #\shift
+        vqrshrn.s32     \out2, \tmp1, #\shift
 .endm
 
 .macro tr_4x4_8 in0, in1, in2, in3, out0, out1, out2, out3, tmp0, tmp1, tmp2, tmp3
-         vshll.s16      \tmp0, \in0, #6
-         vld1.s16       {\in0}, [r1, :64]!
-         vmov           \tmp1, \tmp0
-         vmull.s16      \tmp2, \in1, \in0[1]
-         vmull.s16      \tmp3, \in1, \in0[3]
-         vmlal.s16      \tmp0, \in2, \in0[0] @e0
-         vmlsl.s16      \tmp1, \in2, \in0[0] @e1
-         vmlal.s16      \tmp2, \in3, \in0[3] @o0
-         vmlsl.s16      \tmp3, \in3, \in0[1] @o1
+        vshll.s16       \tmp0, \in0, #6
+        vld1.s16        {\in0}, [r1, :64]!
+        vmov            \tmp1, \tmp0
+        vmull.s16       \tmp2, \in1, \in0[1]
+        vmull.s16       \tmp3, \in1, \in0[3]
+        vmlal.s16       \tmp0, \in2, \in0[0] @e0
+        vmlsl.s16       \tmp1, \in2, \in0[0] @e1
+        vmlal.s16       \tmp2, \in3, \in0[3] @o0
+        vmlsl.s16       \tmp3, \in3, \in0[1] @o1
 
-         vld1.s16       {\in0}, [r1, :64]
+        vld1.s16        {\in0}, [r1, :64]
 
-         vadd.s32       \out0, \tmp0, \tmp2
-         vadd.s32       \out1, \tmp1, \tmp3
-         vsub.s32       \out2, \tmp1, \tmp3
-         vsub.s32       \out3, \tmp0, \tmp2
+        vadd.s32        \out0, \tmp0, \tmp2
+        vadd.s32        \out1, \tmp1, \tmp3
+        vsub.s32        \out2, \tmp1, \tmp3
+        vsub.s32        \out3, \tmp0, \tmp2
 
-         sub            r1,  r1,  #8
+        sub             r1,  r1,  #8
 .endm
 
 @ Do a 4x4 transpose, using q registers for the subtransposes that don't
@@ -385,7 +385,7 @@ function ff_hevc_idct_4x4_\bitdepth\()_neon, export=1
         tr_4x4          d16, d17, d18, d19, d0, d1, d2, d3, 20 - \bitdepth, q10, q11, q12, q13, q0
         transpose_4x4   q0, q1, d0, d1, d2, d3
         vst1.s16        {d0-d3}, [r0, :128]
-        bx lr
+        bx              lr
 endfunc
 .endm
 
@@ -557,14 +557,14 @@ endfunc
 .endm
 
 .macro add_member in, t0, t1, t2, t3, t4, t5, t6, t7, op0, op1, op2, op3, op4, op5, op6, op7
-        sum_sub q5,     \in, \t0, \op0
-        sum_sub q6,     \in, \t1, \op1
-        sum_sub q7,     \in, \t2, \op2
-        sum_sub q8,     \in, \t3, \op3
-        sum_sub q9,     \in, \t4, \op4
-        sum_sub q10,    \in, \t5, \op5
-        sum_sub q11,    \in, \t6, \op6
-        sum_sub q12,    \in, \t7, \op7
+        sum_sub         q5,  \in, \t0, \op0
+        sum_sub         q6,  \in, \t1, \op1
+        sum_sub         q7,  \in, \t2, \op2
+        sum_sub         q8,  \in, \t3, \op3
+        sum_sub         q9,  \in, \t4, \op4
+        sum_sub         q10, \in, \t5, \op5
+        sum_sub         q11, \in, \t6, \op6
+        sum_sub         q12, \in, \t7, \op7
 .endm
 
 .macro butterfly16 in0, in1, in2, in3, in4, in5, in6, in7
@@ -682,7 +682,7 @@ function func_tr_16x4_\name
         mov             r4, #-32
         store16         d26, d27, d28, d29, d30, d31, d8, d9, r4
     .else
-        store_to_stack (\offset + 64), (\offset + 176), q4, q9, q10, q11, q3, q2, q1, q0
+        store_to_stack  (\offset + 64), (\offset + 176), q4, q9, q10, q11, q3, q2, q1, q0
     .endif
 
         bx              lr
@@ -744,10 +744,10 @@ endfunc
 .endm
 
 .macro add_member32 in, t0, t1, t2, t3, op0, op1, op2, op3
-        sum_sub q10,     \in, \t0, \op0
-        sum_sub q11,     \in, \t1, \op1
-        sum_sub q12,     \in, \t2, \op2
-        sum_sub q13,     \in, \t3, \op3
+        sum_sub         q10, \in, \t0, \op0
+        sum_sub         q11, \in, \t1, \op1
+        sum_sub         q12, \in, \t2, \op2
+        sum_sub         q13, \in, \t3, \op3
 .endm
 
 .macro butterfly32 in0, in1, in2, in3
@@ -900,7 +900,7 @@ function func_tr_32x4_\name
         add             r3, r11, #(32 + 3 * 64)
         scale_store     \shift
 
-        bx               r10
+        bx              r10
 endfunc
 .endm
 
@@ -965,59 +965,59 @@ idct_32x32_dc 10
 /* uses registers q2 - q9 for temp values */
 /* TODO: reorder */
 .macro tr4_luma_shift r0, r1, r2, r3, shift
-        vaddl.s16   q5, \r0, \r2    // c0 = src0 + src2
-        vaddl.s16   q2, \r2, \r3    // c1 = src2 + src3
-        vsubl.s16   q4, \r0, \r3    // c2 = src0 - src3
-        vmull.s16   q6, \r1, d0[0]  // c3 = 74 * src1
+        vaddl.s16       q5, \r0, \r2    // c0 = src0 + src2
+        vaddl.s16       q2, \r2, \r3    // c1 = src2 + src3
+        vsubl.s16       q4, \r0, \r3    // c2 = src0 - src3
+        vmull.s16       q6, \r1, d0[0]  // c3 = 74 * src1
 
-        vaddl.s16   q7, \r0, \r3    // src0 + src3
-        vsubw.s16   q7, q7, \r2     // src0 - src2 + src3
-        vmul.s32    q7, q7, d0[0]   // dst2 = 74 * (src0 - src2 + src3)
+        vaddl.s16       q7, \r0, \r3    // src0 + src3
+        vsubw.s16       q7, q7, \r2     // src0 - src2 + src3
+        vmul.s32        q7, q7, d0[0]   // dst2 = 74 * (src0 - src2 + src3)
 
-        vmul.s32    q8, q5, d0[1]   // 29 * c0
-        vmul.s32    q9, q2, d1[0]   // 55 * c1
-        vadd.s32    q8, q9          // 29 * c0 + 55 * c1
-        vadd.s32    q8, q6          // dst0 = 29 * c0 + 55 * c1 + c3
+        vmul.s32        q8, q5, d0[1]   // 29 * c0
+        vmul.s32        q9, q2, d1[0]   // 55 * c1
+        vadd.s32        q8, q9          // 29 * c0 + 55 * c1
+        vadd.s32        q8, q6          // dst0 = 29 * c0 + 55 * c1 + c3
 
-        vmul.s32    q2, q2, d0[1]   // 29 * c1
-        vmul.s32    q9, q4, d1[0]   // 55 * c2
-        vsub.s32    q9, q2          // 55 * c2 - 29 * c1
-        vadd.s32    q9, q6          // dst1 = 55 * c2 - 29 * c1 + c3
+        vmul.s32        q2, q2, d0[1]   // 29 * c1
+        vmul.s32        q9, q4, d1[0]   // 55 * c2
+        vsub.s32        q9, q2          // 55 * c2 - 29 * c1
+        vadd.s32        q9, q6          // dst1 = 55 * c2 - 29 * c1 + c3
 
-        vmul.s32    q5, q5, d1[0]   // 55 * c0
-        vmul.s32    q4, q4, d0[1]   // 29 * c2
-        vadd.s32    q5, q4          // 55 * c0 + 29 * c2
-        vsub.s32    q5, q6          // dst3 = 55 * c0 + 29 * c2 - c3
+        vmul.s32        q5, q5, d1[0]   // 55 * c0
+        vmul.s32        q4, q4, d0[1]   // 29 * c2
+        vadd.s32        q5, q4          // 55 * c0 + 29 * c2
+        vsub.s32        q5, q6          // dst3 = 55 * c0 + 29 * c2 - c3
 
-        vqrshrn.s32   \r0, q8, \shift
-        vqrshrn.s32   \r1, q9, \shift
-        vqrshrn.s32   \r2, q7, \shift
-        vqrshrn.s32   \r3, q5, \shift
+        vqrshrn.s32     \r0, q8, \shift
+        vqrshrn.s32     \r1, q9, \shift
+        vqrshrn.s32     \r2, q7, \shift
+        vqrshrn.s32     \r3, q5, \shift
 .endm
 
 .ltorg
 function ff_hevc_transform_luma_4x4_neon_8, export=1
-        vpush       {d8-d15}
-        vld1.16     {q14, q15}, [r0]  // coeffs
-        ldr         r3, =0x4a  // 74
-        vmov.32     d0[0], r3
-        ldr         r3, =0x1d  // 29
-        vmov.32     d0[1], r3
-        ldr         r3, =0x37  // 55
-        vmov.32     d1[0], r3
+        vpush           {d8-d15}
+        vld1.16         {q14, q15}, [r0]  // coeffs
+        ldr             r3, =0x4a  // 74
+        vmov.32         d0[0], r3
+        ldr             r3, =0x1d  // 29
+        vmov.32         d0[1], r3
+        ldr             r3, =0x37  // 55
+        vmov.32         d1[0], r3
 
-        tr4_luma_shift d28, d29, d30, d31, #7
+        tr4_luma_shift  d28, d29, d30, d31, #7
 
-        vtrn.16     d28, d29
-        vtrn.16     d30, d31
-        vtrn.32     q14, q15
+        vtrn.16         d28, d29
+        vtrn.16         d30, d31
+        vtrn.32         q14, q15
 
-        tr4_luma_shift d28, d29, d30, d31, #12
+        tr4_luma_shift  d28, d29, d30, d31, #12
 
-        vtrn.16     d28, d29
-        vtrn.16     d30, d31
-        vtrn.32     q14, q15
-        vst1.16     {q14, q15}, [r0]
-        vpop        {d8-d15}
-        bx lr
+        vtrn.16         d28, d29
+        vtrn.16         d30, d31
+        vtrn.32         q14, q15
+        vst1.16         {q14, q15}, [r0]
+        vpop            {d8-d15}
+        bx              lr
 endfunc

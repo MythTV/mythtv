@@ -1569,6 +1569,27 @@ Set whether on display the image should be vertically flipped.
 
 See the @code{-display_rotation} option for more details.
 
+@item -mastering_display[:@var{stream_specifier}] @var{G(%u,%u)B(%u,%u)R(%u,%u)WP(%u,%u)L(%u,%u)} (@emph{input,per-stream})
+Set video mastering display metadata.
+
+@var{G(%u,%u)B(%u,%u)R(%u,%u)WP(%u,%u)L(%u,%u)} is a string specifying
+X,Y display primaries for GBR channels and white point (WP) in units of
+0.00002, and max-min luminance (L) values in units of 0.0001 candela per
+meter square. The values are unsigned integers representing the numerator
+of a rational with an implicit denominator of 50000 for GBR and (WP), and
+implicit denominator 10000 for (L).
+
+This option overrides the mastering display metadata stored in the file,
+if any.
+
+@item -content_light[:@var{stream_specifier}] @var{%u,%u} (@emph{input,per-stream})
+Set video content light metadata.
+
+@var{%u,%u} is a string specifying max content light level and maximum picture
+average light level.
+
+This option overrides the content light metadata stored in the file, if any.
+
 @item -vn (@emph{input/output})
 As an input option, blocks all video streams of a file from being filtered or
 being automatically selected or mapped for any output. See @code{-discard}
@@ -2367,25 +2388,19 @@ If either the input or output is blocked leading to actual read speed falling be
 specified readrate, then this rate takes effect till the input catches up with the
 specified readrate. Must not be lower than the primary readrate.
 
-@item -vsync @var{parameter} (@emph{global})
-@itemx -fps_mode[:@var{stream_specifier}] @var{parameter} (@emph{output,per-stream})
-Set video sync method / framerate mode. vsync is applied to all output video streams
-but can be overridden for a stream by setting fps_mode. vsync is deprecated and will be
-removed in the future.
-
-For compatibility reasons some of the values for vsync can be specified as numbers (shown
-in parentheses in the following table).
+@item -fps_mode[:@var{stream_specifier}] @var{parameter} (@emph{output,per-stream})
+Set video sync method / framerate mode.
 
 @table @option
-@item passthrough (0)
+@item passthrough
 Each frame is passed with its timestamp from the demuxer to the muxer.
-@item cfr (1)
+@item cfr
 Frames will be duplicated and dropped to achieve exactly the requested
 constant frame rate.
-@item vfr (2)
+@item vfr
 Frames are passed through with their timestamp or dropped so as to
 prevent 2 frames from having the same timestamp.
-@item auto (-1)
+@item auto
 Chooses between cfr and vfr depending on muxer capabilities. This is the
 default method.
 @end table
@@ -2415,7 +2430,7 @@ Do not process input timestamps, but keep their values without trying
 to sanitize them. In particular, do not remove the initial start time
 offset value.
 
-Note that, depending on the @option{vsync} option or on specific muxer
+Note that, depending on the @option{fps_mode} option or on specific muxer
 processing (e.g. in case the format option @option{avoid_negative_ts}
 is enabled) the output timestamps may mismatch with the input
 timestamps even when this option is selected.

@@ -39,7 +39,6 @@
 #include "opt.h"
 #include "samplefmt.h"
 #include "bprint.h"
-#include "version.h"
 
 #include <float.h>
 
@@ -191,20 +190,12 @@ static int opt_set_init(void *obj, const char *name, int search_flags,
 
         // try state flags first from the target (child), then from its parent
         class = *(const AVClass**)tgt;
-        if (
-#if LIBAVUTIL_VERSION_MAJOR < 60
-            class->version >= AV_VERSION_INT(59, 41, 100) &&
-#endif
-            class->state_flags_offset)
+        if (class->state_flags_offset)
             state_flags = (unsigned*)((uint8_t*)tgt + class->state_flags_offset);
 
         if (!state_flags && obj != tgt) {
             class = *(const AVClass**)obj;
-            if (
-#if LIBAVUTIL_VERSION_MAJOR < 60
-                class->version >= AV_VERSION_INT(59, 41, 100) &&
-#endif
-                class->state_flags_offset)
+            if (class->state_flags_offset)
                 state_flags = (unsigned*)((uint8_t*)obj + class->state_flags_offset);
         }
 
@@ -212,9 +203,7 @@ static int opt_set_init(void *obj, const char *name, int search_flags,
             av_log(obj, AV_LOG_ERROR, "Option '%s' is not a runtime option and "
                    "so cannot be set after the object has been initialized\n",
                    o->name);
-#if LIBAVUTIL_VERSION_MAJOR >= 60
             return AVERROR(EINVAL);
-#endif
         }
     }
 
@@ -2057,18 +2046,6 @@ const AVClass *av_opt_child_class_iterate(const AVClass *parent, void **iter)
         return parent->child_class_iterate(iter);
     return NULL;
 }
-
-#if FF_API_OPT_PTR
-void *av_opt_ptr(const AVClass *class, void *obj, const char *name)
-{
-    const AVOption *opt= av_opt_find2(&class, name, NULL, 0, AV_OPT_SEARCH_FAKE_OBJ, NULL);
-
-    // no direct access to array-type options
-    if (!opt || (opt->type & AV_OPT_TYPE_FLAG_ARRAY))
-        return NULL;
-    return (uint8_t*)obj + opt->offset;
-}
-#endif
 
 static int opt_copy_elem(void *logctx, enum AVOptionType type,
                          void *dst, const void *src)

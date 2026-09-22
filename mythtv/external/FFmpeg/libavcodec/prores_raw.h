@@ -33,6 +33,7 @@
 typedef struct TileContext {
     GetByteContext gb;
     unsigned x, y;
+    int log2_nb_blocks;
 } TileContext;
 
 typedef struct ProResRAWContext {
@@ -42,7 +43,7 @@ typedef struct ProResRAWContext {
     TileContext *tiles;
     unsigned int tiles_size;
     int nb_tiles;
-    int tw, th;
+    int th;
     int nb_tw, nb_th;
 
     enum AVPixelFormat pix_fmt;
@@ -53,6 +54,11 @@ typedef struct ProResRAWContext {
 
     DECLARE_ALIGNED(32, uint8_t, scan)[64];
     DECLARE_ALIGNED(32, uint8_t, qmat)[64];
+
+    /* 8-point combined linearization curve
+     * (inv. transfer fn + encoder-defined shaping) from the frame header,
+     * applied after iDCT */
+    uint16_t lin_curve[8];
 } ProResRAWContext;
 
 extern const uint8_t ff_prores_raw_dc_cb[13];

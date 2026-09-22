@@ -18,8 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "config.h"
 #include "config_components.h"
+#include "libavutil/attributes.h"
 
 #if CONFIG_TLS_PROTOCOL && CONFIG_OPENSSL
 #include <openssl/opensslv.h>
@@ -288,6 +291,7 @@ int ff_listen_connect(int fd, const struct sockaddr *addr,
                     av_log(h, AV_LOG_ERROR, "Connection to %s failed: %s\n",
                            h->filename, av_err2str(ret));
             }
+            av_fallthrough;
         default:
             return ret;
         }

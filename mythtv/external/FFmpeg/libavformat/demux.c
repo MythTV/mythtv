@@ -39,7 +39,7 @@
 #include "libavcodec/bsf.h"
 #include "libavcodec/codec_desc.h"
 #include "libavcodec/internal.h"
-#include "libavcodec/packet_internal.h"
+#include "packet_internal.h"
 #include "libavcodec/raw.h"
 
 #include "avformat.h"
@@ -368,7 +368,7 @@ fail:
     ff_id3v2_free_extra_meta(&id3v2_extra_meta);
     av_dict_free(&tmp);
     if (s->pb && !(s->flags & AVFMT_FLAG_CUSTOM_IO))
-        avio_closep(&s->pb);
+        ff_format_io_close(s, &s->pb);
     avformat_free_context(s);
     *ps = NULL;
     return ret;
@@ -603,7 +603,7 @@ static int handle_new_packet(AVFormatContext *s, AVPacket *pkt, int allow_passth
     if (sti->request_probe <= 0 && allow_passthrough && !fci->raw_packet_buffer.head)
         return 0;
 
-    err = avpriv_packet_list_put(&fci->raw_packet_buffer, pkt, NULL, 0);
+    err = ff_packet_list_put(&fci->raw_packet_buffer, pkt, NULL, 0);
     if (err < 0) {
         av_packet_unref(pkt);
         return err;
@@ -650,7 +650,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 if ((err = probe_codec(s, st, NULL)) < 0)
                     return err;
             if (ffstream(st)->request_probe <= 0) {
-                avpriv_packet_list_get(&fci->raw_packet_buffer, pkt);
+                ff_packet_list_get(&fci->raw_packet_buffer, pkt);
                 fci->raw_packet_buffer_size -= pkt->size;
                 return 0;
             }
@@ -1090,7 +1090,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         pkt->pts > pkt->dts)
         presentation_delayed = 1;
 
-    if (s->debug & FF_FDEBUG_TS)
+    if (s->debug & AV_FDEBUG_TS)
         av_log(s, AV_LOG_DEBUG,
             "IN delayed:%d pts:%s, dts:%s cur_dts:%s st:%d pc:%p duration:%"PRId64" delay:%d onein_oneout:%d\n",
             presentation_delayed, av_ts2str(pkt->pts), av_ts2str(pkt->dts), av_ts2str(sti->cur_dts),
@@ -1160,7 +1160,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     if (pkt->dts > sti->cur_dts)
         sti->cur_dts = pkt->dts;
 
-    if (s->debug & FF_FDEBUG_TS)
+    if (s->debug & AV_FDEBUG_TS)
         av_log(s, AV_LOG_DEBUG, "OUTdelayed:%d/%d pts:%s, dts:%s cur_dts:%s st:%d (%d)\n",
             presentation_delayed, delay, av_ts2str(pkt->pts), av_ts2str(pkt->dts), av_ts2str(sti->cur_dts), st->index, st->id);
 
@@ -1195,7 +1195,7 @@ static int parse_packet(AVFormatContext *s, AVPacket *pkt,
 
         // Theora has valid 0-sized packets that need to be output
         if (st->codecpar->codec_id == AV_CODEC_ID_THEORA) {
-            ret = avpriv_packet_list_put(&fci->parse_queue,
+            ret = ff_packet_list_put(&fci->parse_queue,
                                          pkt, NULL, 0);
             if (ret < 0)
                 goto fail;
@@ -1303,7 +1303,7 @@ static int parse_packet(AVFormatContext *s, AVPacket *pkt,
 
         compute_pkt_fields(s, st, sti->parser, out_pkt, next_dts, next_pts);
 
-        ret = avpriv_packet_list_put(&fci->parse_queue,
+        ret = ff_packet_list_put(&fci->parse_queue,
                                      out_pkt, NULL, 0);
         if (ret < 0)
             goto fail;
@@ -1471,7 +1471,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                    av_ts2str(pkt->dts),
                    pkt->size);
         }
-        if (s->debug & FF_FDEBUG_TS)
+        if (s->debug & AV_FDEBUG_TS)
             av_log(s, AV_LOG_DEBUG,
                    "ff_read_packet stream=%d, pts=%s, dts=%s, size=%d, duration=%"PRId64", flags=%d\n",
                    pkt->stream_index,
@@ -1527,7 +1527,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
     }
 
     if (!got_packet && fci->parse_queue.head)
-        ret = avpriv_packet_list_get(&fci->parse_queue, pkt);
+        ret = ff_packet_list_get(&fci->parse_queue, pkt);
 
     if (ret >= 0) {
         AVStream *const st  = s->streams[pkt->stream_index];
@@ -1536,7 +1536,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         if (sti->first_discard_sample && pkt->pts != AV_NOPTS_VALUE) {
             int64_t pts = pkt->pts - (is_relative(pkt->pts) ? RELATIVE_TS_BASE : 0);
             int64_t sample = ts_to_samples(st, pts);
-            int64_t duration = ts_to_samples(st, pkt->duration);
+            int64_t duration = FFMAX(st->codecpar->frame_size, ts_to_samples(st, pkt->duration));
             int64_t end_sample = sample + duration;
             if (duration > 0 && end_sample >= sti->first_discard_sample &&
                 sample < sti->last_discard_sample)
@@ -1568,7 +1568,7 @@ static int read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         fci->metafree = metaret == AVERROR_OPTION_NOT_FOUND;
     }
 
-    if (s->debug & FF_FDEBUG_TS)
+    if (s->debug & AV_FDEBUG_TS)
         av_log(s, AV_LOG_DEBUG,
                "read_frame_internal stream=%d, pts=%s, dts=%s, "
                "size=%d, duration=%"PRId64", flags=%d\n",
@@ -1595,7 +1595,7 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
 
     if (!genpts) {
         ret = si->packet_buffer.head
-              ? avpriv_packet_list_get(&si->packet_buffer, pkt)
+              ? ff_packet_list_get(&si->packet_buffer, pkt)
               : read_frame_internal(s, pkt);
         if (ret < 0)
             return ret;
@@ -1643,7 +1643,7 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
             st = s->streams[next_pkt->stream_index];
             if (!(next_pkt->pts == AV_NOPTS_VALUE && st->discard < AVDISCARD_ALL &&
                   next_pkt->dts != AV_NOPTS_VALUE && !eof)) {
-                ret = avpriv_packet_list_get(&si->packet_buffer, pkt);
+                ret = ff_packet_list_get(&si->packet_buffer, pkt);
                 goto return_packet;
             }
         }
@@ -1657,7 +1657,7 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
                 return ret;
         }
 
-        ret = avpriv_packet_list_put(&si->packet_buffer,
+        ret = ff_packet_list_put(&si->packet_buffer,
                                      pkt, NULL, 0);
         if (ret < 0) {
             av_packet_unref(pkt);
@@ -2808,7 +2808,7 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
         }
 
         if (!(ic->flags & AVFMT_FLAG_NOBUFFER)) {
-            ret = avpriv_packet_list_put(&si->packet_buffer,
+            ret = ff_packet_list_put(&si->packet_buffer,
                                          pkt1, NULL, 0);
             if (ret < 0)
                 goto unref_then_goto_end;
@@ -3166,7 +3166,7 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
     /* update the stream group parameters from the stream contexts if needed */
     for (unsigned i = 0; i < ic->nb_stream_groups; i++) {
         AVStreamGroup *const stg  = ic->stream_groups[i];
-        AVStreamGroupLCEVC *lcevc;
+        AVStreamGroupLayeredVideo *lcevc;
         const AVStream *st;
 
         if (stg->type != AV_STREAM_GROUP_PARAMS_LCEVC)
@@ -3174,10 +3174,10 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 
         /* For LCEVC in mpegts, the parser is needed to get the enhancement layer
          * dimensions */
-        lcevc = stg->params.lcevc;
+        lcevc = stg->params.layered_video;
         if (lcevc->width && lcevc->height)
             continue;
-        st = stg->streams[lcevc->lcevc_index];
+        st = stg->streams[lcevc->el_index];
         lcevc->width  = st->codecpar->width;
         lcevc->height = st->codecpar->height;
     }

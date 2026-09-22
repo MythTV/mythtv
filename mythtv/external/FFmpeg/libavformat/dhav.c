@@ -280,7 +280,7 @@ static int64_t get_duration(AVFormatContext *s)
         }
     }
 
-    if (pos < buffer_pos || pos + 20 > buffer_pos + buffer_size)
+    if (pos < buffer_pos || pos - buffer_pos > buffer_size - 20)
         goto fail;
 
     date = AV_RL32(buffer + (pos - buffer_pos) + 16);
@@ -484,8 +484,7 @@ static int dhav_read_seek(AVFormatContext *s, int stream_index,
         return -1;
 
     for (int n = 0; n < s->nb_streams; n++) {
-        AVStream *st = s->streams[n];
-        DHAVStream *dst = st->priv_data;
+        DHAVStream *const dst = s->streams[n]->priv_data;
 
         dst->pts = pts;
         dst->last_time = AV_NOPTS_VALUE;

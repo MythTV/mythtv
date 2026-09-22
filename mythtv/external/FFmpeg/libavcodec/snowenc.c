@@ -705,13 +705,15 @@ static int get_dc(SnowEncContext *enc, int mb_x, int mb_y, int plane_index)
 
         for(y2= FFMAX(y, 0); y2<FFMIN(h, y+block_h); y2++){
             for(x2= FFMAX(x, 0); x2<FFMIN(w, x+block_w); x2++){
-                int index= x2-(block_w*mb_x - block_w/2) + (y2-(block_h*mb_y - block_h/2))*obmc_stride;
+                int col= x2-(block_w*mb_x - block_w/2);
+                int row= y2-(block_h*mb_y - block_h/2);
+                int index= col + row*obmc_stride;
                 int obmc_v= obmc[index];
                 int d;
-                if(y<0) obmc_v += obmc[index + block_h*obmc_stride];
-                if(x<0) obmc_v += obmc[index + block_w];
-                if(y+block_h>h) obmc_v += obmc[index - block_h*obmc_stride];
-                if(x+block_w>w) obmc_v += obmc[index - block_w];
+                if(y<0)                              obmc_v += obmc[index + block_h*obmc_stride];
+                if(x<0)                              obmc_v += obmc[index + block_w];
+                if(y+block_h>h  && row-block_h >= 0) obmc_v += obmc[index - block_h*obmc_stride];
+                if(x+block_w>w  && col-block_w >= 0) obmc_v += obmc[index - block_w];
                 //FIXME precalculate this or simplify it somehow else
 
                 d = -dst[index] + (1<<(FRAC_BITS-1));
@@ -722,6 +724,9 @@ static int get_dc(SnowEncContext *enc, int mb_x, int mb_y, int plane_index)
         }
     }
     *b= backup;
+
+    if (!aa)
+        return 0;
 
     return av_clip_uint8( ROUNDED_DIV((int64_t)ab<<LOG2_OBMC_MAX, aa) ); //FIXME we should not need clipping
 }
@@ -815,18 +820,18 @@ static int get_block_rd(SnowEncContext *enc, int mb_x, int mb_y,
         }
     }
 
-    /* copy the regions where obmc[] = (uint8_t)256 */
-    if(LOG2_OBMC_MAX == 8
-        && (mb_x == 0 || mb_x == b_stride-1)
-        && (mb_y == 0 || mb_y == b_height-1)){
+    /* copy the regions where obmc[] = (uint8_t)(1<<LOG2_OBMC_MAX) */
+    if ((mb_x == 0 || mb_x == b_stride-1) &&
+        (mb_y == 0 || mb_y == b_height-1)){
         if(mb_x == 0)
-            x1 = block_w;
+            x1 = FFMIN(x1, block_w);
         else
-            x0 = block_w;
+            x0 = FFMAX(x0, block_w);
         if(mb_y == 0)
-            y1 = block_h;
+            y1 = FFMIN(y1, block_h);
         else
-            y0 = block_h;
+            y0 = FFMAX(y0, block_h);
+        x0 = FFMIN(x0, x1);
         for(y=y0; y<y1; y++)
             memcpy(dst + sx+x0 + (sy+y)*ref_stride, cur + x0 + y*ref_stride, x1-x0);
     }
@@ -1833,10 +1838,10 @@ static int encode_frame(AVCodecContext *avctx, AVPacket *pkt,
                                   EDGE_WIDTH  , EDGE_WIDTH  , EDGE_TOP | EDGE_BOTTOM);
         if (s->current_picture->data[2]) {
             enc->mpvencdsp.draw_edges(s->current_picture->data[1],
-                                      s->current_picture->linesize[1], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                                      s->current_picture->linesize[1], AV_CEIL_RSHIFT(w, s->chroma_h_shift), AV_CEIL_RSHIFT(h, s->chroma_v_shift),
                                       EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
             enc->mpvencdsp.draw_edges(s->current_picture->data[2],
-                                      s->current_picture->linesize[2], w>>s->chroma_h_shift, h>>s->chroma_v_shift,
+                                      s->current_picture->linesize[2], AV_CEIL_RSHIFT(w, s->chroma_h_shift), AV_CEIL_RSHIFT(h, s->chroma_v_shift),
                                       EDGE_WIDTH>>s->chroma_h_shift, EDGE_WIDTH>>s->chroma_v_shift, EDGE_TOP | EDGE_BOTTOM);
         }
     }
