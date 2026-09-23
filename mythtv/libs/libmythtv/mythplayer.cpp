@@ -90,7 +90,8 @@ MythPlayer::MythPlayer(PlayerContext* Context, PlayerFlags Flags)
     m_deleteMap.SetPlayerContext(m_playerCtx);
 
     m_vbiMode = VBIMode::Parse(gCoreContext->GetSetting("VbiFormat"));
-    m_captionsEnabledbyDefault = gCoreContext->GetBoolSetting("DefaultCCMode");
+    m_captionsEnabledbyDefault = gCoreContext->GetNumSetting("DefaultCCMode");
+    m_lastCaptionsEnabled = gCoreContext->GetBoolSetting("LastCaptions", false);
     m_endExitPrompt      = gCoreContext->GetNumSetting("EndOfRecordingExitPrompt");
 
     // Get VBI page number
