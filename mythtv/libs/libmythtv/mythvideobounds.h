@@ -139,7 +139,7 @@ class MythVideoBounds : public QObject
     QRect   m_displayVisibleRect {0,0,0,0};
     /// Rectangle describing QWidget bounds.
     QRect   m_windowRect {0,0,0,0};
-    /// Rectangle describing QWidget bounds - not adjusted for high DPI scaling (macos)
+    /// Rectangle describing QWidget bounds - not adjusted for high DPI scaling
     QRect   m_rawWindowRect {0,0,0,0};
     /// Used to save the display_visible_rect for
     /// restoration after video embedding ends.
