@@ -15,6 +15,14 @@
 // Local includes
 #include "markuputils.h"
 
+inline static void LOG_STDIO(QString message)
+{
+    if (logLevel >= LOG_ERR)
+    {
+        std::cout << message.toStdString() << std::endl;
+    }
+}
+
 static int GetMarkupList(const MythUtilCommandLineParser &cmdline,
                          const QString &type)
 {
@@ -227,7 +235,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
     QString filename = cmdline.toString("getmarkup");
     if (filename.isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --getmarkup filename\n");
+        LOG_STDIO("Missing --getmarkup filename\n");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QVector<ProgramInfo::MarkupEntry> mapMark;
@@ -236,8 +244,7 @@ static int GetMarkup(const MythUtilCommandLineParser &cmdline)
     QFile outfile(filename);
     if (!outfile.open(QIODevice::WriteOnly))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Couldn't open output file %1\n").arg(filename));
+        LOG_STDIO(QString("Couldn't open output file %1\n").arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QTextStream stream(&outfile);
@@ -285,7 +292,7 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
     QString filename = cmdline.toString("setmarkup");
     if (filename.isEmpty())
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR, "Missing --setmarkup filename\n");
+        LOG_STDIO("Missing --setmarkup filename");
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QVector<ProgramInfo::MarkupEntry> mapMark;
@@ -293,39 +300,33 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
     QFile infile(filename);
     if (!infile.open(QIODevice::ReadOnly))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Couldn't open input file %1\n").arg(filename));
+        LOG_STDIO(QString("Couldn't open input file %1").arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QDomDocument xml;
     if (!xml.setContent(&infile))
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Failed to read valid XML from file %1\n").arg(filename));
+        LOG_STDIO(QString("Failed to read valid XML from file %1").arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QDomElement metadata = xml.documentElement();
     if (metadata.tagName() != "metadata")
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Expected top-level 'metadata' element "
-                    "in file %1\n").arg(filename));
+        LOG_STDIO(QString("Expected top-level 'metadata' element in file %1").arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QDomNode item = metadata.firstChild();
     if (!item.isElement() || item.toElement().tagName() != "item")
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Expected 'item' element within 'metadata' element "
-                    "in file %1\n").arg(filename));
+        LOG_STDIO(QString("Expected 'item' element within 'metadata' element in file %1")
+            .arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     QDomNode markup = item.firstChild();
     if (!markup.isElement() || markup.toElement().tagName() != "markup")
     {
-        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-            QString("Expected 'markup' element within 'item' element "
-                    "in file %1\n").arg(filename));
+        LOG_STDIO(QString("Expected 'markup' element within 'item' element in file %1")
+            .arg(filename));
         return GENERIC_EXIT_INVALID_CMDLINE;
     }
     for (QDomNode n = markup.firstChild(); !n.isNull(); n = n.nextSibling())
@@ -345,9 +346,7 @@ static int SetMarkup(const MythUtilCommandLineParser &cmdline)
             }
             else
             {
-                LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                    QString("Weird tag '%1', expected 'mark' or 'seek'\n")
-                    .arg(tagName));
+                LOG_STDIO(QString("Weird tag '%1', expected 'mark' or 'seek'").arg(tagName));
                 continue;
             }
             int type = e.attribute("type").toInt();
