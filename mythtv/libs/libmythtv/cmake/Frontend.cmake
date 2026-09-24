@@ -292,13 +292,10 @@ if(TARGET any_opengl)
     PRIVATE visualisations/goom/filters.h
             visualisations/goom/goomconfig.h
             visualisations/goom/goom_core.h
-            visualisations/goom/goom_tools.h
             visualisations/goom/graphic.h
             visualisations/goom/ifs.h
             visualisations/goom/lines.h
             visualisations/goom/drawmethods.h
-            visualisations/goom/mmx.h
-            visualisations/goom/mathtools.h
             visualisations/goom/surf3d.h
             visualisations/goom/tentacle3d.h
             visualisations/goom/v3d.h
@@ -312,8 +309,7 @@ if(TARGET any_opengl)
             visualisations/goom/ifs_display.cpp
             visualisations/goom/lines.cpp
             visualisations/goom/surf3d.cpp
-            visualisations/goom/zoom_filter_mmx.cpp
-            visualisations/goom/zoom_filter_xmmx.cpp
+            visualisations/goom/zoom_filter_sse2.cpp
             visualisations/videovisualgoom.cpp)
 endif(TARGET any_opengl)
 

@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "surf3d.h"
+#include "drawmethods.h"
 
 #ifndef __cpp_size_t_suffix
 #include <libmythbase/sizetliteral.h>
@@ -51,9 +52,6 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	return g;
 }
 
-//#undef HAVE_MMX
-#include "drawmethods.h"
-
 void surf3d_draw (surf3d *s, int color, int dist, int *buf, int *back, int W,int H) {
 	v2d v2 {};
 	
@@ -81,7 +79,6 @@ void grid3d_draw (grid3d *g, int color, int colorlow,
 					&& ((v2x.x != -666) || (v2x.y!=-666))) {
 				draw_line(buf,v2x.x,v2x.y,v2.x,v2.y, colorlow, W, H);
 				draw_line(back,v2x.x,v2x.y,v2.x,v2.y, color, W, H);
-				DRAWMETHOD_DONE();
 			}
 			v2x = v2;
 		}
@@ -89,9 +86,8 @@ void grid3d_draw (grid3d *g, int color, int colorlow,
 }
 
 void surf3d_rotate (surf3d *s, float angle) {
-	float cosa = NAN;
-	float sina = NAN;
-	SINCOS(angle,sina,cosa);
+	float cosa = cosf(angle);
+	float sina = sinf(angle);
 	for (int i=0;i<s->nbvertex;i++) {
 		Y_ROTATE_V3D(s->vertex[i],s->svertex[i],cosa,sina);
 	}
@@ -104,15 +100,12 @@ void surf3d_translate (surf3d *s) {
 }
 
 void grid3d_update (grid3d *g, float angle, const floatvec& vals, float dist) {
-	float cosa = NAN;
-	float sina = NAN;
+	float cosa = cosf(angle);
+	float sina = sinf(angle);
 	surf3d *s = &(g->surf);
 	v3d cam = s->center;
 	cam.z += dist;
-
-	SINCOS((angle/4.3F),sina,cosa);
-	cam.y += sina*2.0F;
-	SINCOS(angle,sina,cosa);
+	cam.y += sinf(angle/4.3F)*2.0F;
 
 	if (g->mode==0) {
 		if (static_cast<int>(vals.size()) >= g->defx)
