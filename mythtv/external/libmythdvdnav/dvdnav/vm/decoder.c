@@ -24,6 +24,8 @@
 #include "config.h"
 #endif
 
+#include <dvdread/nav_types.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -31,9 +33,6 @@
 #include <string.h>  /* For memset */
 #include <sys/time.h>
 #include <assert.h>
-
-#include <dvdread/nav_types.h>
-#include <dvdread/ifo_types.h> /* vm_cmd_t */
 
 #include "dvdnav/dvdnav.h"
 #include "decoder.h"
@@ -115,6 +114,152 @@ static uint16_t eval_reg(command_t* command, uint8_t reg) {
     return get_GPRM(command->registers, reg & 0x0f) ;
   }
 }
+
+#ifdef TRACE
+
+static char *linkcmd2str(link_cmd_t cmd) {
+  switch(cmd) {
+  case LinkNoLink:
+    return "LinkNoLink";
+  case LinkTopC:
+    return "LinkTopC";
+  case LinkNextC:
+    return "LinkNextC";
+  case LinkPrevC:
+    return "LinkPrevC";
+  case LinkTopPG:
+    return "LinkTopPG";
+  case LinkNextPG:
+    return "LinkNextPG";
+  case LinkPrevPG:
+    return "LinkPrevPG";
+  case LinkTopPGC:
+    return "LinkTopPGC";
+  case LinkNextPGC:
+    return "LinkNextPGC";
+  case LinkPrevPGC:
+    return "LinkPrevPGC";
+  case LinkGoUpPGC:
+    return "LinkGoUpPGC";
+  case LinkTailPGC:
+    return "LinkTailPGC";
+  case LinkRSM:
+    return "LinkRSM";
+  case LinkPGCN:
+    return "LinkPGCN";
+  case LinkPTTN:
+    return "LinkPTTN";
+  case LinkPGN:
+    return "LinkPGN";
+  case LinkCN:
+    return "LinkCN";
+  case Exit:
+    return "Exit";
+  case JumpTT:
+    return "JumpTT";
+  case JumpVTS_TT:
+    return "JumpVTS_TT";
+  case JumpVTS_PTT:
+    return "JumpVTS_PTT";
+  case JumpSS_FP:
+    return "JumpSS_FP";
+  case JumpSS_VMGM_MENU:
+    return "JumpSS_VMGM_MENU";
+  case JumpSS_VTSM:
+    return "JumpSS_VTSM";
+  case JumpSS_VMGM_PGC:
+    return "JumpSS_VMGM_PGC";
+  case CallSS_FP:
+    return "CallSS_FP";
+  case CallSS_VMGM_MENU:
+    return "CallSS_VMGM_MENU";
+  case CallSS_VTSM:
+    return "CallSS_VTSM";
+  case CallSS_VMGM_PGC:
+    return "CallSS_VMGM_PGC";
+  case PlayThis:
+    return "PlayThis";
+  }
+  return "*** (bug)";
+}
+
+void vm_print_link(link_t value) {
+  char *cmd = linkcmd2str(value.command);
+
+  switch(value.command) {
+  case LinkNoLink:
+  case LinkTopC:
+  case LinkNextC:
+  case LinkPrevC:
+  case LinkTopPG:
+  case LinkNextPG:
+  case LinkPrevPG:
+  case LinkTopPGC:
+  case LinkNextPGC:
+  case LinkPrevPGC:
+  case LinkGoUpPGC:
+  case LinkTailPGC:
+  case LinkRSM:
+    fprintf(MSG_OUT, "libdvdnav: %s (button %d)\n", cmd, value.data1);
+    break;
+  case LinkPGCN:
+  case JumpTT:
+  case JumpVTS_TT:
+  case JumpSS_VMGM_MENU: /*  == 2 -> Title Menu */
+  case JumpSS_VMGM_PGC:
+    fprintf(MSG_OUT, "libdvdnav: %s %d\n", cmd, value.data1);
+    break;
+  case LinkPTTN:
+  case LinkPGN:
+  case LinkCN:
+    fprintf(MSG_OUT, "libdvdnav: %s %d (button %d)\n", cmd, value.data1, value.data2);
+    break;
+  case Exit:
+  case JumpSS_FP:
+  case PlayThis: /*  Humm.. should we have this at all.. */
+    fprintf(MSG_OUT, "libdvdnav: %s\n", cmd);
+    break;
+  case JumpVTS_PTT:
+    fprintf(MSG_OUT, "libdvdnav: %s %d:%d\n", cmd, value.data1, value.data2);
+    break;
+  case JumpSS_VTSM:
+    fprintf(MSG_OUT, "libdvdnav: %s vts %d title %d menu %d\n",
+            cmd, value.data1, value.data2, value.data3);
+    break;
+  case CallSS_FP:
+    fprintf(MSG_OUT, "libdvdnav: %s resume cell %d\n", cmd, value.data1);
+    break;
+  case CallSS_VMGM_MENU: /*  == 2 -> Title Menu */
+  case CallSS_VTSM:
+    fprintf(MSG_OUT, "libdvdnav: %s %d resume cell %d\n", cmd, value.data1, value.data2);
+    break;
+  case CallSS_VMGM_PGC:
+    fprintf(MSG_OUT, "libdvdnav: %s %d resume cell %d\n", cmd, value.data1, value.data2);
+    break;
+  }
+ }
+
+void vm_print_registers( registers_t *registers ) {
+  int32_t i;
+  fprintf(MSG_OUT, "libdvdnav:    #   ");
+  for(i = 0; i < 24; i++)
+    fprintf(MSG_OUT, " %2d |", i);
+  fprintf(MSG_OUT, "\nlibdvdnav: SRPMS: ");
+  for(i = 0; i < 24; i++)
+    fprintf(MSG_OUT, "%04x|", registers->SPRM[i]);
+  fprintf(MSG_OUT, "\nlibdvdnav: GRPMS: ");
+  for(i = 0; i < 16; i++)
+    fprintf(MSG_OUT, "%04x|", get_GPRM(registers, i) );
+  fprintf(MSG_OUT, "\nlibdvdnav: Gmode: ");
+  for(i = 0; i < 16; i++)
+    fprintf(MSG_OUT, "%04x|", registers->GPRM_mode[i]);
+  fprintf(MSG_OUT, "\nlibdvdnav: Gtime: ");
+  for(i = 0; i < 16; i++)
+    fprintf(MSG_OUT, "%04lx|", registers->GPRM_time[i].tv_sec & 0xffff);
+  fprintf(MSG_OUT, "\n");
+}
+
+#endif
 
 /* Eval register or immediate data.
    AAAA_AAAA BBBB_BBBB, if immediate use all 16 bits for data else use
@@ -358,7 +503,7 @@ static int32_t eval_jump_instruction(command_t* command, int32_t cond, link_t *r
   return 0;
 }
 
-/* Evaluate a set sytem register instruction
+/* Evaluate a set system register instruction
    May contain a link so return the same as eval_link */
 static int32_t eval_system_set(command_t* command, int32_t cond, link_t *return_values) {
   int32_t i;
@@ -497,7 +642,7 @@ static void eval_set_version_2(command_t* command, int32_t cond) {
 /* Evaluate a command
    returns row number of goto, 0 if no goto, -1 if link.
    Link command in return_values */
-static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *return_values) {
+static int32_t eval_command(const uint8_t *bytes, registers_t* registers, link_t *return_values) {
   int32_t cond, res = 0;
   command_t command;
   command.instruction =( (uint64_t) bytes[0] << 56 ) |
@@ -562,7 +707,7 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
       if(res)
         res = -1;
       break;
-    case 6: /*  Compare -> Set, allways Link Sub-Instruction */
+    case 6: /*  Compare -> Set, always Link Sub-Instruction */
       /* FIXME: These are wrong. Need to be updated from vmcmd.c */
       cond = eval_if_version_4(&command);
       eval_set_version_2(&command, cond);
@@ -585,7 +730,7 @@ static int32_t eval_command(uint8_t *bytes, registers_t* registers, link_t *retu
 }
 
 /* Evaluate a set of commands in the given register set (which is modified) */
-int32_t vmEval_CMD(vm_cmd_t commands[], int32_t num_commands,
+int32_t vmEval_CMD(const vm_cmd_t commands[], int32_t num_commands,
                registers_t *registers, link_t *return_values) {
   int32_t i = 0;
   int32_t total = 0;
@@ -635,150 +780,4 @@ int32_t vmEval_CMD(vm_cmd_t commands[], int32_t num_commands,
 #endif
   return 0;
 }
-
-#ifdef TRACE
-
-static char *linkcmd2str(link_cmd_t cmd) {
-  switch(cmd) {
-  case LinkNoLink:
-    return "LinkNoLink";
-  case LinkTopC:
-    return "LinkTopC";
-  case LinkNextC:
-    return "LinkNextC";
-  case LinkPrevC:
-    return "LinkPrevC";
-  case LinkTopPG:
-    return "LinkTopPG";
-  case LinkNextPG:
-    return "LinkNextPG";
-  case LinkPrevPG:
-    return "LinkPrevPG";
-  case LinkTopPGC:
-    return "LinkTopPGC";
-  case LinkNextPGC:
-    return "LinkNextPGC";
-  case LinkPrevPGC:
-    return "LinkPrevPGC";
-  case LinkGoUpPGC:
-    return "LinkGoUpPGC";
-  case LinkTailPGC:
-    return "LinkTailPGC";
-  case LinkRSM:
-    return "LinkRSM";
-  case LinkPGCN:
-    return "LinkPGCN";
-  case LinkPTTN:
-    return "LinkPTTN";
-  case LinkPGN:
-    return "LinkPGN";
-  case LinkCN:
-    return "LinkCN";
-  case Exit:
-    return "Exit";
-  case JumpTT:
-    return "JumpTT";
-  case JumpVTS_TT:
-    return "JumpVTS_TT";
-  case JumpVTS_PTT:
-    return "JumpVTS_PTT";
-  case JumpSS_FP:
-    return "JumpSS_FP";
-  case JumpSS_VMGM_MENU:
-    return "JumpSS_VMGM_MENU";
-  case JumpSS_VTSM:
-    return "JumpSS_VTSM";
-  case JumpSS_VMGM_PGC:
-    return "JumpSS_VMGM_PGC";
-  case CallSS_FP:
-    return "CallSS_FP";
-  case CallSS_VMGM_MENU:
-    return "CallSS_VMGM_MENU";
-  case CallSS_VTSM:
-    return "CallSS_VTSM";
-  case CallSS_VMGM_PGC:
-    return "CallSS_VMGM_PGC";
-  case PlayThis:
-    return "PlayThis";
-  }
-  return "*** (bug)";
-}
-
-void vm_print_link(link_t value) {
-  char *cmd = linkcmd2str(value.command);
-
-  switch(value.command) {
-  case LinkNoLink:
-  case LinkTopC:
-  case LinkNextC:
-  case LinkPrevC:
-  case LinkTopPG:
-  case LinkNextPG:
-  case LinkPrevPG:
-  case LinkTopPGC:
-  case LinkNextPGC:
-  case LinkPrevPGC:
-  case LinkGoUpPGC:
-  case LinkTailPGC:
-  case LinkRSM:
-    fprintf(MSG_OUT, "libdvdnav: %s (button %d)\n", cmd, value.data1);
-    break;
-  case LinkPGCN:
-  case JumpTT:
-  case JumpVTS_TT:
-  case JumpSS_VMGM_MENU: /*  == 2 -> Title Menu */
-  case JumpSS_VMGM_PGC:
-    fprintf(MSG_OUT, "libdvdnav: %s %d\n", cmd, value.data1);
-    break;
-  case LinkPTTN:
-  case LinkPGN:
-  case LinkCN:
-    fprintf(MSG_OUT, "libdvdnav: %s %d (button %d)\n", cmd, value.data1, value.data2);
-    break;
-  case Exit:
-  case JumpSS_FP:
-  case PlayThis: /*  Humm.. should we have this at all.. */
-    fprintf(MSG_OUT, "libdvdnav: %s\n", cmd);
-    break;
-  case JumpVTS_PTT:
-    fprintf(MSG_OUT, "libdvdnav: %s %d:%d\n", cmd, value.data1, value.data2);
-    break;
-  case JumpSS_VTSM:
-    fprintf(MSG_OUT, "libdvdnav: %s vts %d title %d menu %d\n",
-            cmd, value.data1, value.data2, value.data3);
-    break;
-  case CallSS_FP:
-    fprintf(MSG_OUT, "libdvdnav: %s resume cell %d\n", cmd, value.data1);
-    break;
-  case CallSS_VMGM_MENU: /*  == 2 -> Title Menu */
-  case CallSS_VTSM:
-    fprintf(MSG_OUT, "libdvdnav: %s %d resume cell %d\n", cmd, value.data1, value.data2);
-    break;
-  case CallSS_VMGM_PGC:
-    fprintf(MSG_OUT, "libdvdnav: %s %d resume cell %d\n", cmd, value.data1, value.data2);
-    break;
-  }
- }
-
-void vm_print_registers( registers_t *registers ) {
-  int32_t i;
-  fprintf(MSG_OUT, "libdvdnav:    #   ");
-  for(i = 0; i < 24; i++)
-    fprintf(MSG_OUT, " %2d |", i);
-  fprintf(MSG_OUT, "\nlibdvdnav: SRPMS: ");
-  for(i = 0; i < 24; i++)
-    fprintf(MSG_OUT, "%04x|", registers->SPRM[i]);
-  fprintf(MSG_OUT, "\nlibdvdnav: GRPMS: ");
-  for(i = 0; i < 16; i++)
-    fprintf(MSG_OUT, "%04x|", get_GPRM(registers, i) );
-  fprintf(MSG_OUT, "\nlibdvdnav: Gmode: ");
-  for(i = 0; i < 16; i++)
-    fprintf(MSG_OUT, "%04x|", registers->GPRM_mode[i]);
-  fprintf(MSG_OUT, "\nlibdvdnav: Gtime: ");
-  for(i = 0; i < 16; i++)
-    fprintf(MSG_OUT, "%04lx|", registers->GPRM_time[i].tv_sec & 0xffff);
-  fprintf(MSG_OUT, "\n");
-}
-
-#endif
 

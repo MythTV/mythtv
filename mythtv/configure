@@ -1470,7 +1470,6 @@ HEADERS_LIST_UDFREAD="
 HEADERS_LIST_DVDNAV="
     dlfcn_h
     dvdcss_dvdcss_h
-    sys_param_h
 "
 
 HEADERS_LIST_LIBMPEG2="
@@ -1501,6 +1500,13 @@ SYSTEM_FUNCS_BLURAY="
 
 SYSTEM_FUNCS_DVDNAV="
     gettimeofday
+"
+
+SYSTEM_FUNCS_DVDREAD="
+    gettimeofday
+    getmntent_r
+    strerror_r
+    strerror_s
 "
 
 SYSTEM_FUNCS_GLSLANG="
@@ -4546,7 +4552,6 @@ check_header mntent.h
 check_header pthread.h
 check_header strings.h
 check_header sys/dl.h
-check_header sys/param.h
 check_header sys/time.h
 check_header unistd.h
 
@@ -4560,6 +4565,8 @@ check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
 
 # SYSTEM_FUNCS
 check_func_headers mntent.h getmntent_r
+check_func_headers string.h strerror_r
+check_func_headers string.h strerror_s
 check_func_headers sys/time.h gettimeofday
 check_func_headers fcntl.h posix_fadvise
 
@@ -4648,6 +4655,7 @@ fi
 if $(pkg-config --atleast-version="1.2" libdvdcss); then
     use_pkg_config libdvdcss libdvdcss dvdcss/dvdcss.h dvdcss_open &&
         enable dvdcss_dvdcss_h
+    check_header dvdcss/dvdcpxm.h
 fi
 
 # libudfread
@@ -6502,10 +6510,9 @@ if ! enabled system_libexiv2; then
            ${qmakeconf} -o Makefile)
 fi
 echo "Configuring libmythdvdnav..."
-
-DVDREAD_VERSION_MAJOR=6
-DVDREAD_VERSION_MINOR=0
-DVDREAD_VERSION_MICRO=0
+DVDREAD_VERSION_MAJOR=7
+DVDREAD_VERSION_MINOR=1
+DVDREAD_VERSION_MICRO=1
 
 echo "Creating external/libmythdvdnav/dvdread/dvdread/version.h"
 sed -e "s/@DVDREAD_VERSION_MAJOR@/${DVDREAD_VERSION_MAJOR}/g" \
@@ -6514,9 +6521,9 @@ sed -e "s/@DVDREAD_VERSION_MAJOR@/${DVDREAD_VERSION_MAJOR}/g" \
     external/libmythdvdnav/dvdread/dvdread/version.h.in > $TMPH
 cp_if_changed $TMPH external/libmythdvdnav/dvdread/dvdread/version.h
 
-DVDNAV_VERSION_MAJOR=6
+DVDNAV_VERSION_MAJOR=7
 DVDNAV_VERSION_MINOR=0
-DVDNAV_VERSION_MICRO=0
+DVDNAV_VERSION_MICRO=1
 
 echo "Creating external/libmythdvdnav/dvdnav/dvdnav/version.h"
 sed -e "s/@DVDNAV_MAJOR@/${DVDNAV_VERSION_MAJOR}/g" \
@@ -6542,11 +6549,20 @@ fi
 if enabled dlfcn_h; then
     echo "#define HAVE_DLFCN_H 1" >> $TMPH
 fi
-if enabled sys_param_h; then
-    echo "#define HAVE_SYS_PARAM_H 1" >> $TMPH
-fi
 if enabled dvdcss_dvdcss_h; then
     echo "#define HAVE_DVDCSS_DVDCSS_H 1" >> $TMPH
+fi
+if enabled dvdcss_dvdcpxm_h; then
+    echo "#define HAVE_DVDCSS_DVDCPXM_H 1" >> $TMPH
+fi
+if enabled getmntent_r; then
+    echo "#define HAVE_GETMNTENT_R 1" >> $TMPH
+fi
+if enabled strerror_r; then
+    echo "#define HAVE_STRERROR_R 1" >> $TMPH
+fi
+if enabled strerror_s; then
+    echo "#define HAVE_STRERROR_S 1" >> $TMPH
 fi
 
 cat >> $TMPH <<EOF

@@ -3,12 +3,12 @@
  *
  * Much of the contents in this file is based on VOBDUMP.
  *
- * VOBDUMP: a program for examining DVD .VOB filse
+ * VOBDUMP: a program for examining DVD .VOB files
  *
  * Copyright 1998, 1999 Eric Smith <eric@brouhaha.com>
  *
  * VOBDUMP is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as
+ * under the terms of the GNU General Public License version 2 or version 3 as
  * published by the Free Software Foundation.  Note that I am not
  * granting permission to redistribute or modify VOBDUMP under the
  * terms of any later version of the General Public License.

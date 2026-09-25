@@ -405,12 +405,13 @@ POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
 HEADERS += DVD/mythdvdbuffer.h
 HEADERS += DVD/mythdvdcontext.h
 HEADERS += DVD/mythdvdinfo.h
-HEADERS += DVD/mythdvdstream.h
+HEADERS += DVD/mythdvdlogger.h
+HEADERS += DVD/mythdvdvfs.h
 SOURCES += DVD/mythdvdbuffer.cpp
 SOURCES += DVD/mythdvdcontext.cpp
 SOURCES += DVD/mythdvdinfo.cpp
-SOURCES += DVD/mythdvdio.cpp
-SOURCES += DVD/mythdvdstream.cpp
+SOURCES += DVD/mythdvdlogger.cpp
+SOURCES += DVD/mythdvdvfs.cpp
 using_frontend {
     HEADERS += DVD/mythdvdplayer.h
     SOURCES += DVD/mythdvdplayer.cpp

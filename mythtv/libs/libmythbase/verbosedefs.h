@@ -177,6 +177,8 @@ VERBOSE_MAP(VB_HTTP,  0x40000000000ULL, true,
             "HTTP Server messages")
 VERBOSE_MAP(VB_LIRC,  0x80000000000ULL, true,
             "LIRC Client messages")
+VERBOSE_MAP(VB_DVD,  0x100000000000ULL, true,
+            "libdvdnav and libdvdread messages")
 VERBOSE_MAP(VB_NONE,      0x00000000, false,
             "NO debug output")
 VERBOSE_POSTAMBLE

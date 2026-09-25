@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -34,10 +35,47 @@
 #define getbits_init dvdread_getbits_init
 #define getbits dvdread_getbits
 
+#define STRINGIFY_NAME( z )   STRINGIFY_NAME_( z )
+#define STRINGIFY_NAME_( z ) #z
+
+/* nav structures are filled bit by bit but exposed in the public API, their
+ * layout must not depend on the compiler or its bitfield packing scheme */
+#define CHECK_NAV_STRUCT_SIZE(strt, size) \
+  static_assert(sizeof(strt) == size, STRINGIFY_NAME(strt) " not " STRINGIFY_NAME(size) " bytes")
+
+CHECK_NAV_STRUCT_SIZE(pci_gi_t,       60);
+CHECK_NAV_STRUCT_SIZE(nsml_agli_t,    36);
+CHECK_NAV_STRUCT_SIZE(hl_gi_t,        22);
+CHECK_NAV_STRUCT_SIZE(btn_colit_t,    24);
+CHECK_NAV_STRUCT_SIZE(btni_t,         20);
+CHECK_NAV_STRUCT_SIZE(hli_t,         768);
+CHECK_NAV_STRUCT_SIZE(pci_t,        1056);
+CHECK_NAV_STRUCT_SIZE(dsi_gi_t,       32);
+CHECK_NAV_STRUCT_SIZE(sml_pbi_t,     148);
+CHECK_NAV_STRUCT_SIZE(sml_agl_data_t,  6);
+CHECK_NAV_STRUCT_SIZE(sml_agli_t,     54);
+CHECK_NAV_STRUCT_SIZE(vobu_sri_t,    168);
+CHECK_NAV_STRUCT_SIZE(synci_t,       144);
+CHECK_NAV_STRUCT_SIZE(dsi_t,        1017);
+
+#define CHECK_VALUE(arg)\
+  if(!(arg)) {\
+    DVDReadLog(NULL, NULL, DVD_LOGGER_LEVEL_WARN,\
+                "CHECK_VALUE failed in %s:%i for %s",\
+                __FILE__, __LINE__, # arg );\
+  }
+
+static void read_hli(pci_t *pci, unsigned char *buffer);
+
 void navRead_PCI(pci_t *pci, unsigned char *buffer) {
-  int32_t i, j;
+  int32_t i;
   getbits_state_t state;
   if (!getbits_init(&state, buffer)) abort(); /* Passed NULL pointers */
+
+  /* pci_t is no longer packed, so it now has padding bytes that the field by
+   * field parsing below never writes; clear them to keep the whole structure
+   * deterministic for callers that copy or hash it. */
+  memset(pci, 0, sizeof(*pci));
 
   /* pci pci_gi */
   pci->pci_gi.nv_pck_lbn = getbits(&state, 32 );
@@ -85,6 +123,24 @@ void navRead_PCI(pci_t *pci, unsigned char *buffer) {
   /* pci nsml_agli */
   for(i = 0; i < 9; i++)
     pci->nsml_agli.nsml_agl_dsta[i] = getbits(&state, 32 );
+
+  read_hli(pci, buffer + 96);
+
+#ifndef NDEBUG
+  CHECK_VALUE(pci->pci_gi.zero1 == 0);
+#endif /* !NDEBUG */
+}
+
+/* the still picture NAV packet, substream 0x02, has no PCI general information */
+void navRead_ASV_PCI(pci_t *pci, unsigned char *buffer) {
+  memset(pci, 0, sizeof(*pci));
+  read_hli(pci, buffer);
+}
+
+static void read_hli(pci_t *pci, unsigned char *buffer) {
+  int32_t i, j;
+  getbits_state_t state;
+  if (!getbits_init(&state, buffer)) abort();
 
   /* pci hli hli_gi */
   pci->hli.hl_gi.hli_ss = getbits(&state, 16 );
@@ -142,9 +198,6 @@ void navRead_PCI(pci_t *pci, unsigned char *buffer) {
 
 #ifndef NDEBUG
   /* Asserts */
-
-  /* pci pci gi */
-  CHECK_VALUE(pci->pci_gi.zero1 == 0);
 
   /* pci hli hli_gi */
   CHECK_VALUE(pci->hli.hl_gi.zero1 == 0);
