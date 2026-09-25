@@ -31,6 +31,10 @@ void MythExternRecorderCommandLineParser::LoadArguments(void)
 
     add("--inputid", "inputid", "", "MythTV input this app is attached to.", "")
         ->SetGroup("ExternalRecorder");
+
+    add(QStringList{"--exec"}, "exec", false,
+        "Ignored, but kept for backwards compatibility.", "")
+        ->SetGroup("ExternalRecorder");
 }
 
 int MythExternRecorderCommandLineParser::SetupLogging(const QString& logfile)
