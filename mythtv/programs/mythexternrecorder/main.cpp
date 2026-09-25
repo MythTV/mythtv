@@ -56,22 +56,17 @@ int main(int argc, char *argv[])
 {
     MythExternRecorderCommandLineParser cmdline;
 
-    if (!cmdline.Parse(argc, argv))
+    if (!cmdline.Parse(argc, argv) || cmdline.toBool("showhelp"))
     {
         cmdline.PrintHelp();
         std::cerr << "\nDocumentation can be found at\n"
+                  << "https://wiki.mythtv.org/wiki/Mythexternrecorder\n"
+                  << "   or\n"
                   << "https://github.com/MythTV/mythtv/blob/master/mythtv/programs/mythexternrecorder/README.md\n";
 
+        if (cmdline.toBool("showhelp"))
+            return GENERIC_EXIT_OK;
         return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-
-    if (cmdline.toBool("showhelp"))
-    {
-        cmdline.PrintHelp();
-        std::cerr << "\nDocumentation can be found at\n"
-                  << "https://github.com/MythTV/mythtv/blob/master/mythtv/programs/mythexternrecorder/README.md\n";
-
-        return GENERIC_EXIT_OK;
     }
 
     if (cmdline.toBool("showversion"))
