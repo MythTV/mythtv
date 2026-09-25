@@ -3,7 +3,7 @@
 ---
 ## Overview
 
-MythExternRecorder uses the "External (black box) recorder" protocol (see `Protocol.md`). Users create a TOML-style configuration file to specify how the external recorder application is controlled. The recorder application could be `ffmpeg`, `cvlc`, or any other application that produces a transport stream containing audio and video.
+MythExternRecorder uses the "External (black box) recorder" protocol (see `Protocol.md`). Users create a TOML-style configuration file (see https://learnxinyminutes.com/toml for a primer) to specify how the external recorder application is controlled. The recorder application could be `ffmpeg`, `cvlc`, or any other application that produces a transport stream containing audio and video.
 
 When using `http://localhost:6544` to configure a new capture card, choose "External (black box) recorder" as the card type, then specify the path to `mythexternrecorder` along with the argument for your configuration file:
 
@@ -342,6 +342,13 @@ https://github.com/jpoet/hdhr-externrec-tool
 
 ---
 ### Using a shell
+
+**NOTE**: When using a shell, variables are accessed using whatever syntax the shell uses instead of the {var_name} syntax that mythexternrecorder uses internally. Usually that means $var_name.
+
+**NOTE**: Internally, mythexternrecorder does recursive variable expansion where one variable can reference another variable. When using a shell the recursive expansion does not happen.
+
+**NOTE**: The [INCLUDE]/files and [RECORDER]/desc are still processed internally even when a shell is specified, and therefore use the {var_name} syntax.
+
 **magewell-1-3-2.toml**
 ```toml
 [Variables]
@@ -383,8 +390,6 @@ command="/usr/local/bin/stb-control --device $DEVICE --check-internet"
 damaged_on_failure=true
 log_level="DEBUG"
 ```
-
-**NOTE:**: When using a shell you need to be careful with any variable definitions. When not using a shell, mythexternrecorder does recursive espansion of the variables, but that doesn't happen with a shell.
 
 ----
 ## INI
