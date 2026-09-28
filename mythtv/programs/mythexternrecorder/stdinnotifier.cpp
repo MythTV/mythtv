@@ -55,7 +55,7 @@ void StdinNotifier::handleReadyRead()
         if (errno == EAGAIN)
             break;
 
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("stdin read failed: %1")
             .arg(QString::fromLocal8Bit(strerror(errno))));
 
@@ -78,7 +78,7 @@ void StdinNotifier::handleReadyRead()
         if (line.isEmpty())
             continue;
 
-        LOG(VB_RECORD, LOG_DEBUG,
+        LOG(VB_GENERAL, LOG_DEBUG,
             QString("StdinNotifier received: [%1]")
             .arg(QString::fromUtf8(line)));
 
@@ -94,7 +94,7 @@ void StdinNotifier::handleReadyRead()
 
         if (jsonDoc.isNull() || !jsonDoc.isObject())
         {
-            LOG(VB_RECORD, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Invalid JSON message received: %1. Details: %2")
                 .arg(QString::fromUtf8(line),
                      jsonError.errorString()));
