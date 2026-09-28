@@ -86,7 +86,7 @@ bool Process::start(const QString& command, QProcessEnvironment& env,
     m_started = QDateTime::currentDateTime();
     m_state = State::Running;
 
-    LOG(VB_RECORD, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG,
         QString("Process::Started '%1'%2")
         .arg(m_command)
         .arg(useShell ? QString(" via %1").arg(shellPath) : ""));
@@ -118,7 +118,7 @@ bool Process::wait(int timeout)
     if (!isRunning())
         return isFinished();
 
-    LOG(VB_RECORD, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG,
         QString("Process::wait '%1': state=%3 "
                 "qprocess-state=%4")
             .arg(m_command)
@@ -143,7 +143,7 @@ bool Process::terminate(int timeout)
         m_process.waitForFinished();
     }
 
-    LOG(VB_RECORD, LOG_WARNING,
+    LOG(VB_GENERAL, LOG_WARNING,
         QString("Process::terminate '%1'").arg(m_command));
 
     return succeeded();
@@ -211,7 +211,7 @@ void Process::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     m_state = State::Finished;
 
-    LOG(VB_RECORD, LOG_DEBUG, QString("Process::Finished '%1'").arg(m_command));
+    LOG(VB_GENERAL, LOG_DEBUG, QString("Process::Finished '%1'").arg(m_command));
 
     // Notifies Recorder that the task is finished
     emit finished(m_result == Result::Success, exitCode);
@@ -228,7 +228,7 @@ void Process::processErrorOccurred(QProcess::ProcessError error)
         m_result = Result::Failed;
         m_state = State::Finished;
 
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             QString("Process::Error Failed to start '%1'").arg(m_command));
 
         // Fail if binary didn't execute
@@ -236,7 +236,7 @@ void Process::processErrorOccurred(QProcess::ProcessError error)
         return;
     }
 
-    LOG(VB_RECORD, LOG_WARNING,
+    LOG(VB_GENERAL, LOG_WARNING,
         QString("Process::Error Failed '%1' '%2'")
             .arg(m_errstr)
             .arg(m_command));

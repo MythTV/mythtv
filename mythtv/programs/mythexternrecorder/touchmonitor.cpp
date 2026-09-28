@@ -75,7 +75,7 @@ void TouchMonitor::start(void)
     if (m_isRunning)
         return;
 
-    LOG(VB_RECORD, LOG_INFO, QString("TouchMonitor: %1 : %2")
+    LOG(VB_GENERAL, LOG_INFO, QString("TouchMonitor: %1 : %2")
         .arg(m_name, toQString(m_config)));
 
     m_isRunning = true;

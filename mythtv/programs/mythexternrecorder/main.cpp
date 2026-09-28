@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
     cmdline.SetupLogging(logFile);
 
-    LOG(VB_RECORD, LOG_CRIT,
+    LOG(VB_GENERAL, LOG_CRIT,
         QString("Starting external recorder %1")
         .arg(QString::fromStdString(desc)));
 
@@ -166,14 +166,14 @@ int main(int argc, char *argv[])
                          }
                          catch (const std::exception& e)
                          {
-                             LOG(VB_RECORD, LOG_ERR,
+                             LOG(VB_GENERAL, LOG_ERR,
                                  QString("Exception processing command: %1")
                                  .arg(e.what()));
                              app.quit();
                          }
                          catch (...)
                          {
-                             LOG(VB_RECORD, LOG_ERR,
+                             LOG(VB_GENERAL, LOG_ERR,
                                  "Unknown exception processing command.");
                              app.quit();
                          }
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     // Start the Qt event loop
     int exitCode = app.exec();
 
-    LOG(VB_RECORD, LOG_DEBUG, "Finished.");
+    LOG(VB_GENERAL, LOG_DEBUG, "Finished.");
     logStop();
 
     return exitCode;

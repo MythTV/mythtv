@@ -105,7 +105,7 @@ Recorder::Recorder(QObject *parent, std::unique_ptr<ExternConfig> config,
 
 Recorder::~Recorder(void)
 {
-    LOG(VB_RECORD, LOG_DEBUG, "External Recorder destructor");
+    LOG(VB_GENERAL, LOG_DEBUG, "External Recorder destructor");
 
     if (m_isStreaming.load())
         stopStreaming(QJsonObject{});
@@ -142,7 +142,7 @@ void Recorder::terminateProcesses(void)
 
             if (myProcess->isRunning())
             {
-                LOG(VB_RECORD, LOG_INFO,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Force terminating %1 process %2")
                     .arg(key)
                     .arg(myProcess->processId()));
@@ -185,26 +185,26 @@ void Recorder::sendResponse(const QJsonObject &originalMsg,
     {
         if (response.value("command").toString() == "STATUS")
         {
-            LOG(VB_RECORD, level,
+            LOG(VB_GENERAL, level,
                 QString("<> %1").arg(response.value("message").toString()));
         }
         else
         {
             if (response.contains("message"))
             {
-                LOG(VB_RECORD, level, QString("'%1' -> '%2'")
+                LOG(VB_GENERAL, level, QString("'%1' -> '%2'")
                     .arg(response.value("command").toString(),
                          response.value("message").toString()));
             }
             else if (response.contains("value"))
             {
-                LOG(VB_RECORD, level, QString("'%1' <- '%2'")
+                LOG(VB_GENERAL, level, QString("'%1' <- '%2'")
                     .arg(response.value("command").toString(),
                          response.value("value").toVariant().toString()));
             }
             else
             {
-                LOG(VB_RECORD, level, QString("> '%1'")
+                LOG(VB_GENERAL, level, QString("> '%1'")
                     .arg(response.value("command").toString()));
             }
         }
@@ -219,7 +219,7 @@ void Recorder::sendResponse(const QJsonObject &originalMsg,
     }
     catch (const std::exception &e)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Failed to send response: %1\nResponse data: %2")
             .arg(QString::fromStdString(e.what()),
                  QString::fromUtf8(QJsonDocument(response)
@@ -234,7 +234,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
     if (rawCmd.isEmpty())
     {
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             "No command parameter present inside incoming message.");
         return true;
     }
@@ -244,7 +244,7 @@ bool Recorder::processCommand(const QJsonObject &message)
     const auto it = m_handlers.constFind(command);
     if (it == m_handlers.constEnd())
     {
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             QString("Unknown backend command: %1").arg(rawCmd));
 
         QJsonObject response = {
@@ -262,7 +262,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
     try
     {
-        LOG(VB_RECORD, level, QString("%1 : %2")
+        LOG(VB_GENERAL, level, QString("%1 : %2")
             .arg(rawCmd,
                  QString::fromUtf8(QJsonDocument(message)
                                    .toJson(QJsonDocument::Compact))));
@@ -271,7 +271,7 @@ bool Recorder::processCommand(const QJsonObject &message)
     }
     catch (const std::exception &e)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Standard exception caught during command execution %1: %2")
             .arg(it.key(), QString::fromStdString(e.what())));
 
@@ -284,7 +284,7 @@ bool Recorder::processCommand(const QJsonObject &message)
     }
     catch (...)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Unknown unhandled critical panic running command: %1")
             .arg(it.key()));
 
@@ -301,7 +301,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
 void Recorder::processVariablesInMessage(const QJsonObject &message)
 {
-    LOG(VB_RECORD, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG,
         "Processing message variables. Message: " +
         QString::fromUtf8(QJsonDocument(message)
                           .toJson(QJsonDocument::Compact)));
@@ -471,7 +471,7 @@ bool Recorder::lockTimeout(const QJsonObject &params)
 
     if (!ok)
     {
-        LOG(VB_RECORD, LOG_WARNING, "lockTimeout logic error");
+        LOG(VB_GENERAL, LOG_WARNING, "lockTimeout logic error");
         value = 3000;
     }
 
@@ -609,7 +609,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
         {
             if (tuneProc->succeeded() && tuneCmd == m_tunedCmd)
             {
-                LOG(VB_RECORD, LOG_INFO,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Already tuned to `(%1)`").arg(tuneCmd));
 
                 QJsonObject response = {{"status", "OK"}, {"message", "Tuned"}};
@@ -623,7 +623,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
             }
             if (tuneProc->isRunning() && tuneCmd == m_tunedCmd)
             {
-                LOG(VB_CHANNEL, LOG_INFO,
+                LOG(VB_GENERAL, LOG_INFO,
                     QString("Already tuning to `%1`").arg(tuneCmd));
 
                 QJsonObject response = {{"status", "OK"},
@@ -635,7 +635,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
         }
     }
 
-    LOG(VB_RECORD, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO,
         QString("Tuning with %1").arg(tuneCmd));
 
     m_tunedCmd = tuneCmd;
@@ -722,7 +722,7 @@ bool Recorder::isOpen(const QJsonObject &params)
 
 bool Recorder::closeRecorder(const QJsonObject &params)
 {
-    LOG(VB_RECORD, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG,
         "CloseRecorder command received from backend. "
         "Stopping all operations.");
 
@@ -742,7 +742,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
 {
     if (m_isStreaming.load())
     {
-        LOG(VB_RECORD, LOG_INFO, "Already streaming");
+        LOG(VB_GENERAL, LOG_INFO, "Already streaming");
 
         QJsonObject response = {{"status", "WARN"},
                                 {"message", "Already streaming"}};
@@ -754,7 +754,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
     // Make sure there is not a dangling thread
     if (m_streamThread.joinable())
     {
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             "Joining previous stream thread before starting a new one");
         m_streamThread.join();
     }
@@ -774,7 +774,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
     if (params.contains("reason"))
     {
         m_streamState = params.value("reason").toString().toLower();
-        LOG(VB_RECORD, LOG_INFO, QString("StartStreaming: %1")
+        LOG(VB_GENERAL, LOG_INFO, QString("StartStreaming: %1")
             .arg(m_streamState));
     }
 
@@ -783,7 +783,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
                                                "", m_shell.isEmpty());
     if (streamCmd.empty() && !profile.empty())
     {
-        LOG(VB_RECORD, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
             QString("[RECORDER]/%1 not provided, Using [RECORDER]/command")
             .arg(QString::fromStdString(key)));
         key = "command";
@@ -794,7 +794,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
     {
         QString message = QString("No [RECORDER]/%1 specified")
                           .arg(QString::fromStdString(key));
-        LOG(VB_RECORD, LOG_WARNING, message);
+        LOG(VB_GENERAL, LOG_WARNING, message);
 
         QJsonObject response = {{"status", "ERR"}, {"message", message}};
 
@@ -802,7 +802,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
         return true;
     }
 
-    LOG(VB_RECORD, LOG_INFO,
+    LOG(VB_GENERAL, LOG_INFO,
         QString("[RECORDER]/%1 : %2")
         .arg(QString::fromStdString(key), QString::fromStdString(streamCmd)));
 
@@ -833,7 +833,7 @@ bool Recorder::stopStreaming(const QJsonObject &params)
 
     if (!wasStreaming)
     {
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             "Received StopStreaming, but engine was already idle.");
 
         QJsonObject response = {
@@ -850,7 +850,7 @@ bool Recorder::stopStreaming(const QJsonObject &params)
         m_streamState =
             params.value("reason").toString().toLower();
 
-        LOG(VB_RECORD, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
             QString("StopStreaming: %1").arg(m_streamState));
     }
 
@@ -891,8 +891,6 @@ bool Recorder::xon(const QJsonObject &params)
         QString cmd = getTunerValue("recstarted");
         executeCommand(cmd, "recstarted", true, false, LOG_DEBUG);
     }
-
-    LOG(VB_RECORD, LOG_INFO, "Data is now flowing to Myth.");
 
     return true;
 }
@@ -937,11 +935,11 @@ bool Recorder::loadChannels(const QJsonObject &params)
                                              "", m_shell.isEmpty());
     if (!scanCmd.empty())
     {
-        LOG(VB_CHANNEL, LOG_INFO, "Populate channels");
+        LOG(VB_GENERAL, LOG_INFO, "Populate channels");
         executeCommand(QString::fromStdString(scanCmd), "loadChannels", false);
     }
 
-    LOG(VB_CHANNEL, LOG_INFO, "Reading channels");
+    LOG(VB_GENERAL, LOG_INFO, "Reading channels");
     m_config->loadChannels();
 
     QJsonObject response = {
@@ -982,7 +980,7 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
     command = command.trimmed();
     if (command.isEmpty())
     {
-        LOG(VB_RECORD, logLvl, QString("%1 not specified").arg(desc));
+        LOG(VB_GENERAL, logLvl, QString("%1 not specified").arg(desc));
         return;
     }
 
@@ -997,7 +995,7 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
             active_proc->disconnect();
             if (active_proc->isRunning())
             {
-                LOG(VB_RECORD, logLvl,
+                LOG(VB_GENERAL, logLvl,
                     QString("Force terminating duplicate process: %1")
                     .arg(desc));
                 active_proc->terminate(1000);
@@ -1018,11 +1016,11 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
     // Capture standard error and output logs
     connect(myProcess, &Process::stdoutReady, this,
             [desc, logLvl](const QString &text)
-            { LOG(VB_RECORD, logLvl, QString("%1| %2").arg(desc, text)); });
+            { LOG(VB_GENERAL, logLvl, QString("%1| %2").arg(desc, text)); });
 
     connect(myProcess, &Process::stderrReady, this,
             [desc, logLvl](const QString &text)
-            { LOG(VB_RECORD, logLvl, QString("%1| %2").arg(desc, text)); });
+            { LOG(VB_GENERAL, logLvl, QString("%1| %2").arg(desc, text)); });
 
     connect(myProcess, &Process::finished, this,
             [this, desc, flag_damaged, logLvl, command, myProcess]
@@ -1030,12 +1028,12 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
             {
                 if (success)
                 {
-                    LOG(VB_RECORD, logLvl,
+                    LOG(VB_GENERAL, logLvl,
                         QString("`%1` completed successfully").arg(command));
                 }
                 else
                 {
-                    LOG(VB_RECORD, LOG_WARNING,
+                    LOG(VB_GENERAL, LOG_WARNING,
                         QString("`%1` completed with code %2")
                         .arg(command).arg(exitCode));
                     if (flag_damaged)
@@ -1072,14 +1070,14 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
     {
         if (!myProcess->start(command, m_env, m_shell))
         {
-            LOG(VB_RECORD, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("Error starting background %1 command").arg(desc));
             m_processes.remove(desc);
             myProcess->deleteLater();
             return;
         }
 
-        LOG(VB_RECORD, logLvl,
+        LOG(VB_GENERAL, logLvl,
             QString("Started background %1 command (%2): %3")
             .arg(desc)
             .arg(myProcess->processId())
@@ -1088,12 +1086,12 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
     else
     {
         // Blocks the loop until process finishes
-        LOG(VB_RECORD, logLvl,
+        LOG(VB_GENERAL, logLvl,
             QString("Executing foreground command: %1").arg(command));
 
         bool result = myProcess->execute(command, m_env);
 
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             QString("Foreground execute returned: %1 succeeded=%2")
             .arg(result)
             .arg(myProcess->succeeded()));
@@ -1106,17 +1104,17 @@ bool Recorder::executeDetachedCommand(const QString& command,
     QString cmd = command.trimmed();
     if (cmd.isEmpty())
     {
-        LOG(VB_RECORD, logLvl, QString("%1 not specified").arg(desc));
+        LOG(VB_GENERAL, logLvl, QString("%1 not specified").arg(desc));
         return true;
     }
 
-    LOG(VB_RECORD, logLvl,
+    LOG(VB_GENERAL, logLvl,
         QString("Starting detached %1 command: %2")
         .arg(desc, cmd));
 
     if (!Process::startDetached(cmd))
     {
-        LOG(VB_RECORD, LOG_WARNING,
+        LOG(VB_GENERAL, LOG_WARNING,
             QString("Unable to start detached %1 command: %2")
             .arg(desc, command));
         return false;
@@ -1201,7 +1199,7 @@ void Recorder::StderrLine(const QString &line)
     }
     else
     {
-        LOG(VB_RECORD, level, QString("<> %1")
+        LOG(VB_GENERAL, level, QString("<> %1")
             .arg(message.remove(QRegularExpression(R"(\s+$)"))));
     }
 }
@@ -1212,7 +1210,7 @@ void Recorder::stderrLoop(int fd)
 
     if (!stream)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Unable to open stderr fd %1: %2")
             .arg(fd)
             .arg(strerror(errno)));
@@ -1243,7 +1241,7 @@ void Recorder::stderrLoop(int fd)
                 }
 
 
-                LOG(VB_RECORD, LOG_ERR,
+                LOG(VB_GENERAL, LOG_ERR,
                     QString("getline error on fd %1: %2")
                     .arg(fd)
                     .arg(strerror(errno)));
@@ -1273,7 +1271,7 @@ void Recorder::streamLoop(QString command)
     auto res = m_streamProcess->launch(command, m_env, m_shell);
     if (!res.ok)
     {
-        LOG(VB_RECORD, LOG_ERR,
+        LOG(VB_GENERAL, LOG_ERR,
             QString("Unable to start stream process: %1").arg(res.error));
         m_isStreaming.store(false);
 
@@ -1306,14 +1304,14 @@ void Recorder::streamLoop(QString command)
             if (errno == EINTR)
                 continue;
 
-            LOG(VB_RECORD, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR,
                 QString("read() failed: %1").arg(strerror(errno)));
             break;
         }
 
         if (bytes == 0)
         {
-            LOG(VB_RECORD, LOG_INFO, "Stream process closed stdout (EOF)");
+            LOG(VB_GENERAL, LOG_INFO, "Stream process closed stdout (EOF)");
             break;
         }
 
@@ -1332,7 +1330,7 @@ void Recorder::streamLoop(QString command)
             if (written <= 0)
             {
                 m_isStreaming.store(false);
-                LOG(VB_RECORD, LOG_WARNING,
+                LOG(VB_GENERAL, LOG_WARNING,
                     QString("Failed to write to stdout: %1")
                     .arg(strerror(errno)));
                 break;
@@ -1352,7 +1350,7 @@ void Recorder::streamLoop(QString command)
     {
         if (!processStillRunning)
         {
-            LOG(VB_RECORD, LOG_ERR, "Stream process died unexpectedly.");
+            LOG(VB_GENERAL, LOG_ERR, "Stream process died unexpectedly.");
 
             QJsonObject context = {{"command", "STATUS"}};
             QJsonObject response = {
@@ -1362,7 +1360,7 @@ void Recorder::streamLoop(QString command)
         }
         else
         {
-            LOG(VB_RECORD, LOG_ERR,
+            LOG(VB_GENERAL, LOG_ERR,
              "Stream process is still running, but stdout closed prematurely.");
         }
     }
@@ -1374,7 +1372,7 @@ void Recorder::streamLoop(QString command)
     if (m_stderrThread.joinable())
         m_stderrThread.join();
 
-    LOG(VB_RECORD, LOG_DEBUG,
+    LOG(VB_GENERAL, LOG_DEBUG,
         "POSIX stream pipeline and tracking threads successfully torn down.");
 }
 
@@ -1390,7 +1388,7 @@ void Recorder::initializeTouchTasks(void)
         // touch.log_level
         QString taskName = QString::fromStdString(name);
 
-        LOG(VB_RECORD, LOG_INFO,
+        LOG(VB_GENERAL, LOG_INFO,
             QString("Registering touch monitor task: %1")
             .arg(taskName));
         TouchMonitor *monitor = new TouchMonitor(taskName, touch, this);

@@ -118,7 +118,7 @@ toml::table ExternTomlConfig::parseFile(const std::filesystem::path& filepath,
     {
         toml::table tbl = toml::parse_file(filepath.string());
 
-        LOG(VB_RECORD, LOG_WARNING, QString("Loaded '%1'\n%2")
+        LOG(VB_GENERAL, LOG_DEBUG, QString("Loaded '%1'\n%2")
             .arg(QString::fromStdString(filepath.string()))
             .arg(QString::fromStdString(tableAsString(tbl))));
 
@@ -736,7 +736,24 @@ std::string ExternTomlConfig::tableAsString(const toml::table& tbl)
 std::string ExternTomlConfig::asString(void) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return tableAsString(m_root);
+
+    std::string result;
+
+    // Export the Runtime Variables map into its own section
+    if (!m_variables.empty())
+    {
+        result += "[VARIABLES]\n";
+        for (const auto& [name, value] : m_variables)
+        {
+            result += name;
+            result += '=';
+            result += value;
+            result += '\n';
+        }
+        result += '\n'; // Separate sections by a clean newline
+    }
+
+    return result + tableAsString(m_root);
 }
 
 ChannelInfo
