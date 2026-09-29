@@ -271,13 +271,14 @@ bool Recorder::processCommand(const QJsonObject &message)
     }
     catch (const std::exception &e)
     {
-        LOG(VB_GENERAL, LOG_ERR,
-            QString("Standard exception caught during command execution %1: %2")
-            .arg(it.key(), QString::fromStdString(e.what())));
+        QString msg = QString("Standard exception caught during command execution of %1: %2")
+            .arg(it.key(), QString::fromStdString(e.what()));
+
+        LOG(VB_GENERAL, LOG_ERR, msg);
 
         QJsonObject response = {
             {"status", "ERR"},
-            {"message", QString::fromStdString(e.what())}
+            {"message", msg}
         };
 
         sendResponse(message, response);
