@@ -70,10 +70,10 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
     m_section["RECORDER"] = getSectionName(m_root, "RECORDER");
 
     // A RECORDER section must exist
-    auto& recSection = m_section.at("RECORDER");
+    const auto& recSection = m_section.at("RECORDER");
     if (!m_root.contains(recSection) || !m_root[recSection].is_table())
     {
-        std::cerr << std::format("Configuration Error: "
+        m_errstrm << std::format("Configuration Error: "
                                  "Missing required section [RECORDER] "
                                  "(Note: Names are case-sensitive).\n");
         m_fatal = true;
@@ -95,7 +95,7 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
 }
 
 std::string ExternTomlConfig::getSectionName(const toml::table& tbl,
-                                               std::string_view name) const
+                                             std::string_view name) const
 {
     for (const auto& [k, n] : tbl)
     {
@@ -126,7 +126,7 @@ toml::table ExternTomlConfig::parseFile(const std::filesystem::path& filepath,
     }
     catch (const toml::parse_error& err)
     {
-        std::cerr << "\n=========================================\n"
+        m_errstrm << "\n=========================================\n"
                   << "Critical toml configuration error\n"
                   << "=========================================\n"
                   << "The " << where << " file '" << filepath
@@ -151,7 +151,7 @@ bool ExternTomlConfig::loadIncludes(void)
 
                 if (!filename)
                 {
-                    std::cerr << "'INCLUDE.files' entries must be strings"
+                    m_errstrm << "'INCLUDE.files' entries must be strings"
                               << std::endl;
                     m_fatal = true;
                     return false;
@@ -194,17 +194,33 @@ bool ExternTomlConfig::loadIncludes(void)
         }
         else
         {
-            std::cerr << "'files' missing from include section" << std::endl;
+            m_errstrm << "'files' missing from include section" << std::endl;
         }
     }
     return true;
 }
 
+const toml::table*
+  ExternTomlConfig::getTable(std::string_view sectionKey) const
+{
+    auto section = m_section.find(std::string(sectionKey));
+    if (section == m_section.end())
+        return nullptr;
+
+    const std::string& sectionName = section->second;
+    return m_root[sectionName].as_table();
+}
+
+toml::table* ExternTomlConfig::getTable(std::string_view sectionKey)
+{
+    return
+        const_cast<toml::table*>(static_cast<const ExternTomlConfig&>(*this)
+                                 .getTable(sectionKey));
+}
+
 bool ExternTomlConfig::loadChannels(void)
 {
-    const auto& section = m_section.at("TUNER");
-    const auto* tuner = m_root[section].as_table();
-
+    const toml::table* tuner = getTable("TUNER");
     if (!tuner)
         return true;
 
@@ -217,7 +233,7 @@ bool ExternTomlConfig::loadChannels(void)
 
     if (!filename)
     {
-        std::cerr << "TUNER/channels must be a string" << std::endl;
+        m_errstrm << "TUNER/channels must be a string" << std::endl;
         return false;
     }
 
@@ -237,14 +253,14 @@ bool ExternTomlConfig::loadChannels(void)
     return true;
 }
 
-static std::optional<std::chrono::seconds>
-  parseDuration(const toml::node& node, std::string_view name)
+std::optional<std::chrono::seconds>
+  ExternTomlConfig::parseDuration(const toml::node& node, std::string_view name) const
 {
     if (const auto value = node.value<int>())
     {
         if (*value < 0)
         {
-            std::cerr << std::format("{} cannot be negative\n", name);
+            m_errstrm << std::format("{} cannot be negative\n", name);
             return std::nullopt;
         }
 
@@ -254,7 +270,7 @@ static std::optional<std::chrono::seconds>
     const auto value = node.value<std::string_view>();
     if (!value)
     {
-        std::cerr << std::format(
+        m_errstrm << std::format(
             "{} must be an integer or duration string\n", name);
         return std::nullopt;
     }
@@ -292,7 +308,7 @@ static std::optional<std::chrono::seconds>
 
     if (!remaining.empty() || count == 0)
     {
-        std::cerr << std::format("Invalid duration '{}' for {}\n",
+        m_errstrm << std::format("Invalid duration '{}' for {}\n",
                                  *value, name);
         return std::nullopt;
     }
@@ -325,8 +341,9 @@ static std::optional<std::chrono::seconds>
     return std::chrono::seconds(total_seconds);
 }
 
-static TouchConfig parseTouchConfig(const std::string& name,
-                                    const toml::table& table)
+TouchConfig
+  ExternTomlConfig::parseTouchConfig(const std::string& name,
+                                     const toml::table& table) const
 {
     TouchConfig config;
 
@@ -353,7 +370,7 @@ static TouchConfig parseTouchConfig(const std::string& name,
     const auto command = table["command"].value<std::string>();
     if (!command)
     {
-        std::cerr << std::format("[TOUCH.{}].command must be a string", name)
+        m_errstrm << std::format("[TOUCH.{}].command must be a string", name)
                   << std::endl;
         return {};
     }
@@ -375,9 +392,7 @@ static TouchConfig parseTouchConfig(const std::string& name,
 
 bool ExternTomlConfig::loadTouch(void)
 {
-    const auto& section = m_section.at("TOUCH");
-    auto* touch = m_root[section].as_table();
-
+    const toml::table* touch = getTable("TOUCH");
     if (!touch)
         return true;
 
@@ -385,7 +400,7 @@ bool ExternTomlConfig::loadTouch(void)
     {
         if (!node.as_table())
         {
-            std::cerr << std::format("[TOUCH.{}] must be a table", key.str())
+            m_errstrm << std::format("[TOUCH.{}] must be a table", key.str())
                       << std::endl;
             return false;
         }
@@ -431,10 +446,9 @@ void ExternTomlConfig::mergeTable(const toml::table& source,
 
 bool ExternTomlConfig::variableExists(std::string_view varName) const
 {
-    const auto& sectionName = m_section.at("VARIABLES");
-    const auto* variables = m_root[sectionName].as_table();
+    const toml::table* variables = getTable("VARIABLES");
     if (!variables)
-        return false;
+        return true;
 
     for (const auto& [k, n] : *variables)
     {
@@ -450,8 +464,7 @@ bool ExternTomlConfig::variableExists(std::string_view varName) const
 
 std::string ExternTomlConfig::expandVariable(std::string_view varName) const
 {
-    const auto& varSection = m_section.at("VARIABLES");
-    const auto* variables = m_root[varSection].as_table();
+    const toml::table* variables = getTable("VARIABLES");
     if (!variables)
         return {};
 
@@ -478,7 +491,7 @@ std::string ExternTomlConfig::expandVariable(std::string_view varName) const
         return vb->get() ? "true" : "false";
     else
     {
-        std::cerr << std::format("Configuration variable '{}' "
+        m_errstrm << std::format("Configuration variable '{}' "
                                  "is not a scalar value", varName)
                   << std::endl;
         return {};
@@ -596,7 +609,7 @@ std::string ExternTomlConfig::expandVars(std::string value) const
 
         if (++substitutions > maxSubstitutions)
         {
-            std::cerr << "Too many variable substitutions; "
+            m_errstrm << "Too many variable substitutions; "
                       << "possible circular reference" << std::endl;
             m_fatal = true;
             return {};
@@ -611,10 +624,10 @@ std::string ExternTomlConfig::expandVars(std::string value) const
 
 const toml::table ExternTomlConfig::variables(void) const
 {
-    const auto& sectionName = m_section.at("VARIABLES");
-    const auto* variables = m_root[sectionName].as_table();
+    const toml::table* variables = getTable("VARIABLES");
     if (!variables)
         return {};
+
     return *variables;
 }
 
@@ -623,16 +636,14 @@ const toml::table ExternTomlConfig::variables(void) const
 // -------------------------------------------------------------------------
 bool ExternTomlConfig::hasTable(const std::string& table) const
 {
-    const auto& sectionName = m_section.at(table);
-    const auto* node = m_root.get(sectionName);
+    const toml::table* node = getTable(table);
     return node && node->is_table();
 }
 
 void ExternTomlConfig::updateVariable(std::string_view key,
                                       std::string_view value)
 {
-    const auto& sectionName = m_section.at("VARIABLES");
-    auto* variables = m_root[sectionName].as_table();
+    toml::table* variables = getTable("VARIABLES");
     if (!variables)
         return;
 
@@ -679,8 +690,7 @@ std::optional<std::string>
                              std::string_view keyName,
                              bool expand) const
 {
-    const auto& section = m_section.at(std::string(tableName));
-    const auto* targetTable = m_root[section].as_table();
+    const toml::table* targetTable = getTable(tableName);
     if (!targetTable)
         return std::nullopt;
 

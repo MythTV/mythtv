@@ -50,9 +50,17 @@ class ExternTomlConfig : public ExternConfig
 
     std::string getSectionName(const toml::table& tbl,
                                std::string_view name) const;
+    const toml::table* getTable(std::string_view sectionKey) const;
+    toml::table* getTable(std::string_view sectionKey);
 
-    static toml::table parseFile(const std::filesystem::path& filename,
-                                 const std::string& where);
+    toml::table parseFile(const std::filesystem::path& filename,
+                          const std::string& where);
+
+    std::optional<std::chrono::seconds>
+      parseDuration(const toml::node& node, std::string_view name) const;
+
+    TouchConfig parseTouchConfig(const std::string& name,
+                                 const toml::table& table) const;
 
     static void mergeTable(const toml::table& source,
                            toml::table& destination);

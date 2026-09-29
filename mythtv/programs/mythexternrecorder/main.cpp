@@ -124,6 +124,10 @@ int main(int argc, char *argv[])
         QString("Starting external recorder %1")
         .arg(QString::fromStdString(desc)));
 
+    QString config_errors = QString::fromStdString(config->ErrorMsg());
+    if (!config_errors.isEmpty())
+        LOG(VB_GENERAL, LOG_ERR, config_errors);
+
     QTextStream stderrStream(stderr);
 
     StdinNotifier stdinNotifier;

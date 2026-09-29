@@ -25,7 +25,7 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
     std::ifstream checkStream(filename);
     if (!checkStream.is_open())
     {
-        std::cerr << std::format("Unable to read configuration file '{}': "
+        m_errstrm << std::format("Unable to read configuration file '{}': "
                                  "Permission denied or file missing.\n",
                                  filename.string());
         m_fatal = true;
@@ -44,7 +44,7 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
     // Validate Format and Parse Status
     if (m_settings.status() == QSettings::FormatError)
     {
-        std::cerr << std::format("Malformed syntax detected in '{}'. "
+        m_errstrm << std::format("Malformed syntax detected in '{}'. "
                                  "Check formatting tokens.\n",
                                  filename.string());
         m_fatal = true;
@@ -307,7 +307,7 @@ std::string ExternIniConfig::expandVars(std::string value) const
 
         if (++substitutions > maxSubstitutions)
         {
-            std::cerr << "Too many variable substitutions; "
+            m_errstrm << "Too many variable substitutions; "
                       << "possible circular reference" << std::endl;
             m_fatal = true;
             return {};
@@ -339,7 +339,7 @@ bool ExternIniConfig::loadChannels(void)
 
     if (settings->status() != QSettings::NoError)
     {
-        std::cerr << std::format("Unable to load channel configuration '{}'",
+        m_errstrm << std::format("Unable to load channel configuration '{}'",
                                  channelsPath.string())
                   << std::endl;
 

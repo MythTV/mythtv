@@ -87,7 +87,12 @@ class ExternConfig
     std::filesystem::path m_basePath;
     mutable bool m_fatal {false};
 
+    std::string ErrorMsg(void) const { return m_errstrm.str(); }
+
   protected:
     std::map<std::string, TouchConfig> m_touch;
+
     VarContainer m_variables;
+
+    mutable std::ostringstream m_errstrm;
 };
