@@ -6,7 +6,7 @@
 
 function(find_or_build_ffmpeg)
   if(LIBS_USE_INSTALLED)
-    pkg_check_modules(LIBAVCODEC libmythavcodec QUIET IMPORTED_TARGET)
+    pkg_check_modules(LIBAVCODEC libmythavcodec${MYTH_FFMPEG_BUILD_SUFFIX} QUIET IMPORTED_TARGET)
     if(TARGET PkgConfig::LIBAVCODEC)
       message(STATUS "Found FFmpeg in ${LIBAVCODEC_LIBDIR}")
       set(ProjectDepends
@@ -55,6 +55,10 @@ function(find_or_build_ffmpeg)
     --disable-static
     --enable-shared
     )
+
+  if(NOT MYTH_FFMPEG_BUILD_SUFFIX STREQUAL "")
+    list(APPEND FF_ARGS --build-suffix=${MYTH_FFMPEG_BUILD_SUFFIX})
+  endif()
 
   if(NOT LIBS_INSTALL_PREFIX STREQUAL CMAKE_INSTALL_PREFIX)
     list(APPEND FF_ARGS --extra-cflags=-I${LIBS_INSTALL_PREFIX}/include
@@ -171,7 +175,11 @@ function(find_or_build_ffmpeg)
     set_target_properties(embedded_libs PROPERTIES REQUIRES_RW TRUE)
   endif()
 
-  message(STATUS "Will build FFmpeg (embedded)")
+  if(MYTH_FFMPEG_BUILD_SUFFIX STREQUAL "")
+    message(STATUS "Will build FFmpeg (embedded)")
+  else()
+    message(STATUS "Will build FFmpeg (embedded) with --build-suffix=${MYTH_FFMPEG_BUILD_SUFFIX}")
+  endif()
 
   ExternalProject_Add_Step(
     FFmpeg install_pkgconfig_files

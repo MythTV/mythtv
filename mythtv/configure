@@ -118,6 +118,7 @@ Advanced options (experts only):
   --disable-avx            disable AVX optimizations
   --disable-yasm           disable use of yasm assembler
   --enable-pic             build position-independent code
+  --build-suffix=SUFFIX    append SUFFIX to embedded FFmpeg library names []
   --enable-proc-opt        enable processor specific compilation
   --enable-compdb          enable clang compiler database
 
@@ -5733,6 +5734,8 @@ ffmpeg_optset extra_cxxflags extra_ldflags target_os
 ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optset ar nm ranlib
+# ffmpeg_optset would emit --build_suffix (note the underscore).
+test -n "$build_suffix" && ffopts="$ffopts '--build-suffix=$build_suffix'"
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
