@@ -126,6 +126,8 @@ class MUI_PUBLIC MythImage : public QImage, public ReferenceCounter
     bool           m_cached        {false};
 
     static MythUIHelper *s_ui;
+
+  friend class MythPainter; // Give MythPainter::Teardown() access to ~MythImage()
 };
 
 #endif

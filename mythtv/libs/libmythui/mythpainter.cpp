@@ -38,7 +38,10 @@ void MythPainter::Teardown(void)
     }
 
     for (auto *image : std::as_const(m_allocatedImages))
+    {
         image->SetParent(nullptr);
+        delete image;
+    }
     m_allocatedImages.clear();
 }
 
