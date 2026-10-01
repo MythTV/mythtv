@@ -112,6 +112,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    config->updateVariable("INPUTID",
+                           cmdline.toString("inputid").toStdString());
+
     // Init logging
     std::string desc = config->getValue("RECORDER", "desc",
                                         confFile.stem().string(), true);
