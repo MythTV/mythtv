@@ -247,15 +247,10 @@ class ImageLoader
 
         if (image)
         {
-            if (VERBOSE_LEVEL_CHECK(VB_GUI | VB_FILE, LOG_INFO))
-            {
-                image->IncrRef();
-                int cnt = image->DecrRef();
-                LOG(VB_GUI | VB_FILE, LOG_INFO,
-                    QString("ImageLoader::LoadImage(%1) Found in cache, "
-                            "RefCount = %2")
-                    .arg(cacheKey).arg(cnt));
-            }
+            LOG(VB_GUI | VB_FILE, LOG_INFO,
+                QString("ImageLoader::LoadImage(%1) Found in cache, "
+                        "RefCount = %2")
+                .arg(cacheKey).arg(image->GetRefCount()));
 
             if (imProps.m_isReflected)
                 image->setIsReflected(true);
