@@ -1533,7 +1533,7 @@ void AllMusic::resync()
 
     m_numPcs = query.size() * 2;
     m_numLoaded = 0;
-    QList<MusicMetadata::IdType> idList;
+    QSet<MusicMetadata::IdType> idList;
 
     if (query.isActive() && query.size() > 0)
     {
@@ -1541,7 +1541,7 @@ void AllMusic::resync()
         {
             MusicMetadata::IdType id = query.value(0).toInt();
 
-            idList.append(id);
+            idList.insert(id);
 
             auto *dbMeta = new MusicMetadata(
                 query.value(12).toString(),    // filename
