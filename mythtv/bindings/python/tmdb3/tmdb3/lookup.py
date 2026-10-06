@@ -346,7 +346,12 @@ def buildEpisode(args, opts):
         inetref = query
     else:
         results = searchSeries(query)
-        series = results[0]
+        try:
+            series = results[0]
+        except IndexError:
+            # the title matched no series, so there is nothing to look up
+            sys.stdout.write('ERROR: Series not found: ' + str(args))
+            return 9
         inetref = str(series.id)
 
     series = Series(inetref)
