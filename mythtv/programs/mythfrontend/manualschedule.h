@@ -43,6 +43,7 @@ class ManualSchedule : public MythScreenType
     QList<uint32_t> m_chanids;
 
     MythUITextEdit *m_titleEdit       {nullptr};
+    MythUITextEdit *m_subtitleEdit    {nullptr};
 
     MythUIButtonList *m_channelList   {nullptr};
     MythUIButtonList *m_startdateList {nullptr};
