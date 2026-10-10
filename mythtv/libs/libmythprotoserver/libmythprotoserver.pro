@@ -33,13 +33,13 @@ LIBS += -L../libmythbase
 LIBS += -L../libmythtv
 LIBS += -L../libmythui
 LIBS += -L../libmythupnp
-LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
+LIBS += -L../../external/FFmpeg/libswresample $$mythFFmpegLib(swresample)
 LIBS += -L../../external/FFmpeg/libavutil -L../../external/FFmpeg/libavcodec
 LIBS += -L../../external/FFmpeg/libavformat -L../../external/FFmpeg/libswscale
 LIBS += -lmythbase-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION
 LIBS += -lmythtv-$$LIBVERSION -lmythupnp-$$LIBVERSION
-LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
+LIBS += $$mythFFmpegLib(avutil) $$mythFFmpegLib(avcodec) $$mythFFmpegLib(avformat) $$mythFFmpegLib(swscale)
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 using_mheg:LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 

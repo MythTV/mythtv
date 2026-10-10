@@ -17,9 +17,9 @@ INSTALLS += target
 
 INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
-LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
+LIBS += $$mythFFmpegLib(avformat)
+LIBS += $$mythFFmpegLib(avcodec)
+LIBS += $$mythFFmpegLib(avutil)
 LIBS += -ltag -logg -lvorbisfile -lvorbis -lvorbisenc -lFLAC -lmp3lame
 LIBS += -lmythmetadata-$$LIBVERSION
 LIBS += -lmythtv-$$LIBVERSION

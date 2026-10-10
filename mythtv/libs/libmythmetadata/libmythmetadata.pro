@@ -44,12 +44,12 @@ INCLUDEPATH += $${CONFIG_TAGLIB_INCLUDES}
 
 LIBS += -L../libmythbase           -lmythbase-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
-LIBS += -L../../external/FFmpeg/libswresample -lmythswresample
-LIBS += -L../../external/FFmpeg/libavutil -lmythavutil
-LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
+LIBS += -L../../external/FFmpeg/libswresample $$mythFFmpegLib(swresample)
+LIBS += -L../../external/FFmpeg/libavutil $$mythFFmpegLib(avutil)
+LIBS += -L../../external/FFmpeg/libavcodec $$mythFFmpegLib(avcodec)
+LIBS += -L../../external/FFmpeg/libavformat $$mythFFmpegLib(avformat)
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
-LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
+LIBS += -L../../external/FFmpeg/libswscale $$mythFFmpegLib(swscale)
 
 !using_system_libexiv2 {
     darwin {

@@ -15,12 +15,12 @@ LIBS += -L../../../libmythtv -lmythtv-$$LIBVERSION
 # libmythui for MythUIProgressDialog
 LIBS += -L../../../libmythui -lmythui-$$LIBVERSION
 LIBS += -L../../../libmythupnp -lmythupnp-$$LIBVERSION
-LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
-LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
-LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
-LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
+LIBS += -L../../../../external/FFmpeg/libswresample $$mythFFmpegLib(swresample)
+LIBS += -L../../../../external/FFmpeg/libavutil $$mythFFmpegLib(avutil)
+LIBS += -L../../../../external/FFmpeg/libavcodec $$mythFFmpegLib(avcodec)
+LIBS += -L../../../../external/FFmpeg/libswscale $$mythFFmpegLib(swscale)
+LIBS += -L../../../../external/FFmpeg/libavformat $$mythFFmpegLib(avformat)
+LIBS += -L../../../../external/FFmpeg/libavfilter $$mythFFmpegLib(avfilter)
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil

@@ -2,10 +2,10 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-LIBS += -lmythswscale
-LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
+LIBS += $$mythFFmpegLib(swscale)
+LIBS += $$mythFFmpegLib(avformat)
+LIBS += $$mythFFmpegLib(avcodec)
+LIBS += $$mythFFmpegLib(avutil)
 LIBS += -lmythmetadata-$$LIBVERSION
 LIBS += -lmythtv-$$LIBVERSION
 # libmythtv dependencies
