@@ -38,7 +38,13 @@ void MythPainter::Teardown(void)
     }
 
     for (auto *image : std::as_const(m_allocatedImages))
+    {
         image->SetParent(nullptr);
+        while (image->DecrRef() > 0)
+        {
+            // decrement until deletion
+        }
+    }
     m_allocatedImages.clear();
 }
 
