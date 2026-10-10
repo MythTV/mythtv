@@ -276,6 +276,31 @@ LaunchResult PosixProcess::launch(const QString& command,
     int stdoutPipe[2];
     int stderrPipe[2];
 
+#include <unistd.h>
+#include <fcntl.h>
+
+#ifdef __APPLE__
+    if (pipe(stdoutPipe) < 0)
+    {
+        QString errStr = QString("Failed to create stdout pipe: %1")
+                             .arg(QString::fromLocal8Bit(strerror(errno)));
+        LOG(VB_GENERAL, LOG_ERR, errStr);
+        return {false, errStr};
+    }
+    fcntl(stdoutPipe[0], F_SETFD, FD_CLOEXEC);
+    fcntl(stdoutPipe[1], F_SETFD, FD_CLOEXEC);
+
+    if (pipe(stderrPipe) < 0)
+    {
+        QString errStr = QString("Failed to create stderr pipe: %1")
+                             .arg(QString::fromLocal8Bit(strerror(errno)));
+        LOG(VB_GENERAL, LOG_ERR, errStr);
+        return {false, errStr};
+    }
+    fcntl(stderrPipe[0], F_SETFD, FD_CLOEXEC);
+    fcntl(stderrPipe[1], F_SETFD, FD_CLOEXEC);
+#else
+    // Standard Linux path
     if (pipe2(stdoutPipe, O_CLOEXEC) < 0)
     {
         QString errStr = QString("Failed to create stdout pipe: %1")
@@ -293,6 +318,7 @@ LaunchResult PosixProcess::launch(const QString& command,
         close(stdoutPipe[1]);
         return {false, errStr};
     }
+#endif
 
     // Actions
     posix_spawn_file_actions_t actions;
