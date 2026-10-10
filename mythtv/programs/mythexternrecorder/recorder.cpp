@@ -816,7 +816,9 @@ bool Recorder::startStreaming(const QJsonObject &params)
     m_streamThread = std::thread(&Recorder::streamLoop, this,
                                   QString::fromStdString(streamCmd));
 
+#if defined(Q_OS_LINUX)
     pthread_setname_np(m_streamThread.native_handle(), "stream");
+#endif
 
     return true;
 }
