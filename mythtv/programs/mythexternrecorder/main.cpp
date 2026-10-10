@@ -24,7 +24,12 @@
 #include <unistd.h>
 #include <cstdio>
 #include <iostream>
+
+#ifdef __linux__
 #include <sys/prctl.h>
+#else
+#include <pthread.h>
+#endif
 
 // Qt
 #include <QCoreApplication>
