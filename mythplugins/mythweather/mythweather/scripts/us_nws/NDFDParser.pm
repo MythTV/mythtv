@@ -68,7 +68,7 @@ sub EndDocument {
 
 sub conditionsStart {
     my ($expat, $name, %atts)  = @_;
-    
+
     if ($name eq 'value') {
         $timestr = $currtimearray->[$expat->{timeindex}];
         my $condhash = {};
@@ -160,16 +160,12 @@ sub timeChar {
         # you can't get a date out of UnixDate that has tz in 0:00 format,
         # annoying.
         $text = UnixDate($text, "%O%z");
-        if ($currKey =~ /p3h/) {
-            push (@$currtimearray, $text);
-        }
+        push (@$currtimearray, $text);
         $expat->{CurrStartTime} = $text;
     }
     if ($expat->in_element('end-valid-time')) {
         $text = UnixDate($text, "%O%z");
-        if ($currKey !~ /p3h/) {
-            push (@$currtimearray, "$expat->{CurrStartTime},$text");
-        }
+          push (@$currtimearray, "$expat->{CurrStartTime},$text");
 
     }
 }
@@ -179,10 +175,12 @@ sub timeChar {
 sub doParse {
     my ($lat, $lon, $start, $end, $units, $params) = @_;
     my $product = "time-series";
+    my $dataformat = "DWML";
 
     my $NDFD_XML = ndfdXML->NDFDgen(SOAP::Data->name("latitude" => $lat), 
         SOAP::Data->name("longitude" => $lon),
         SOAP::Data->name("product" => $product),
+        $dataformat,
         SOAP::Data->name("startTime" => $start),
         SOAP::Data->name("endTime" => $end),
         SOAP::Data->name("Unit" => $units),

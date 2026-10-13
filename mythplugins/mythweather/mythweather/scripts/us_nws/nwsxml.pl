@@ -81,7 +81,7 @@ if (!(defined $opt_u && defined $loc && !$loc eq "")) {
 
 my $units = $opt_u;
 
-my $base_url = 'http://w1.weather.gov/xml/current_obs/';
+my $base_url = 'http://forecast.weather.gov/xml/current_obs/';
 my $url = $base_url . $loc . '.xml';
 my $response = get $url;
 die unless defined $response;
