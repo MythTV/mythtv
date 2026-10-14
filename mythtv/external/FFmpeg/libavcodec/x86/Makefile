@@ -1,5 +1,9 @@
 OBJS                                   += x86/constants.o               \
 
+EMMS_OBJS_$(HAVE_MMX_INLINE)_$(HAVE_MMX_EXTERNAL)_$(HAVE_MM_EMPTY) = x86/emms.o
+# Add internal copy of ff_emms() to lavc for shared builds (if needed).
+SHLIBOBJS                              += $(EMMS_OBJS__yes_)
+
 # subsystems
 X86ASM-OBJS-$(CONFIG_AC3DSP)           += x86/ac3dsp_init.o
 X86ASM-OBJS-$(CONFIG_AUDIODSP)         += x86/audiodsp_init.o
@@ -65,8 +69,10 @@ X86ASM-OBJS-$(CONFIG_PRORES_DECODER)   += x86/proresdsp_init.o
 X86ASM-OBJS-$(CONFIG_PRORES_RAW_DECODER) += x86/proresdsp_init.o
 X86ASM-OBJS-$(CONFIG_RV40_DECODER)     += x86/rv40dsp_init.o
 X86ASM-OBJS-$(CONFIG_SBC_ENCODER)      += x86/sbcdsp_init.o
-OBJS-$(CONFIG_SNOW_DECODER)            += x86/snowdsp.o
-OBJS-$(CONFIG_SNOW_ENCODER)            += x86/snowdsp.o
+OBJS-$(CONFIG_SNOW_DECODER)            += x86/snowdsp_init.o
+X86ASM-OBJS-$(CONFIG_SNOW_DECODER)     += x86/snowdsp.o
+OBJS-$(CONFIG_SNOW_ENCODER)            += x86/snowdsp_init.o
+X86ASM-OBJS-$(CONFIG_SNOW_ENCODER)     += x86/snowdsp.o
 X86ASM-OBJS-$(CONFIG_SVQ1_ENCODER)     += x86/svq1enc_init.o
 X86ASM-OBJS-$(CONFIG_TAK_DECODER)      += x86/takdsp_init.o
 OBJS-$(CONFIG_TRUEHD_DECODER)          += x86/mlpdsp_init.o

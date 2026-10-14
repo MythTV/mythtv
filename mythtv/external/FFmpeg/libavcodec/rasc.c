@@ -51,6 +51,8 @@ typedef struct RASCContext {
     GetByteContext  gb;
     uint8_t        *delta;
     int             delta_size;
+    uint8_t        *mv_scratch;
+    unsigned int    mv_scratch_size;
     uint8_t        *cursor;
     int             cursor_size;
     unsigned        cursor_w;
@@ -294,10 +296,8 @@ static int decode_move(AVCodecContext *avctx,
                 b2 -= s->frame2->linesize[0];
             }
         } else if (type == 0) {
-            uint8_t *buffer;
-
-            av_fast_padded_malloc(&s->delta, &s->delta_size, w * h * s->bpp);
-            buffer = s->delta;
+            av_fast_padded_malloc(&s->mv_scratch, &s->mv_scratch_size, w * h * s->bpp);
+            uint8_t *buffer = s->mv_scratch;
             if (!buffer)
                 return AVERROR(ENOMEM);
 
@@ -318,6 +318,11 @@ static int decode_move(AVCodecContext *avctx,
     bytestream2_skip(gb, size - (bytestream2_tell(gb) - pos));
 
     return 0;
+}
+
+static inline int dlta_room(unsigned cx, unsigned w, unsigned bpp, unsigned need)
+{
+    return cx + need <= w * bpp;
 }
 
 #define NEXT_LINE                        \
@@ -418,6 +423,8 @@ static int decode_dlta(AVCodecContext *avctx,
         case 4:
             fill = bytestream2_get_byte(&dc);
             while (len > 0 && cy > 0) {
+                if (!dlta_room(cx, w, s->bpp, 4))
+                    return AVERROR_INVALIDDATA;
                 AV_WL32(b1 + cx, AV_RL32(b2 + cx));
                 AV_WL32(b2 + cx, fill);
                 cx++;
@@ -427,6 +434,8 @@ static int decode_dlta(AVCodecContext *avctx,
         case 7:
             fill = bytestream2_get_le32(&dc);
             while (len > 0 && cy > 0) {
+                if (!dlta_room(cx, w, s->bpp, 4))
+                    return AVERROR_INVALIDDATA;
                 AV_WL32(b1 + cx, AV_RL32(b2 + cx));
                 AV_WL32(b2 + cx, fill);
                 cx += 4;
@@ -443,6 +452,8 @@ static int decode_dlta(AVCodecContext *avctx,
             while (len > 0 && cy > 0) {
                 unsigned v0, v1;
 
+                if (!dlta_room(cx, w, s->bpp, 4))
+                    return AVERROR_INVALIDDATA;
                 v0 = AV_RL32(b2 + cx);
                 v1 = AV_RL32(b1 + cx);
                 AV_WL32(b2 + cx, v1);
@@ -454,6 +465,8 @@ static int decode_dlta(AVCodecContext *avctx,
         case 13:
             while (len > 0 && cy > 0) {
                 fill = bytestream2_get_le32(&dc);
+                if (!dlta_room(cx, w, s->bpp, 4))
+                    return AVERROR_INVALIDDATA;
                 AV_WL32(b1 + cx, AV_RL32(b2 + cx));
                 AV_WL32(b2 + cx, fill);
                 cx += 4;
@@ -772,6 +785,8 @@ static av_cold int decode_close(AVCodecContext *avctx)
     s->cursor_size = 0;
     av_freep(&s->delta);
     s->delta_size = 0;
+    av_freep(&s->mv_scratch);
+    s->mv_scratch_size = 0;
     av_frame_free(&s->frame1);
     av_frame_free(&s->frame2);
     ff_inflate_end(&s->zstream);

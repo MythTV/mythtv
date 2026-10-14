@@ -45,7 +45,7 @@ layout (constant_id =  8) const bool planar_rgb = false;
 layout (constant_id =  9) const int codec_planes = 0;
 layout (constant_id = 10) const int color_planes = 0;
 layout (constant_id = 11) const int planes = 0;
-layout (constant_id = 12) const int bits = 0;
+layout (constant_id = 12) const int c_bits = 0;
 
 layout (constant_id = 13) const int chroma_shift_x = 0;
 layout (constant_id = 14) const int chroma_shift_y = 0;
@@ -55,6 +55,7 @@ const ivec2 chroma_shift = ivec2(chroma_shift_x, chroma_shift_y);
 layout (constant_id = 15) const bool force_pcm = false;
 layout (constant_id = 16) const bool rct_search = false;
 layout (constant_id = 17) const uint context_model = 0;
+layout (constant_id = 18) const uint remap_mode = 0;
 
 layout (push_constant, scalar) uniform pushConstants {
     u8buf slice_data;
@@ -74,6 +75,7 @@ layout (push_constant, scalar) uniform pushConstants {
     ivec2 sar;
     int pic_mode;
     uint slice_size_max;
+    uint max_pixels_per_slice;
 };
 
 #include "rangecoder.glsl"
@@ -98,6 +100,11 @@ struct SliceContext {
 
     uint slice_coding_mode;
     bool slice_reset_contexts;
+
+    i32vec4 remap_count;
+
+    /* Decoder-only */
+    uint remap;
 };
 
 #if !defined(SB_QUALI)
@@ -115,6 +122,8 @@ layout (set = 1, binding = 0, scalar) SB_QUALI buffer slice_ctx_buf {
 uint slice_coord(uint width, uint sx, uint num_h_slices, uint chroma_shift)
 {
     uint mpw = 1 << chroma_shift;
+    if (colorspace == 2)
+        mpw = max(mpw, 2u);
     uint awidth = align(width, mpw);
 
     if ((version < 4) || ((version == 4) && (micro_version < 3)))
@@ -128,6 +137,35 @@ uint slice_coord(uint width, uint sx, uint num_h_slices, uint chroma_shift)
 }
 
 #if defined(ENCODE) || defined(DECODE)
+
+#define ceil_log2(x) (findMSB(uint(((uint(x) - 1u) << 1u) | 1u)))
+
+u16vec4 get_slice_bits(in SliceContext sc)
+{
+#ifndef FLOAT
+    return u16vec4(c_bits, c_bits, c_bits, c_bits);
+#else
+    u32vec4 cnt = sc.remap_count;
+#if defined(ENCODE)
+    if (remap_mode == 0)
+#elif defined(DECODE)
+    if (sc.remap == 0)
+#endif
+        cnt = u32vec4(uint(rct_offset), uint(rct_offset),
+                      uint(rct_offset), uint(rct_offset));
+
+    u16vec4 bits = u16vec4(cnt);
+    if (sc.slice_coding_mode == 0) {
+        uint max3 = max(cnt[0], max(cnt[1], cnt[2]));
+        bits = u16vec4(ceil_log2(max3),
+                       ceil_log2(cnt[0] + cnt[1]),
+                       ceil_log2(cnt[0] + cnt[2]),
+                       ceil_log2(cnt[3]));
+    }
+
+    return bits;
+#endif
+}
 
 layout (set = 0, binding = 1, scalar) readonly uniform quant_buf {
     int16_t quant_table[MAX_QUANT_TABLES]
@@ -236,14 +274,19 @@ ivec2 get_pred(readonly uimage2D pred, ivec2 sp, ivec2 off,
 
 void linecache_load(readonly uimage2D src, ivec2 sp, int y, uint comp)
 {
-    if (gl_LocalInvocationID.x == 0) {
+    if (gl_LocalInvocationID.x == 0)
         linecache[0] = TYPE(0);
-    } else if (gl_LocalInvocationID.x == 1) {
+
+#ifndef GOLOMB
+    if (gl_LocalInvocationID.x == 1)
+#endif
+    {
         TYPE c = TYPE(0);
         if (y > 0)
             c = TYPE(imageLoad(src, sp + LADDR(ivec2(0, y - 1)))[comp]);
         linecache[1] = c;
     }
+
     barrier();
 }
 

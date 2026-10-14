@@ -29,6 +29,7 @@
 #include "hwcontext.h"
 #include "hwcontext_internal.h"
 #include "hwcontext_videotoolbox.h"
+#include "attributes.h"
 #include "mem.h"
 #include "pixfmt.h"
 #include "pixdesc.h"
@@ -85,6 +86,7 @@ static const struct {
 #if HAVE_KCVPIXELFORMATTYPE_422YPCBCR8_YUVS
     { kCVPixelFormatType_422YpCbCr8_yuvs,               false, AV_PIX_FMT_YUYV422 },
 #endif
+    { 'bp16'/*kCVPixelFormatType_16VersatileBayer*/,    false, AV_PIX_FMT_BAYER_RGGB16},
 };
 
 static const enum AVPixelFormat supported_formats[] = {
@@ -120,6 +122,7 @@ static const enum AVPixelFormat supported_formats[] = {
     AV_PIX_FMT_YUYV422,
 #endif
     AV_PIX_FMT_BGRA,
+    AV_PIX_FMT_BAYER_RGGB16,
 };
 
 static int vt_frames_get_constraints(AVHWDeviceContext *ctx,
@@ -462,6 +465,7 @@ CFStringRef av_map_videotoolbox_color_matrix_from_av(enum AVColorSpace space)
 #if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_ITU_R_2100_HLG
         if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *))
             return CVYCbCrMatrixGetStringForIntegerCodePoint(space);
+        av_fallthrough;
 #endif
     case AVCOL_SPC_UNSPECIFIED:
         return NULL;
@@ -487,6 +491,7 @@ CFStringRef av_map_videotoolbox_color_primaries_from_av(enum AVColorPrimaries pr
 #if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_ITU_R_2100_HLG
         if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *))
             return CVColorPrimariesGetStringForIntegerCodePoint(pri);
+        av_fallthrough;
 #endif
     case AVCOL_PRI_UNSPECIFIED:
         return NULL;
@@ -534,6 +539,7 @@ CFStringRef av_map_videotoolbox_color_trc_from_av(enum AVColorTransferCharacteri
 #if HAVE_KCVIMAGEBUFFERTRANSFERFUNCTION_ITU_R_2100_HLG
         if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, watchOS 4, *))
             return CVTransferFunctionGetStringForIntegerCodePoint(trc);
+        av_fallthrough;
 #endif
     case AVCOL_TRC_UNSPECIFIED:
         return NULL;
