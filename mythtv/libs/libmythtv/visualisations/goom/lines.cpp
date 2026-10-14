@@ -7,11 +7,11 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <numbers>
 
 #include "lines.h"
 #include "drawmethods.h"
 #include "goom_core.h"
-#include "goom_tools.h"
 #include "goomconfig.h"
 
 #include "libmythbase/mythrandom.h"
@@ -52,7 +52,7 @@ genline (int id, float param, GMUnitArray& l, int rx, int ry)
 		for (int i = 0; i < LINENUMPOINTS; i++) {
 			l[i].x = ((float) i * rx) / 512.0F;
 			l[i].y = param;
-			l[i].angle = M_PI_F / 2.0F;
+			l[i].angle = std::numbers::pi_v<float> / 2.0F;
 		}
 		return;
 	case GML_VLINE:
@@ -64,7 +64,7 @@ genline (int id, float param, GMUnitArray& l, int rx, int ry)
 		return;
 	case GML_CIRCLE:
 		for (int i = 0; i < LINENUMPOINTS; i++) {
-			l[i].angle = 2.0F * M_PI_F * (float) i / 512.0F;
+			l[i].angle = 2.0F * std::numbers::pi_v<float> * (float) i / 512.0F;
 			float cosa = param * cosf (l[i].angle);
 			float sina = param * sinf (l[i].angle);
 			l[i].x = ((float) rx / 2.0F) + cosa;
@@ -219,7 +219,6 @@ goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 			int y2 = (int) (pt->y + (sina * line->amplitude * data[i]));
 
 			draw_line ((int *)p, x1, y1, x2, y2, color, line->screenX, line->screenY);
-			DRAWMETHOD_DONE ();
 
 			x1 = x2;
 			y1 = y2;

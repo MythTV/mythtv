@@ -2,14 +2,14 @@
 #include <cstdint>
 
 #include "zoom_filters.h"
-#include "libmythbase/mythconfig.h"
 
-#if HAVE_MMX
+#include "libmythtv/sse2.h"
+
+#ifdef Q_PROCESSOR_X86
 static   constexpr uint8_t  BUFFPOINTNB   { 16     };
 //static constexpr uint16_t BUFFPOINTMASK { 0xffff };
 //static constexpr uint8_t  BUFFINCR      { 0xff   };
 
-#include "mmx.h"
 
 //static constexpr uint8_t sqrtperte { 16 };
 // faire : a % sqrtperte <=> a & pertemask
@@ -17,15 +17,7 @@ static constexpr uint8_t PERTEMASK { 0xf };
 // faire : a / sqrtperte <=> a >> PERTEDEC
 static constexpr uint8_t PERTEDEC { 4 };
 
-extern "C" {
-#include "libavutil/cpu.h"
-}
-
-int zoom_filter_mmx_supported () {
-    return (av_get_cpu_flags() & AV_CPU_FLAG_MMX);
-}
-
-void zoom_filter_mmx (int prevX, int prevY,
+void zoom_filter_sse2(int prevX, int prevY,
                       const unsigned int *expix1, unsigned int *expix2,//NOLINT(readability-non-const-parameter)
                       const sintvec& brutS,
                       const sintvec& brutD,
@@ -37,7 +29,6 @@ void zoom_filter_mmx (int prevX, int prevY,
     
     int bufsize = prevX * prevY;
 
-    pxor_r2r(mm7,mm7);
     
     for (int loop=0; loop<bufsize; loop++)
     {
@@ -69,73 +60,70 @@ void zoom_filter_mmx (int prevX, int prevY,
         }
 
         int posplusprevX = pos + prevX;
-            
-        movd_m2r(coeffs, mm6);
 
+        __asm__ volatile (
+            "pxor       %%xmm7, %%xmm7\n\t"
+            "movd       %1,     %%xmm6\n\t"
         /* recuperation des deux premiers pixels dans mm0 et mm1 */
-        movq_m2r(expix1[pos], mm0); /* b1-v1-r1-a1-b2-v2-r2-a2 */
-        movq_r2r(mm0, mm1);         /* b1-v1-r1-a1-b2-v2-r2-a2 */
+            "movq       %2,     %%xmm0\n\t" /* b1-v1-r1-a1-b2-v2-r2-a2 */
+            "movq       %%xmm0, %%xmm1\n\t" /* b1-v1-r1-a1-b2-v2-r2-a2 */
 
         /* depackage du premier pixel */
-        punpcklbw_r2r(mm7, mm0);    /* 00-b2-00-v2-00-r2-00-a2 */
-        movq_r2r(mm6, mm5);         /* xx-xx-xx-xx-c4-c3-c2-c1 */
+            "punpcklbw  %%xmm7, %%xmm0\n\t" /* 00-b2-00-v2-00-r2-00-a2 */
+            "movq       %%xmm6, %%xmm5\n\t" /* xx-xx-xx-xx-c4-c3-c2-c1 */
 
         /* depackage du 2ieme pixel */
-        punpckhbw_r2r(mm7, mm1);    /* 00-b1-00-v1-00-r1-00-a1 */
+            "punpckhbw  %%xmm7, %%xmm1\n\t" /* 00-b1-00-v1-00-r1-00-a1 */
 
         /* extraction des coefficients... */
-        punpcklbw_r2r(mm5, mm6);    /* c4-c4-c3-c3-c2-c2-c1-c1 */
-        movq_r2r(mm6, mm4);         /* c4-c4-c3-c3-c2-c2-c1-c1 */
-        movq_r2r(mm6, mm5);         /* c4-c4-c3-c3-c2-c2-c1-c1 */
-        punpcklbw_r2r(mm5, mm6);    /* c2-c2-c2-c2-c1-c1-c1-c1 */
-        punpckhbw_r2r(mm5, mm4);    /* c4-c4-c4-c4-c3-c3-c3-c3 */
+            "punpcklbw  %%xmm5, %%xmm6\n\t" /* c4-c4-c3-c3-c2-c2-c1-c1 */
+            "movq       %%xmm6, %%xmm4\n\t" /* c4-c4-c3-c3-c2-c2-c1-c1 */
+            "movq       %%xmm6, %%xmm5\n\t" /* c4-c4-c3-c3-c2-c2-c1-c1 */
+            "punpcklbw  %%xmm5, %%xmm6\n\t" /* c2-c2-c2-c2-c1-c1-c1-c1 */
+            "punpckhbw  %%xmm5, %%xmm4\n\t" /* c4-c4-c4-c4-c3-c3-c3-c3 */
         
-        movq_r2r(mm6, mm3);         /* c2-c2-c2-c2-c1-c1-c1-c1 */
-        punpcklbw_r2r(mm7, mm6);    /* 00-c1-00-c1-00-c1-00-c1 */
-        punpckhbw_r2r(mm7, mm3);    /* 00-c2-00-c2-00-c2-00-c2 */
+            "movq       %%xmm6, %%xmm3\n\t" /* c2-c2-c2-c2-c1-c1-c1-c1 */
+            "punpcklbw  %%xmm7, %%xmm6\n\t" /* 00-c1-00-c1-00-c1-00-c1 */
+            "punpckhbw  %%xmm7, %%xmm3\n\t" /* 00-c2-00-c2-00-c2-00-c2 */
 
         /* multiplication des pixels par les coefficients */
-        pmullw_r2r(mm6, mm0);       /* c1*b2-c1*v2-c1*r2-c1*a2 */
-        pmullw_r2r(mm3, mm1);       /* c2*b1-c2*v1-c2*r1-c2*a1 */
-        paddw_r2r(mm1, mm0);
+            "pmullw     %%xmm6, %%xmm0\n\t" /* c1*b2-c1*v2-c1*r2-c1*a2 */
+            "pmullw     %%xmm3, %%xmm1\n\t" /* c2*b1-c2*v1-c2*r1-c2*a1 */
+            "paddw      %%xmm1, %%xmm0\n\t"
         
         /* ...extraction des 2 derniers coefficients */
-        movq_r2r(mm4, mm5);         /* c4-c4-c4-c4-c3-c3-c3-c3 */
-        punpcklbw_r2r(mm7, mm4);    /* 00-c3-00-c3-00-c3-00-c3 */
-        punpckhbw_r2r(mm7, mm5);    /* 00-c4-00-c4-00-c4-00-c4 */
+            "movq       %%xmm4, %%xmm5\n\t" /* c4-c4-c4-c4-c3-c3-c3-c3 */
+            "punpcklbw  %%xmm7, %%xmm4\n\t" /* 00-c3-00-c3-00-c3-00-c3 */
+            "punpckhbw  %%xmm7, %%xmm5\n\t" /* 00-c4-00-c4-00-c4-00-c4 */
         
         /* ajouter la longueur de ligne a esi */
         /* recuperation des 2 derniers pixels */
-        movq_m2r(expix1[posplusprevX], mm1);
-        movq_r2r(mm1, mm2);
+            "movq       %3,     %%xmm1\n\t"
+            "movq       %%xmm1, %%xmm2\n\t"
         
         /* depackage des pixels */
-        punpcklbw_r2r(mm7, mm1);
-        punpckhbw_r2r(mm7, mm2);
+            "punpcklbw  %%xmm7, %%xmm1\n\t"
+            "punpckhbw  %%xmm7, %%xmm2\n\t"
         
         /* multiplication pas les coeffs */
-        pmullw_r2r(mm4, mm1);
-        pmullw_r2r(mm5, mm2);
+            "pmullw     %%xmm4, %%xmm1\n\t"
+            "pmullw     %%xmm5, %%xmm2\n\t"
         
         /* ajout des valeurs obtenues de iso8859-15 à la valeur finale */
-        paddw_r2r(mm1, mm0);
-        paddw_r2r(mm2, mm0);
+            "paddw      %%xmm1, %%xmm0\n\t"
+            "paddw      %%xmm2, %%xmm0\n\t"
         
         /* division par 256 = 16+16+16+16, puis repackage du pixel final */
-        psrlw_i2r(8, mm0);
-        packuswb_r2r(mm7, mm0);
-        movd_r2m(mm0,expix2[loop]);
+            "psrlw      %4,     %%xmm0\n\t"
+            "packuswb   %%xmm7, %%xmm0\n\t"
+            "movd       %%xmm0, %0\n\t"
+            : "=m" (expix2[loop])
+            : "m" (coeffs), "m" (expix1[pos]), "m" (expix1[posplusprevX]), "i" (8)
+            );
     }
-    emms();
 }
-
-#else
-
-int zoom_filter_mmx_supported () {
-    return 0;
-}
-
-void zoom_filter_mmx ([[maybe_unused]] int prevX,
+#else // !defined(Q_PROCESSOR_X86)
+void zoom_filter_sse2([[maybe_unused]] int prevX,
                       [[maybe_unused]] int prevY,
                       [[maybe_unused]] const unsigned int *expix1,
                       [[maybe_unused]] unsigned int *expix2,
@@ -145,10 +133,4 @@ void zoom_filter_mmx ([[maybe_unused]] int prevX,
                       [[maybe_unused]] const GoomCoefficients &precalCoef)
 {
 }
-
 #endif
-
-/*
- * vim:ts=4:sw=4:ai:et:si:sts=4
- */
-
