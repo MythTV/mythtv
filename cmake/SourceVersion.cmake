@@ -142,10 +142,12 @@ function(mythtv_find_source_version version version_major branch)
                 --contains HEAD --merged HEAD
         OUTPUT_VARIABLE branchNames
         OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-      string(REGEX MATCHALL "[^\n\r]+" branchNamesList ${branchNames})
-      list(GET branchNamesList 0 branchName)
-      string(REGEX REPLACE "^[\\*\\+] " "" branchName ${branchName})
-      string(STRIP ${branchName} branchName)
+      if(NOT ${branchNames} STREQUAL "")
+        string(REGEX MATCHALL "[^\n\r]+" branchNamesList ${branchNames})
+        list(GET branchNamesList 0 branchName)
+        string(REGEX REPLACE "^[\\*\\+] " "" branchName ${branchName})
+        string(STRIP ${branchName} branchName)
+      endif()
     endif()
 
     if(versionString)
