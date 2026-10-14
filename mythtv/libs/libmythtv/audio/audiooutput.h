@@ -256,12 +256,12 @@ class MTV_PUBLIC AudioOutput::Event : public MythEvent
     MythEvent *clone(void) const override // MythEvent
         { return new Event(*this); }
 
-    static const inline QEvent::Type kPlaying    {static_cast<QEvent::Type>(QEvent::registerEventType())};
-    static const inline QEvent::Type kBuffering  {static_cast<QEvent::Type>(QEvent::registerEventType())};
-    static const inline QEvent::Type kInfo       {static_cast<QEvent::Type>(QEvent::registerEventType())};
-    static const inline QEvent::Type kPaused     {static_cast<QEvent::Type>(QEvent::registerEventType())};
-    static const inline QEvent::Type kStopped    {static_cast<QEvent::Type>(QEvent::registerEventType())};
-    static const inline QEvent::Type kError      {static_cast<QEvent::Type>(QEvent::registerEventType())};
+    static const QEvent::Type kPlaying;
+    static const QEvent::Type kBuffering;
+    static const QEvent::Type kInfo;
+    static const QEvent::Type kPaused;
+    static const QEvent::Type kStopped;
+    static const QEvent::Type kError;
 
   private:
     Event(const Event &o) = default;

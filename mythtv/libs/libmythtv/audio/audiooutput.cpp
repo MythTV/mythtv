@@ -57,6 +57,13 @@ extern "C" {
 
 #define LOC QString("AO: ")
 
+const QEvent::Type AudioOutput::Event::kPlaying{static_cast<QEvent::Type>(QEvent::registerEventType())};
+const QEvent::Type AudioOutput::Event::kBuffering{static_cast<QEvent::Type>(QEvent::registerEventType())};
+const QEvent::Type AudioOutput::Event::kInfo{static_cast<QEvent::Type>(QEvent::registerEventType())};
+const QEvent::Type AudioOutput::Event::kPaused{static_cast<QEvent::Type>(QEvent::registerEventType())};
+const QEvent::Type AudioOutput::Event::kStopped{static_cast<QEvent::Type>(QEvent::registerEventType())};
+const QEvent::Type AudioOutput::Event::kError{static_cast<QEvent::Type>(QEvent::registerEventType())};
+
 void AudioOutput::Cleanup(void)
 {
 #if CONFIG_AUDIO_PULSE
