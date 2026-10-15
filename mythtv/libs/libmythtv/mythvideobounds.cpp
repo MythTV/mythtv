@@ -86,10 +86,8 @@ void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
 void MythVideoBounds::DisplayChanged()
 {
     PopulateGeometry();
-#ifdef Q_OS_MACOS
     // PopulateGeometry will update m_devicePixelRatio
     m_windowRect = m_displayVisibleRect = SCALED_RECT(m_rawWindowRect, m_devicePixelRatio);
-#endif
     MoveResize();
 }
 
@@ -102,9 +100,7 @@ void MythVideoBounds::PopulateGeometry(void)
     if (!screen)
         return;
 
-#ifdef Q_OS_MACOS
     m_devicePixelRatio = screen->devicePixelRatio();
-#endif
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
