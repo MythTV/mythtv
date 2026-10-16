@@ -42,6 +42,8 @@ LIBS += -lmythtv-$$LIBVERSION -lmythupnp-$$LIBVERSION
 LIBS += -lmythavutil -lmythavcodec -lmythavformat -lmythswscale
 LIBS += $$EXTRA_LIBS $$LATE_LIBS $$QMAKE_LIBS_DYNLOAD
 using_mheg:LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+LIBS += -L../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
 
 inc.path = $${PREFIX}/include/mythtv/libmythprotoserver
 

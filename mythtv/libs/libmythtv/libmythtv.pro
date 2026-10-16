@@ -400,8 +400,6 @@ freebsd {
   QMAKE_CXXFLAGS += -isystem ../../external/libmythdvdnav/dvdread
 }
 
-POST_TARGETDEPS += ../../external/libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
-
 HEADERS += DVD/mythdvdbuffer.h
 HEADERS += DVD/mythdvdcontext.h
 HEADERS += DVD/mythdvdinfo.h

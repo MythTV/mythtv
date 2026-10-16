@@ -40,6 +40,9 @@ LIBS += -lmyth-$$LIBVERSION
 LIBS += -lmythmetadata-$$LIBVERSION
 LIBS += -lmythprotoserver-$$LIBVERSION
 
+LIBS += -L../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
+
 using_frontend: using_opengl: QT += opengl
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_hdhomerun:LIBS += -lhdhomerun
