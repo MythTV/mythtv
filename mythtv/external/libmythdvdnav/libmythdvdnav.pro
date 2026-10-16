@@ -2,9 +2,10 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythdvdnav-$$LIBVERSION
-CONFIG += thread staticlib warn_off object_parallel_to_source
+CONFIG += thread warn_off object_parallel_to_source
 CONFIG -= qt
 target.path = $${LIBDIR}
+INSTALLS = target
 
 INCLUDEPATH += .
 INCLUDEPATH += ./dvdnav ./dvdread
@@ -42,7 +43,7 @@ using_dvdcss_dvdcss_h {
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # dvdnav
-#DEFINES += DVDNAV_API_EXPORT # only for shared library
+DEFINES += DVDNAV_API_EXPORT
 HEADERS += dvdnav/dvdnav/dvd_types.h
 HEADERS += dvdnav/dvdnav/dvdnav.h
 HEADERS += dvdnav/dvdnav/dvdnav_events.h
@@ -73,7 +74,7 @@ SOURCES += dvdnav/searching.c
 SOURCES += dvdnav/settings.c
 
 # dvdread
-#DEFINES += DVDREAD_API_EXPORT # only for shared library
+DEFINES += DVDREAD_API_EXPORT
 
 HEADERS += dvdread/dvdread/attributes.h
 HEADERS += dvdread/dvdread/bitreader.h
