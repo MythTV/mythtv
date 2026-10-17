@@ -19,6 +19,9 @@ LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
 using_mheg:LIBS += -L../../../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 LIBS += -L../.. -lmythtv-$$LIBVERSION
+LIBS += -L../../../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libmythdvdnav
 
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libavutil
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/FFmpeg/libswscale

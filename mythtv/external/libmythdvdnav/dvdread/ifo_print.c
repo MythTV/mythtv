@@ -19,7 +19,6 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <inttypes.h>
 #include <string.h>
 #include <ctype.h>
@@ -28,6 +27,8 @@
 #include "dvdread/ifo_types.h"
 #include "dvdread/ifo_read.h"
 #include "dvdread/ifo_print.h"
+#include "dvdread_internal.h"
+#include "logger.h"
 
 /* Put this in some other file / package?  It's used in nav_print too. */
 static void ifo_print_time(dvd_time_t *dtime) {
@@ -219,6 +220,7 @@ static void ifo_print_audio_attributes(audio_attr_t *attr) {
     break;
   case 2:
     printf("mpeg1 ");
+    /* Falls Through. */ /* to MPEG-2 */
   case 3:
     printf("mpeg2ext ");
     switch(attr->quantization) {
@@ -495,6 +497,29 @@ static void ifoPrint_USER_OPS(user_ops_t *user_ops) {
   }
 }
 
+void ifoPrint_AMGI_MAT(amgi_mat_t *amgi_mat) {
+
+  printf("AMG Identifier: %.12s\n", amgi_mat->amg_identifier);
+  printf("start Sector of AMG: %08x\n", amgi_mat->amg_start_sector);
+  printf("Last Sector of AMGI: %08x\n", amgi_mat->amgi_last_sector);
+  printf("Specification version number: %01x.%01x\n",
+         amgi_mat->specification_version >> 4,
+         amgi_mat->specification_version & 0xf);
+  printf("AMG Number of Volumes: %i\n", amgi_mat->amg_nr_of_volumes);
+  printf("AMG This Volume: %i\n", amgi_mat->amg_this_volume_nr);
+  printf("Disc side %i\n", amgi_mat->disc_side);
+  printf("Audio_SV ifo relative pointer: %08x\n", amgi_mat->audio_sv_ifo_relative_p);
+  printf("VMG Number of title sets: %i\n", amgi_mat->vmg_nr_of_title_sets);
+  printf("AMG Number of title sets: %i\n", amgi_mat->amg_nr_of_title_sets);
+  printf("Provider ID: %.32s\n", amgi_mat->provider_identifier);
+  printf("End byte address: %08x\n", amgi_mat->amg_end_byte_address);
+  printf("Start sector of AMGM_VOBS: %08x\n", amgi_mat->amgm_vobs_sa);
+  printf("Start sector of ATT_SRPT: %08x\n", amgi_mat->att_srpt_sa);
+  printf("Start sector of AOTT_SRPT: %08x\n", amgi_mat->aott_srpt_sa);
+  printf("Start sector of AMGM_PGCI_UT: %08x\n", amgi_mat->amgm_pgci_ut_sa);
+  printf("Last sector of audio system space: %02x\n", amgi_mat->last_sector_audio_sys_space);
+
+}
 
 static void ifoPrint_VMGI_MAT(vmgi_mat_t *vmgi_mat) {
 
@@ -554,7 +579,7 @@ static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
   printf("Specification version number: %01x.%01x\n",
          vtsi_mat->specification_version>>4,
          vtsi_mat->specification_version&0xf);
-  printf("VTS Category: %08x\n", vtsi_mat->vts_category);
+  printf("VTS Category: %08x\n", vtsi_mat->vts_category );
   printf("End byte of VTSI_MAT: %08x\n", vtsi_mat->vtsi_last_byte);
   printf("Start sector of VTSM_VOBS:  %08x\n", vtsi_mat->vtsm_vobs);
   printf("Start sector of VTSTT_VOBS: %08x\n", vtsi_mat->vtstt_vobs);
@@ -608,6 +633,105 @@ static void ifoPrint_VTSI_MAT(vtsi_mat_t *vtsi_mat) {
   }
 }
 
+static void ifo_print_atsi_records(atsi_record_t *records){
+  for (int i =0; i <8; i++){
+    printf("Encoding Format (0x00 for lcpm, 0x01 for mlp, 0x05 for dts: %.02x\n", records[i].encoding);
+    printf("audio_format uknown: %.02x\n", records[i].unknown1);
+    printf("audio_format bitrate: %.02x\n", records[i].bitrate);
+    printf("audio_format sampling frequency: %.02x\n", records[i].sampling_frequency);
+    printf("audio_format number of channels: %.02x\n", records[i].nr_channels);
+    printf("audio_format unknown: %.02x\n", records[i].unknown2);
+  }
+}
+
+static void ifo_print_downmix_coefficients(downmix_coeff_t *downmix_coefficients) {
+  for (int i = 0; i < DOWNMIX_COEFF_MAX_SIZE; i++) {
+    const downmix_coeff_t *t = &downmix_coefficients[i];
+    int used = 0;
+
+    for (int ch = 0; ch < 8; ch++)
+      used |= t->dm_coef[ch].left | t->dm_coef[ch].right;
+    if (!used)
+      continue;
+
+    printf("Downmix coefficient table %d (left/right gain codes):", i);
+    for (int ch = 0; ch < 8; ch++)
+      printf(" %02x/%02x", t->dm_coef[ch].left, t->dm_coef[ch].right);
+    printf("\n");
+  }
+}
+
+void ifoPrint_TT(atsi_title_table_t *atsi_title_table){
+  printf("Number of titles: %04x\n", atsi_title_table->nr_titles);
+  printf("Last byte address: %08x\n", atsi_title_table->last_byte_address);
+  
+  for (int i=0; i< atsi_title_table->nr_titles;i++){
+    printf("Offset of record table for entry %d: %08x\n", i, atsi_title_table->atsi_index_rows[i].offset_record_table);
+  }
+ 
+
+  for (int i=0; i< atsi_title_table->nr_titles;i++){
+    atsi_title_record_t *index=atsi_title_table->atsi_title_row_tables+i;
+    printf("Number of tracks in title %d: %04x\n", i,index->nr_tracks );
+
+    printf("Length PTS of title %d: %08x\n", i, index->length_pts);
+    printf("Start sector of pointers table %d: %04x\n", i, index->start_sector_pointers_table);
+
+    for (int j=0; j<index->nr_tracks ;j++){
+      printf("Track number in title of track %d: %02x\n", j, index->atsi_track_timestamp_rows[j].track_number_in_title );
+      printf("Length PTS of track %d: %08x\n", j, index->atsi_track_timestamp_rows[j].length_pts_of_track);
+      printf("Start PTS of track %d: %08x\n", j, index->atsi_track_timestamp_rows[j].first_pts_of_track);
+    }
+    for (int j=0; j< index->nr_pointer_records;j++){
+      printf("Track start sector %d: %08x\n", j, index->atsi_track_pointer_rows[j].start_sector);
+      printf("Length PTS of track %d: %08x\n", j, index->atsi_track_pointer_rows[j].end_sector);
+    }
+  }
+}
+
+void ifoPrint_TIF(tracks_info_table_t *tracks_info_table){
+  printf("Number of titles: %04x\n", tracks_info_table->nr_of_titles);
+  printf("Last byte in table: %04x\n", tracks_info_table->last_byte_in_table);
+  
+  for (int i =0; i<tracks_info_table->nr_of_titles;i++){
+
+    printf("Type and rank of track %d: %02x\n",i, tracks_info_table->tracks_info[i].type_and_rank);
+    printf("Number of chapters in title of track %d: %02x\n",i, tracks_info_table->tracks_info[i].nr_chapters_in_title);
+    printf("Length of audio zone pts of track %d: %04x\n",i, tracks_info_table->tracks_info[i].len_audio_zone_pts);
+    printf("Rank of group, or video titleset number of track %d: %02x\n",i, tracks_info_table->tracks_info[i].group_property);
+    printf("video Title number, of rank of title in audio track of track %d: %02x\n",i, tracks_info_table->tracks_info[i].title_property);
+    printf("Title set sector pointer of track %d: %08x\n",i, tracks_info_table->tracks_info[i].ts_pointer_relative_sector);
+  }
+        
+
+}
+
+void ifoPrint_ATSI_MAT(atsi_mat_t *atsi_mat) {
+  printf("ATS Identifier: %.12s\n", atsi_mat->ats_identifier);
+  printf("Last Sector of ATS: %08x\n", atsi_mat->ats_last_sector);
+  printf("Last Sector of ATSI: %08x\n", atsi_mat->atsi_last_sector);
+  printf("Specification version number: %01x.%01x\n",
+         atsi_mat->specification_version>>4,
+         atsi_mat->specification_version&0xf);
+  printf("End byte of ATSI_MAT: %08x\n", atsi_mat->atsi_last_byte);
+  printf("Start sector of linked VTS (VTS_SA): %08x\n", atsi_mat->vts_sa);
+  printf("Start sector of ATST_AOBS: %08x\n", atsi_mat->atst_aobs);
+  printf("Start sector of VTS_PTT_SRPT: %08x\n", atsi_mat->vts_ptt_srpt);
+  printf("Start sector of ATS_PCGI_UT:    %08x\n", atsi_mat->ats_pgci_ut);
+  printf("Start sector of VTSM_PGCI_UT: %08x\n", atsi_mat->vtsm_pgci_ut);
+  printf("Start sector of VTS_TMAPT:    %08x\n", atsi_mat->vts_tmapt);
+  printf("Start sector of VTSM_C_ADT:      %08x\n", atsi_mat->vtsm_c_adt);
+  printf("Start sector of VTSM_VOBU_ADMAP: %08x\n",atsi_mat->vtsm_vobu_admap);
+  printf("Start sector of VTS_C_ADT:       %08x\n", atsi_mat->vts_c_adt);
+  printf("Start sector of VTS_VOBU_ADMAP:  %08x\n", atsi_mat->vts_vobu_admap);
+
+  printf("ATSI_RECORDS: ");
+  ifo_print_atsi_records(atsi_mat->atsi_record);
+  printf("\n");
+  ifo_print_downmix_coefficients(atsi_mat->downmix_coefficients);
+
+
+}
 
 static void ifoPrint_PGC_COMMAND_TBL(pgc_command_tbl_t *cmd_tbl) {
   int i;
@@ -1076,130 +1200,299 @@ static void ifoPrint_VTS_ATRT(vts_atrt_t *vts_atrt) {
   }
 }
 
+/* DVD-VR Specific Print Functions */
+
+static void ifoPrint_RTAV_VMGI(rtav_vmgi_t *vmgi) {
+  printf("RTAV Identifier: %.12s\n", vmgi->id);
+  printf("Specification version number: %01x.%01x\n",
+         vmgi->version >> 8, vmgi->version & 0xff);
+  printf("VMG End Address: %08x\n", vmgi->vmg_ea);
+  printf("VMGI End Address: %08x\n", vmgi->vmgi_ea);
+
+  printf("PGCI Start Address: %08x\n", vmgi->org_pgci_sa);
+  printf("ORG_PGCI Start Address: %08x\n", vmgi->org_pgci_sa);
+  printf("UD_PGCI Start Address: %08x\n", vmgi->ud_pgcit_sa);
+
+  printf("Text Encoding: 0x%02x\n", vmgi->txt_encoding);
+  printf("Disc Info 1: %.64s\n", vmgi->disc_info1);
+  printf("Disc Info 2: %.64s\n", vmgi->disc_info2);
+
+}
+
+static void ifoPrint_PGCI(pgci_t *pgci) {
+  int i;
+  if (!pgci) {
+    printf("No PGCI present\n");
+    return;
+  }
+
+  printf("Program Information Table (pgci)\n");
+  printf("Number of VOB Formats: %d\n", pgci->nr_of_vob_formats);
+  printf("ORG_PGCI Length: %08x\n", pgci->len_org_pgci);
+
+  for(i = 0; i < pgci->nr_of_vob_formats; i++) {
+    printf("  Format %2i: Video Attr 0x%04x, Audio Streams: %d\n", 
+           i + 1,
+           pgci->vob_formats[i].video_attr,
+           pgci->vob_formats[i].nr_of_audio_streams);
+  }
+}
+
+static void ifoPrint_PGC_GI(pgc_gi_t *pgc_gi) {
+  int i;
+  if (!pgc_gi) {
+    printf("No pgc_gi present\n");
+    return;
+  }
+
+  printf("Program General Information (PGC_GI)\n");
+  printf("Number of Programs: %d\n", pgc_gi->nr_of_programs);
+
+  for(i = 0; i < pgc_gi->nr_of_programs; i++) {
+    pgi_t *prog = &pgc_gi->pgi[i];
+
+    printf("\n  Program %3i:\n", i + 1);
+    printf("    Start Byte Offset: %08x\n", pgc_gi->program_offsets[i]);
+    printf("    VOB Attribute: 0x%04x\n", prog->header.vob_attr);
+
+    printf("    Timestamp (PGTM): %02x %02x %02x %02x %02x\n",
+           prog->header.vob_timestamp.pgtm[0],
+           prog->header.vob_timestamp.pgtm[1],
+           prog->header.vob_timestamp.pgtm[2],
+           prog->header.vob_timestamp.pgtm[3],
+           prog->header.vob_timestamp.pgtm[4]);
+
+    printf("    Start PTM: 0x%08x (Extra: 0x%04x)\n", 
+           prog->header.vob_v_s_ptm.ptm, 
+           prog->header.vob_v_s_ptm.ptm_extra);
+    printf("    End   PTM: 0x%08x (Extra: 0x%04x)\n", 
+           prog->header.vob_v_e_ptm.ptm, 
+           prog->header.vob_v_e_ptm.ptm_extra);
+
+    printf("    Time Map: %d time entries, %d VOBU entries\n", 
+           prog->map.nr_of_time_info, 
+           prog->map.nr_of_vobu_info);
+  }
+}
+
+static void ifoPrint_ud_pgcit(ud_pgcit_t *ud_pgcit) {
+  int i;
+  if (!ud_pgcit) {
+    printf("No UD_PGCIT present\n");
+    return;
+  }
+
+  printf("Program Set General Information (UD_PGCIT)\n");
+  printf("Total Number of Programs on Disc: %d\n", ud_pgcit->total_nr_of_programs);
+  printf("Number of Program Sets (Playlists): %d\n", ud_pgcit->nr_of_pgci);
+
+  for(i = 0; i < ud_pgcit->nr_of_pgci; i++) {
+    ud_pgci_t *item = &ud_pgcit->ud_pgci_items[i];
+    printf("\n  Playlist %2i:\n", i + 1);
+    printf("    Label: %.64s\n", item->label);
+    printf("    Programs in Set: %d\n", item->nr_of_programs);
+    printf("    First Program ID: %d\n", item->first_prog_id);
+    printf("    Program Set ID: %d\n", item->prog_set_id);
+  }
+}
 
 void ifo_print(dvd_reader_t *dvd, int title) {
   ifo_handle_t *ifohandle;
   printf("Local ifo_print\n");
   ifohandle = ifoOpen(dvd, title);
   if(!ifohandle) {
-    fprintf(stderr, "Can't open info file for title %d\n", title);
+    Log0(dvd,  "Can't open info file for title %d", title);
     return;
   }
 
+  switch(ifohandle->ifo_format){
+    case (IFO_VIDEO):
+      if(ifohandle->vmgi_mat) {
 
-  if(ifohandle->vmgi_mat) {
+        printf("VMG top level\n-------------\n");
+        ifoPrint_VMGI_MAT(ifohandle->vmgi_mat);
 
-    printf("VMG top level\n-------------\n");
-    ifoPrint_VMGI_MAT(ifohandle->vmgi_mat);
+        printf("\nFirst Play PGC\n--------------\n");
+        if(ifohandle->first_play_pgc)
+          ifoPrint_PGC(ifohandle->first_play_pgc);
+        else
+          printf("No First Play PGC present\n");
 
-    printf("\nFirst Play PGC\n--------------\n");
-    if(ifohandle->first_play_pgc)
-      ifoPrint_PGC(ifohandle->first_play_pgc);
-    else
-      printf("No First Play PGC present\n");
+        printf("\nTitle Track search pointer table\n");
+        printf(  "------------------------------------------------\n");
+        ifoPrint_TT_SRPT(ifohandle->tt_srpt);
 
-    printf("\nTitle Track search pointer table\n");
-    printf(  "------------------------------------------------\n");
-    ifoPrint_TT_SRPT(ifohandle->tt_srpt);
+        printf("\nMenu PGCI Unit table\n");
+        printf(  "--------------------\n");
+        if(ifohandle->pgci_ut) {
+          ifoPrint_PGCI_UT(ifohandle->pgci_ut);
+        } else {
+          printf("No PGCI Unit table present\n");
+        }
 
-    printf("\nMenu PGCI Unit table\n");
-    printf(  "--------------------\n");
-    if(ifohandle->pgci_ut) {
-      ifoPrint_PGCI_UT(ifohandle->pgci_ut);
-    } else {
-      printf("No PGCI Unit table present\n");
-    }
+        printf("\nParental Management Information table\n");
+        printf(  "------------------------------------\n");
+        if(ifohandle->ptl_mait) {
+          ifoPrint_PTL_MAIT(ifohandle->ptl_mait);
+        } else {
+          printf("No Parental Management Information present\n");
+        }
 
-    printf("\nParental Management Information table\n");
-    printf(  "------------------------------------\n");
-    if(ifohandle->ptl_mait) {
-      ifoPrint_PTL_MAIT(ifohandle->ptl_mait);
-    } else {
-      printf("No Parental Management Information present\n");
-    }
+        printf("\nVideo Title Set Attribute Table\n");
+        printf(  "-------------------------------\n");
+        ifoPrint_VTS_ATRT(ifohandle->vts_atrt);
 
-    printf("\nVideo Title Set Attribute Table\n");
-    printf(  "-------------------------------\n");
-    ifoPrint_VTS_ATRT(ifohandle->vts_atrt);
+        printf("\nText Data Manager Information\n");
+        printf(  "-----------------------------\n");
+        if(ifohandle->txtdt_mgi) {
+          //ifo_print_TXTDT_MGI(&(vmgi->txtdt_mgi));
+        } else {
+          printf("No Text Data Manager Information present\n");
+        }
 
-    printf("\nText Data Manager Information\n");
-    printf(  "-----------------------------\n");
-    if(ifohandle->txtdt_mgi) {
-      //ifo_print_TXTDT_MGI(&(vmgi->txtdt_mgi));
-    } else {
-      printf("No Text Data Manager Information present\n");
-    }
+        printf("\nMenu Cell Address table\n");
+        printf(  "-----------------\n");
+        if(ifohandle->menu_c_adt) {
+          ifoPrint_C_ADT(ifohandle->menu_c_adt);
+        } else {
+          printf("No Menu Cell Address table present\n");
+        }
 
-    printf("\nMenu Cell Address table\n");
-    printf(  "-----------------\n");
-    if(ifohandle->menu_c_adt) {
-      ifoPrint_C_ADT(ifohandle->menu_c_adt);
-    } else {
-      printf("No Menu Cell Address table present\n");
-    }
-
-    printf("\nVideo Manager Menu VOBU address map\n");
-    printf(  "-----------------\n");
-    if(ifohandle->menu_vobu_admap) {
-      ifoPrint_VOBU_ADMAP(ifohandle->menu_vobu_admap);
-    } else {
-      printf("No Menu VOBU address map present\n");
-    }
-  }
+        printf("\nVideo Manager Menu VOBU address map\n");
+        printf(  "-----------------\n");
+        if(ifohandle->menu_vobu_admap) {
+          ifoPrint_VOBU_ADMAP(ifohandle->menu_vobu_admap);
+        } else {
+          printf("No Menu VOBU address map present\n");
+        }
+      }
 
 
-  if(ifohandle->vtsi_mat) {
+      if(ifohandle->vtsi_mat) {
 
-    printf("VTS top level\n-------------\n");
-    ifoPrint_VTSI_MAT(ifohandle->vtsi_mat);
+        printf("VTS top level\n-------------\n");
+        ifoPrint_VTSI_MAT(ifohandle->vtsi_mat);
 
-    printf("\nPart of Title Track search pointer table\n");
-    printf(  "----------------------------------------------\n");
-    ifoPrint_VTS_PTT_SRPT(ifohandle->vts_ptt_srpt);
+        printf("\nPart of Title Track search pointer table\n");
+        printf(  "----------------------------------------------\n");
+        ifoPrint_VTS_PTT_SRPT(ifohandle->vts_ptt_srpt);
 
-    printf("\nPGCI Unit table\n");
-    printf(  "--------------------\n");
-    ifoPrint_PGCIT(ifohandle->vts_pgcit, 0);
+        printf("\nPGCI Unit table\n");
+        printf(  "--------------------\n");
+        ifoPrint_PGCIT(ifohandle->vts_pgcit, 0);
 
-    printf("\nMenu PGCI Unit table\n");
-    printf(  "--------------------\n");
-    if(ifohandle->pgci_ut) {
-      ifoPrint_PGCI_UT(ifohandle->pgci_ut);
-    } else {
-      printf("No Menu PGCI Unit table present\n");
-    }
+        printf("\nMenu PGCI Unit table\n");
+        printf(  "--------------------\n");
+        if(ifohandle->pgci_ut) {
+          ifoPrint_PGCI_UT(ifohandle->pgci_ut);
+        } else {
+          printf("No Menu PGCI Unit table present\n");
+        }
 
-    printf("\nVTS Time Map table\n");
-    printf(  "-----------------\n");
-    if(ifohandle->vts_tmapt) {
-      ifoPrint_VTS_TMAPT(ifohandle->vts_tmapt);
-    } else {
-      printf("No VTS Time Map table present\n");
-    }
+        printf("\nVTS Time Map table\n");
+        printf(  "-----------------\n");
+        if(ifohandle->vts_tmapt) {
+          ifoPrint_VTS_TMAPT(ifohandle->vts_tmapt);
+        } else {
+          printf("No VTS Time Map table present\n");
+        }
 
-    printf("\nMenu Cell Address table\n");
-    printf(  "-----------------\n");
-    if(ifohandle->menu_c_adt) {
-      ifoPrint_C_ADT(ifohandle->menu_c_adt);
-    } else {
-      printf("No Cell Address table present\n");
-    }
+        printf("\nMenu Cell Address table\n");
+        printf(  "-----------------\n");
+        if(ifohandle->menu_c_adt) {
+          ifoPrint_C_ADT(ifohandle->menu_c_adt);
+        } else {
+          printf("No Cell Address table present\n");
+        }
 
-    printf("\nVideo Title Set Menu VOBU address map\n");
-    printf(  "-----------------\n");
-    if(ifohandle->menu_vobu_admap) {
-      ifoPrint_VOBU_ADMAP(ifohandle->menu_vobu_admap);
-    } else {
-      printf("No Menu VOBU address map present\n");
-    }
+        printf("\nVideo Title Set Menu VOBU address map\n");
+        printf(  "-----------------\n");
+        if(ifohandle->menu_vobu_admap) {
+          ifoPrint_VOBU_ADMAP(ifohandle->menu_vobu_admap);
+        } else {
+          printf("No Menu VOBU address map present\n");
+        }
 
-    printf("\nCell Address table\n");
-    printf(  "-----------------\n");
-    ifoPrint_C_ADT(ifohandle->vts_c_adt);
+        printf("\nCell Address table\n");
+        printf(  "-----------------\n");
+        ifoPrint_C_ADT(ifohandle->vts_c_adt);
 
-    printf("\nVideo Title Set VOBU address map\n");
-    printf(  "-----------------\n");
-    ifoPrint_VOBU_ADMAP(ifohandle->vts_vobu_admap);
+        printf("\nVideo Title Set VOBU address map\n");
+        printf(  "-----------------\n");
+        ifoPrint_VOBU_ADMAP(ifohandle->vts_vobu_admap);
+      }
+      break;
+    case(IFO_AUDIO):
+
+      if(ifohandle->samg_mat){
+          printf("\nSimple Audio Manager table\n");
+          printf(  "-----------------\n");
+        //ifoPrint_SAMG(ifohandle->amgi_mat);
+        }
+      if(ifohandle->amgi_mat){
+          printf("\nAudio Manager table\n");
+          printf(  "-----------------\n");
+          ifoPrint_AMGI_MAT(ifohandle->amgi_mat);
+        }
+      if(ifohandle->info_table_first_sector){
+          printf("\nInfo table first sector\n");
+          printf(  "-----------------\n");
+          ifoPrint_TIF(ifohandle->info_table_first_sector);
+        }
+
+      if(ifohandle->info_table_second_sector){
+          printf("\nInfo table second sector\n");
+          printf(  "-----------------\n");
+          ifoPrint_TIF(ifohandle->info_table_second_sector);
+        }
+
+      if(ifohandle->atsi_mat){
+          printf("\nATSI mat\n");
+          printf(  "-----------------\n");
+          ifoPrint_ATSI_MAT(ifohandle->atsi_mat);
+        }
+
+      if(ifohandle->atsi_title_table){
+          printf("\nATSI mat\n");
+          printf(  "-----------------\n");
+          ifoPrint_TT(ifohandle->atsi_title_table);
+            }
+      break;
+    case(IFO_VIDEO_RECORDING):
+      printf("\nDVD-VR (RTAV) Information\n");
+      printf("-------------------------\n");
+
+      if(ifohandle->rtav_vmgi) {
+        printf("\nRTAV Manager Information\n");
+        printf("------------------------\n");
+        ifoPrint_RTAV_VMGI(ifohandle->rtav_vmgi);
+      } else {
+        printf("No RTAV VMGI present\n");
+      }
+
+      if(ifohandle->pgci) {
+        printf("\nProgram Information Table (Tech Specs)\n");
+        printf("--------------------------------------\n");
+        ifoPrint_PGCI(ifohandle->pgci);
+      }
+
+      if(ifohandle->pgc_gi) {
+        printf("\nProgram General Information (Original Content)\n");
+        printf("----------------------------------------------\n");
+        ifoPrint_PGC_GI(ifohandle->pgc_gi);
+      }
+
+      if(ifohandle->ud_pgcit) {
+        printf("\nProgram Set General Information (Playlists)\n");
+        printf("-------------------------------------------\n");
+        ifoPrint_ud_pgcit(ifohandle->ud_pgcit);
+      }
+      break;
+    case(IFO_UNKNOWN): 
+
+      printf("\nUKNOWN IFO TYPE\n");
+      break;
+
   }
 
   ifoClose(ifohandle);
