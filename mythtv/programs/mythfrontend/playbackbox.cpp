@@ -536,6 +536,8 @@ PlaybackBox::~PlaybackBox(void)
         emit m_player->RequestEmbedding(false, {}, m_playerSelectedNewShow);
         m_player->DecrRef();
     }
+
+    m_recordingList->Reset(); // Delete PlaybackBoxListItem memories
 }
 
 bool PlaybackBox::Create()
@@ -2600,7 +2602,10 @@ void PlaybackBox::RemoveProgram( uint recordingID, bool forgetHistory,
     MythUIButtonListItem *uiItem =
         m_recordingList->GetItemByData(QVariant::fromValue(delItem));
     if (uiItem)
+    {
         m_recordingList->RemoveItem(uiItem);
+        delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+    }
 }
 
 void PlaybackBox::fanartLoad(void)
@@ -3585,7 +3590,10 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
             MythUIButtonListItem *uiItem =
                 m_recordingList->GetItemByData(QVariant::fromValue(tmpItem));
             if (uiItem)
+            {
                 m_recordingList->RemoveItem(uiItem);
+                delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+            }
         }
     }
     m_playList.clear();
@@ -4208,7 +4216,10 @@ void PlaybackBox::customEvent(QEvent *event)
                 MythUIButtonListItem *uiItem =
                     m_recordingList->GetItemByData(QVariant::fromValue(pginfo));
                 if (uiItem)
+                {
                     m_recordingList->RemoveItem(uiItem);
+                    delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+                }
             }
             if (!list.empty())
                 m_helper.DeleteRecordings(list);
@@ -4441,6 +4452,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
                     }
 
                     m_recordingList->RemoveItem(item_by_data);
+                    delete dynamic_cast<PlaybackBoxListItem*>(item_by_data);
                 }
                 pit = (*git).erase(pit);
             }
@@ -4940,6 +4952,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         newTitle != pginfo->GetTitle())
     {
         m_recordingList->RemoveItem(item);
+        delete dynamic_cast<PlaybackBoxListItem*>(item);
     }
     else
     {
