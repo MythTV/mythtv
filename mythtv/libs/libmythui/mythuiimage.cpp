@@ -788,6 +788,10 @@ void MythUIImage::SetImage(MythImage *img)
         SetSize(img->size());
 
     m_imagesLock.lock();
+    if (m_images.contains(0) && m_images[0])
+    {
+        m_images[0]->DecrRef(); // delete the original
+    }
     m_images[0] = img;
     m_delays.clear();
     m_imagesLock.unlock();
@@ -1106,6 +1110,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     SetMinArea(rect);
 
                     m_imagesLock.lock();
+                    if (m_images.contains(j) && m_images[j])
+                    {
+                        m_images[j]->DecrRef(); // delete the original
+                    }
                     m_images[j] = image;
                     m_imagesLock.unlock();
 
@@ -1119,6 +1127,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     Reset();
 
                     m_imagesLock.lock();
+                    if (m_images.contains(j) && m_images[j])
+                    {
+                        m_images[j]->DecrRef(); // delete the original
+                    }
                     m_images[j] = nullptr;
                     m_imagesLock.unlock();
                 }
@@ -1615,7 +1627,7 @@ void MythUIImage::customEvent(QEvent *event)
 
             m_imagesLock.lock();
 
-            if (m_images[number])
+            if (m_images.contains(number) && m_images[number])
             {
                 // If we got to this point, it means this same MythUIImage
                 // was told to reload the same image, so we use the newest

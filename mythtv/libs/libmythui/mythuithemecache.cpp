@@ -304,7 +304,15 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         // If the file isn't in the disk cache, then we don't want to bother
         // checking the last modified times of the original
         if (!cacheFileInfo.exists())
+        {
+            if (ret)
+            {
+                // Reference count was incremented by calling GetImageFromCache()
+                // above, but now we're abandoning use of the returned value.
+                ret->DecrRef();
+            }
             return nullptr;
+        }
 
         // Now compare the time on the source versus our cached copy
         QDateTime srcLastModified;
@@ -331,7 +339,15 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         else
         {
             if (!GetMythUI()->FindThemeFile(File))
+            {
+                if (ret)
+                {
+                    // Reference count was incremented by calling GetImageFromCache()
+                    // above, but now we're abandoning use of the returned value.
+                    ret->DecrRef();
+                }
                 return nullptr;
+            }
 
             QFileInfo original(File);
 
@@ -376,6 +392,12 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         }
         else
         {
+            if (ret)
+            {
+                // Reference count was incremented by calling GetImageFromCache()
+                // above, but now we're abandoning use of the returned value.
+                ret->DecrRef();
+            }
             ret = nullptr;
             // If file has changed on disk, then remove it from the memory
             // and disk cache
