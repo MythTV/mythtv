@@ -820,7 +820,7 @@ void MythRenderOpenGL::DrawProcedural(QRect Area, int Alpha, QOpenGLFramebufferO
     SetShaderProjection(Program);
     Program->setUniformValue("u_time",  TimeVal);
     Program->setUniformValue("u_alpha", static_cast<float>(Alpha / 255.0F));
-    Program->setUniformValue("u_res",   QVector2D(m_window->width(), m_window->height()));
+    Program->setUniformValue("u_res", QVector2D(m_viewport.width(), m_viewport.height()));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     glDisableVertexAttribArray(VERTEX_INDEX);

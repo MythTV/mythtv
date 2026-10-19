@@ -108,6 +108,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     }
 
     QSize currentsize = m_parent->size();
+    m_pixelRatio = m_parent->devicePixelRatioF();
+    m_usingHighDPI = !qFuzzyCompare(m_pixelRatio, 1.0);
 
     // check if we need to adjust cache sizes
     // NOTE - don't use the scaled size if using high DPI. Our images are at the lower

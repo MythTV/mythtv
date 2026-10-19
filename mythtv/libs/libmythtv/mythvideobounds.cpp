@@ -25,6 +25,7 @@
 
 // Qt
 #include <QApplication>
+#include <QWindow>
 
 // MythtTV
 #include "libmythbase/mythcorecontext.h"
@@ -100,7 +101,8 @@ void MythVideoBounds::PopulateGeometry(void)
     if (!screen)
         return;
 
-    m_devicePixelRatio = screen->devicePixelRatio();
+    QWindow *window = m_display->GetCurrentWindow();
+    m_devicePixelRatio = window ? window->devicePixelRatio() : screen->devicePixelRatio();
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {
