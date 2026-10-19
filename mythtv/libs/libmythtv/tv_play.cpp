@@ -5273,6 +5273,7 @@ void TV::ChangeFFRew(int Direction)
     }
     else if (!m_ffRewReverse && m_playerContext.m_ffRewState == -Direction)
     {
+        auto last_ffRewIndex = m_playerContext.m_ffRewIndex;
         while (--m_playerContext.m_ffRewIndex >= kInitFFRWSpeed)
             if (m_ffRewSpeeds[static_cast<size_t>(m_playerContext.m_ffRewIndex)])
                 break;
@@ -5282,6 +5283,7 @@ void TV::ChangeFFRew(int Direction)
         }
         else
         {
+            m_playerContext.m_ffRewIndex = last_ffRewIndex;
             float time = StopFFRew();
             DoPlayerSeek(time);
             UpdateOSDSeekMessage(m_playerContext.GetPlayMessage(), kOSDTimeout_Med);
