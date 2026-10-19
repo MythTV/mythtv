@@ -316,16 +316,17 @@ void MythPainter::DrawRectPriv(MythImage *im, const QRect area, int radius,
     radius = std::min(area.width() / 2, radius);
     radius = std::min(area.height() / 2, radius);
 
-    int lineWidth = linePen.width();
-    QRect r(lineWidth, lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+    qreal lineWidth = (linePen.style() == Qt::NoPen) ? 0.0 : linePen.widthF();
+    qreal halfLine  = lineWidth / 2.0;
+    QRectF r(halfLine, halfLine,
+             area.width() - lineWidth, area.height() - lineWidth);
 
     if (ellipse)
         painter.drawEllipse(r);
     else if (radius == 0)
         painter.drawRect(r);
     else
-        painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
+        painter.drawRoundedRect(r, static_cast<qreal>(radius), static_cast<qreal>(radius));
 
     painter.end();
     im->Assign(image);
