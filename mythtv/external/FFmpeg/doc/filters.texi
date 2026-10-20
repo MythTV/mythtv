@@ -7743,6 +7743,11 @@ The file path of the downloaded whisper.cpp model (mandatory).
 The language to use for transcription ('auto' for auto-detect).
 Default value: @code{"auto"}
 
+@item translate
+If enabled, translate the transcription from the source language to English. A
+multilingual model is required to enable this option.
+Default value: @code{"false"}
+
 @item queue
 The maximum size that will be queued into the filter before processing the audio
 with whisper. Using a small value the audio stream will be processed more often,
@@ -7775,8 +7780,8 @@ Default value: @code{"text"}
 
 @item max_len
 Maximum segment length in characters. When set to a value greater than 0,
-transcription segments will be split to not exceed this length. This is useful
-for generating subtitles with shorter lines.
+transcription segments will be split by word to not exceed this length. This is
+useful for generating subtitles with shorter lines.
 Default value: @code{"0"}
 
 @item vad_model
@@ -8606,21 +8611,24 @@ Same as the @ref{subtitles} filter, except that it doesn't require libavcodec
 and libavformat to work. On the other hand, it is limited to ASS (Advanced
 Substation Alpha) subtitles files.
 
-This filter accepts the following option in addition to the common options from
-the @ref{subtitles} filter:
+This filter accepts @option{filename}/@option{f}, @option{original_size},
+@option{fontsdir}, and @option{alpha} from the @ref{subtitles} filter, plus the
+following option:
 
 @table @option
 @item shaping
-Set the shaping engine
+Set the shaping engine.
 
 Available values are:
 @table @samp
 @item auto
 The default libass shaping engine, which is the best available.
 @item simple
-Fast, font-agnostic shaper that can do only substitutions
+Fast, font-agnostic shaper that can do only substitutions.
 @item complex
-Slower shaper using OpenType for substitutions and positioning
+Slower shaper using OpenType for substitutions and positioning. Required
+for correct rendering of complex scripts such as Arabic, Hebrew, Devanagari
+and Thai. Requires libass to be built with HarfBuzz.
 @end table
 
 The default is @code{auto}.
@@ -12216,18 +12224,42 @@ and configure FFmpeg with @code{--enable-libtorch
 --extra-cflags=-I/libtorch_root/libtorch/include/torch/csrc/api/include
 --extra-ldflags=-L/libtorch_root/libtorch/lib/}
 
+@item onnx
+ONNX Runtime backend. To enable this backend you need to install the
+ONNX Runtime library (see @url{https://onnxruntime.ai/}) and configure
+FFmpeg with @code{--enable-libonnxruntime}.
+
+The current ONNX Runtime backend expects 4-D input and output tensors
+with NCHW layout and 32-bit floating-point element type (ONNX
+@code{FLOAT}); models with integer or other element types (e.g.
+@code{UINT8}) are not supported and will be rejected at load time.
+Models using NHWC layout or other ranks are not yet
+supported. Only single-input models are supported; the backend binds
+exactly one input tensor when running the model.
+
+The @option{input} and @option{output} options are optional for the
+ONNX Runtime backend; when they are omitted the backend resolves the
+tensor names from the session.
+
+The ONNX Runtime backend runs inference synchronously using a single
+inference request. The shared @option{async} and @option{nireq} options
+therefore have no effect for @code{dnn_backend=onnx}; inference always
+runs synchronously regardless of their values.
+
 @end table
 
 @item model
 Set path to model file specifying network architecture and its parameters.
-Note that different backends use different file formats. TensorFlow, OpenVINO
-and Libtorch backend can load files for only its format.
+Note that different backends use different file formats. TensorFlow, OpenVINO,
+Libtorch, and ONNX Runtime backends can load files for only their respective formats.
 
 @item input
-Set the input name of the dnn network.
+Set the input name of the dnn network. Required for the TensorFlow backend;
+optional for the ONNX Runtime backend.
 
 @item output
-Set the output name of the dnn network.
+Set the output name of the dnn network. Required for the TensorFlow backend;
+optional for the ONNX Runtime backend.
 
 @item backend_configs
 Set the configs to be passed into backend. To use async execution, set async (default: set).
@@ -12235,6 +12267,20 @@ Roll back to sync execution if the backend does not support async.
 
 For tensorflow backend, you can set its configs with @option{sess_config} options,
 please use tools/python/tf_sess_config.py to get the configs of TensorFlow backend for your system.
+
+@item device
+Set the device to run the model. For the ONNX Runtime backend this selects the
+execution provider: @code{cpu} (default), @code{cuda} (NVIDIA GPU),
+@code{dml} (DirectML, Windows only) or @code{vitisai} (AMD Ryzen AI NPU).
+
+@item device_id
+Set the device index used by GPU execution providers (e.g. @code{cuda} or
+@code{dml}) for the ONNX Runtime backend. Default is 0.
+
+@item threads_per_operation
+ONNX Runtime backend only. Set the number of CPU threads used per ONNX
+Runtime operator when running with @code{device=cpu}. Default is 0 (let
+ONNX Runtime choose automatically). Has no effect for GPU/NPU providers.
 
 @end table
 
@@ -14742,6 +14788,73 @@ Available value for @var{flags} is:
 Enable scene change detection using the value of the option @var{scene}.
 This flag is enabled by default.
 @end table
+@end table
+
+@section frc_amf
+
+Double the frame rate, using Frame Rate Converter (FRC) provided by
+AMD Advanced Media Framework library for hardware acceleration.
+
+The filter accepts the following options:
+
+@table @option
+@item engine_type
+Specify the engine used to run shaders.
+@table @samp
+@item dx11
+DirectX 11.
+
+@item dx12
+DirectX 12 (Default value).
+@end table
+
+@item enable
+Boolean value: enable/disable FRC. Dynamic value, can be altered at a runtime
+without re-initializing the filter. (Default value: enabled).
+
+@item fallback_mode
+Fallback behavior in case of low interpolation confidence.
+@table @samp
+@item duplicate
+Duplicate frame.
+
+@item blend
+Blend two frames together (Default value).
+@end table
+
+@item indicator
+Boolean value: show FRC indicator square in the top left corner of the video
+(Default value: disabled).
+
+@item profile
+Level of hierarchical motion search.
+@table @samp
+@item low
+Less levels of hierarchical motion search.
+Only recommended for extremely low resolutions.
+
+@item high
+Recommended for any resolution up to 1440p. (Default value)
+
+@item super
+More levels of hierarchical motion search. Recommended for resolutions 1440p
+or higher.
+@end table
+
+@item mv_search_mode
+Performance mode of the motion search.
+@table @samp
+@item native
+Conduct motion search on the full resolution of source images.
+
+@item performance
+Conduct motion search on the down scaled source images.
+Recommended for APU or low end GPU for better performance.
+@end table
+
+@item use_future_frame
+Boolean value: enable dependency on future frame, improves quality for the cost
+of latency (Default value: enabled).
 @end table
 
 @section framestep
@@ -23279,6 +23392,23 @@ at least libass release 0.17.0 (or LIBASS_VERSION 0x01600010), @emph{and} libass
 have been built with libunibreak.
 
 The option is enabled by default except for native ASS.
+
+@item shaping
+Set the shaping engine.
+
+Available values are:
+@table @samp
+@item auto
+The default libass shaping engine, which is the best available.
+@item simple
+Fast, font-agnostic shaper that can do only substitutions.
+@item complex
+Slower shaper using OpenType for substitutions and positioning. Required
+for correct rendering of complex scripts such as Arabic, Hebrew, Devanagari
+and Thai. Requires libass to be built with HarfBuzz.
+@end table
+
+The default is @code{auto}.
 @end table
 
 If the first key is not specified, it is assumed that the first value
@@ -23647,9 +23777,9 @@ The value must be between @code{0} and @var{nb_frames - 1}. Default is @code{0}.
 @item
 Produce 8x8 PNG tiles of all keyframes (@option{-skip_frame nokey}) in a movie:
 @example
-ffmpeg -skip_frame nokey -i file.avi -vf 'scale=128:72,tile=8x8' -an -vsync 0 keyframes%03d.png
+ffmpeg -skip_frame nokey -i file.avi -vf 'scale=128:72,tile=8x8' -an -fps_mode passthrough keyframes%03d.png
 @end example
-The @option{-vsync 0} is necessary to prevent @command{ffmpeg} from
+The @option{-fps_mode passthrough} is necessary to prevent @command{ffmpeg} from
 duplicating each output frame to accommodate the originally detected frame
 rate.
 
@@ -25648,6 +25778,22 @@ Work the same as the identical @ref{scale} filter options.
 @item reset_sar
 Works the same as the identical @ref{scale} filter option.
 
+@item in_color_range
+Override input color range.
+
+@item out_color_range
+Specify output color range.
+
+The accepted values for in_trc and out_trc are:
+@table @samp
+@item studio
+Studio (or restricted, or MPEG) color range.
+
+@item full
+Full (or JPEG) color range.
+
+@end table
+
 @anchor{color_profile}
 @item color_profile
 Specify all color properties at once.
@@ -25665,10 +25811,13 @@ BT.2020
 
 @end table
 
-@item trc
+@item in_trc
+Override input transfer characteristics.
+
+@item out_trc
 Specify output transfer characteristics.
 
-The accepted values are:
+The accepted values for in_trc and out_trc are:
 @table @samp
 @item bt709
 BT.709
@@ -25720,10 +25869,13 @@ ARIB_STD_B67
 
 @end table
 
-@item primaries
+@item in_primaries
+Override input color primaries.
+
+@item out_primaries
 Specify output color primaries.
 
-The accepted values are:
+The accepted values for in_primaries and out_primaries are:
 @table @samp
 @item bt709
 BT.709
@@ -25774,6 +25926,13 @@ vpp_amf=-2:720:format=yuv420p
 Upscale to 4K and change color profile to bt2020.
 @example
 vpp_amf=4096:2160:color_profile=bt2020
+@end example
+
+@item
+Override input primaries and input transfer characteristics, change both to bt709.
+
+@example
+vpp_amf=color_profile=bt2020:in_trc=smpte2084:in_primaries=bt2020:out_trc=bt709:out_primaries=bt709
 @end example
 @end itemize
 
@@ -26956,7 +27115,19 @@ value.
 @chapter CUDA Video Filters
 @c man begin CUDA Video Filters
 
-To enable CUDA and/or NPP filters please refer to configuration guidelines for @ref{CUDA} and for @ref{CUDA NPP} filters.
+Below is a description of the currently available Nvidia CUDA video filters.
+
+Prerequisites:
+@itemize
+@item Install Nvidia CUDA Toolkit
+@end itemize
+
+Note: If FFmpeg detects the Nvidia CUDA Toolkit during configuration, it will enable CUDA filters automatically without requiring any additional flags. If you want to explicitly enable them, use the following options:
+
+@itemize
+@item Configure FFmpeg with @code{--enable-cuda-nvcc --enable-nonfree}.
+@item Configure FFmpeg with @code{--enable-cuda-llvm}. Additional requirement: @code{llvm} lib must be installed.
+@end itemize
 
 Running CUDA filters requires you to initialize a hardware device and to pass that device to all filters in any filter graph.
 @table @option
@@ -26991,23 +27162,7 @@ Since CUDA filters operate exclusively on GPU memory, frame data must sometimes 
 @end itemize
 Note that @ref{hwupload} uploads data to a surface with the same layout as the software frame, so it may be necessary to add a @ref{format} filter immediately before @ref{hwupload} to ensure the input is in the correct format. Similarly, @ref{hwdownload} may not support all output formats, so an additional @ref{format} filter may need to be inserted immediately after @ref{hwdownload} in the filter graph to ensure compatibility.
 
-@anchor{CUDA}
-@section CUDA
-Below is a description of the currently available Nvidia CUDA video filters.
-
-Prerequisites:
-@itemize
-@item Install Nvidia CUDA Toolkit
-@end itemize
-
-Note: If FFmpeg detects the Nvidia CUDA Toolkit during configuration, it will enable CUDA filters automatically without requiring any additional flags. If you want to explicitly enable them, use the following options:
-
-@itemize
-@item Configure FFmpeg with @code{--enable-cuda-nvcc --enable-nonfree}.
-@item Configure FFmpeg with @code{--enable-cuda-llvm}. Additional requirement: @code{llvm} lib must be installed.
-@end itemize
-
-@subsection bilateral_cuda
+@section bilateral_cuda
 CUDA accelerated bilateral filter, an edge preserving filter.
 This filter is mathematically accurate thanks to the use of GPU acceleration.
 For best output quality, use one to one chroma subsampling, i.e. yuv444p format.
@@ -27027,7 +27182,7 @@ Set window size of the bilateral function to determine the number of neighbours 
 If the number entered is even, one will be added automatically.
 Allowed range is 1 to 255. Default is 1.
 @end table
-@subsubsection Examples
+@subsection Examples
 
 @itemize
 @item
@@ -27046,7 +27201,7 @@ Apply the bilateral filter on a video.
 
 @end itemize
 
-@subsection bwdif_cuda
+@section bwdif_cuda
 
 Deinterlace the input video using the @ref{bwdif} algorithm, but implemented
 in CUDA so that it can work as part of a GPU accelerated pipeline with nvdec
@@ -27098,13 +27253,13 @@ Only deinterlace frames marked as interlaced.
 The default value is @code{all}.
 @end table
 
-@subsection chromakey_cuda
+@section chromakey_cuda
 CUDA accelerated YUV colorspace color/chroma keying.
 
 This filter works like normal chromakey filter but operates on CUDA frames.
 for more details and parameters see @ref{chromakey}.
 
-@subsubsection Examples
+@subsection Examples
 
 @itemize
 @item
@@ -27140,7 +27295,7 @@ Process two software sources, explicitly uploading the frames:
 
 @end itemize
 
-@subsection colorspace_cuda
+@section colorspace_cuda
 
 CUDA accelerated implementation of the colorspace filter.
 
@@ -27173,7 +27328,7 @@ JPEG (full) range
 @end table
 
 @anchor{overlay_cuda}
-@subsection overlay_cuda
+@section overlay_cuda
 
 Overlay one video on top of another.
 
@@ -27252,13 +27407,13 @@ This filter also supports the @ref{framesync} options.
 
 
 @anchor{pad_cuda}
-@subsection pad_cuda
+@section pad_cuda
 Add paddings to an input video stream using CUDA.
 
 This filter is the CUDA-accelerated version of the @ref{pad} filter. It accepts the same options and expressions and provides the same core functionality.
 For a detailed description of available options, please see the documentation for the @ref{pad} filter.
 
-@subsubsection Examples
+@subsection Examples
 
 @itemize
 @item
@@ -27275,7 +27430,7 @@ ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i input.mp4 -vf "pad_cuda=w=ih
 @end itemize
 
 @anchor{scale_cuda}
-@subsection scale_cuda
+@section scale_cuda
 
 Scale (resize) and convert (pixel format) the input video, using accelerated CUDA kernels.
 Setting the output width and height works in the same way as for the @ref{scale} filter.
@@ -27324,6 +27479,12 @@ frame-consumer that exhausts the limited decoder frame pool.
 If set to 1, frames are passed through as-is if they match the desired output
 parameters. This is the default behaviour.
 
+@item use_filters
+If set to 1, filter with a generic weight LUT instead of using fixed-function
+shader kernels. May be faster or slower depending on the hardware. A value
+of @code{auto} (the default) enables this automatically when required for
+correct anti-aliasing when downscaling.
+
 @item param
 Algorithm-Specific parameter.
 
@@ -27338,7 +27499,7 @@ Works the same as the identical @ref{scale} filter option.
 
 @end table
 
-@subsubsection Examples
+@subsection Examples
 
 @itemize
 @item
@@ -27362,7 +27523,7 @@ scale_cuda=passthrough=0
 @end example
 @end itemize
 
-@subsection thumbnail_cuda
+@section thumbnail_cuda
 
 Select the most representative frame in a given sequence of consecutive frames using CUDA.
 
@@ -27378,7 +27539,7 @@ the end. Default is @code{100}.
 Since the filter keeps track of the whole frames sequence, a bigger @var{n}
 value will result in a higher memory usage, so a high value is not recommended.
 
-@subsubsection Example
+@subsection Example
 
 @itemize
 
@@ -27390,7 +27551,57 @@ Thumbnails are extracted from every @var{n}=150-frame batch, selecting one per b
 
 @end itemize
 
-@subsection yadif_cuda
+@section transpose_cuda
+
+Transpose rows with columns in the input video and optionally flip it.
+For more in depth examples see the @ref{transpose} video filter, which shares mostly the same options.
+
+It accepts the following parameters:
+
+@table @option
+
+@item dir
+Specify the transposition direction.
+
+Can assume the following values:
+@table @samp
+@item cclock_flip
+Rotate by 90 degrees counterclockwise and vertically flip. (default)
+
+@item clock
+Rotate by 90 degrees clockwise.
+
+@item cclock
+Rotate by 90 degrees counterclockwise.
+
+@item clock_flip
+Rotate by 90 degrees clockwise and vertically flip.
+
+@item reversal
+Rotate by 180 degrees.
+
+@item hflip
+Flip horizontally.
+
+@item vflip
+Flip vertically.
+@end table
+
+@item passthrough
+Do not apply the transposition if the input geometry matches the one
+specified by the specified value. It accepts the following values:
+@table @samp
+@item none
+Always apply transposition. (default)
+@item portrait
+Preserve portrait geometry (when @var{height} >= @var{width}).
+@item landscape
+Preserve landscape geometry (when @var{width} >= @var{height}).
+@end table
+
+@end table
+
+@section yadif_cuda
 
 Deinterlace the input video using the @ref{yadif} algorithm, but implemented
 in CUDA so that it can work as part of a GPU accelerated pipeline with nvdec
@@ -27446,274 +27657,6 @@ Only deinterlace frames marked as interlaced.
 @end table
 
 The default value is @code{all}.
-@end table
-
-@anchor{CUDA NPP}
-@section CUDA NPP
-Below is a description of the currently available NVIDIA Performance Primitives (libnpp) video filters.
-
-Prerequisites:
-@itemize
-@item Install Nvidia CUDA Toolkit
-@item Install libnpp
-@end itemize
-
-To enable CUDA NPP filters:
-
-@itemize
-@item Configure FFmpeg with @code{--enable-nonfree --enable-libnpp}.
-@end itemize
-
-
-@anchor{scale_npp}
-@subsection scale_npp
-
-Use the NVIDIA Performance Primitives (libnpp) to perform scaling and/or pixel
-format conversion on CUDA video frames. Setting the output width and height
-works in the same way as for the @var{scale} filter.
-
-The following additional options are accepted:
-@table @option
-@item format
-The pixel format of the output CUDA frames. If set to the string "same" (the
-default), the input format will be kept. Note that automatic format negotiation
-and conversion is not yet supported for hardware frames
-
-@item interp_algo
-The interpolation algorithm used for resizing. One of the following:
-@table @option
-@item nn
-Nearest neighbour.
-
-@item linear
-@item cubic
-@item cubic2p_bspline
-2-parameter cubic (B=1, C=0)
-
-@item cubic2p_catmullrom
-2-parameter cubic (B=0, C=1/2)
-
-@item cubic2p_b05c03
-2-parameter cubic (B=1/2, C=3/10)
-
-@item super
-Supersampling
-
-@item lanczos
-@end table
-
-@item force_original_aspect_ratio
-Enable decreasing or increasing output video width or height if necessary to
-keep the original aspect ratio. Possible values:
-
-@table @samp
-@item disable
-Scale the video as specified and disable this feature.
-
-@item decrease
-The output video dimensions will automatically be decreased if needed.
-
-@item increase
-The output video dimensions will automatically be increased if needed.
-
-@end table
-
-One useful instance of this option is that when you know a specific device's
-maximum allowed resolution, you can use this to limit the output video to
-that, while retaining the aspect ratio. For example, device A allows
-1280x720 playback, and your video is 1920x800. Using this option (set it to
-decrease) and specifying 1280x720 to the command line makes the output
-1280x533.
-
-Please note that this is a different thing than specifying -1 for @option{w}
-or @option{h}, you still need to specify the output resolution for this option
-to work.
-
-@item force_divisible_by
-Ensures that both the output dimensions, width and height, are divisible by the
-given integer when used together with @option{force_original_aspect_ratio}. This
-works similar to using @code{-n} in the @option{w} and @option{h} options.
-
-This option respects the value set for @option{force_original_aspect_ratio},
-increasing or decreasing the resolution accordingly. The video's aspect ratio
-may be slightly modified.
-
-This option can be handy if you need to have a video fit within or exceed
-a defined resolution using @option{force_original_aspect_ratio} but also have
-encoder restrictions on width or height divisibility.
-
-@item reset_sar
-Works the same as the identical @ref{scale} filter option.
-
-@item eval
-Specify when to evaluate @var{width} and @var{height} expression. It accepts the following values:
-
-@table @samp
-@item init
-Only evaluate expressions once during the filter initialization or when a command is processed.
-
-@item frame
-Evaluate expressions for each incoming frame.
-
-@end table
-
-@end table
-
-The values of the @option{w} and @option{h} options are expressions
-containing the following constants:
-
-@table @var
-@item in_w
-@item in_h
-The input width and height
-
-@item iw
-@item ih
-These are the same as @var{in_w} and @var{in_h}.
-
-@item out_w
-@item out_h
-The output (scaled) width and height
-
-@item ow
-@item oh
-These are the same as @var{out_w} and @var{out_h}
-
-@item a
-The same as @var{iw} / @var{ih}
-
-@item sar
-input sample aspect ratio
-
-@item dar
-The input display aspect ratio. Calculated from @code{(iw / ih) * sar}.
-
-@item n
-The (sequential) number of the input frame, starting from 0.
-Only available with @code{eval=frame}.
-
-@item t
-The presentation timestamp of the input frame, expressed as a number of
-seconds. Only available with @code{eval=frame}.
-
-@item pos
-The position (byte offset) of the frame in the input stream, or NaN if
-this information is unavailable and/or meaningless (for example in case of synthetic video).
-Only available with @code{eval=frame}.
-Deprecated, do not use.
-@end table
-
-@subsection scale2ref_npp
-
-Use the NVIDIA Performance Primitives (libnpp) to scale (resize) the input
-video, based on a reference video.
-
-See the @ref{scale_npp} filter for available options, scale2ref_npp supports the same
-but uses the reference video instead of the main input as basis. scale2ref_npp
-also supports the following additional constants for the @option{w} and
-@option{h} options:
-
-@table @var
-@item main_w
-@item main_h
-The main input video's width and height
-
-@item main_a
-The same as @var{main_w} / @var{main_h}
-
-@item main_sar
-The main input video's sample aspect ratio
-
-@item main_dar, mdar
-The main input video's display aspect ratio. Calculated from
-@code{(main_w / main_h) * main_sar}.
-
-@item main_n
-The (sequential) number of the main input frame, starting from 0.
-Only available with @code{eval=frame}.
-
-@item main_t
-The presentation timestamp of the main input frame, expressed as a number of
-seconds. Only available with @code{eval=frame}.
-
-@item main_pos
-The position (byte offset) of the frame in the main input stream, or NaN if
-this information is unavailable and/or meaningless (for example in case of synthetic video).
-Only available with @code{eval=frame}.
-@end table
-
-@subsubsection Examples
-
-@itemize
-@item
-Scale a subtitle stream (b) to match the main video (a) in size before overlaying
-@example
-'scale2ref_npp[b][a];[a][b]overlay_cuda'
-@end example
-
-@item
-Scale a logo to 1/10th the height of a video, while preserving its display aspect ratio.
-@example
-[logo-in][video-in]scale2ref_npp=w=oh*mdar:h=ih/10[logo-out][video-out]
-@end example
-@end itemize
-
-@subsection sharpen_npp
-Use the NVIDIA Performance Primitives (libnpp) to perform image sharpening with
-border control.
-
-The following additional options are accepted:
-@table @option
-
-@item border_type
-Type of sampling to be used ad frame borders. One of the following:
-@table @option
-
-@item replicate
-Replicate pixel values.
-
-@end table
-@end table
-
-@subsection transpose_npp
-
-Transpose rows with columns in the input video and optionally flip it.
-For more in depth examples see the @ref{transpose} video filter, which shares mostly the same options.
-
-It accepts the following parameters:
-
-@table @option
-
-@item dir
-Specify the transposition direction.
-
-Can assume the following values:
-@table @samp
-@item cclock_flip
-Rotate by 90 degrees counterclockwise and vertically flip. (default)
-
-@item clock
-Rotate by 90 degrees clockwise.
-
-@item cclock
-Rotate by 90 degrees counterclockwise.
-
-@item clock_flip
-Rotate by 90 degrees clockwise and vertically flip.
-@end table
-
-@item passthrough
-Do not apply the transposition if the input geometry matches the one
-specified by the specified value. It accepts the following values:
-@table @samp
-@item none
-Always apply transposition. (default)
-@item portrait
-Preserve portrait geometry (when @var{height} >= @var{width}).
-@item landscape
-Preserve landscape geometry (when @var{width} >= @var{height}).
-@end table
-
 @end table
 
 @c man end CUDA Video Filters
@@ -29236,7 +29179,8 @@ Preserve landscape geometry (when @var{width} >= @var{height}).
 Below is a description of the currently available Vulkan video filters.
 
 To enable compilation of these filters you need to configure FFmpeg with
-@code{--enable-vulkan} and either @code{--enable-libglslang} or @code{--enable-libshaderc}.
+@code{--enable-vulkan}, and have a SPIR-V compiler (@code{glslc} or
+@code{glslangValidator}) available at build time.
 
 Running Vulkan filters requires you to initialize a hardware device and to pass that device to all filters in any filter graph.
 @table @option
@@ -32333,7 +32277,7 @@ select=n=2:e='mod(n, 2)+1' [odd][even]; [odd] pad=h=2*ih [tmp]; [tmp][even] over
 Select useful frames from an ffconcat file which is using inpoints and
 outpoints but where the source files are not intra frame only.
 @example
-ffmpeg -copyts -vsync 0 -segment_time_metadata 1 -i input.ffconcat -vf select=concatdec_select -af aselect=concatdec_select output.avi
+ffmpeg -copyts -segment_time_metadata 1 -i input.ffconcat -fps_mode passthrough -vf select=concatdec_select -af aselect=concatdec_select output.avi
 @end example
 @end itemize
 

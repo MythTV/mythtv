@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "libavutil/attributes.h"
 #include "libavutil/frame.h"
 #include "libavutil/mem_internal.h"
 
@@ -223,6 +224,7 @@ typedef struct AVSContext {
     int qp_fixed;
     int pic_qp_fixed;
     int cbp;
+    DECLARE_ALIGNED(32, int16_t, block)[64];
     uint8_t permutated_scantable[64];
 
     /** intra prediction is done with un-deblocked samples
@@ -244,7 +246,6 @@ typedef struct AVSContext {
     uint8_t *edge_emu_buffer;
 
     int got_keyframe;
-    int16_t *block;
 } AVSContext;
 
 extern const uint8_t     ff_cavs_chroma_qp[64];
@@ -257,6 +258,7 @@ static inline void set_mvs(cavs_vector *mv, enum cavs_block size) {
     case BLK_16X16:
         mv[MV_STRIDE  ] = mv[0];
         mv[MV_STRIDE+1] = mv[0];
+        av_fallthrough;
     case BLK_16X8:
         mv[1] = mv[0];
         break;

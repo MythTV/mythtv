@@ -30,6 +30,7 @@
 #include "jpegquanttables.h"
 #include "jpegtables.h"
 #include "leaddata.h"
+#include "libavutil/attributes.h"
 #include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/thread.h"
@@ -160,7 +161,7 @@ static int lead_decode_frame(AVCodecContext *avctx, AVFrame * frame,
     case 0x6:
     case 0x8000:
         yuv20p_half = 1;
-        // fall-through
+        av_fallthrough;
     case 0x1000:
         avctx->pix_fmt = AV_PIX_FMT_YUV420P;
         break;
@@ -183,6 +184,15 @@ static int lead_decode_frame(AVCodecContext *avctx, AVFrame * frame,
     q = AV_RL16(buf + 6);
     calc_dequant(dequant[0], ff_mjpeg_std_luminance_quant_tbl, q);
     calc_dequant(dequant[1], ff_mjpeg_std_chrominance_quant_tbl, q);
+
+    int mb_size_log2 = 4 - (avctx->pix_fmt == AV_PIX_FMT_YUV444P);
+    int blocks_per_mb = 2 + (1<<mb_size_log2)*(1<<mb_size_log2) / 64 - 2*yuv20p_half;
+    // Check against a lower bound of the input bitstream size
+    // Each block has at least a dc and ac code
+    // The smallest DC and AC code are each 2 bit
+    // There are cases where a column at the right or row at the bottom cannot be encoded, these are disregarded in this check as they do not fulfill the contract of encoding width x height pixels. They are either unsupported by the format or our implementation is incorrect
+    if ((avpkt->size - 8LL) * 8 < AV_CEIL_RSHIFT(avctx->width, mb_size_log2) * AV_CEIL_RSHIFT(avctx->height, mb_size_log2) * blocks_per_mb * (2 + 2))
+        return AVERROR_INVALIDDATA;
 
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;

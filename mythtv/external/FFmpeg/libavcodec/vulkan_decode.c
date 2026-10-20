@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/refstruct.h"
 #include "vulkan_video.h"
 #include "vulkan_decode.h"
@@ -27,6 +28,7 @@
 #define DECODER_IS_SDR(codec_id) \
     (((codec_id) == AV_CODEC_ID_FFV1) || \
      ((codec_id) == AV_CODEC_ID_DPX) || \
+     ((codec_id) == AV_CODEC_ID_APV) || \
      ((codec_id) == AV_CODEC_ID_PRORES_RAW) || \
      ((codec_id) == AV_CODEC_ID_PRORES))
 
@@ -54,6 +56,9 @@ extern const FFVulkanDecodeDescriptor ff_vk_dec_prores_desc;
 #if CONFIG_DPX_VULKAN_HWACCEL
 extern const FFVulkanDecodeDescriptor ff_vk_dec_dpx_desc;
 #endif
+#if CONFIG_APV_VULKAN_HWACCEL
+extern const FFVulkanDecodeDescriptor ff_vk_dec_apv_desc;
+#endif
 
 static const FFVulkanDecodeDescriptor *dec_descs[] = {
 #if CONFIG_H264_VULKAN_HWACCEL
@@ -79,6 +84,9 @@ static const FFVulkanDecodeDescriptor *dec_descs[] = {
 #endif
 #if CONFIG_DPX_VULKAN_HWACCEL
     &ff_vk_dec_dpx_desc,
+#endif
+#if CONFIG_APV_VULKAN_HWACCEL
+    &ff_vk_dec_apv_desc,
 #endif
 };
 
@@ -233,7 +241,8 @@ int ff_vk_decode_prepare_frame(FFVulkanDecodeContext *dec, AVFrame *pic,
                                 (AVVkFrame *)pic->data[0],
                                 hwfc->format[0],
                                 VK_IMAGE_USAGE_VIDEO_DECODE_DST_BIT_KHR |
-                                (!is_current ? VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR : 0));
+                                (hwfc->usage & VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR));
+                                // the above fixes VUID-VkVideoBeginCodingInfoKHR-slotIndex-07245
         if (err < 0)
             return err;
 
@@ -335,12 +344,21 @@ int ff_vk_decode_add_slice(AVCodecContext *avctx, FFVulkanDecodePicture *vp,
          * easier, and gives us ample headroom. */
         buf_size = 2 << av_log2(buf_size);
 
+        /* When the frames context uses DRM modifier tiling,
+         * hwctx->create_pnext contains VkImageDrmFormatModifierListCreateInfoEXT,
+         * which per spec does not extend VkBufferCreateInfo, so we need to find
+         * the VkVideoProfileListInfoKHR structure within it. */
+        void *buf_pnext = ctx->s.hwfc->create_pnext;
+        if (ctx->s.hwfc->tiling == VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT)
+            buf_pnext = (void *)ff_vk_find_struct(ctx->s.hwfc->create_pnext,
+                                                  VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR);
+
         err = ff_vk_get_pooled_buffer(&ctx->s, &ctx->buf_pool, &new_ref,
                                       DECODER_IS_SDR(avctx->codec_id) ?
                                       (VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
                                        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) :
                                       VK_BUFFER_USAGE_VIDEO_DECODE_SRC_BIT_KHR,
-                                      ctx->s.hwfc->create_pnext, buf_size,
+                                      buf_pnext, buf_size,
                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                       (DECODER_IS_SDR(avctx->codec_id) ?
                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT : 0x0));
@@ -1203,7 +1221,7 @@ int ff_vk_frame_params(AVCodecContext *avctx, AVBufferRef *hw_frames_ctx)
         case AV_PIX_FMT_YUVA422P12:
         case AV_PIX_FMT_YUVA444P12:
             hwfc->format[3] = VK_FORMAT_R16_UNORM;
-            /* fallthrough */
+            av_fallthrough;
         case AV_PIX_FMT_YUV422P10:
         case AV_PIX_FMT_YUV444P10:
         case AV_PIX_FMT_YUV422P12:
@@ -1217,7 +1235,9 @@ int ff_vk_frame_params(AVCodecContext *avctx, AVBufferRef *hw_frames_ctx)
         }
     }
 
-    hwfc->tiling = VK_IMAGE_TILING_OPTIMAL;
+    if (hwfc->tiling != VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT)
+        hwfc->tiling = VK_IMAGE_TILING_OPTIMAL;
+
     hwfc->usage  = VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
                    VK_IMAGE_USAGE_STORAGE_BIT      |
                    VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -1382,10 +1402,22 @@ int ff_vk_decode_init(AVCodecContext *avctx)
         dpb_frames->height    = s->frames->height;
 
         dpb_hwfc = dpb_frames->hwctx;
-        dpb_hwfc->create_pnext = (void *)ff_vk_find_struct(ctx->s.hwfc->create_pnext,
-                                                           VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR);
+        void *profile_list = (void *)ff_vk_find_struct(ctx->s.hwfc->create_pnext,
+                                                       VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR);
+        /* Reference (DPB) images use the same tiling and pNext chain as output.
+         * If VK_VIDEO_DECODE_CAPABILITY_DPB_AND_OUTPUT_DISTINCT_BIT_KHR is 0, the
+         * driver does not support separate output and DPB with different layouts/tiling. */
+        void *drm_create_pnext = (void *)ff_vk_find_struct(ctx->s.hwfc->create_pnext,
+                                                           VK_STRUCTURE_TYPE_IMAGE_DRM_FORMAT_MODIFIER_LIST_CREATE_INFO_EXT);
+        if (drm_create_pnext) {
+            dpb_hwfc->create_pnext = drm_create_pnext;
+            dpb_hwfc->tiling       = VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
+            av_assert2(ff_vk_find_struct(drm_create_pnext, VK_STRUCTURE_TYPE_VIDEO_PROFILE_LIST_INFO_KHR));
+        } else {
+            dpb_hwfc->create_pnext = profile_list;
+            dpb_hwfc->tiling       = VK_IMAGE_TILING_OPTIMAL;
+        }
         dpb_hwfc->format[0]    = s->hwfc->format[0];
-        dpb_hwfc->tiling       = VK_IMAGE_TILING_OPTIMAL;
         dpb_hwfc->usage        = VK_IMAGE_USAGE_VIDEO_DECODE_DPB_BIT_KHR;
 
         if (ctx->common.layered_dpb)

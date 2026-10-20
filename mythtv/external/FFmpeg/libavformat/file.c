@@ -19,9 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <string.h>
+
 #include "config_components.h"
 
 #include "libavutil/avstring.h"
+#include "libavutil/error.h"
 #include "libavutil/file_open.h"
 #include "libavutil/internal.h"
 #include "libavutil/mem.h"
@@ -232,6 +235,9 @@ static int64_t file_seek(URLContext *h, int64_t pos, int whence)
 {
     FileContext *c = h->priv_data;
     int64_t ret;
+
+    if (c->follow && (whence == SEEK_END || whence == AVSEEK_SIZE))
+        return AVERROR(ENOSYS); /* true size is not known */
 
     if (whence == AVSEEK_SIZE) {
         struct stat st;

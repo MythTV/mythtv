@@ -615,11 +615,6 @@ static void dump_stream_format(const AVFormatContext *ic, int i,
 
     // Fields which are missing from AVCodecParameters need to be taken from the AVCodecContext
     if (sti->avctx) {
-#if FF_API_CODEC_PROPS
-FF_DISABLE_DEPRECATION_WARNINGS
-        avctx->properties   = sti->avctx->properties;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
         avctx->codec        = sti->avctx->codec;
         avctx->qmin         = sti->avctx->qmin;
         avctx->qmax         = sti->avctx->qmax;
@@ -810,16 +805,19 @@ static void dump_stream_group(const AVFormatContext *ic, uint8_t *printed,
         }
         break;
     }
+    case AV_STREAM_GROUP_PARAMS_DOLBY_VISION:
     case AV_STREAM_GROUP_PARAMS_LCEVC: {
-        const AVStreamGroupLCEVC *lcevc = stg->params.lcevc;
+        const AVStreamGroupLayeredVideo *layered_video = stg->params.layered_video;
         AVCodecContext *avctx = avcodec_alloc_context3(NULL);
         const char *ptr = NULL;
-        av_log(NULL, AV_LOG_INFO, " LCEVC:");
-        if (avctx && stg->nb_streams && !avcodec_parameters_to_context(avctx, stg->streams[0]->codecpar)) {
-            avctx->width  = lcevc->width;
-            avctx->height = lcevc->height;
-            avctx->coded_width  = lcevc->width;
-            avctx->coded_height = lcevc->height;
+        av_log(NULL, AV_LOG_INFO, " %s:", stg->type == AV_STREAM_GROUP_PARAMS_DOLBY_VISION ?
+                                          "Dolby Vision" : "LCEVC");
+        if (avctx && stg->nb_streams == 2 &&
+            !avcodec_parameters_to_context(avctx, stg->streams[!layered_video->el_index]->codecpar)) {
+            avctx->width  = layered_video->width;
+            avctx->height = layered_video->height;
+            avctx->coded_width  = layered_video->width;
+            avctx->coded_height = layered_video->height;
             if (ic->dump_separator)
                 av_opt_set(avctx, "dump_separator", ic->dump_separator, 0);
             buf[0] = 0;
@@ -833,6 +831,15 @@ static void dump_stream_group(const AVFormatContext *ic, uint8_t *printed,
         for (int i = 0; i < stg->nb_streams; i++) {
             const AVStream *st = stg->streams[i];
             dump_stream_format(ic, st->index, i, index, is_output, AV_LOG_VERBOSE);
+            printed[st->index] = 1;
+        }
+        break;
+    }
+    case AV_STREAM_GROUP_PARAMS_TREF: {
+        av_log(NULL, AV_LOG_INFO, " Track Reference:\n");
+        for (int i = 0; i < stg->nb_streams; i++) {
+            const AVStream *st = stg->streams[i];
+            dump_stream_format(ic, st->index, i, index, is_output, AV_LOG_INFO);
             printed[st->index] = 1;
         }
         break;

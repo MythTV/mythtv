@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "libavutil/common.h"
+#include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem_internal.h"
 #include "libavutil/pixdesc.h"
@@ -45,10 +46,14 @@ static const int dst_fmts[] = {
     AV_PIX_FMT_BGRA,
     AV_PIX_FMT_RGB24,
     AV_PIX_FMT_BGR24,
-    AV_PIX_FMT_RGB565,
-    AV_PIX_FMT_BGR565,
-    AV_PIX_FMT_RGB555,
-    AV_PIX_FMT_BGR555,
+    AV_PIX_FMT_RGB565LE,
+    AV_PIX_FMT_BGR565LE,
+    AV_PIX_FMT_RGB555LE,
+    AV_PIX_FMT_BGR555LE,
+    AV_PIX_FMT_RGB565BE,
+    AV_PIX_FMT_BGR565BE,
+    AV_PIX_FMT_RGB555BE,
+    AV_PIX_FMT_BGR555BE,
 //     AV_PIX_FMT_RGB444,
 //     AV_PIX_FMT_BGR444,
 //     AV_PIX_FMT_RGB8,
@@ -70,31 +75,31 @@ static int cmp_off_by_n(const uint8_t *ref, const uint8_t *test, size_t n, int a
     return 0;
 }
 
-static int cmp_555_by_n(const uint8_t *ref, const uint8_t *test, size_t n, int accuracy)
+static int cmp_555_by_n(const uint8_t *ref, const uint8_t *test, size_t n, int accuracy, int is_be)
 {
-    const uint16_t *ref16  = (const uint16_t *) ref;
-    const uint16_t *test16 = (const uint16_t *) test;
     for (size_t i = 0; i < n; i++) {
-        if (abs(( ref16[i]        & 0x1f) - ( test16[i]        & 0x1f)) > accuracy)
+        uint16_t r = is_be ? AV_RB16(ref  + i * 2) : AV_RL16(ref  + i * 2);
+        uint16_t t = is_be ? AV_RB16(test + i * 2) : AV_RL16(test + i * 2);
+        if (abs(( r        & 0x1f) - ( t        & 0x1f)) > accuracy)
             return 1;
-        if (abs(((ref16[i] >>  5) & 0x1f) - ((test16[i] >>  5) & 0x1f)) > accuracy)
+        if (abs(((r >>  5) & 0x1f) - ((t >>  5) & 0x1f)) > accuracy)
             return 1;
-        if (abs(((ref16[i] >> 10) & 0x1f) - ((test16[i] >> 10) & 0x1f)) > accuracy)
+        if (abs(((r >> 10) & 0x1f) - ((t >> 10) & 0x1f)) > accuracy)
             return 1;
     }
     return 0;
 }
 
-static int cmp_565_by_n(const uint8_t *ref, const uint8_t *test, size_t n, int accuracy)
+static int cmp_565_by_n(const uint8_t *ref, const uint8_t *test, size_t n, int accuracy, int is_be)
 {
-    const uint16_t *ref16  = (const uint16_t *) ref;
-    const uint16_t *test16 = (const uint16_t *) test;
     for (size_t i = 0; i < n; i++) {
-        if (abs(( ref16[i]        & 0x1f) - ( test16[i]        & 0x1f)) > accuracy)
+        uint16_t r = is_be ? AV_RB16(ref  + i * 2) : AV_RL16(ref  + i * 2);
+        uint16_t t = is_be ? AV_RB16(test + i * 2) : AV_RL16(test + i * 2);
+        if (abs(( r        & 0x1f) - ( t        & 0x1f)) > accuracy)
             return 1;
-        if (abs(((ref16[i] >>  5) & 0x3f) - ((test16[i] >>  5) & 0x3f)) > accuracy)
+        if (abs(((r >>  5) & 0x3f) - ((t >>  5) & 0x3f)) > accuracy)
             return 1;
-        if (abs(((ref16[i] >> 11) & 0x1f) - ((test16[i] >> 11) & 0x1f)) > accuracy)
+        if (abs(((r >> 11) & 0x1f) - ((t >> 11) & 0x1f)) > accuracy)
             return 1;
     }
     return 0;
@@ -108,10 +113,9 @@ static void check_yuv2rgb(int src_pix_fmt)
 #define NUM_LINES 4
     static const int input_sizes[] = {8, 128, 1080, MAX_LINE_SIZE};
 
-    declare_func_emms(AV_CPU_FLAG_MMX | AV_CPU_FLAG_MMXEXT,
-                      int, SwsInternal *c, const uint8_t *const src[],
-                           const int srcStride[], int srcSliceY, int srcSliceH,
-                           uint8_t *const dst[], const int dstStride[]);
+    declare_func(int, SwsInternal *c, const uint8_t *const src[],
+                      const int srcStride[], int srcSliceY, int srcSliceH,
+                      uint8_t *const dst[], const int dstStride[]);
 
     LOCAL_ALIGNED_8(uint8_t, src_y, [(MAX_LINE_SIZE + SRC_STRIDE_PAD) * NUM_LINES]);
     LOCAL_ALIGNED_8(uint8_t, src_u, [(MAX_LINE_SIZE + SRC_STRIDE_PAD) * NUM_LINES]);
@@ -145,10 +149,14 @@ static void check_yuv2rgb(int src_pix_fmt)
             int width = input_sizes[isi];
             int srcSliceY = 0;
             int srcSliceH = NUM_LINES;
+            /* Use av_image_get_linesize so that semi-planar formats (NV12,
+             * NV21) get the correct interleaved-UV stride (= width bytes),
+             * not (width >> log2_chroma_w) which would only count UV pairs. */
+            int chroma_linesize = av_image_get_linesize(src_pix_fmt, width, 1);
             int srcStride[4] = {
                 width + SRC_STRIDE_PAD,
-                (width >> src_desc->log2_chroma_w) + SRC_STRIDE_PAD,
-                (width >> src_desc->log2_chroma_w) + SRC_STRIDE_PAD,
+                chroma_linesize + SRC_STRIDE_PAD,
+                chroma_linesize + SRC_STRIDE_PAD,
                 width + SRC_STRIDE_PAD,
             };
             int dstStride[4] = {
@@ -195,19 +203,27 @@ static void check_yuv2rgb(int src_pix_fmt)
                                          dst1_0 + row * dstStride[0],
                                          width * sample_size, 3))
                             fail();
-                } else if (dst_pix_fmt == AV_PIX_FMT_RGB565 ||
-                           dst_pix_fmt == AV_PIX_FMT_BGR565) {
+                } else if (dst_pix_fmt == AV_PIX_FMT_RGB565LE ||
+                           dst_pix_fmt == AV_PIX_FMT_BGR565LE ||
+                           dst_pix_fmt == AV_PIX_FMT_RGB565BE ||
+                           dst_pix_fmt == AV_PIX_FMT_BGR565BE) {
+                    int is_be = dst_pix_fmt == AV_PIX_FMT_RGB565BE ||
+                                dst_pix_fmt == AV_PIX_FMT_BGR565BE;
                     for (int row = 0; row < srcSliceH; row++)
                         if (cmp_565_by_n(dst0_0 + row * dstStride[0],
                                          dst1_0 + row * dstStride[0],
-                                         width, 2))
+                                         width, 2, is_be))
                             fail();
-                } else if (dst_pix_fmt == AV_PIX_FMT_RGB555 ||
-                           dst_pix_fmt == AV_PIX_FMT_BGR555) {
+                } else if (dst_pix_fmt == AV_PIX_FMT_RGB555LE ||
+                           dst_pix_fmt == AV_PIX_FMT_BGR555LE ||
+                           dst_pix_fmt == AV_PIX_FMT_RGB555BE ||
+                           dst_pix_fmt == AV_PIX_FMT_BGR555BE) {
+                    int is_be = dst_pix_fmt == AV_PIX_FMT_RGB555BE ||
+                                dst_pix_fmt == AV_PIX_FMT_BGR555BE;
                     for (int row = 0; row < srcSliceH; row++)
                         if (cmp_555_by_n(dst0_0 + row * dstStride[0],
                                          dst1_0 + row * dstStride[0],
-                                         width, 2))
+                                         width, 2, is_be))
                             fail();
                 } else if (dst_pix_fmt == AV_PIX_FMT_GBRP) {
                     for (int p = 0; p < 3; p++)
@@ -240,4 +256,8 @@ void checkasm_check_sw_yuv2rgb(void)
     report("yuv422p");
     check_yuv2rgb(AV_PIX_FMT_YUVA420P);
     report("yuva420p");
+    check_yuv2rgb(AV_PIX_FMT_NV12);
+    report("nv12");
+    check_yuv2rgb(AV_PIX_FMT_NV21);
+    report("nv21");
 }

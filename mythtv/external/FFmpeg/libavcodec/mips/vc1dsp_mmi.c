@@ -1485,7 +1485,7 @@ void ff_vc1_v_s_overlap_mmi(int16_t *top, int16_t *bottom)
  * @return whether other 3 pairs should be filtered or not
  * @see 8.6
  */
-static av_always_inline int vc1_filter_line(uint8_t *src, int stride, int pq)
+static av_always_inline int vc1_filter_line(uint8_t *src, ptrdiff_t stride, int pq)
 {
     int a0 = (2 * (src[-2 * stride] - src[1 * stride]) -
               5 * (src[-1 * stride] - src[0 * stride]) + 4) >> 3;
@@ -1534,7 +1534,7 @@ static av_always_inline int vc1_filter_line(uint8_t *src, int stride, int pq)
  * @param pq block quantizer
  * @see 8.6
  */
-static inline void vc1_loop_filter(uint8_t *src, int step, int stride,
+static inline void vc1_loop_filter(uint8_t *src, ptrdiff_t step, ptrdiff_t stride,
                                    int len, int pq)
 {
     int i;
@@ -2079,8 +2079,9 @@ typedef void (*vc1_mspel_mc_filter_8bits)
  * @param  rnd     Rounding bias.
  */
 #define VC1_MSPEL_MC(OP)                                                    \
-static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride,\
-                               int hmode, int vmode, int rnd)               \
+static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src,            \
+                               ptrdiff_t stride, int hmode, int vmode,      \
+                               int rnd)                                     \
 {                                                                           \
     static const vc1_mspel_mc_filter_ver_16bits vc1_put_shift_ver_16bits[] =\
          { NULL, vc1_put_ver_16b_shift1_mmi,                                \
@@ -2118,7 +2119,8 @@ static void OP ## vc1_mspel_mc(uint8_t *dst, const uint8_t *src, int stride,\
     vc1_put_shift_8bits[hmode](dst, src, stride, rnd, 1);                   \
 }                                                                           \
 static void OP ## vc1_mspel_mc_16(uint8_t *dst, const uint8_t *src,         \
-                                  int stride, int hmode, int vmode, int rnd)\
+                                  ptrdiff_t stride, int hmode, int vmode,   \
+                                  int rnd)                                  \
 {                                                                           \
     OP ## vc1_mspel_mc(dst + 0, src + 0, stride, hmode, vmode, rnd);        \
     OP ## vc1_mspel_mc(dst + 8, src + 8, stride, hmode, vmode, rnd);        \

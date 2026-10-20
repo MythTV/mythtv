@@ -31,7 +31,8 @@ $(FATE_LAVF_AUDIO): $(AREF)
 fate-lavf-aiff: CMD = lavf_audio "" "-metadata copyright=noone" # codespell:ignore
 fate-lavf-al fate-lavf-ul: CMD = lavf_audio "" "" "-ar 44100"
 fate-lavf-dfpwm: CMD = lavf_audio "" "" "-sample_rate 44100"
-fate-lavf-ogg: CMD = lavf_audio "" "-c:a flac"
+#FIXME - fate-lavf-ogg fails on aarch64 when frame_size is 4096
+fate-lavf-ogg: CMD = lavf_audio "" "-frame_size 4608 -c:a flac"
 fate-lavf-s16.voc: CMD = lavf_audio "-ac 2" "-c:a pcm_s16le"
 fate-lavf-ast: CMD = lavf_audio "-ac 2" "-loopstart 1 -loopend 10"
 fate-lavf-mka: CMD = lavf_audio "" "-c:a tta"

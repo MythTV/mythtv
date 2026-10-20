@@ -48,6 +48,18 @@ extern const unsigned int ff_ffv1_dec_golomb_comp_spv_len;
 extern const unsigned char ff_ffv1_dec_rgb_golomb_comp_spv_data[];
 extern const unsigned int ff_ffv1_dec_rgb_golomb_comp_spv_len;
 
+extern const unsigned char ff_ffv1_dec_rgb_float_comp_spv_data[];
+extern const unsigned int ff_ffv1_dec_rgb_float_comp_spv_len;
+
+extern const unsigned char ff_ffv1_dec_rgb_float_golomb_comp_spv_data[];
+extern const unsigned int ff_ffv1_dec_rgb_float_golomb_comp_spv_len;
+
+extern const unsigned char ff_ffv1_dec_bayer_comp_spv_data[];
+extern const unsigned int ff_ffv1_dec_bayer_comp_spv_len;
+
+extern const unsigned char ff_ffv1_dec_bayer_golomb_comp_spv_data[];
+extern const unsigned int ff_ffv1_dec_bayer_golomb_comp_spv_len;
+
 const FFVulkanDecodeDescriptor ff_vk_dec_ffv1_desc = {
     .codec_id         = AV_CODEC_ID_FFV1,
     .queue_flags      = VK_QUEUE_COMPUTE_BIT,
@@ -61,6 +73,7 @@ typedef struct FFv1VulkanDecodePicture {
     uint32_t slice_state_size;
     uint32_t slice_data_size;
 
+    AVBufferRef *slice_fltmap_buf;
     AVBufferRef *slice_feedback_buf;
     uint32_t    *slice_offset;
     int          slice_num;
@@ -77,6 +90,7 @@ typedef struct FFv1VulkanDecodeContext {
     FFVkBuffer consts_buf;
 
     AVBufferPool *slice_state_pool;
+    AVBufferPool *slice_fltmap_pool;
     AVBufferPool *slice_feedback_pool;
 } FFv1VulkanDecodeContext;
 
@@ -154,6 +168,19 @@ static int vk_ffv1_start_frame(AVCodecContext          *avctx,
                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
     if (err < 0)
         return err;
+
+    /* Allocate slice offsets/status buffer (note, for integer+remap, we don't need it) */
+    if (f->version >=4 && f->micro_version >= 9 &&
+        (av_pix_fmt_desc_get(sw_format)->flags & AV_PIX_FMT_FLAG_FLOAT)) {
+        err = ff_vk_get_pooled_buffer(&ctx->s, &fv->slice_fltmap_pool,
+                                      &fp->slice_fltmap_buf,
+                                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                                      NULL, 65536*4*f->slice_count*sizeof(uint32_t),
+                                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT |
+                                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        if (err < 0)
+            return err;
+    }
 
     /* Prepare frame to be used */
     err = ff_vk_decode_prepare_frame_sdr(dec, f->picture.f, vp, 1,
@@ -234,6 +261,9 @@ static int vk_ffv1_end_frame(AVCodecContext *avctx)
     FFVkBuffer *slices_buf = (FFVkBuffer *)vp->slices_buf->data;
     FFVkBuffer *slice_state = (FFVkBuffer *)fp->slice_state->data;
     FFVkBuffer *slice_feedback = (FFVkBuffer *)fp->slice_feedback_buf->data;
+    FFVkBuffer *fltmap_buf = NULL;
+    if (fp->slice_fltmap_buf)
+        fltmap_buf = (FFVkBuffer *)fp->slice_fltmap_buf->data;
 
     VkImageView rct_image_views[AV_NUM_DATA_POINTERS];
 
@@ -277,6 +307,11 @@ static int vk_ffv1_end_frame(AVCodecContext *avctx)
     RET(ff_vk_exec_add_dep_buf(&ctx->s, exec, &vp->slices_buf, 1, 0));
     vp->slices_buf = NULL;
 
+    if (fp->slice_fltmap_buf) {
+        RET(ff_vk_exec_add_dep_buf(&ctx->s, exec, &fp->slice_fltmap_buf, 1, 0));
+        fp->slice_fltmap_buf = NULL;
+    }
+
     AVVkFrame *vkf = (AVVkFrame *)f->picture.f->data[0];
     for (int i = 0; i < ff_vk_count_images(vkf); i++) {
         vkf->layout[i] = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -300,6 +335,13 @@ static int vk_ffv1_end_frame(AVCodecContext *avctx)
                                     2*f->slice_count*sizeof(uint32_t),
                                     VK_WHOLE_SIZE,
                                     VK_FORMAT_UNDEFINED);
+    if (fltmap_buf)
+        ff_vk_shader_update_desc_buffer(&ctx->s, exec, &fv->setup,
+                                        1, 3, 0,
+                                        fltmap_buf,
+                                        0,
+                                        VK_WHOLE_SIZE,
+                                        VK_FORMAT_UNDEFINED);
 
     ff_vk_exec_bind_shader(&ctx->s, exec, &fv->setup);
 
@@ -358,7 +400,10 @@ static int vk_ffv1_end_frame(AVCodecContext *avctx)
         nb_img_bar = 0;
         nb_buf_bar = 0;
 
-        for (int i = 0; i < color_planes; i++)
+        /* The intermediate frame has 4 planes (GBRAP16/32). Clear all of
+         * them since the bayer decoder uses all four. */
+        int n_dec_planes = f->bayer ? 4 : color_planes;
+        for (int i = 0; i < n_dec_planes; i++)
             vk->CmdClearColorImage(exec->buf, vkf->img[i], VK_IMAGE_LAYOUT_GENERAL,
                                    &((VkClearColorValue) { 0 }),
                                    1, &((VkImageSubresourceRange) {
@@ -484,6 +529,13 @@ static int vk_ffv1_end_frame(AVCodecContext *avctx)
                                       1, 5,
                                       VK_IMAGE_LAYOUT_GENERAL,
                                       VK_NULL_HANDLE);
+    if (fltmap_buf)
+        ff_vk_shader_update_desc_buffer(&ctx->s, exec, &fv->decode,
+                                        1, 6, 0,
+                                        fltmap_buf,
+                                        0,
+                                        VK_WHOLE_SIZE,
+                                        VK_FORMAT_UNDEFINED);
 
     ff_vk_exec_bind_shader(&ctx->s, exec, &fv->decode);
     ff_vk_shader_update_push_const(&ctx->s, exec, &fv->decode,
@@ -525,7 +577,7 @@ static int init_setup_shader(FFV1Context *f, FFVulkanContext *s,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 2, 1, 0);
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 2, 1);
 
     const FFVulkanDescriptorSetBinding desc_set[] = {
         { /* slice_data_buf */
@@ -540,8 +592,12 @@ static int init_setup_shader(FFV1Context *f, FFVulkanContext *s,
             .type   = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
         },
+        { /* fltmap_buf */
+            .type   = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            .stages = VK_SHADER_STAGE_COMPUTE_BIT,
+        },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set, 3, 0, 0);
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set, 4, 0);
 
     RET(ff_vk_shader_link(s, shd,
                           ff_ffv1_dec_setup_comp_spv_data,
@@ -572,7 +628,7 @@ static int init_reset_shader(FFV1Context *f, FFVulkanContext *s,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 1, 1, 0);
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 1, 1);
 
     const FFVulkanDescriptorSetBinding desc_set[] = {
         { /* slice_data_buf */
@@ -584,7 +640,7 @@ static int init_reset_shader(FFV1Context *f, FFVulkanContext *s,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set, 2, 0, 0);
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set, 2, 0);
 
     if (ac == AC_GOLOMB_RICE)
         RET(ff_vk_shader_link(s, shd,
@@ -605,7 +661,8 @@ static int init_decode_shader(FFV1Context *f, FFVulkanContext *s,
                               FFVkExecPool *pool, FFVulkanShader *shd,
                               AVHWFramesContext *dec_frames_ctx,
                               AVHWFramesContext *out_frames_ctx,
-                              VkSpecializationInfo *sl, int ac, int rgb)
+                              VkSpecializationInfo *sl, int ac, int rgb,
+                              int bayer)
 {
     int err;
 
@@ -626,7 +683,7 @@ static int init_decode_shader(FFV1Context *f, FFVulkanContext *s,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
         },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 2, 1, 0);
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set_const, 2, 1);
 
     const FFVulkanDescriptorSetBinding desc_set[] = {
         { /* slice_data_buf */
@@ -655,10 +712,42 @@ static int init_decode_shader(FFV1Context *f, FFVulkanContext *s,
             .stages = VK_SHADER_STAGE_COMPUTE_BIT,
             .elems  = av_pix_fmt_count_planes(out_frames_ctx->sw_format),
         },
+        { /* fltmap_buf */
+            .type   = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            .stages = VK_SHADER_STAGE_COMPUTE_BIT,
+        },
     };
-    ff_vk_shader_add_descriptor_set(s, shd, desc_set, 5 + rgb, 0, 0);
+    /* Detect a float output from the pixfmt descriptor instead of f->flt:
+     * the encoder side does not (yet) write f->flt to the extradata, so the
+     * parsed value is unreliable for some v4m4+ streams. The descriptor's
+     * FLOAT flag is set by the pixfmt selection logic and is accurate */
+    int is_float = !!(av_pix_fmt_desc_get(out_frames_ctx->sw_format)->flags &
+                      AV_PIX_FMT_FLAG_FLOAT);
 
-    if (ac == AC_GOLOMB_RICE) {
+    /* Bindings 5 (dst) and 6 (fltmap_buf) are conditional */
+    ff_vk_shader_add_descriptor_set(s, shd, desc_set,
+                                    5 + rgb + (is_float && !bayer),
+                                    0);
+
+    if (bayer) {
+        if (ac == AC_GOLOMB_RICE)
+            ff_vk_shader_link(s, shd,
+                              ff_ffv1_dec_bayer_golomb_comp_spv_data,
+                              ff_ffv1_dec_bayer_golomb_comp_spv_len, "main");
+        else
+            ff_vk_shader_link(s, shd,
+                              ff_ffv1_dec_bayer_comp_spv_data,
+                              ff_ffv1_dec_bayer_comp_spv_len, "main");
+    } else if (is_float) {
+        if (ac == AC_GOLOMB_RICE)
+            ff_vk_shader_link(s, shd,
+                              ff_ffv1_dec_rgb_float_golomb_comp_spv_data,
+                              ff_ffv1_dec_rgb_float_golomb_comp_spv_len, "main");
+        else
+            ff_vk_shader_link(s, shd,
+                              ff_ffv1_dec_rgb_float_comp_spv_data,
+                              ff_ffv1_dec_rgb_float_comp_spv_len, "main");
+    } else if (ac == AC_GOLOMB_RICE) {
         if (rgb)
             ff_vk_shader_link(s, shd,
                               ff_ffv1_dec_rgb_golomb_comp_spv_data,
@@ -733,6 +822,7 @@ static void vk_decode_ffv1_uninit(FFVulkanDecodeShared *ctx)
     ff_vk_free_buf(&ctx->s, &fv->consts_buf);
 
     av_buffer_pool_uninit(&fv->slice_state_pool);
+    av_buffer_pool_uninit(&fv->slice_fltmap_pool);
     av_buffer_pool_uninit(&fv->slice_feedback_pool);
 
     av_freep(&fv);
@@ -746,8 +836,7 @@ static int vk_decode_ffv1_init(AVCodecContext *avctx)
     FFVulkanDecodeShared *ctx = NULL;
     FFv1VulkanDecodeContext *fv;
 
-    if (f->version < 3 ||
-        (f->version == 4 && f->micro_version > 3))
+    if (f->version < 3)
         return AVERROR(ENOTSUP);
 
     /* Streams with a low amount of slices will usually be much slower
@@ -799,7 +888,7 @@ static int vk_decode_ffv1_init(AVCodecContext *avctx)
 
     /* Decode shaders */
     RET(init_decode_shader(f, &ctx->s, &ctx->exec_pool, &fv->decode,
-                           dctx, hwfc, sl, f->ac, is_rgb));
+                           dctx, hwfc, sl, f->ac, is_rgb, f->bayer));
 
     /* Init static data */
     RET(ff_ffv1_vk_init_consts(&ctx->s, &fv->consts_buf, f));

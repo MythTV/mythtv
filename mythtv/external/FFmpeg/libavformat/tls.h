@@ -25,7 +25,6 @@
 
 #include "libavutil/bprint.h"
 #include "libavutil/opt.h"
-#include "version.h"
 
 #include "url.h"
 
@@ -33,6 +32,26 @@
  * Maximum size limit of a certificate and private key size.
  */
 #define MAX_CERTIFICATE_SIZE 8192
+
+/**
+ * The DTLS content type.
+ * See https://tools.ietf.org/html/rfc2246#section-6.2.1
+ * change_cipher_spec(20), alert(21), handshake(22), application_data(23)
+ */
+#define DTLS_CONTENT_TYPE_CHANGE_CIPHER_SPEC 20
+/**
+ * The DTLS record layer header has a total size of 13 bytes, consisting of
+ * ContentType (1 byte), ProtocolVersion (2 bytes), Epoch (2 bytes),
+ * SequenceNumber (6 bytes), and Length (2 bytes).
+ * See https://datatracker.ietf.org/doc/html/rfc9147#section-4
+ */
+#define DTLS_RECORD_LAYER_HEADER_LEN 13
+/**
+ * The DTLS version number, which is 0xfeff for DTLS 1.0, or 0xfefd for DTLS 1.2.
+ * See https://datatracker.ietf.org/doc/html/rfc9147#name-the-dtls-record-layer
+ */
+#define DTLS_VERSION_10 0xfeff
+#define DTLS_VERSION_12 0xfefd
 
 typedef struct TLSShared {
     const AVClass *class;
@@ -68,17 +87,11 @@ typedef struct TLSShared {
 
 #define TLS_OPTFL (AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 
-#if FF_API_NO_DEFAULT_TLS_VERIFY
-#define TLS_VERIFY_DEFAULT 0
-#else
-#define TLS_VERIFY_DEFAULT 1
-#endif
-
 #define FF_TLS_CLIENT_OPTIONS(pstruct, options_field) \
     {"ca_file",    "Certificate Authority database file", offsetof(pstruct, options_field . ca_file),   AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
     {"cafile",     "Certificate Authority database file", offsetof(pstruct, options_field . ca_file),   AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
-    {"tls_verify", "Verify the peer certificate",         offsetof(pstruct, options_field . verify),    AV_OPT_TYPE_BOOL, { .i64 = TLS_VERIFY_DEFAULT }, 0, 1, .flags = TLS_OPTFL }, \
-    {"verify",     "Verify the peer certificate",         offsetof(pstruct, options_field . verify),    AV_OPT_TYPE_BOOL, { .i64 = TLS_VERIFY_DEFAULT }, 0, 1, .flags = TLS_OPTFL }, \
+    {"tls_verify", "Verify the peer certificate",         offsetof(pstruct, options_field . verify),    AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = TLS_OPTFL }, \
+    {"verify",     "Verify the peer certificate",         offsetof(pstruct, options_field . verify),    AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, .flags = TLS_OPTFL }, \
     {"cert_file",  "Certificate file",                    offsetof(pstruct, options_field . cert_file), AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
     {"cert",       "Certificate file",                    offsetof(pstruct, options_field . cert_file), AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
     {"key_file",   "Private key file",                    offsetof(pstruct, options_field . key_file),  AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
@@ -94,6 +107,8 @@ typedef struct TLSShared {
     {"cert_pem",   "Certificate PEM string",              offsetof(pstruct, options_field . cert_buf),  AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
     {"key_pem",    "Private key PEM string",              offsetof(pstruct, options_field . key_buf),   AV_OPT_TYPE_STRING, .flags = TLS_OPTFL }, \
     FF_TLS_CLIENT_OPTIONS(pstruct, options_field)
+
+int ff_tls_parse_host(TLSShared *s, char *hostname, int hostname_size, int *port_ptr, const char *uri);
 
 int ff_tls_open_underlying(TLSShared *c, URLContext *parent, const char *uri, AVDictionary **options);
 
@@ -112,5 +127,10 @@ void ff_gnutls_deinit(void);
 
 int ff_openssl_init(void);
 void ff_openssl_deinit(void);
+
+/**
+ * Whether the packet is a DTLS packet, as defined by RFC 5764 Section 5.1.2.
+ */
+int ff_is_dtls_packet(const uint8_t *buf, int size);
 
 #endif /* AVFORMAT_TLS_H */

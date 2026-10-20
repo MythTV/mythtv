@@ -16,8 +16,10 @@ libavformat/log2_tab.c
 libavformat/rangecoder_dec.c
 libavformat/riscv/cpu_common.c
 libswresample/log2_tab.c
+libswscale/aarch64/ops_entries.c
 libswscale/log2_tab.c
 libswscale/riscv/cpu_common.c
+libswscale/uops_macros.h
 tools/uncoded_frame.c
 tools/yuvcmp.c
 Headers without standard inclusion guards:
@@ -26,6 +28,7 @@ compat/float/float.h
 compat/float/limits.h
 compat/stdbit/stdbit.h
 libavcodec/bitstream_template.h
+libswscale/x86/uops_macros.asm.h
 tools/decode_simple.h
 Use of av_clip() where av_clip_uintp2() could be used:
 Use of av_clip() where av_clip_intp2() could be used:

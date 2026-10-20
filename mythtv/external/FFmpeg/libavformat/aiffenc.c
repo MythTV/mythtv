@@ -23,7 +23,7 @@
 
 #include "libavutil/intfloat.h"
 #include "libavutil/opt.h"
-#include "libavcodec/packet_internal.h"
+#include "packet_internal.h"
 #include "avformat.h"
 #include "internal.h"
 #include "aiff.h"
@@ -147,12 +147,6 @@ static int aiff_write_header(AVFormatContext *s)
         avio_wb32(pb, 0xA2805140);
     }
 
-    if (par->ch_layout.order == AV_CHANNEL_ORDER_NATIVE && par->ch_layout.nb_channels > 2) {
-        ffio_wfourcc(pb, "CHAN");
-        avio_wb32(pb, 12);
-        ff_mov_write_chan(pb, par->ch_layout.u.mask);
-    }
-
     put_meta(s, "title",     MKBETAG('N', 'A', 'M', 'E'));
     put_meta(s, "author",    MKBETAG('A', 'U', 'T', 'H'));
     put_meta(s, "copyright", MKBETAG('(', 'c', ')', ' '));
@@ -193,6 +187,14 @@ static int aiff_write_header(AVFormatContext *s)
         avio_write(pb, par->extradata, par->extradata_size);
     }
 
+    /* CHAN chunk; a decoder may use the channel count when parsing this chunk,
+     * so let's write it after the COMM chunk which indicates said channel count. */
+    if (par->ch_layout.order == AV_CHANNEL_ORDER_NATIVE && par->ch_layout.nb_channels > 2) {
+        ffio_wfourcc(pb, "CHAN");
+        avio_wb32(pb, 12);
+        ff_mov_write_chan(pb, par->ch_layout.u.mask);
+    }
+
     /* Sound data chunk */
     ffio_wfourcc(pb, "SSND");
     aiff->ssnd = avio_tell(pb);         /* Sound chunk size */
@@ -221,7 +223,7 @@ static int aiff_write_packet(AVFormatContext *s, AVPacket *pkt)
         if (s->streams[pkt->stream_index]->nb_frames >= 1)
             return 0;
 
-        return avpriv_packet_list_put(&aiff->pict_list, pkt, NULL, 0);
+        return ff_packet_list_put(&aiff->pict_list, pkt, NULL, 0);
     }
 
     return 0;
@@ -267,7 +269,7 @@ static void aiff_deinit(AVFormatContext *s)
 {
     AIFFOutputContext *aiff = s->priv_data;
 
-    avpriv_packet_list_free(&aiff->pict_list);
+    ff_packet_list_free(&aiff->pict_list);
 }
 
 #define OFFSET(x) offsetof(AIFFOutputContext, x)
