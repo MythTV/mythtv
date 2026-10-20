@@ -262,7 +262,7 @@ jobs:
         if: ${{ matrix.container.install_ansible_cmd != '' }}
 
       - name: Checkout MythTV/ansible repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: MythTV/ansible
           path: ansible
@@ -277,7 +277,7 @@ jobs:
         if: ${{ matrix.container.install_extra_pkgs_cmd != '' }}
 
       - name: Checkout Mythtv/mythtv repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: mythtv
           fetch-depth: 0
@@ -412,7 +412,7 @@ jobs:
         if: matrix.os.qt_version == 'qt6'
 
       - name: Checkout MythTV/ansible repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: MythTV/ansible
           path: ansible
@@ -453,7 +453,7 @@ jobs:
         if: matrix.os.arch == 'x86_64'
 
       - name: Checkout Mythtv/mythtv repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: mythtv
 
