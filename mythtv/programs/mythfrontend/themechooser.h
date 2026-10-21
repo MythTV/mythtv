@@ -88,6 +88,7 @@ class ThemeChooser : public MythScreenType
     QMap<QString, ThemeInfo*>  m_themeNameInfos;
     QMap<QString, ThemeInfo*>  m_themeFileNameInfos;
     QMap<QString, QString>     m_themeStatuses;
+    QSet<ThemeInfo*>           m_themeInfosToDelete;
     ThemeInfo                 *m_downloadTheme    {nullptr};
     QString                    m_downloadFile;
     DownloadState              m_downloadState    {dsIdle};
