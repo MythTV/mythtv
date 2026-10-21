@@ -78,6 +78,15 @@ ThemeChooser::ThemeChooser(MythScreenStack *parent,
 ThemeChooser::~ThemeChooser()
 {
     gCoreContext->removeListener(this);
+
+    // Free memory of current ThemeInfo pointers
+    qDeleteAll(m_themeNameInfos);
+    m_themeNameInfos.clear();
+    m_themeFileNameInfos.clear();
+
+    // Free memory of retired ThemeInfo pointers
+    qDeleteAll(m_themeInfosToDelete);
+    m_themeInfosToDelete.clear();
 }
 
 static bool sortThemeNames(const QFileInfo &s1, const QFileInfo &s2)
@@ -399,10 +408,7 @@ void ThemeChooser::Init(void)
     m_themes->Reset();
     for (const auto &theme : std::as_const(m_infoList))
     {
-        if (!m_themeFileNameInfos.contains(theme.filePath()))
-            continue;
-
-        themeinfo = m_themeFileNameInfos[theme.filePath()];
+        themeinfo = m_themeFileNameInfos.value(theme.filePath());
         if (!themeinfo)
             continue;
 
@@ -482,7 +488,23 @@ ThemeInfo *ThemeChooser::loadThemeInfo(const QFileInfo &theme)
         return nullptr;
     }
 
+    if (auto oldti = m_themeFileNameInfos.take(theme.filePath()))
+    {
+        // We're about to overwrite a ThemeInfo* which was
+        // dynamically allocated. We can't delete it now
+        // because there are currently displayed graphic
+        // elements depending on it. Instead, we'll
+        // insert it into a set of retired instances to
+        // be deleted later.
+        m_themeInfosToDelete.insert(oldti);
+    }
     m_themeFileNameInfos[theme.filePath()] = themeinfo;
+
+    if (auto oldti = m_themeNameInfos.take(theme.fileName()))
+    {
+        // Insert ThemeInfo* into set to be deleted later.
+        m_themeInfosToDelete.insert(oldti);
+    }
     m_themeNameInfos[theme.fileName()] = themeinfo;
 
     return themeinfo;
