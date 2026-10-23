@@ -360,13 +360,10 @@ jobs:
 
       - name: Setup Python and Ansible Variables
         run: |
-          PYTHON_EXE=$PKGMGR_PREFIX/bin/python3
-          PYTHON_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+str(sys.version_info.minor))")
-          PYTHON_DOT_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+'.'+str(sys.version_info.minor))")
-          ANSIBLE_EXTRA="ansible_python_interpreter=$PYTHON_EXE database_version=${{ matrix.os.database_version }}"
-          echo "PYTHON_EXE=$PYTHON_EXE" >> $GITHUB_ENV
+          ANSIBLE_PYTHON=$(ansible --version | awk -F'location = ' '/python module location/ {print $2}' | sed 's|/lib/.*|/bin/python|')
+          PYTHON_VERSION=$(${ANSIBLE_PYTHON} -c "import sys; print(str(sys.version_info.major)+str(sys.version_info.minor))")
+          ANSIBLE_EXTRA="ansible_python_interpreter=$ANSIBLE_PYTHON database_version=${{ matrix.os.database_version }}"
           echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
-          echo "PYTHON_DOT_VERSION=$PYTHON_DOT_VERSION" >> $GITHUB_ENV
           echo "ANSIBLE_EXTRA=$ANSIBLE_EXTRA" >> $GITHUB_ENV
 
       - name: Setup build envinomental variables
