@@ -22,7 +22,7 @@ defineReplace(avLibName) {
         eval(LIBVERSION = $$major)
 
         temp = $$SLIBNAME_WITH_MAJOR_QT
-        temp = $$replace(temp, FULLNAME, $$NAME)
+        temp = $$replace(temp, FULLNAME, $$NAME$$BUILDSUF)
         temp = $$replace(temp, NAME,     $$NAME)
         temp = $$replace(temp, LIBMAJOR, $$LIBVERSION)
 

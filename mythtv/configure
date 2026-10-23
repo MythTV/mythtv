@@ -5748,6 +5748,10 @@ ffmpeg_optset extra_cxxflags extra_ldflags target_os
 ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optset ar nm ranlib
+# Always tag embedded FFmpeg wrappers with Myth's library version
+# (libmythavcodec-37). ffmpeg_optset would emit --build_suffix (underscore).
+build_suffix="-$MYTHTV_LIBVERSION"
+ffopts="$ffopts '--build-suffix=$build_suffix'"
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
