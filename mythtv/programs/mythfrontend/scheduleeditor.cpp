@@ -113,6 +113,7 @@ ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
 ScheduleEditor::~ScheduleEditor(void)
 {
     delete m_recordingRule;
+    delete m_recInfo;
 
     // if we have a player, we need to tell we are done
     if (m_player)
