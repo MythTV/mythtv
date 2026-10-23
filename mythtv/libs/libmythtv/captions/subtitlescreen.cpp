@@ -183,6 +183,9 @@ private:
                               MythUIShape *bg2);
 
     QHash<QString, MythFontProperties *> m_fontMap;
+    // Set true if corresponding entry in m_fontMap
+    // is dynamically allocated memory
+    QHash<QString, bool> m_fontMapAllocated;
     QHash<QString, MythUIShape *>       m_shapeMap;
     QHash<QString, QSet<QString> >     m_changeMap;
     // The following m_*Map fields are the original values from the
@@ -375,6 +378,16 @@ SubtitleFormat::~SubtitleFormat(void)
         m_cleanup[i]->deleteLater();
         m_cleanup[i] = nullptr; // just to be safe
     }
+    for (auto it = m_fontMap.cbegin(); it != m_fontMap.cend(); ++it)
+    {
+        if (m_fontMapAllocated[it.key()])
+        {
+            // Release dynamically allocated memory
+            delete m_fontMap[it.key()];
+        }
+    }
+    m_fontMap.clear();
+    m_fontMapAllocated.clear();
 }
 
 QString SubtitleFormat::MakePrefix(const QString &family,
@@ -481,6 +494,8 @@ void SubtitleFormat::Complement(MythFontProperties *font, MythUIShape *bg)
 void SubtitleFormat::Load(const QString &family,
                           const CC708CharacterAttribute &attr)
 {
+    bool resultFontAllocated {false};
+
     // Widgets for the actual values
     auto *baseParent = new MythUIType(nullptr, "base");
     m_cleanup += baseParent;
@@ -507,8 +522,19 @@ void SubtitleFormat::Load(const QString &family,
             QString("Couldn't load theme file %1").arg(kSubFileName));
     QString prefix = MakePrefix(family, attr);
     MythFontProperties *resultFont = baseParent->GetFont(prefix);
+    LOG(VB_VBI, LOG_DEBUG,
+        QString("providerBaseFont = %1").arg(fontToString(providerBaseFont)));
     if (!resultFont)
+    {
         resultFont = providerBaseFont;
+        // Remember resultFont points to dynamically allocated memory
+        resultFontAllocated = true;
+    }
+    else
+    {
+        // Release dynamically allocated memory
+        delete providerBaseFont;
+    }
     auto *resultBG = dynamic_cast<MythUIShape *>(baseParent->GetChild(prefix));
 
     // The providerBaseShape object is not leaked here.  It is added
@@ -525,10 +551,14 @@ void SubtitleFormat::Load(const QString &family,
     if (family == kSubFamily708 &&
         (attr.m_fontTag & 0x7) == k708AttrFontSmallCaps)
         resultFont->GetFace()->setCapitalization(QFont::SmallCaps);
+    if (m_fontMap[prefix] && m_fontMapAllocated[prefix])
+    {
+        // Release dynamically allocated memory
+        delete m_fontMap[prefix];
+    }
     m_fontMap[prefix] = resultFont;
+    m_fontMapAllocated[prefix] = resultFontAllocated;
     m_shapeMap[prefix] = resultBG;
-    LOG(VB_VBI, LOG_DEBUG,
-        QString("providerBaseFont = %1").arg(fontToString(providerBaseFont)));
     LOG(VB_VBI, LOG_DEBUG,
         QString("negFont = %1").arg(fontToString(negFont)));
     LOG(VB_VBI, LOG_DEBUG,
