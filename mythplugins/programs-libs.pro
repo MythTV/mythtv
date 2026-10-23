@@ -7,6 +7,7 @@ LIBS += -lmythavcodec
 LIBS += -lmythavutil
 LIBS += -lmythavformat
 LIBS += -lmythswresample
+LIBS += -lmythdvdnav-$$LIBVERSION
 
 # On Windows, libs are stored with the binaries:
 mingw:LIBS += -L$${SYSROOT}$${PREFIX}/bin

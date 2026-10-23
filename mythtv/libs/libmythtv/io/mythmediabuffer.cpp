@@ -29,7 +29,6 @@
 
 #include "Bluray/mythbdbuffer.h"
 #include "DVD/mythdvdbuffer.h"
-#include "DVD/mythdvdstream.h"
 #include "httplivestreambuffer.h"
 #include "io/mythfilebuffer.h"
 #include "io/mythmediabuffer.h"
@@ -179,13 +178,15 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
     if (!mythurl && imgext && filename.startsWith("dvd:"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD image at " + filename);
-        return new MythDVDStream(filename);
+        return new MythDVDBuffer(filename);
     }
 
     if (!mythurl && lower.endsWith(".vob") && filename.contains("/VIDEO_TS/"))
     {
         LOG(VB_PLAYBACK, LOG_INFO, "DVD VOB at " + filename);
-        auto *dvdstream = new MythDVDStream(filename);
+        const QString root = filename.section("/VIDEO_TS/", 0, 0);
+        LOG(VB_PLAYBACK, LOG_INFO, "Trying DVD at " + root);
+        auto *dvdstream = new MythDVDBuffer(root);
         if (dvdstream && dvdstream->IsOpen())
             return dvdstream;
         delete dvdstream;

@@ -274,9 +274,10 @@ add_library(
   DVD/mythdvdcontext.h
   DVD/mythdvdinfo.cpp
   DVD/mythdvdinfo.h
-  DVD/mythdvdio.cpp
-  DVD/mythdvdstream.cpp
-  DVD/mythdvdstream.h
+  DVD/mythdvdlogger.cpp
+  DVD/mythdvdlogger.h
+  DVD/mythdvdvfs.cpp
+  DVD/mythdvdvfs.h
   # Bluray
   Bluray/mythbdbuffer.cpp
   Bluray/mythbdbuffer.h

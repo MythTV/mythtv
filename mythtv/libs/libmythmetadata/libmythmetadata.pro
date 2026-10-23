@@ -50,6 +50,8 @@ LIBS += -L../../external/FFmpeg/libavcodec -lmythavcodec
 LIBS += -L../../external/FFmpeg/libavformat -lmythavformat
 LIBS += -L../libmythtv              -lmythtv-$${LIBVERSION}
 LIBS += -L../../external/FFmpeg/libswscale -lmythswscale
+LIBS += -L../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
 
 !using_system_libexiv2 {
     darwin {
