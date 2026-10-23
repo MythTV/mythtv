@@ -18,12 +18,12 @@ QMAKE_CLEAN += $(TARGET)
 HEADERS += ../mytharchive/archiveutil.h ../mytharchive/remoteavformatcontext.h external/pxsup2dast.h
 SOURCES += mytharchivehelper.cpp ../mytharchive/archiveutil.cpp external/pxsup2dast.c
 
-LIBS += -lmythswscale
-LIBS += -lmythavformat
-LIBS += -lmythavcodec
-LIBS += -lmythavcodec
-LIBS += -lmythavutil
-LIBS += -lmythavfilter
+LIBS += -lmythswscale-$$LIBVERSION
+LIBS += -lmythavformat-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION
+LIBS += -lmythavcodec-$$LIBVERSION
+LIBS += -lmythavutil-$$LIBVERSION
+LIBS += -lmythavfilter-$$LIBVERSION
 LIBS += -lz
 LIBS += -lmythtv-$$LIBVERSION
 # libmythtv dependencies

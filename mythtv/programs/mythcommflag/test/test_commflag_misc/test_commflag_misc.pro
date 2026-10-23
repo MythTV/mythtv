@@ -17,12 +17,12 @@ LIBS += -L../../../../libs/libmyth -lmyth-$$LIBVERSION
 LIBS += -L../../../../libs/libmythtv -lmythtv-$$LIBVERSION
 LIBS += -L../../../../libs/libmythmetadata -lmythmetadata-$$LIBVERSION
 # Add FFMpeg for libmythtv
-LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
-LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
-LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec
-LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale
-LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat
-LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
+LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavcodec -lmythavcodec-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat-$$LIBVERSION
+LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter-$$LIBVERSION
 using_mheg:LIBS += -L../../../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
 using_mheg:QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythfreemheg
