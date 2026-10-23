@@ -555,7 +555,7 @@ V2VideoLookupList* V2Video::LookupVideo( const QString    &Title,
 }
 
 
-bool V2Video::RemoveVideoFromDB( int Id )
+bool V2Video::RemoveVideoFromDB( int Id, bool RemoveFile )
 {
     bool bResult = false;
 
@@ -564,10 +564,24 @@ bool V2Video::RemoveVideoFromDB( int Id )
     QScopedPointer<VideoMetadataListManager> mlm(new VideoMetadataListManager());
     mlm->setList(videolist);
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byID(Id);
-
-    if (metadata)
-        bResult = metadata->DeleteFromDatabase();
-
+    if (metadata) {
+        bool isremoved = false;
+        if (RemoveFile)
+        {
+            if (metadata->GetHost() != gCoreContext->GetHostName())
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("V2Video/RemoveVideoFromDB Video id %1 is on host %2, not local host %3. Cannot remove file.")
+                    .arg(Id).arg(metadata->GetHost()).arg(gCoreContext->GetHostName()));
+                return false;
+            }
+            StorageGroup sgroup("Videos", metadata->GetHost());
+            QString filename = metadata->GetFilename();
+            QString fullname = sgroup.FindFile(filename);
+            isremoved = QFile::remove(fullname);
+        }
+        if (isremoved || !RemoveFile)
+            bResult = metadata->DeleteFromDatabase();
+    }
     return bResult;
 }
 

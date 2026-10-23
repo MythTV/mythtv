@@ -52,7 +52,8 @@ class V2Video : public MythHTTPService
                                                     int              Episode,
                                                     const QString    &GrabberType,
                                                     bool             AllowGeneric );
-    static bool             RemoveVideoFromDB  ( int      Id );
+    static bool             RemoveVideoFromDB  ( int      Id,
+                                                 bool     RemoveFile);
     static bool             AddVideo           ( const QString  &FileName,
                                                     const QString  &HostName  );
 
