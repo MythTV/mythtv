@@ -363,7 +363,7 @@ jobs:
           PYTHON_EXE=$PKGMGR_PREFIX/bin/python3
           PYTHON_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+str(sys.version_info.minor))")
           PYTHON_DOT_VERSION=$(${PYTHON_EXE} -c "import sys; print(str(sys.version_info.major)+'.'+str(sys.version_info.minor))")
-          ANSIBLE_EXTRA="ansible_python_interpreter=$PYTHON_EXE database_version=${{ matrix.os.database_version }}"
+          ANSIBLE_EXTRA="database_version=${{ matrix.os.database_version }}"
           echo "PYTHON_EXE=$PYTHON_EXE" >> $GITHUB_ENV
           echo "PYTHON_VERSION=$PYTHON_VERSION" >> $GITHUB_ENV
           echo "PYTHON_DOT_VERSION=$PYTHON_DOT_VERSION" >> $GITHUB_ENV
