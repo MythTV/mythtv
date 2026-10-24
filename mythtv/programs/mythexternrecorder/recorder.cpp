@@ -827,6 +827,17 @@ bool Recorder::stopStreaming(const QJsonObject &params)
 {
     bool wasStreaming = m_isStreaming.exchange(false);
 
+    // Stop any recurring touch monitor tasks
+    for (auto it = m_touchMonitors.begin(); it != m_touchMonitors.end(); ++it)
+    {
+        if (TouchMonitor *monitor = it.value())
+        {
+            monitor->stop();
+            monitor->deleteLater();
+        }
+    }
+    m_touchMonitors.clear();
+
     // streamLoop may be blocked in read(stdout_input_fd).
     if (m_streamProcess && m_streamProcess->pid() > 0)
         m_streamProcess->terminate();
@@ -1075,7 +1086,8 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Error starting background %1 command").arg(desc));
-            m_processes.remove(desc);
+            if (m_processes.value(desc) == myProcess)
+                m_processes.remove(desc);
             myProcess->deleteLater();
             return;
         }
@@ -1092,12 +1104,10 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
         LOG(VB_GENERAL, logLvl,
             QString("Executing foreground command: %1").arg(command));
 
-        bool result = myProcess->execute(command, m_env);
+        bool result = myProcess->execute(command, m_env, m_shell);
 
-        LOG(VB_GENERAL, LOG_WARNING,
-            QString("Foreground execute returned: %1 succeeded=%2")
-            .arg(result)
-            .arg(myProcess->succeeded()));
+        LOG(VB_GENERAL, logLvl,
+            QString("Foreground execute returned: %1").arg(result));
     }
 }
 
@@ -1151,7 +1161,7 @@ void Recorder::StderrLine(const QString &line)
     QString status = "INFO";
     LogLevel_t level = LOG_INFO;
     QString message = line;
-    bool send;
+    bool send = false;
 
     for (const auto& info : levels)
     {
@@ -1209,6 +1219,9 @@ void Recorder::StderrLine(const QString &line)
 
 void Recorder::stderrLoop(int fd)
 {
+    if (fd < 0)
+        return;
+
     FILE *stream = fdopen(fd, "r");
 
     if (!stream)
@@ -1217,6 +1230,7 @@ void Recorder::stderrLoop(int fd)
             QString("Unable to open stderr fd %1: %2")
             .arg(fd)
             .arg(strerror(errno)));
+        ::close(fd);
         return;
     }
 
@@ -1242,7 +1256,6 @@ void Recorder::stderrLoop(int fd)
                     clearerr(stream);
                     continue;
                 }
-
 
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("getline error on fd %1: %2")
@@ -1390,6 +1403,17 @@ void Recorder::initializeTouchTasks(void)
         // touch.damaged_on_failure
         // touch.log_level
         QString taskName = QString::fromStdString(name);
+
+        auto existing = m_touchMonitors.find(taskName);
+        if (existing != m_touchMonitors.end())
+        {
+            if (existing.value())
+            {
+                existing.value()->stop();
+                existing.value()->deleteLater();
+            }
+            m_touchMonitors.erase(existing);
+        }
 
         LOG(VB_GENERAL, LOG_INFO,
             QString("Registering touch monitor task: %1")
