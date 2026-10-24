@@ -52,6 +52,7 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
     }
 
     m_basePath = filename.parent_path();
+    updateVariable(std::string("CONFIGDIR"), m_basePath.string());
     if (!loadChannels())
     {
         m_fatal = true;

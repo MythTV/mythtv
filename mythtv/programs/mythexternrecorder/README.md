@@ -59,6 +59,7 @@ In addition to user-defined variables, several built-in variables are automatica
 * **SOURCEID** – Internal MythTV video source ID
 * **TITLE** – Episode title
 * **SUBTITLE** – Episode subtitle
+* **CONFIGDIR** – Directory containing configuration file
 
 > **NOTE:**
 > These variables are only populated during the tuning process. If your configuration does not define `[TUNER]/command` or `[TUNER]/channels`, they will be unavailable.

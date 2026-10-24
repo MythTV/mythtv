@@ -66,6 +66,8 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
             m_variables[std::string(k.str())] = strvalue;
         }
     }
+    updateVariable(std::string("CONFIGDIR"), m_basePath.string());
+    m_variables[std::string("CONFIGDIR")] = std::string(m_basePath.string());
 
     m_section["RECORDER"] = getSectionName(m_root, "RECORDER");
 
