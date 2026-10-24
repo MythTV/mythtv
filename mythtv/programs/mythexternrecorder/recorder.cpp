@@ -812,6 +812,10 @@ bool Recorder::startStreaming(const QJsonObject &params)
 
     m_isStreaming.store(true);
 
+    // Prepare environment variables on the main thread safely before spawning the thread
+    if (!m_shell.isEmpty())
+        variablesToEnv();
+
     m_streamProcess = std::make_unique<PosixProcess>();
     m_streamThread = std::thread(&Recorder::streamLoop, this,
                                   QString::fromStdString(streamCmd));
@@ -1280,10 +1284,7 @@ void Recorder::stderrLoop(int fd)
 
 void Recorder::streamLoop(QString command)
 {
-    if (!m_shell.isEmpty())
-        variablesToEnv();
-
-    // Launch POSIX child process
+    // Launch POSIX child process - environment variables already safe inside m_env
     auto res = m_streamProcess->launch(command, m_env, m_shell);
     if (!res.ok)
     {
@@ -1302,7 +1303,6 @@ void Recorder::streamLoop(QString command)
 
     const int stderrFd = m_streamProcess->takeStderrFd();
     m_stderrThread = std::thread(&Recorder::stderrLoop, this, stderrFd);
-
 
 #if defined(Q_OS_LINUX)
     pthread_setname_np(m_stderrThread.native_handle(), "stream-stderr");
