@@ -173,7 +173,7 @@ bool ExternTomlConfig::loadIncludes(void)
 
                 const toml::table included = parseFile(includePath, "included");
 
-                // Only these sections are expected in modular files.
+                // Only merge these sections if they actually exist in the target layout
                 for (const auto& section :
                          {
                              "RECORDER",
@@ -182,14 +182,22 @@ bool ExternTomlConfig::loadIncludes(void)
                              "SCANNER"
                          })
                 {
-                    m_section[section] = getSectionName(included, section);
-                    const auto& sectionName = m_section.at(section);
-                    if (const auto* table = included[sectionName].as_table())
+                    // Look up the case-variant name from the included
+                    // file first
+                    std::string matchedSection = getSectionName(included,
+                                                                section);
+
+                    if (included.contains(matchedSection) &&
+                        included[matchedSection].is_table())
                     {
-                        if (auto* existing = m_root[sectionName].as_table())
+                        // Cache the verified section name format
+                        m_section[section] = matchedSection;
+                        const auto* table = included[matchedSection].as_table();
+
+                        if (auto* existing = m_root[matchedSection].as_table())
                             mergeTable(*table, *existing);
                         else
-                            m_root.insert(sectionName, *table);
+                            m_root.insert(matchedSection, *table);
                     }
                 }
             }
@@ -512,9 +520,9 @@ std::string ExternTomlConfig::expandVars(std::string value) const
      *                     Group 1 captures the alphanumeric variable name.
      * ------------------------------------------------------------------
      */
+
     static const std::regex conditionalRegex(R"(\[\?([\s\S]*?)\?\])");
     static const std::regex variableRegex(R"(\{([A-Za-z_][A-Za-z0-9_]*)\})");
-
 
     /*
      * ------------------------------------------------------------------
@@ -560,14 +568,8 @@ std::string ExternTomlConfig::expandVars(std::string value) const
 
         if (allDefined)
         {
-            // Expand the variables inside the block before merging back
-            std::smatch innerMatch;
-            while (std::regex_search(contents, innerMatch, variableRegex))
-            {
-                const std::string name = innerMatch[1].str(); // Pull inner name
-                contents.replace(innerMatch.position(),
-                                 innerMatch.length(), expandVariable(name));
-            }
+            // Let the main variable-expansion loop below handle
+            // individual substitutions.
             replacement = contents;
         }
 
