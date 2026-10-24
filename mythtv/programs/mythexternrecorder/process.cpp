@@ -62,8 +62,14 @@ bool Process::start(const QString& command, QProcessEnvironment& env,
         // Direct execution
         QStringList argv = QProcess::splitCommand(command);
         if (argv.isEmpty())
+        {
+            m_state = State::Finished;
+            m_result = Result::Failed;
+            m_errstr = "Failed to split command line string into separate arguments.";
             return false;
+        }
 
+        m_process.setProcessEnvironment(env);
         QString program = argv.takeFirst();
         m_process.setProgram(program);
         m_process.setArguments(argv);
@@ -83,8 +89,12 @@ bool Process::start(const QString& command, QProcessEnvironment& env,
         return false;
     }
 
-    m_started = QDateTime::currentDateTime();
-    m_state = State::Running;
+    // Only flag as Running if a command hasn't already finished
+    if (!isFinished())
+    {
+        m_started = QDateTime::currentDateTime();
+        m_state = State::Running;
+    }
 
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("Process::Started '%1'%2")
