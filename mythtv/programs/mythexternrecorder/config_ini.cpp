@@ -102,7 +102,7 @@ std::optional<QString> ExternIniConfig::findKey(const QSettings &settings,
         sectionName = "TUNER";
         requestedKey = "newepisodecommand";
     }
-    else if (key=="recstarting")
+    else if (key == "recstarting")
     {
         sectionName = "TUNER";
         requestedKey = "ondatastart";
@@ -117,7 +117,7 @@ std::optional<QString> ExternIniConfig::findKey(const QSettings &settings,
 
     for (const auto &candidate : settings.allKeys())
     {
-        if (!candidate.startsWith(prefix, Qt::CaseSensitive))
+        if (!candidate.startsWith(prefix, Qt::CaseInsensitive))
             continue;
 
         const QString candidateKey = candidate.mid(prefix.size());
@@ -329,7 +329,7 @@ bool ExternIniConfig::loadChannels(void)
     if (!filename)
         return true;
 
-    std::filesystem::path channelsPath = expandVars(*filename);
+    std::filesystem::path channelsPath = *filename;
 
     if (channelsPath.is_relative())
         channelsPath = m_basePath / channelsPath;
