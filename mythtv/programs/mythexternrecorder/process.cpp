@@ -107,8 +107,15 @@ bool Process::start(const QString& command, QProcessEnvironment& env,
 bool Process::startDetached(const QString& command)
 {
     QStringList argv = QProcess::splitCommand(command);
-    QString program = argv.takeFirst();
+    if (argv.isEmpty())
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("Process::startDetached failed: splitCommand parsed an empty string list from '%1'")
+            .arg(command));
+        return false;
+    }
 
+    QString program = argv.takeFirst();
     return QProcess::startDetached(program, argv);
 }
 
@@ -129,8 +136,7 @@ bool Process::wait(int timeout)
         return isFinished();
 
     LOG(VB_GENERAL, LOG_DEBUG,
-        QString("Process::wait '%1': state=%3 "
-                "qprocess-state=%4")
+        QString("Process::wait '%1': state=%2 qprocess-state=%3")
             .arg(m_command)
             .arg(static_cast<int>(m_state))
             .arg(static_cast<int>(m_process.state())));
