@@ -642,6 +642,9 @@ bool Recorder::tuneChannel(const QJsonObject &params)
     m_tunedCmd = tuneCmd;
     executeCommand(tuneCmd, "Tune", true);
 
+    if (m_tunedCmd.trimmed().endsWith('&'))
+        m_recDirectTune = true;
+
     QJsonObject response = {
         {"status", "OK"},
         {"message", "InProgress"}
