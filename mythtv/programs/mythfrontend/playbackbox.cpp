@@ -1168,7 +1168,7 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
         for (uint i = 4; i < (uint) list.size(); i++)
             tokens += list[i] + ", ";
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
-            "Ignoring PREVIEW_SUCCESS, no matcing token" + tokens);
+            "Ignoring PREVIEW_SUCCESS, no matching token" + tokens);
         return;
     }
 
@@ -2604,7 +2604,7 @@ void PlaybackBox::RemoveProgram( uint recordingID, bool forgetHistory,
     if (uiItem)
     {
         m_recordingList->RemoveItem(uiItem);
-        delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+        delete uiItem;
     }
 }
 
@@ -3592,7 +3592,7 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
             if (uiItem)
             {
                 m_recordingList->RemoveItem(uiItem);
-                delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+                delete uiItem;
             }
         }
     }
@@ -4218,7 +4218,7 @@ void PlaybackBox::customEvent(QEvent *event)
                 if (uiItem)
                 {
                     m_recordingList->RemoveItem(uiItem);
-                    delete dynamic_cast<PlaybackBoxListItem*>(uiItem);
+                    delete uiItem;
                 }
             }
             if (!list.empty())
@@ -4339,7 +4339,9 @@ void PlaybackBox::customEvent(QEvent *event)
             }
 
             if (old_avail != availableStatus)
+            {
                 UpdateUIListItem(pginfo, true);
+            }
         }
         else if ((message == "PLAY_PLAYLIST") && !m_playListPlay.empty())
         {
@@ -4452,7 +4454,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
                     }
 
                     m_recordingList->RemoveItem(item_by_data);
-                    delete dynamic_cast<PlaybackBoxListItem*>(item_by_data);
+                    delete item_by_data;
                 }
                 pit = (*git).erase(pit);
             }
@@ -4952,7 +4954,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         newTitle != pginfo->GetTitle())
     {
         m_recordingList->RemoveItem(item);
-        delete dynamic_cast<PlaybackBoxListItem*>(item);
+        delete item;
     }
     else
     {
