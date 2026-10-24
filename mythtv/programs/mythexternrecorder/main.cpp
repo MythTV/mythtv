@@ -111,9 +111,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // Print the detailed parse tracking errors
     if (config->failed())
     {
-        std::cerr << "Invalid config file.\n";
+        std::cerr << "Invalid config file. Details:\n" << config->ErrorMsg();
         return 1;
     }
 
@@ -123,8 +124,13 @@ int main(int argc, char *argv[])
     // Init logging
     std::string desc = config->getValue("RECORDER", "desc",
                                         confFile.stem().string(), true);
-    QString logFile = logPath + QString("/recorder-%1.log")
-                      .arg(QString::fromStdString(desc));
+
+    // Remove slashes from description so file name will be valid
+    QString sanitizedDesc = QString::fromStdString(desc);
+    sanitizedDesc.replace('/', '-');
+    sanitizedDesc.replace('\\', '-');
+
+    QString logFile = logPath + QString("/recorder-%1.log").arg(sanitizedDesc);
 
     cmdline.SetupLogging(logFile);
 
@@ -188,6 +194,7 @@ int main(int argc, char *argv[])
                              LOG(VB_GENERAL, LOG_ERR,
                                  "Unknown exception processing command.");
                              app.quit();
+                             throw;
                          }
                      });
 
