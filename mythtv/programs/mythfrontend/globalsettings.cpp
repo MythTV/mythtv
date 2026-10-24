@@ -36,6 +36,7 @@
 #include "libmythtv/channelgroup.h"
 #include "libmythtv/decoders/mythcodeccontext.h"
 #include "libmythtv/playgroup.h" //Used for playBackGroup, to be remove at one point
+#include "libmythtv/mythplayer.h" // for StartCaptions enum
 #include "libmythtv/recordingprofile.h"
 #include "libmythtv/visualisations/videovisual.h"
 #include "libmythui/mythdisplay.h"
@@ -1661,14 +1662,15 @@ static HostComboBoxSetting *DefaultCCMode()
     gc->setLabel(OSDSettings::tr("Default to display closed captioning or "
                                  "subtitles"));
 
-    gc->addSelection(OSDSettings::tr("Captions off"), "0");
-    gc->addSelection(OSDSettings::tr("Captions on"), "1");
-    gc->addSelection(OSDSettings::tr("Last captions state"), "2");
+    gc->addSelection(OSDSettings::tr("Captions off"), QString::number(StartCaptionsOff));
+    gc->addSelection(OSDSettings::tr("Captions on"), QString::number(StartCaptionsOn));
+    gc->addSelection(OSDSettings::tr("Last captions state"), QString::number(StartCaptionsLast));
 
-    gc->setHelpText(OSDSettings::tr("If enabled, captions will be displayed "
+    gc->setHelpText(OSDSettings::tr("Start with Captions off, Captions on, "
+                                    "or use the Last Captions state "
                                     "when playing back recordings or watching "
                                     "Live TV. Closed Captioning can be turned "
-                                    "on or off by pressing \"T\" during"
+                                    "on or off by pressing \"T\" during "
                                     "playback."));
     return gc;
 }

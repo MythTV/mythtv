@@ -467,13 +467,15 @@ void MythPlayerUI::VideoStart()
     {
         switch (m_captionsEnabledbyDefault)
         {
-            case 0:     // Captions off
+            case StartCaptionsOff:
                 SetCaptionsEnabled(false, false);
                 break;
-            case 1:     // Captions on
+            case StartCaptionsOn:
                 SetCaptionsEnabled(true, false);
                 break;
-            default:    // Last captions state
+            case StartCaptionsLast:
+                [[fallthrough]];
+            default:
                 SetCaptionsEnabled(m_lastCaptionsEnabled, false);
                 break;
         }

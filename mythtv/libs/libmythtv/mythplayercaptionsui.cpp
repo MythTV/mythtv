@@ -268,22 +268,35 @@ void MythPlayerCaptionsUI::SetAllowForcedSubtitles(bool Allow)
 
 void MythPlayerCaptionsUI::ToggleCaptions()
 {
-    bool togval = !(static_cast<bool>(m_captionsState.m_textDisplayMode));
-    SetCaptionsEnabled(togval);
-    gCoreContext->SaveSetting("LastCaptions", togval);
+    SetCaptionsEnabled(!(static_cast<bool>(m_captionsState.m_textDisplayMode)));
 }
 
 void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);
+    bool isEnabledOnEntry = static_cast<bool>(m_captionsState.m_textDisplayMode);
+    bool isEnabledOnExit = isEnabledOnEntry;
     auto mode = toCaptionType(Type);
     auto origmode = m_captionsState.m_textDisplayMode;
     if (m_captionsState.m_textDisplayMode)
+    {
         DisableCaptions(m_captionsState.m_textDisplayMode, (origmode & mode) != 0U);
+        isEnabledOnExit = false;
+    }
     if (origmode & mode)
-        return;
-    if (mode)
+    {
+        // Enabled state unchanged
+    }
+    else if (mode)
+    {
         EnableCaptions(mode);
+        isEnabledOnExit = true;
+    }
+
+    if (isEnabledOnExit != isEnabledOnEntry)
+    {
+        gCoreContext->SaveSetting("LastCaptions", isEnabledOnExit);
+    }
 }
 
 void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
@@ -298,6 +311,7 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
     if (!Enable)
     {
         DisableCaptions(origmode, UpdateOSD);
+        gCoreContext->SaveSetting("LastCaptions", false);
         return;
     }
 
@@ -310,10 +324,12 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
             if (UpdateOSD)
                 UpdateOSDMessage(tr("No captions", "CC/Teletext/Subtitle text not available"), kOSDTimeout_Med);
             LOG(VB_PLAYBACK, LOG_INFO, "No captions available yet to enable.");
+            gCoreContext->SaveSetting("LastCaptions", false);
         }
         else
         {
             EnableCaptions(mode, UpdateOSD);
+            gCoreContext->SaveSetting("LastCaptions", true);
         }
     }
 }
