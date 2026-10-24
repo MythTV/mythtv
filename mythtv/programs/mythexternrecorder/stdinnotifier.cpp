@@ -31,6 +31,7 @@ void StdinNotifier::handleReadyRead()
     m_notifier->setEnabled(false);
 
     char buffer[4096];
+    bool immediateEof = false;
 
     for (;;)
     {
@@ -44,9 +45,10 @@ void StdinNotifier::handleReadyRead()
 
         if (count == 0)
         {
-            // EOF
-            emit finished();
-            return;
+            // Mark EOF state instead of returning instantly so
+            // m_buffer is drained first
+            immediateEof = true;
+            break;
         }
 
         if (errno == EINTR)
@@ -102,6 +104,13 @@ void StdinNotifier::handleReadyRead()
         }
 
         emit commandReceived(jsonDoc.object());
+    }
+
+    // exit only after lines are finished being processed
+    if (immediateEof)
+    {
+        emit finished();
+        return;
     }
 
     m_notifier->setEnabled(true);
