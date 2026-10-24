@@ -190,7 +190,7 @@ LaunchResult PosixProcess::launch(const QString& command,
         }
 
         finalArgs.push_back(shellPath);
-        // POSIX shells use -c to execute a string string
+        // POSIX shells use -c to execute a string
         finalArgs.push_back("-c");
         // The entire command string is one argument
         finalArgs.push_back(command);
@@ -198,8 +198,8 @@ LaunchResult PosixProcess::launch(const QString& command,
     else
     {
         // Run without shell
-        m_args = QProcess::splitCommand(command);
-        if (m_args.isEmpty())
+        QStringList parsedArgs = QProcess::splitCommand(command);
+        if (parsedArgs.isEmpty())
         {
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Failed to split '%1' into args").arg(command));
@@ -207,7 +207,7 @@ LaunchResult PosixProcess::launch(const QString& command,
                     QString("Failed to split '%1' into args").arg(command)};
         }
 
-        QString execProg = m_args[0];
+        QString execProg = parsedArgs[0];
 
         if (execProg.contains('/'))
         {
@@ -235,8 +235,11 @@ LaunchResult PosixProcess::launch(const QString& command,
             }
         }
 
-        finalArgs = m_args;
+        finalArgs = parsedArgs;
     }
+
+    // Capture un-tokenized representation to preserve accurate telemetry loops
+    m_args = finalArgs;
 
     QString fullCommandLine = finalArgs.join("\" \"");
     if (!fullCommandLine.isEmpty())
@@ -276,9 +279,6 @@ LaunchResult PosixProcess::launch(const QString& command,
     int stdoutPipe[2];
     int stderrPipe[2];
 
-#include <unistd.h>
-#include <fcntl.h>
-
 #ifdef __APPLE__
     if (pipe(stdoutPipe) < 0)
     {
@@ -295,6 +295,8 @@ LaunchResult PosixProcess::launch(const QString& command,
         QString errStr = QString("Failed to create stderr pipe: %1")
                              .arg(QString::fromLocal8Bit(strerror(errno)));
         LOG(VB_GENERAL, LOG_ERR, errStr);
+        close(stdoutPipe[0]);
+        close(stdoutPipe[1]);
         return {false, errStr};
     }
     fcntl(stderrPipe[0], F_SETFD, FD_CLOEXEC);
@@ -330,7 +332,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     // Map child stderr -> pipe write end
     posix_spawn_file_actions_adddup2(&actions, stderrPipe[1], STDERR_FILENO);
 
-    // Child only writes to the pipes)
+    // Child only writes to the pipes
     posix_spawn_file_actions_addclose(&actions, stdoutPipe[0]);
     posix_spawn_file_actions_addclose(&actions, stderrPipe[0]);
 
