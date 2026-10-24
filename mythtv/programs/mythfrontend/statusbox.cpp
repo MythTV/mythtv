@@ -79,7 +79,7 @@ StatusBox::~StatusBox(void)
     if (m_logList)
         gCoreContext->SaveSetting("StatusBoxItemCurrent",
                                   m_logList->GetCurrentPos());
-    for (auto ptr: m_expList)
+    for (auto *ptr: m_expList)
     {
         delete ptr;
     }
