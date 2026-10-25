@@ -562,10 +562,15 @@ AudioDeviceID CoreAudioData::GetDeviceWithName(const QString &deviceName)
             if (device.GetTotalOutputChannels() == 0)
                 continue;
             QString *name = device.GetName();
-            if (name && *name == deviceName)
+            if (name)
             {
-                LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetDeviceWithName: Found: %1").arg(*name));
-                deviceID = dev;
+                // We must unconditionally delete 'name' on every loop iteration,
+                // otherwise all non-matching audio devices will leak heap memory.
+                if (*name == deviceName)
+                {
+                    LOG(VB_AUDIO, LOG_INFO, QString("CoreAudioData::GetDeviceWithName: Found: %1").arg(*name));
+                    deviceID = dev;
+                }
                 delete name;
             }
             if (deviceID)
