@@ -1309,9 +1309,6 @@ int CoreAudioData::OpenAnalog()
              .arg(err));
     }
 
-    if(new_layout.mNumberChannelDescriptions > 0)
-        free(new_layout.mChannelDescriptions);
-
     // Set up the audio output unit
     int formatFlags;
     switch (mCA->m_outputFormat)
