@@ -183,9 +183,7 @@ private:
                               MythUIShape *bg2);
 
     QHash<QString, MythFontProperties *> m_fontMap;
-    // Set true if corresponding entry in m_fontMap
-    // is dynamically allocated memory
-    QHash<QString, bool> m_fontMapAllocated;
+    QSet<MythFontProperties *>    m_dynamAllocated;
     QHash<QString, MythUIShape *>       m_shapeMap;
     QHash<QString, QSet<QString> >     m_changeMap;
     // The following m_*Map fields are the original values from the
@@ -378,16 +376,9 @@ SubtitleFormat::~SubtitleFormat(void)
         m_cleanup[i]->deleteLater();
         m_cleanup[i] = nullptr; // just to be safe
     }
-    for (auto it = m_fontMap.cbegin(); it != m_fontMap.cend(); ++it)
-    {
-        if (m_fontMapAllocated[it.key()])
-        {
-            // Release dynamically allocated memory
-            delete m_fontMap[it.key()];
-        }
-    }
+    qDeleteAll(m_dynamAllocated);
+    m_dynamAllocated.clear();
     m_fontMap.clear();
-    m_fontMapAllocated.clear();
 }
 
 QString SubtitleFormat::MakePrefix(const QString &family,
@@ -494,7 +485,6 @@ void SubtitleFormat::Complement(MythFontProperties *font, MythUIShape *bg)
 void SubtitleFormat::Load(const QString &family,
                           const CC708CharacterAttribute &attr)
 {
-    bool resultFontAllocated {false};
 
     // Widgets for the actual values
     auto *baseParent = new MythUIType(nullptr, "base");
@@ -527,8 +517,8 @@ void SubtitleFormat::Load(const QString &family,
     if (!resultFont)
     {
         resultFont = providerBaseFont;
-        // Remember resultFont points to dynamically allocated memory
-        resultFontAllocated = true;
+        // Remember we have dynamically allocated memory
+        m_dynamAllocated.insert(providerBaseFont);
     }
     else
     {
@@ -551,13 +541,12 @@ void SubtitleFormat::Load(const QString &family,
     if (family == kSubFamily708 &&
         (attr.m_fontTag & 0x7) == k708AttrFontSmallCaps)
         resultFont->GetFace()->setCapitalization(QFont::SmallCaps);
-    if (m_fontMap[prefix] && m_fontMapAllocated[prefix])
+    if (m_fontMap.value(prefix) && m_dynamAllocated.remove(m_fontMap.value(prefix)))
     {
         // Release dynamically allocated memory
-        delete m_fontMap[prefix];
+        delete m_fontMap.value(prefix);
     }
     m_fontMap[prefix] = resultFont;
-    m_fontMapAllocated[prefix] = resultFontAllocated;
     m_shapeMap[prefix] = resultBG;
     LOG(VB_VBI, LOG_DEBUG,
         QString("negFont = %1").arg(fontToString(negFont)));
