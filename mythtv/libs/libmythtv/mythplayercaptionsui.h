@@ -37,10 +37,11 @@ class MTV_PUBLIC MythPlayerCaptionsUI : public MythPlayerAudioUI
   protected slots:
     void InitialiseState() override;
     void SetAllowForcedSubtitles(bool Allow);
+    void SaveLastCaptionsState();
     void ToggleCaptions();
     void ToggleCaptionsByType(uint Type);
     void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
-    virtual void DisableCaptions(uint Mode, bool UpdateOSD = true);
+    virtual void DisableCaptions(uint Mode, bool UpdateOSD = true, bool saveInDb = true);
     virtual void EnableCaptions(uint Mode, bool UpdateOSD = true);
     virtual void SetTrack(uint Type, uint TrackNo);
     void ChangeCaptionTrack(int Direction);

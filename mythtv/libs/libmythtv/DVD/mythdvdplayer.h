@@ -62,7 +62,7 @@ class MythDVDPlayer : public MythPlayerUI
     void     GoToMenu(const QString& Menu);
     void     GoToDVDProgram(bool Direction);
     void     SetBookmark(bool Clear = false) override;
-    void     DisableCaptions(uint Mode, bool OSDMsg = true) override;
+    void     DisableCaptions(uint Mode, bool OSDMsg = true, bool saveInDb = true) override;
     void     EnableCaptions(uint Mode, bool OSDMsg = true) override;
     void     SetTrack(uint Type, uint TrackNo) override;
     void     DoDisableDVDSubtitles();

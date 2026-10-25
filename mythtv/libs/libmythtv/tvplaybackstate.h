@@ -50,7 +50,7 @@ class MTV_PUBLIC TVPlaybackState : public QObject
     void ToggleCaptions();
     void ToggleCaptionsByType(uint Type);
     void SetCaptionsEnabled(bool Enable, bool UpdateOSD = true);
-    void DisableCaptions(uint Mode, bool UpdateOSD = true);
+    void DisableCaptions(uint Mode, bool UpdateOSD = true, bool saveInDb = true);
     void EnableCaptions(uint Mode, bool UpdateOSD = true);
     void ChangeCaptionTrack(int Direction);
 
