@@ -1306,13 +1306,6 @@ int CoreAudioData::OpenAnalog()
              .arg(err));
     }
 
-    if(new_layout.mNumberChannelDescriptions > 0)
-    {
-        // memory allocated by C library
-        // NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
-        free(new_layout.mChannelDescriptions);
-    }
-
     // Set up the audio output unit
     int formatFlags = 0;
     switch (mCA->m_outputFormat)
