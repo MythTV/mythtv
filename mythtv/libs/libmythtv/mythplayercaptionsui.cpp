@@ -158,7 +158,7 @@ void MythPlayerCaptionsUI::SaveLastCaptionsState()
     }
 }
 
-void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD, bool saveInDb)
+void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD, bool SaveInDb)
 {
     auto oldcaptions = m_captionsState.m_textDisplayMode;
     if (m_captionsState.m_textDisplayMode != kDisplayNone)
@@ -167,7 +167,7 @@ void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD, bool saveI
     if (oldcaptions != m_captionsState.m_textDisplayMode)
     {
         emit CaptionsStateChanged(m_captionsState);
-        if (saveInDb)
+        if (SaveInDb)
         {
             SaveLastCaptionsState();
         }
