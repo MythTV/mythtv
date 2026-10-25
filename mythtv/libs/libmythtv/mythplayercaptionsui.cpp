@@ -148,14 +148,30 @@ static uint toTrackType(uint Type)
     return kTrackTypeUnknown;
 }
 
-void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD)
+void MythPlayerCaptionsUI::SaveLastCaptionsState()
+{
+    bool enabled = m_captionsState.m_textDisplayMode != kDisplayNone;
+    if (enabled != m_lastCaptionsEnabled)
+    {
+        m_lastCaptionsEnabled = enabled;
+        gCoreContext->SaveSetting("LastCaptions", enabled);
+    }
+}
+
+void MythPlayerCaptionsUI::DisableCaptions(uint Mode, bool UpdateOSD, bool saveInDb)
 {
     auto oldcaptions = m_captionsState.m_textDisplayMode;
     if (m_captionsState.m_textDisplayMode != kDisplayNone)
         m_lastValidTextDisplayMode = m_captionsState.m_textDisplayMode;
     m_captionsState.m_textDisplayMode &= ~Mode;
     if (oldcaptions != m_captionsState.m_textDisplayMode)
+    {
         emit CaptionsStateChanged(m_captionsState);
+        if (saveInDb)
+        {
+            SaveLastCaptionsState();
+        }
+    }
     ResetCaptions();
 
     QMutexLocker locker(&m_osdLock);
@@ -246,7 +262,10 @@ void MythPlayerCaptionsUI::EnableCaptions(uint Mode, bool UpdateOSD)
     if (m_captionsState.m_textDisplayMode != kDisplayNone)
         m_lastValidTextDisplayMode = m_captionsState.m_textDisplayMode;
     if (oldcaptions != m_captionsState.m_textDisplayMode)
+    {
         emit CaptionsStateChanged(m_captionsState);
+        SaveLastCaptionsState();
+    }
     if (UpdateOSD)
         UpdateOSDMessage(msg, kOSDTimeout_Med);
 }
@@ -274,28 +293,17 @@ void MythPlayerCaptionsUI::ToggleCaptions()
 void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
 {
     QMutexLocker locker(&m_osdLock);
-    bool isEnabledOnEntry = static_cast<bool>(m_captionsState.m_textDisplayMode);
-    bool isEnabledOnExit = isEnabledOnEntry;
     auto mode = toCaptionType(Type);
     auto origmode = m_captionsState.m_textDisplayMode;
     if (m_captionsState.m_textDisplayMode)
     {
         DisableCaptions(m_captionsState.m_textDisplayMode, (origmode & mode) != 0U);
-        isEnabledOnExit = false;
     }
     if (origmode & mode)
-    {
-        // Enabled state unchanged
-    }
-    else if (mode)
+        return;
+    if (mode)
     {
         EnableCaptions(mode);
-        isEnabledOnExit = true;
-    }
-
-    if (isEnabledOnExit != isEnabledOnEntry)
-    {
-        gCoreContext->SaveSetting("LastCaptions", isEnabledOnExit);
     }
 }
 
@@ -311,25 +319,23 @@ void MythPlayerCaptionsUI::SetCaptionsEnabled(bool Enable, bool UpdateOSD)
     if (!Enable)
     {
         DisableCaptions(origmode, UpdateOSD);
-        gCoreContext->SaveSetting("LastCaptions", false);
         return;
     }
 
     if (auto mode = HasCaptionTrack(m_lastValidTextDisplayMode) ?
             m_lastValidTextDisplayMode : NextCaptionTrack(kDisplayNone); origmode != mode)
     {
-        DisableCaptions(origmode, false);
+        DisableCaptions(origmode, false, false); // Defer write to DB
         if (kDisplayNone == mode)
         {
             if (UpdateOSD)
                 UpdateOSDMessage(tr("No captions", "CC/Teletext/Subtitle text not available"), kOSDTimeout_Med);
             LOG(VB_PLAYBACK, LOG_INFO, "No captions available yet to enable.");
-            gCoreContext->SaveSetting("LastCaptions", false);
+            SaveLastCaptionsState(); // Write to DB now
         }
         else
         {
             EnableCaptions(mode, UpdateOSD);
-            gCoreContext->SaveSetting("LastCaptions", true);
         }
     }
 }
@@ -360,7 +366,7 @@ void MythPlayerCaptionsUI::SetTrack(uint Type, uint TrackNo)
     }
     else if (auto subtype = toCaptionType(Type); subtype)
     {
-        DisableCaptions(m_captionsState.m_textDisplayMode, false);
+        DisableCaptions(m_captionsState.m_textDisplayMode, false, false);
         EnableCaptions(subtype, true);
         if ((kDisplayCC708 == subtype || kDisplayCC608 == subtype) && m_decoder)
             if (auto sid = m_decoder->GetTrackInfo(Type, TrackNo).m_stream_id; sid > 0)
