@@ -297,7 +297,8 @@ void MythPlayerCaptionsUI::ToggleCaptionsByType(uint Type)
     auto origmode = m_captionsState.m_textDisplayMode;
     if (m_captionsState.m_textDisplayMode)
     {
-        DisableCaptions(m_captionsState.m_textDisplayMode, (origmode & mode) != 0U);
+        DisableCaptions(m_captionsState.m_textDisplayMode, (origmode & mode) != 0U,
+                        ((origmode & mode) != 0U) || (mode == 0U));
     }
     if (origmode & mode)
         return;
@@ -428,7 +429,7 @@ void MythPlayerCaptionsUI::ChangeCaptionTrack(int Direction)
     if ((nextmode == kDisplayTextSubtitle) || (nextmode == kDisplayNUVTeletextCaptions) ||
         (nextmode == kDisplayNone))
     {
-        DisableCaptions(m_captionsState.m_textDisplayMode, true);
+        DisableCaptions(m_captionsState.m_textDisplayMode, true, (nextmode == kDisplayNone));
         if (nextmode != kDisplayNone)
             EnableCaptions(nextmode, true);
     }
