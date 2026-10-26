@@ -1630,7 +1630,9 @@ std::chrono::milliseconds SubtitleScreen::GetDelay(void) const
 
 void SubtitleScreen::Clear708Cache(uint64_t mask)
 {
-    for (auto *child : std::as_const(m_childrenList))
+    // DeleteChild() erases from m_childrenList; iterate over a copy.
+    const QList<MythUIType *> children = m_childrenList;
+    for (auto *child : children)
     {
         auto *wrapper = dynamic_cast<SubWrapper *>(child);
         if (wrapper)
@@ -1780,7 +1782,9 @@ void SubtitleScreen::Pulse(void)
         currentFrame ? currentFrame->m_timecode : std::chrono::milliseconds::max();
     bool needRescale = (m_textFontZoom != m_textFontZoomPrev);
 
-    for (auto *child : std::as_const(m_childrenList))
+    // DeleteChild() erases from m_childrenList; iterate over a copy.
+    const QList<MythUIType *> children = m_childrenList;
+    for (auto *child : children)
     {
         auto *wrapper = dynamic_cast<SubWrapper *>(child);
         if (!wrapper)
