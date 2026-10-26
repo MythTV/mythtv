@@ -1721,12 +1721,12 @@ void TVRec::HandlePendingRecordings(void)
     if (m_pendingRecordings.empty())
         return;
 
-    // Make sure EIT scan is stopped so it does't interfere
+    // Make sure active EIT scan is stopped so it does not interfere
     if (m_scanner && HasFlags(kFlagEITScannerRunning))
     {
         LOG(VB_CHANNEL, LOG_INFO,
-            LOC + "Stopping active EIT scan for pending recording.");
-        m_tuningRequests.enqueue(TuningRequest(kFlagNoRec));
+            LOC + "Stop active EIT scan for pending recording.");
+        m_tuningRequests.enqueue(TuningRequest(kFlagCloseRec));
     }
 
     // If we have a pending recording and AskAllowRecording
