@@ -1317,7 +1317,7 @@ static int init_base_units(AVCodecContext *avctx)
             return AVERROR(ENOMEM);
     } else {
         av_log(avctx, AV_LOG_ERROR, "Unable to get feedback for H.265 units = %zu\n", data_size);
-        return err;
+        return AVERROR_EXTERNAL;
     }
 
     ret = vk->GetEncodedVideoSessionParametersKHR(s->hwctx->act_dev, &params_info,
@@ -1325,7 +1325,8 @@ static int init_base_units(AVCodecContext *avctx)
                                                   &data_size, data);
     if (ret != VK_SUCCESS) {
         av_log(avctx, AV_LOG_ERROR, "Error writing feedback units\n");
-        return err;
+        err = AVERROR_EXTERNAL;
+        goto end;
     }
 
     av_log(avctx, AV_LOG_VERBOSE, "Feedback units written, overrides: %i (SPS: %i PPS: %i VPS: %i)\n",
@@ -1339,22 +1340,23 @@ static int init_base_units(AVCodecContext *avctx)
     h265_params_feedback.hasStdPPSOverrides = 1;
 
     /* No need to sync any overrides */
+    err = 0;
     if (!params_feedback.hasOverrides)
-        return 0;
+        goto end;
 
     /* Parse back tne units and override */
     err = parse_feedback_units(avctx, data, data_size,
                                h265_params_feedback.hasStdSPSOverrides,
                                h265_params_feedback.hasStdPPSOverrides);
     if (err < 0)
-        return err;
+        goto end;
 
     /* Create final session parameters */
     err = create_session_params(avctx);
-    if (err < 0)
-        return err;
 
-    return 0;
+end:
+    av_free(data);
+    return err;
 }
 
 static int vulkan_encode_h265_add_nal(AVCodecContext *avctx,
@@ -1595,23 +1597,21 @@ static av_cold int vulkan_encode_h265_init(AVCodecContext *avctx)
 
     av_log(avctx, AV_LOG_VERBOSE, "    Capability flags:\n");
     av_log(avctx, AV_LOG_VERBOSE, "        hdr_compliance: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_HRD_COMPLIANCE_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_HRD_COMPLIANCE_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        pred_weight_table_generated: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_PREDICTION_WEIGHT_TABLE_GENERATED_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_PREDICTION_WEIGHT_TABLE_GENERATED_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        row_unaligned_slice: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_ROW_UNALIGNED_SLICE_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_ROW_UNALIGNED_SLICE_SEGMENT_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        different_slice_type: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_DIFFERENT_SLICE_TYPE_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_DIFFERENT_SLICE_SEGMENT_TYPE_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        b_frame_in_l0_list: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L0_LIST_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        b_frame_in_l1_list: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_B_FRAME_IN_L1_LIST_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_B_FRAME_IN_L1_LIST_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        per_pict_type_min_max_qp: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_PER_PICTURE_TYPE_MIN_MAX_QP_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_PER_PICTURE_TYPE_MIN_MAX_QP_BIT_KHR));
     av_log(avctx, AV_LOG_VERBOSE, "        per_slice_constant_qp: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_PER_SLICE_CONSTANT_QP_BIT_KHR));
-    av_log(avctx, AV_LOG_VERBOSE, "        generate_prefix_nalu: %i\n",
-           !!(enc->caps.flags & VK_VIDEO_ENCODE_H264_CAPABILITY_GENERATE_PREFIX_NALU_BIT_KHR));
+           !!(enc->caps.flags & VK_VIDEO_ENCODE_H265_CAPABILITY_PER_SLICE_SEGMENT_CONSTANT_QP_BIT_KHR));
 
     av_log(avctx, AV_LOG_VERBOSE, "    Capabilities:\n");
     av_log(avctx, AV_LOG_VERBOSE, "        maxLevelIdc: %i\n",

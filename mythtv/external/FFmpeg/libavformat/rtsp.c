@@ -612,7 +612,8 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
                              NULL, NULL, 0, p);
                 if (proto[0] == '\0') {
                     /* relative control URL */
-                    if (rtsp_st->control_url[strlen(rtsp_st->control_url)-1]!='/')
+                    size_t len = strlen(rtsp_st->control_url);
+                    if (len == 0 || rtsp_st->control_url[len - 1] != '/')
                         av_strlcat(rtsp_st->control_url, "/",
                                    sizeof(rtsp_st->control_url));
                     av_strlcat(rtsp_st->control_url, p,
@@ -1867,6 +1868,32 @@ void ff_rtsp_close_connections(AVFormatContext *s)
     ffurl_closep(&rt->rtsp_hd);
 }
 
+static int rtsp_url_same_origin(const char *url1, const char *url2)
+{
+    char proto1[128], proto2[128];
+    char host1[1024], host2[1024];
+    int port1, port2;
+
+    av_url_split(proto1, sizeof(proto1), NULL, 0, host1, sizeof(host1),
+                 &port1, NULL, 0, url1);
+    av_url_split(proto2, sizeof(proto2), NULL, 0, host2, sizeof(host2),
+                 &port2, NULL, 0, url2);
+
+    if (!proto1[0] || !proto2[0] || !host1[0] || !host2[0])
+        return 0;
+
+    if (port1 < 0)
+        port1 = !av_strcasecmp(proto1, "rtsps") ? RTSPS_DEFAULT_PORT
+                                                : RTSP_DEFAULT_PORT;
+    if (port2 < 0)
+        port2 = !av_strcasecmp(proto2, "rtsps") ? RTSPS_DEFAULT_PORT
+                                                : RTSP_DEFAULT_PORT;
+
+    return !av_strcasecmp(proto1, proto2) &&
+           !av_strcasecmp(host1, host2) &&
+           port1 == port2;
+}
+
 int ff_rtsp_connect(AVFormatContext *s)
 {
     RTSPState *rt = s->priv_data;
@@ -2180,7 +2207,13 @@ redirect:
     ff_rtsp_close_streams(s);
     ff_rtsp_close_connections(s);
     if (reply->status_code >=300 && reply->status_code < 400 && s->iformat) {
-        int ret = ff_format_check_set_url(s, reply->location);
+        int ret;
+
+        if (!rtsp_url_same_origin(s->url, reply->location)) {
+            memset(rt->auth, 0, sizeof(rt->auth));
+            memset(&rt->auth_state, 0, sizeof(rt->auth_state));
+        }
+        ret = ff_format_check_set_url(s, reply->location);
         if (ret < 0) {
             err = ret;
             goto fail2;

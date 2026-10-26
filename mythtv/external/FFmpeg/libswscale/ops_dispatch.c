@@ -19,17 +19,28 @@
  */
 
 #include "libavutil/avassert.h"
+#include "libavutil/cpu.h"
+#include "libavutil/mathematics.h"
 #include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
+#include "libavutil/refstruct.h"
 
 #include "ops.h"
 #include "ops_internal.h"
 #include "ops_dispatch.h"
+#include "swscale_internal.h"
+
+#define RET(x)                                                                 \
+    do {                                                                       \
+        if ((ret = (x)) < 0)                                                   \
+            goto fail;                                                         \
+    } while (0)
 
 typedef struct SwsOpPass {
     SwsCompiledOp comp;
     SwsOpExec exec_base;
-    int num_blocks;
+    SwsOpExec exec_tail;
+    size_t num_blocks;
     int tail_off_in;
     int tail_off_out;
     int tail_size_in;
@@ -40,12 +51,19 @@ typedef struct SwsOpPass {
     int pixel_bits_out;
     int idx_in[4];
     int idx_out[4];
-    bool memcpy_in;
+    int palette_idx;
+    int *offsets_y;
+    int filter_size_h;
+    bool memcpy_first;
+    bool memcpy_last;
     bool memcpy_out;
+    size_t tail_blocks;
+    uint8_t *tail_buf; /* extra memory for fixing unpadded tails */
+    unsigned int tail_buf_size;
 } SwsOpPass;
 
-int ff_sws_ops_compile_backend(SwsContext *ctx, const SwsOpBackend *backend,
-                               const SwsOpList *ops, SwsCompiledOp *out)
+static int compile_backend(SwsContext *ctx, const SwsOpBackend *backend,
+                           const SwsOpList *ops, SwsCompiledOp *out)
 {
     SwsOpList *copy;
     SwsCompiledOp compiled = {0};
@@ -63,34 +81,56 @@ int ff_sws_ops_compile_backend(SwsContext *ctx, const SwsOpBackend *backend,
         int msg_lev = ret == AVERROR(ENOTSUP) ? AV_LOG_TRACE : AV_LOG_ERROR;
         av_log(ctx, msg_lev, "Backend '%s' failed to compile operations: %s\n",
                backend->name, av_err2str(ret));
-    } else {
-        *out = compiled;
+        goto fail;
     }
 
+    compiled.backend = backend;
+    *out = compiled;
+
+    av_log(ctx, AV_LOG_VERBOSE, "Compiled using backend '%s': "
+           "block size = %d, over-read = {%d %d %d %d}, over-write = {%d %d %d %d}, "
+           "cpu flags = 0x%x\n", backend->name, out->block_size,
+           out->over_read[0], out->over_read[1],
+           out->over_read[2], out->over_read[3],
+           out->over_write[0], out->over_write[1],
+           out->over_write[2], out->over_write[3],
+           out->cpu_flags);
+
+    ff_sws_op_list_print(ctx, AV_LOG_VERBOSE, AV_LOG_TRACE, ops);
+
+fail:
     ff_sws_op_list_free(&copy);
     return ret;
 }
 
-int ff_sws_ops_compile(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out)
+int ff_sws_ops_compile(SwsContext *ctx, const SwsOpBackend *backend,
+                       const SwsOpList *ops, SwsCompiledOp *out)
 {
+    if (backend)
+        return compile_backend(ctx, backend, ops, out);
+
+    const SwsBackend enabled = ff_sws_enabled_backends(ctx);
     for (int n = 0; ff_sws_op_backends[n]; n++) {
         const SwsOpBackend *backend = ff_sws_op_backends[n];
         if (ops->src.hw_format != backend->hw_format ||
-            ops->dst.hw_format != backend->hw_format)
+            ops->dst.hw_format != backend->hw_format ||
+            !(enabled & backend->flags))
             continue;
-        if (ff_sws_ops_compile_backend(ctx, backend, ops, out) < 0)
+        if (compile_backend(ctx, backend, ops, out) < 0)
             continue;
 
-        av_log(ctx, AV_LOG_VERBOSE, "Compiled using backend '%s': "
-               "block size = %d, over-read = %d, over-write = %d, cpu flags = 0x%x\n",
-               backend->name, out->block_size, out->over_read, out->over_write,
-               out->cpu_flags);
         return 0;
     }
 
-    av_log(ctx, AV_LOG_WARNING, "No backend found for operations:\n");
-    ff_sws_op_list_print(ctx, AV_LOG_WARNING, AV_LOG_TRACE, ops);
     return AVERROR(ENOTSUP);
+}
+
+void ff_sws_compiled_op_unref(SwsCompiledOp *comp)
+{
+    if (comp->free)
+        comp->free(comp->priv);
+
+    *comp = (SwsCompiledOp) {0};
 }
 
 static void op_pass_free(void *ptr)
@@ -99,153 +139,239 @@ static void op_pass_free(void *ptr)
     if (!p)
         return;
 
-    if (p->comp.free)
-        p->comp.free(p->comp.priv);
-
+    ff_sws_compiled_op_unref(&p->comp);
+    av_refstruct_unref(&p->offsets_y);
+    av_free(p->exec_base.in_bump_y);
+    av_free(p->exec_base.in_offset_x);
+    av_free(p->tail_buf);
     av_free(p);
 }
 
-static inline void get_row_data(const SwsOpPass *p, const int y,
+static inline void get_row_data(const SwsOpPass *p, const int y_dst,
                                 const uint8_t *in[4], uint8_t *out[4])
 {
     const SwsOpExec *base = &p->exec_base;
+    const int y_src = p->offsets_y ? p->offsets_y[y_dst] : y_dst;
     for (int i = 0; i < p->planes_in; i++)
-        in[i] = base->in[i] + (y >> base->in_sub_y[i]) * base->in_stride[i];
+        in[i] = base->in[i] + (y_src >> base->in_sub_y[i]) * base->in_stride[i];
     for (int i = 0; i < p->planes_out; i++)
-        out[i] = base->out[i] + (y >> base->out_sub_y[i]) * base->out_stride[i];
+        out[i] = base->out[i] + (y_dst >> base->out_sub_y[i]) * base->out_stride[i];
 }
 
-static void op_pass_setup(const SwsFrame *out, const SwsFrame *in,
-                          const SwsPass *pass)
+static inline int get_lines_in(const SwsOpPass *p, const int y, const int h,
+                               const int plane)
+{
+    const SwsOpExec *base = &p->exec_base;
+    if (!p->offsets_y)
+        return h >> base->in_sub_y[plane];
+
+    const int y0 = p->offsets_y[y] >> base->in_sub_y[plane];
+    const int y1 = p->offsets_y[y + h - 1] >> base->in_sub_y[plane];
+    return y1 - y0 + 1;
+}
+
+static inline size_t pixel_bytes(size_t pixels, int pixel_bits,
+                                 enum AVRounding rounding)
+{
+    const uint64_t bits = (uint64_t) pixels * pixel_bits;
+    switch (rounding) {
+    case AV_ROUND_ZERO:
+    case AV_ROUND_DOWN:
+        return bits >> 3;
+    case AV_ROUND_INF:
+    case AV_ROUND_UP:
+        return (bits + 7) >> 3;
+    default:
+        av_unreachable("Invalid rounding mode");
+        return (size_t) -1;
+    }
+}
+
+static size_t safe_bytes_pad(int linesize, int plane_pad)
+{
+    av_assert1(linesize);
+    int64_t safe_bytes = FFABS((int64_t) linesize) - plane_pad;
+    return FFMAX(safe_bytes, 0);
+}
+
+static size_t safe_blocks_offset(size_t num_blocks, unsigned block_size,
+                                 ptrdiff_t safe_offset,
+                                 const int32_t *offset_bytes)
+{
+    size_t safe_blocks = num_blocks;
+    while (safe_blocks && offset_bytes[safe_blocks * block_size - 1] > safe_offset)
+        safe_blocks--;
+    return safe_blocks;
+}
+
+static int op_pass_setup(const SwsFrame *out, const SwsFrame *in,
+                         const SwsPass *pass)
 {
     const AVPixFmtDescriptor *indesc  = av_pix_fmt_desc_get(in->format);
-    const AVPixFmtDescriptor *outdesc = av_pix_fmt_desc_get(out->format);
+    const bool float_in = indesc->flags & AV_PIX_FMT_FLAG_FLOAT;
+    const int width = out->width;
 
     SwsOpPass *p = pass->priv;
     SwsOpExec *exec = &p->exec_base;
     const SwsCompiledOp *comp = &p->comp;
-    const int block_size = comp->block_size;
-    p->num_blocks = (pass->width + block_size - 1) / block_size;
 
     /* Set up main loop parameters */
-    const int aligned_w  = p->num_blocks * block_size;
-    const int safe_width = (p->num_blocks - 1) * block_size;
-    const int tail_size  = pass->width - safe_width;
-    p->tail_off_in   = safe_width * p->pixel_bits_in  >> 3;
-    p->tail_off_out  = safe_width * p->pixel_bits_out >> 3;
-    p->tail_size_in  = tail_size  * p->pixel_bits_in  >> 3;
-    p->tail_size_out = tail_size  * p->pixel_bits_out >> 3;
-    p->memcpy_in     = false;
-    p->memcpy_out    = false;
+    const unsigned block_size = comp->block_size;
+    const size_t num_blocks   = (width + block_size - 1) / block_size;
+    const size_t aligned_w    = num_blocks * block_size;
+    if (aligned_w < width) /* overflow */
+        return AVERROR(EINVAL);
+    p->num_blocks   = num_blocks;
+    p->memcpy_first = false;
+    p->memcpy_last  = false;
+    p->memcpy_out   = false;
 
+    size_t safe_blocks = num_blocks;
     for (int i = 0; i < p->planes_in; i++) {
-        const int idx        = p->idx_in[i];
-        const int chroma     = idx == 1 || idx == 2;
-        const int sub_x      = chroma ? indesc->log2_chroma_w : 0;
-        const int sub_y      = chroma ? indesc->log2_chroma_h : 0;
-        const int plane_w    = (aligned_w + sub_x) >> sub_x;
-        const int plane_pad  = (comp->over_read + sub_x) >> sub_x;
-        const int plane_size = plane_w * p->pixel_bits_in >> 3;
-        if (comp->slice_align)
-            p->memcpy_in |= plane_size + plane_pad > in->linesize[idx];
+        const int idx = p->idx_in[i];
+        size_t input_bytes = in->linesize[idx];
+        if (p->filter_size_h && float_in) {
+            /* Floating point inputs may contain NaN / Infinity in the padding */
+            const int plane_w = AV_CEIL_RSHIFT(in->width, exec->in_sub_x[i]);
+            input_bytes = pixel_bytes(plane_w, p->pixel_bits_in, AV_ROUND_UP);
+        }
+
+        size_t safe_bytes = safe_bytes_pad(input_bytes, comp->over_read[i]);
+        size_t safe_blocks_in;
+        if (exec->in_offset_x) {
+            size_t filter_size = pixel_bytes(p->filter_size_h, p->pixel_bits_in,
+                                             AV_ROUND_UP);
+            safe_blocks_in = safe_blocks_offset(num_blocks, block_size,
+                                                safe_bytes - filter_size,
+                                                exec->in_offset_x);
+        } else {
+            safe_blocks_in = safe_bytes / exec->block_size_in[i];
+        }
+
+        if (safe_blocks_in < num_blocks) {
+            p->memcpy_first |= in->linesize[idx] < 0;
+            p->memcpy_last  |= in->linesize[idx] > 0;
+            safe_blocks = FFMIN(safe_blocks, safe_blocks_in);
+        }
+
+        size_t loop_size   = num_blocks * exec->block_size_in[i];
         exec->in[i]        = in->data[idx];
         exec->in_stride[i] = in->linesize[idx];
-        exec->in_sub_y[i]  = sub_y;
-        exec->in_sub_x[i]  = sub_x;
+        exec->in_bump[i]   = in->linesize[idx] - loop_size;
     }
 
     for (int i = 0; i < p->planes_out; i++) {
-        const int idx        = p->idx_out[i];
-        const int chroma     = idx == 1 || idx == 2;
-        const int sub_x      = chroma ? outdesc->log2_chroma_w : 0;
-        const int sub_y      = chroma ? outdesc->log2_chroma_h : 0;
-        const int plane_w    = (aligned_w + sub_x) >> sub_x;
-        const int plane_pad  = (comp->over_write + sub_x) >> sub_x;
-        const int plane_size = plane_w * p->pixel_bits_out >> 3;
-        if (comp->slice_align)
-            p->memcpy_out |= plane_size + plane_pad > out->linesize[idx];
+        const int idx = p->idx_out[i];
+        size_t safe_bytes = safe_bytes_pad(out->linesize[idx], comp->over_write[i]);
+        size_t safe_blocks_out = safe_bytes / exec->block_size_out[i];
+        if (safe_blocks_out < num_blocks) {
+            p->memcpy_out = true;
+            safe_blocks   = FFMIN(safe_blocks, safe_blocks_out);
+        }
+
+        size_t loop_size    = num_blocks * exec->block_size_out[i];
         exec->out[i]        = out->data[idx];
         exec->out_stride[i] = out->linesize[idx];
-        exec->out_sub_y[i]  = sub_y;
-        exec->out_sub_x[i]  = sub_x;
+        exec->out_bump[i]   = out->linesize[idx] - loop_size;
     }
 
-    /* Pre-fill pointer bump for the main section only; this value does not
-     * matter at all for the tail / last row handlers because they only ever
-     * process a single line */
-    const int blocks_main = p->num_blocks - p->memcpy_out;
-    for (int i = 0; i < 4; i++) {
-        exec->in_bump[i]  = exec->in_stride[i]  - blocks_main * exec->block_size_in;
-        exec->out_bump[i] = exec->out_stride[i] - blocks_main * exec->block_size_out;
+    if (p->palette_idx >= 0) {
+        exec->in[1] = in->data[p->palette_idx];
+        exec->in_stride[1] = exec->in_bump[1] = 0;
     }
 
-    exec->in_frame  = in;
-    exec->out_frame = out;
+    const bool memcpy_in = p->memcpy_first || p->memcpy_last;
+    if (!memcpy_in && !p->memcpy_out) {
+        av_assert0(safe_blocks == num_blocks);
+        return 0;
+    }
+
+    /* Set-up tail section parameters and buffers */
+    SwsOpExec *tail = &p->exec_tail;
+    const int align = av_cpu_max_align();
+    size_t alloc_size = 0;
+    *tail = *exec;
+
+    const size_t safe_width = safe_blocks * block_size;
+    const size_t tail_size  = width - safe_width;
+    p->tail_off_out  = pixel_bytes(safe_width, p->pixel_bits_out, AV_ROUND_DOWN);
+    p->tail_size_out = pixel_bytes(tail_size,  p->pixel_bits_out, AV_ROUND_UP);
+    p->tail_blocks   = num_blocks - safe_blocks;
+
+    if (exec->in_offset_x) {
+        p->tail_off_in  = exec->in_offset_x[safe_width];
+        p->tail_size_in = exec->in_offset_x[width - 1] - p->tail_off_in;
+        p->tail_size_in += pixel_bytes(p->filter_size_h, p->pixel_bits_in, AV_ROUND_UP);
+    } else {
+        p->tail_off_in  = pixel_bytes(safe_width, p->pixel_bits_in, AV_ROUND_DOWN);
+        p->tail_size_in = pixel_bytes(tail_size,  p->pixel_bits_in, AV_ROUND_UP);
+    }
+
+    const size_t alloc_width = aligned_w - safe_width;
+    for (int i = 0; memcpy_in && i < p->planes_in; i++) {
+        size_t needed_size;
+        if (exec->in_offset_x) {
+            /* The input offset map is already padded to multiples of the block
+             * size, and clamps the input offsets to the image boundaries; so
+             * we just need to compensate for the comp->over_read */
+            needed_size = p->tail_size_in;
+        } else {
+            needed_size = pixel_bytes(alloc_width, p->pixel_bits_in, AV_ROUND_UP);
+        }
+        size_t loop_size   = p->tail_blocks * exec->block_size_in[i];
+        tail->in_stride[i] = FFALIGN(needed_size + comp->over_read[i], align);
+        tail->in_bump[i]   = tail->in_stride[i] - loop_size;
+        alloc_size += tail->in_stride[i] * in->height;
+    }
+
+    for (int i = 0; p->memcpy_out && i < p->planes_out; i++) {
+        size_t needed_size  = pixel_bytes(alloc_width, p->pixel_bits_out, AV_ROUND_UP);
+        size_t loop_size    = p->tail_blocks * exec->block_size_out[i];
+        tail->out_stride[i] = FFALIGN(needed_size + comp->over_write[i], align);
+        tail->out_bump[i]   = tail->out_stride[i] - loop_size;
+        alloc_size += tail->out_stride[i] * out->height;
+    }
+
+    if (memcpy_in && exec->in_offset_x) {
+        /* `in_offset_x` is indexed relative to the line start, not the start
+         * of the section being processed; so we need to over-allocate this
+         * array to the full width of the image, even though we will only
+         * partially fill in the offsets relevant to the tail region */
+        alloc_size += aligned_w * sizeof(*exec->in_offset_x);
+    }
+
+    av_fast_mallocz(&p->tail_buf, &p->tail_buf_size, alloc_size);
+    if (!p->tail_buf)
+        return AVERROR(ENOMEM);
+
+    uint8_t *tail_buf = p->tail_buf;
+    for (int i = 0; memcpy_in && i < p->planes_in; i++) {
+        tail->in[i] = tail_buf;
+        tail_buf += tail->in_stride[i] * in->height;
+    }
+
+    for (int i = 0; p->memcpy_out && i < p->planes_out; i++) {
+        tail->out[i] = tail_buf;
+        tail_buf += tail->out_stride[i] * out->height;
+    }
+
+    if (memcpy_in && exec->in_offset_x) {
+        tail->in_offset_x = (int32_t *) tail_buf;
+        for (int i = safe_width; i < aligned_w; i++)
+            tail->in_offset_x[i] = exec->in_offset_x[i] - p->tail_off_in;
+    }
+
+    return 0;
 }
 
-/* Dispatch kernel over the last column of the image using memcpy */
-static av_always_inline void
-handle_tail(const SwsOpPass *p, SwsOpExec *exec,
-            const bool copy_out, const bool copy_in,
-            int y, const int h)
+static void copy_lines(uint8_t *dst, const size_t dst_stride,
+                       const uint8_t *src, const size_t src_stride,
+                       const int h, const size_t bytes)
 {
-    DECLARE_ALIGNED_64(uint8_t, tmp)[2][4][sizeof(uint32_t[128])];
-
-    const SwsOpExec *base = &p->exec_base;
-    const SwsCompiledOp *comp = &p->comp;
-    const int tail_size_in  = p->tail_size_in;
-    const int tail_size_out = p->tail_size_out;
-    const int bx = p->num_blocks - 1;
-
-    const uint8_t *in_data[4];
-    uint8_t *out_data[4];
-    get_row_data(p, y, in_data, out_data);
-
-    for (int i = 0; i < p->planes_in; i++) {
-        in_data[i] += p->tail_off_in;
-        if (copy_in) {
-            exec->in[i] = (void *) tmp[0][i];
-            exec->in_stride[i] = sizeof(tmp[0][i]);
-        } else {
-            exec->in[i] = in_data[i];
-        }
-    }
-
-    for (int i = 0; i < p->planes_out; i++) {
-        out_data[i] += p->tail_off_out;
-        if (copy_out) {
-            exec->out[i] = (void *) tmp[1][i];
-            exec->out_stride[i] = sizeof(tmp[1][i]);
-        } else {
-            exec->out[i] = out_data[i];
-        }
-    }
-
-    for (int y_end = y + h; y < y_end; y++) {
-        if (copy_in) {
-            for (int i = 0; i < p->planes_in; i++) {
-                av_assert2(tmp[0][i] + tail_size_in < (uint8_t *) tmp[1]);
-                memcpy(tmp[0][i], in_data[i], tail_size_in);
-                in_data[i] += base->in_stride[i]; /* exec->in_stride was clobbered */
-            }
-        }
-
-        comp->func(exec, comp->priv, bx, y, p->num_blocks, y + 1);
-
-        if (copy_out) {
-            for (int i = 0; i < p->planes_out; i++) {
-                av_assert2(tmp[1][i] + tail_size_out < (uint8_t *) tmp[2]);
-                memcpy(out_data[i], tmp[1][i], tail_size_out);
-                out_data[i] += base->out_stride[i];
-            }
-        }
-
-        for (int i = 0; i < 4; i++) {
-            if (!copy_in && exec->in[i])
-                exec->in[i] += exec->in_stride[i];
-            if (!copy_out && exec->out[i])
-                exec->out[i] += exec->out_stride[i];
-        }
+    for (int y = 0; y < h; y++) {
+        memcpy(dst, src, bytes);
+        dst += dst_stride;
+        src += src_stride;
     }
 }
 
@@ -265,97 +391,281 @@ static void op_pass_run(const SwsFrame *out, const SwsFrame *in, const int y,
      *
      * 1. We can overread the input, unless this is the last line of an
      *    unpadded buffer. All defined operations can handle arbitrary pixel
-     *    input, so overread of arbitrary data is fine.
+     *    input, so overread of arbitrary data is fine. For flipped images,
+     *    this condition is actually *inverted* to where the first line is
+     *    the one at the end of the buffer.
      *
      * 2. We can overwrite the output, as long as we don't write more than the
      *    amount of pixels that fit into one linesize. So we always need to
      *    memcpy the last column on the output side if unpadded.
-     *
-     * 3. For the last row, we also need to memcpy the remainder of the input,
-     *    to avoid reading past the end of the buffer. Note that since we know
-     *    the run() function is called on stripes of the same buffer, we don't
-     *    need to worry about this for the end of a slice.
      */
 
-    const int last_slice  = y + h == pass->height;
-    const bool memcpy_in  = last_slice && p->memcpy_in;
+    const bool memcpy_in  = p->memcpy_last && y + h == pass->lines ||
+                            p->memcpy_first && y == 0;
     const bool memcpy_out = p->memcpy_out;
-    const int num_blocks  = p->num_blocks;
-    const int blocks_main = num_blocks - memcpy_out;
-    const int h_main      = h - memcpy_in;
+    const size_t num_blocks  = p->num_blocks;
+    const size_t tail_blocks = p->tail_blocks;
 
-    /* Handle main section */
     get_row_data(p, y, exec.in, exec.out);
-    comp->func(&exec, comp->priv, 0, y, blocks_main, y + h_main);
-
-    if (memcpy_in) {
-        /* Safe part of last row */
-        get_row_data(p, y + h_main, exec.in, exec.out);
-        comp->func(&exec, comp->priv, 0, y + h_main, num_blocks - 1, y + h);
+    if (!memcpy_in && !memcpy_out) {
+        /* Fast path (fully aligned/padded inputs and outputs) */
+        comp->func(&exec, comp->priv, 0, y, num_blocks, y + h);
+        return;
     }
 
-    /* Handle last column via memcpy, takes over `exec` so call these last */
-    if (memcpy_out)
-        handle_tail(p, &exec, true, false, y, h_main);
-    if (memcpy_in)
-        handle_tail(p, &exec, memcpy_out, true, y + h_main, 1);
+    /* Non-aligned case (slow path); process main blocks as normal, and
+     * a separate tail (via memcpy into an appropriately padded buffer) */
+    if (num_blocks > tail_blocks) {
+        for (int i = 0; i < 4; i++) {
+            /* We process fewer blocks, so the in_bump needs to be increased
+             * to reflect that the plane pointers are left on the last block,
+             * not the end of the processed line, after each loop iteration */
+            exec.in_bump[i]  += exec.block_size_in[i]  * tail_blocks;
+            exec.out_bump[i] += exec.block_size_out[i] * tail_blocks;
+        }
+
+        comp->func(&exec, comp->priv, 0, y, num_blocks - tail_blocks, y + h);
+    }
+
+    DECLARE_ALIGNED_32(SwsOpExec, tail) = p->exec_tail;
+    tail.slice_y = y;
+    tail.slice_h = h;
+
+    for (int i = 0; i < p->planes_in; i++) {
+        /* Input offsets are relative to the base pointer */
+        if (!exec.in_offset_x || memcpy_in)
+            exec.in[i] += p->tail_off_in;
+        tail.in[i] += y * tail.in_stride[i];
+    }
+    for (int i = 0; i < p->planes_out; i++) {
+        exec.out[i] += p->tail_off_out;
+        tail.out[i] += y * tail.out_stride[i];
+    }
+
+    for (int i = 0; i < p->planes_in; i++) {
+        if (memcpy_in) {
+            const int lines = get_lines_in(p, y, h, i);
+            copy_lines((uint8_t *) tail.in[i], tail.in_stride[i],
+                       exec.in[i], exec.in_stride[i], lines, p->tail_size_in);
+        } else {
+            /* Reuse input pointers directly */
+            const size_t loop_size = tail_blocks * exec.block_size_in[i];
+            tail.in[i]        = exec.in[i];
+            tail.in_stride[i] = exec.in_stride[i];
+            tail.in_bump[i]   = exec.in_stride[i] - loop_size;
+        }
+    }
+
+    for (int i = 0; !memcpy_out && i < p->planes_out; i++) {
+        /* Reuse output pointers directly */
+        const size_t loop_size = tail_blocks * exec.block_size_out[i];
+        tail.out[i]        = exec.out[i];
+        tail.out_stride[i] = exec.out_stride[i];
+        tail.out_bump[i]   = exec.out_stride[i] - loop_size;
+    }
+
+    /* Dispatch kernel over tail */
+    av_assert1(tail_blocks > 0);
+    comp->func(&tail, comp->priv, num_blocks - tail_blocks, y, num_blocks, y + h);
+
+    for (int i = 0; memcpy_out && i < p->planes_out; i++) {
+        const int lines = h >> tail.out_sub_y[i];
+        copy_lines(exec.out[i], exec.out_stride[i],
+                   tail.out[i], tail.out_stride[i], lines, p->tail_size_out);
+    }
 }
 
-static int rw_planes(const SwsOp *op)
+static int rw_data_planes(const SwsOp *op)
 {
-    return op->rw.packed ? 1 : op->rw.elems;
+    /* Exclude the palette plane from the plane count, since it does not need
+     * to be directly processed/adjusted by the dispatch layer */
+    return op->rw.mode == SWS_RW_PALETTE ? 1 : ff_sws_rw_op_planes(op);
 }
 
 static int rw_pixel_bits(const SwsOp *op)
 {
-    const int elems = op->rw.packed ? op->rw.elems : 1;
+    if (op->rw.mode == SWS_RW_PALETTE)
+        return 8; /* index size */
+
+    int elems = 0;
+    switch (op->rw.mode) {
+    case SWS_RW_PLANAR: elems = 1; break;
+    case SWS_RW_PACKED: elems = op->rw.elems; break;
+    }
+
     const int size  = ff_sws_pixel_type_size(op->type);
     const int bits  = 8 >> op->rw.frac;
     av_assert1(bits >= 1);
     return elems * size * bits;
 }
 
-static int compile(SwsGraph *graph, const SwsOpList *ops,
-                   const SwsFormat *dst, SwsPass *input, SwsPass **output)
+static void align_pass(SwsPass *pass, int block_size, const int *over_rw,
+                       int pixel_bits)
 {
+    if (!pass || pixel_bits <= 0)
+        return;
+
+    /* Add at least as many pixels as needed to cover the padding requirement */
+    int pad_max = 0;
+    for (int i = 0; i < 4; i++) {
+        const int pad = (over_rw[i] * 8 + pixel_bits - 1) / pixel_bits;
+        pad_max = FFMAX(pad_max, pad);
+    }
+
+    SwsPassBuffer *buf = pass->output;
+    buf->width_align = FFMAX(buf->width_align, block_size);
+    buf->width_pad = FFMAX(buf->width_pad, pad_max);
+}
+
+/* Unchanging part of parameter list */
+typedef struct CompileArgs {
+    const SwsOpBackend *backend;
+    SwsGraph *graph;
+    int flags;
+} CompileArgs;
+
+static int compile_single(const CompileArgs *args, const SwsOpList *ops,
+                          SwsPass *link, SwsPass *input, SwsPass **output)
+{
+    SwsGraph *graph = args->graph;
     SwsContext *ctx = graph->ctx;
     SwsOpPass *p = av_mallocz(sizeof(*p));
     if (!p)
         return AVERROR(ENOMEM);
 
-    int ret = ff_sws_ops_compile(ctx, ops, &p->comp);
+    int ret = ff_sws_ops_compile(ctx, args->backend, ops, &p->comp);
     if (ret < 0)
         goto fail;
+    else if (args->flags & SWS_OP_FLAG_DRY_RUN)
+        goto fail; /* nothing to do, just return */
 
-    const SwsOp *read  = ff_sws_op_list_input(ops);
+    const SwsCompiledOp *comp = &p->comp;
+    const SwsFormat *src = &ops->src;
+    const SwsFormat *dst = &ops->dst;
+    av_assert0(!link || link->format == dst->format);
+    if (p->comp.opaque) {
+        SwsCompiledOp c = *comp;
+        av_free(p);
+        ret = ff_sws_graph_add_pass(graph, dst->format, dst->width, dst->height,
+                                    input, 0, c.slice_align, c.func_opaque,
+                                    NULL, c.priv, c.free, output);
+        if (ret >= 0) {
+            (*output)->backend = c.backend->flags;
+            ff_sws_pass_link_output(*output, link);
+        }
+        return ret;
+    }
+
+    const AVPixFmtDescriptor *indesc  = av_pix_fmt_desc_get(src->format);
+    const AVPixFmtDescriptor *outdesc = av_pix_fmt_desc_get(dst->format);
     const SwsOp *write = ff_sws_op_list_output(ops);
-    p->planes_in  = rw_planes(read);
-    p->planes_out = rw_planes(write);
-    p->pixel_bits_in  = rw_pixel_bits(read);
+    p->planes_out     = rw_data_planes(write);
     p->pixel_bits_out = rw_pixel_bits(write);
+    p->palette_idx    = -1;
     p->exec_base = (SwsOpExec) {
         .width  = dst->width,
         .height = dst->height,
-        .block_size_in  = p->comp.block_size * p->pixel_bits_in  >> 3,
-        .block_size_out = p->comp.block_size * p->pixel_bits_out >> 3,
     };
 
-    for (int i = 0; i < 4; i++) {
-        p->idx_in[i]  = i < p->planes_in  ? ops->order_src.in[i] : -1;
-        p->idx_out[i] = i < p->planes_out ? ops->order_dst.in[i] : -1;
+    const SwsOp *read = ff_sws_op_list_input(ops);
+    if (read) {
+        p->planes_in     = rw_data_planes(read);
+        p->pixel_bits_in = rw_pixel_bits(read);
+        if (read->rw.mode == SWS_RW_PALETTE)
+            p->palette_idx = ops->plane_src[1];
     }
 
-    SwsPass *pass;
-    ret = ff_sws_graph_add_pass(graph, dst->format, dst->width, dst->height,
-                                input, p->comp.slice_align, p, op_pass_run,
-                                &pass);
-    if (ret < 0)
+    const int64_t block_bits_in  = (int64_t) comp->block_size * p->pixel_bits_in;
+    const int64_t block_bits_out = (int64_t) comp->block_size * p->pixel_bits_out;
+    if (block_bits_in & 0x7 || block_bits_out & 0x7) {
+        av_log(ctx, AV_LOG_ERROR, "Block size must be byte-aligned.\n");
+        ret = AVERROR(EINVAL);
         goto fail;
+    }
 
-    pass->setup = op_pass_setup;
-    pass->free  = op_pass_free;
+    for (int i = 0; i < 4; i++)
+        p->idx_in[i] = p->idx_out[i] = -1;
 
-    *output = pass;
+    for (int i = 0; i < p->planes_in; i++) {
+        const int idx = ops->plane_src[i];
+        const int chroma = idx == 1 || idx == 2;
+        const int sub_x = chroma ? indesc->log2_chroma_w : 0;
+        const int sub_y = chroma ? indesc->log2_chroma_h : 0;
+        p->exec_base.in_sub_x[i] = sub_x;
+        p->exec_base.in_sub_y[i] = sub_y;
+        p->exec_base.block_size_in[i] = block_bits_in >> 3;
+        p->idx_in[i] = idx;
+    }
+
+    for (int i = 0; i < p->planes_out; i++) {
+        const int idx = ops->plane_dst[i];
+        const int chroma = idx == 1 || idx == 2;
+        const int sub_x = chroma ? outdesc->log2_chroma_w : 0;
+        const int sub_y = chroma ? outdesc->log2_chroma_h : 0;
+        p->exec_base.out_sub_x[i] = sub_x;
+        p->exec_base.out_sub_y[i] = sub_y;
+        p->exec_base.block_size_out[i] = block_bits_out >> 3;
+        p->idx_out[i] = idx;
+    }
+
+    const SwsFilterWeights *filter = read ? read->rw.filter.kernel : NULL;
+    if (read && read->rw.filter.op == SWS_OP_FILTER_V) {
+        p->offsets_y = av_refstruct_ref(filter->offsets);
+
+        /* Compute relative pointer bumps for each output line */
+        int32_t *bump = av_malloc_array(filter->dst_size, sizeof(*bump));
+        if (!bump) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+
+        int line = filter->offsets[0];
+        for (int y = 0; y < filter->dst_size - 1; y++) {
+            int next = filter->offsets[y + 1];
+            bump[y] = next - line - 1;
+            line = next;
+        }
+        bump[filter->dst_size - 1] = 0;
+        p->exec_base.in_bump_y = bump;
+    } else if (read && read->rw.filter.op == SWS_OP_FILTER_H) {
+        /* Compute pixel offset map for each output line */
+        const int pixels = FFALIGN(filter->dst_size, p->comp.block_size);
+        int32_t *offset = av_malloc_array(pixels, sizeof(*offset));
+        if (!offset) {
+            ret = AVERROR(ENOMEM);
+            goto fail;
+        }
+        p->exec_base.in_offset_x = offset;
+
+        for (int x = 0; x < filter->dst_size; x++) {
+            /* Sanity check; if the tap would land on a half-pixel, we cannot
+             * reasonably expect the implementation to know about this. Just
+             * error out in such (theoretical) cases. */
+            int64_t bits = (int64_t) filter->offsets[x] * p->pixel_bits_in;
+            if ((bits & 0x7) || (bits >> 3) > INT32_MAX) {
+                ret = AVERROR(EINVAL);
+                goto fail;
+            }
+            offset[x] = bits >> 3;
+        }
+        for (int x = filter->dst_size; x < pixels; x++)
+            offset[x] = offset[filter->dst_size - 1];
+        for (int i = 0; i < 4; i++)
+            p->exec_base.block_size_in[i] = 0; /* ptr does not advance */
+        p->filter_size_h = filter->filter_size;
+    }
+
+    ret = ff_sws_graph_add_pass(graph, dst->format, dst->width, dst->height,
+                                input, 0, comp->slice_align, op_pass_run,
+                                op_pass_setup, p, op_pass_free, output);
+    if (ret < 0)
+        return ret;
+
+    (*output)->backend = comp->backend->flags;
+    ff_sws_pass_link_output(*output, link);
+    align_pass(*output, comp->block_size, comp->over_write, p->pixel_bits_out);
+    if (read)
+        align_pass(input, comp->block_size, comp->over_read,  p->pixel_bits_in);
     return 0;
 
 fail:
@@ -363,33 +673,130 @@ fail:
     return ret;
 }
 
-int ff_sws_compile_pass(SwsGraph *graph, SwsOpList *ops, int flags,
-                        const SwsFormat *dst, SwsPass *input, SwsPass **output)
+/* Return a mask of all planes matching any flag in `flags` */
+static SwsCompMask plane_mask_flags(const SwsOp *op, SwsCompFlags flags)
 {
-    SwsContext *ctx = graph->ctx;
-    int ret;
-
-    /* Check if the whole operation graph is an end-to-end no-op */
-    if (ff_sws_op_list_is_noop(ops)) {
-        *output = input;
-        return 0;
+    SwsCompMask planes = 0;
+    for (int c = 0; c < 4; c++) {
+        if (op->comps.flags[c] & flags)
+            planes |= SWS_COMP(c);
     }
 
-    const SwsOp *read  = ff_sws_op_list_input(ops);
+    return planes;
+}
+
+/* Takes over ownership of *pops, even on failure */
+static int compile_subpass(const CompileArgs *args, SwsOpList **pops,
+                           SwsPass *link, SwsPass *input, SwsPass **output)
+{
+    int ret;
+    SwsContext *ctx = args->graph->ctx;
+    SwsOpList *ops  = *pops;
+    SwsOpList *rest = NULL;
+    SwsPass *tmp = NULL;
+    *pops = NULL;
+
+    if (args->flags & SWS_OP_FLAG_SPLIT_MEMCPY) {
+        /* Split off copied and constant planes into a separate subpass,
+         * since these are likely to be handled by the memcpy backend */
+        av_assert0(ops->num_ops >= 2);
+        const SwsOp *prev = &ops->ops[ops->num_ops - 2];
+        SwsCompMask planes = plane_mask_flags(prev, SWS_COMP_COPY | SWS_COMP_CONST);
+        RET(ff_sws_op_list_split_planes(ops, &rest, planes));
+        if (rest) {
+            /* Parallel split: share input and link all outputs together */
+            av_log(ctx, AV_LOG_DEBUG, "Splitting const/memcpy planes: %s\n",
+                   ff_sws_comp_mask_str(planes));
+            RET(compile_subpass(args, &ops,  link, input, &tmp));
+            RET(compile_subpass(args, &rest, tmp, input, output));
+            return 0;
+        }
+    }
+
+    ret = compile_single(args, ops, link, input, output);
+    if (ret != AVERROR(ENOTSUP))
+        goto fail; /* either success or a hard error */
+
+    /* Find any unresolved filter */
+    for (int idx = 1; idx < ops->num_ops - 1; idx++) {
+        const SwsOp *op = &ops->ops[idx];
+        if (op->op == SWS_OP_FILTER_H || op->op == SWS_OP_FILTER_V) {
+            RET(ff_sws_op_list_split_at(ops, &rest, idx));
+            if (ff_sws_op_list_is_noop(ops)) {
+                /* Prevent infinite recursion by avoiding splitting in a way
+                 * that does not meaningfully reduce the number of operations
+                 * performed in the second part. */
+                FFSWAP(SwsOpList *, ops, rest);
+                break;
+            }
+            /* Serial split: feed first pass into second */
+            RET(compile_subpass(args, &ops,  NULL, input, &tmp));
+            RET(compile_subpass(args, &rest, link, tmp, output));
+            return 0;
+        }
+    }
+
+    /* If we didn't find any more operations to eliminate, then this ops list
+     * is simply unsupported by any of the available backends */
+    av_log(ctx, AV_LOG_WARNING, "No backend found for operations:\n");
+    ff_sws_op_list_print(ctx, AV_LOG_WARNING, AV_LOG_TRACE, ops);
+    ret = AVERROR(ENOTSUP);
+
+fail:
+    ff_sws_op_list_free(&ops);
+    ff_sws_op_list_free(&rest);
+    return ret;
+}
+
+int ff_sws_compile_pass(SwsGraph *graph, const SwsOpBackend *backend,
+                        SwsOpList **pops, int flags, SwsPass *input,
+                        SwsPass **output)
+{
+    const int passes_orig = graph->num_passes;
+    SwsContext *ctx = graph->ctx;
+    SwsOpList *ops = *pops;
+    int ret = 0;
+
     const SwsOp *write = ff_sws_op_list_output(ops);
-    if (!read || !write) {
-        av_log(ctx, AV_LOG_ERROR, "First and last operations must be a read "
-               "and write, respectively.\n");
-        return AVERROR(EINVAL);
+    if (!write) {
+        av_log(ctx, AV_LOG_ERROR, "Last operation must be SWS_OP_WRITE.\n");
+        ret = AVERROR(EINVAL);
+        goto out;
     }
 
     if (flags & SWS_OP_FLAG_OPTIMIZE) {
         ret = ff_sws_op_list_optimize(ops);
         if (ret < 0)
-            return ret;
-    } else {
-        ff_sws_op_list_update_comps(ops);
+            goto out;
+        av_log(ctx, AV_LOG_DEBUG, "Operation list after optimizing:\n");
+        ff_sws_op_list_print(ctx, AV_LOG_DEBUG, AV_LOG_TRACE, ops);
     }
 
-    return compile(graph, ops, dst, input, output);
+    /* Check if the whole operation graph is an end-to-end no-op */
+    if (ff_sws_op_list_is_noop(ops)) {
+        if (output)
+            *output = input;
+        goto out;
+    }
+
+    const CompileArgs args = {
+        .backend = backend,
+        .graph   = graph,
+        .flags   = flags,
+    };
+
+    ret = compile_subpass(&args, &ops, NULL, input, output);
+    if (ret < 0)
+        goto out;
+
+    const int num_passes = graph->num_passes - passes_orig;
+    if (num_passes > 1)
+        av_log(ctx, AV_LOG_VERBOSE, "Using %d separate passes.\n", num_passes);
+
+out:
+    if (ret < 0)
+        ff_sws_graph_rollback(graph, passes_orig);
+    ff_sws_op_list_free(&ops);
+    *pops = NULL;
+    return ret;
 }

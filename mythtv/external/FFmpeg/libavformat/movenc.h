@@ -26,11 +26,12 @@
 
 #include "avformat.h"
 #include "movenccenc.h"
-#include "libavcodec/packet_internal.h"
+#include "packet_internal.h"
 
 #define MOV_FRAG_INFO_ALLOC_INCREMENT 64
 #define MOV_INDEX_CLUSTER_SIZE 1024
 #define MOV_TIMESCALE 1000
+#define MOV_TIMESCALE_Q (AVRational){1, 1000}
 
 #define RTP_MAX_PACKET_SIZE 1450
 
@@ -84,6 +85,12 @@ typedef struct MOVFragmentInfo {
     int size;
 } MOVFragmentInfo;
 
+typedef struct MovTag {
+    uint32_t    name;
+    int         nb_id;
+    uint32_t   *id; ///< trackID of the referenced track
+} MovTag;
+
 typedef struct MOVTrack {
     int         mode;
     int         entry_version;
@@ -125,16 +132,18 @@ typedef struct MOVTrack {
     unsigned    cluster_capacity;
     int         audio_vbr;
     int         height; ///< active picture (w/o VBI) height for D-10/IMX
-    uint32_t    tref_tag;
-    int         tref_id; ///< trackID of the referenced track
+    int         nb_tref_tags;
+    MovTag      *tref_tags;
     int64_t     start_dts;
     int64_t     start_cts;
     int64_t     end_pts;
+    int64_t     elst_end_pts;
     int         end_reliable;
     int64_t     dts_shift;
 
     int         hint_track;   ///< the track that hints this track, -1 if no hint track is set
-    int         src_track;    ///< the track that this hint (or tmcd) track describes
+    int         nb_src_track;
+    int         *src_track;   ///< the tracks that this hint (or tmcd) track describes
     AVFormatContext *rtp_ctx; ///< the format context for the hinting rtp muxer
     uint32_t    prev_rtp_ts;
     int64_t     cur_rtp_ts_unwrapped;

@@ -186,9 +186,12 @@ static int FUNC(decoder_model_info)(CodedBitstreamContext *ctx, RWContext *rw,
 static int FUNC(sequence_header_obu)(CodedBitstreamContext *ctx, RWContext *rw,
                                      AV1RawSequenceHeader *current)
 {
+    CodedBitstreamAV1Context *priv = ctx->priv_data;
     int i, err;
 
     HEADER("Sequence Header");
+
+    priv->seen_frame_header = 0;
 
     fc(3, seq_profile, AV_PROFILE_AV1_MAIN,
                        AV_PROFILE_AV1_PROFESSIONAL);
@@ -595,7 +598,7 @@ static int FUNC(tile_info)(CodedBitstreamContext *ctx, RWContext *rw,
     int max_tile_width_sb, max_tile_height_sb, max_tile_area_sb;
     int min_log2_tile_cols, max_log2_tile_cols, max_log2_tile_rows;
     int min_log2_tiles, min_log2_tile_rows;
-    int i, err;
+    int err;
 
     mi_cols = 2 * ((priv->frame_width  + 7) >> 3);
     mi_rows = 2 * ((priv->frame_height + 7) >> 3);
@@ -627,8 +630,8 @@ static int FUNC(tile_info)(CodedBitstreamContext *ctx, RWContext *rw,
         tile_width_sb = (sb_cols + (1 << current->tile_cols_log2) - 1) >>
             current->tile_cols_log2;
 
-        for (int off = 0, i = 0; off < sb_cols; off += tile_width_sb)
-            current->tile_start_col_sb[i++] = off;
+        for (int off = 0, j = 0; off < sb_cols; off += tile_width_sb)
+            current->tile_start_col_sb[j++] = off;
 
         current->tile_cols = (sb_cols + tile_width_sb - 1) / tile_width_sb;
 
@@ -639,11 +642,12 @@ static int FUNC(tile_info)(CodedBitstreamContext *ctx, RWContext *rw,
         tile_height_sb = (sb_rows + (1 << current->tile_rows_log2) - 1) >>
             current->tile_rows_log2;
 
-        for (int off = 0, i = 0; off < sb_rows; off += tile_height_sb)
-            current->tile_start_row_sb[i++] = off;
+        for (int off = 0, j = 0; off < sb_rows; off += tile_height_sb)
+            current->tile_start_row_sb[j++] = off;
 
         current->tile_rows = (sb_rows + tile_height_sb - 1) / tile_height_sb;
 
+        int i;
         for (i = 0; i < current->tile_cols - 1; i++)
             infer(width_in_sbs_minus_1[i], tile_width_sb - 1);
         infer(width_in_sbs_minus_1[i],
@@ -654,7 +658,7 @@ static int FUNC(tile_info)(CodedBitstreamContext *ctx, RWContext *rw,
               sb_rows - (current->tile_rows - 1) * tile_height_sb - 1);
 
     } else {
-        int widest_tile_sb, start_sb, size_sb, max_width, max_height;
+        int widest_tile_sb, start_sb, size_sb, max_width, max_height, i;
 
         widest_tile_sb = 0;
 
@@ -2007,10 +2011,12 @@ static int FUNC(metadata_itut_t35)(CodedBitstreamContext *ctx, RWContext *rw,
     // be arbitrarily many trailing zeroes so we need to read through twice.
     current->payload_size = cbs_av1_get_payload_bytes_left(rw);
 
-    current->payload_ref = av_buffer_alloc(current->payload_size);
+    current->payload_ref = av_buffer_alloc(current->payload_size +
+                                           AV_INPUT_BUFFER_PADDING_SIZE);
     if (!current->payload_ref)
         return AVERROR(ENOMEM);
     current->payload = current->payload_ref->data;
+    memset(current->payload + current->payload_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 #endif
 
     for (i = 0; i < current->payload_size; i++)

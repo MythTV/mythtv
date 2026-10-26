@@ -77,6 +77,7 @@ static inline void ff_color_update_dynamic(SwsColor *dst, const SwsColor *src)
 typedef struct SwsFormat {
     int width, height;
     int interlaced;
+    int field;
     enum AVPixelFormat format;
     enum AVPixelFormat hw_format;
     enum AVColorRange range;
@@ -106,6 +107,11 @@ static inline void ff_fmt_clear(SwsFormat *fmt)
  */
 SwsFormat ff_fmt_from_frame(const AVFrame *frame, int field);
 
+/**
+ * Subset of ff_fmt_from_frame() that sets default metadata for the format.
+ */
+void ff_fmt_from_pixfmt(enum AVPixelFormat pixfmt, SwsFormat *fmt);
+
 static inline int ff_color_equal(const SwsColor *c1, const SwsColor *c2)
 {
     return  c1->prim == c2->prim &&
@@ -115,23 +121,18 @@ static inline int ff_color_equal(const SwsColor *c1, const SwsColor *c2)
             ff_prim_equal(&c1->gamut, &c2->gamut);
 }
 
-/* Tests only the static components of a colorspace, ignoring dimensions and per-frame data */
-static inline int ff_props_equal(const SwsFormat *fmt1, const SwsFormat *fmt2)
-{
-    return fmt1->interlaced == fmt2->interlaced &&
-           fmt1->format     == fmt2->format     &&
-           fmt1->range      == fmt2->range      &&
-           fmt1->csp        == fmt2->csp        &&
-           fmt1->loc        == fmt2->loc        &&
-           ff_color_equal(&fmt1->color, &fmt2->color);
-}
-
 /* Tests only the static components of a colorspace, ignoring per-frame data */
 static inline int ff_fmt_equal(const SwsFormat *fmt1, const SwsFormat *fmt2)
 {
     return fmt1->width      == fmt2->width      &&
            fmt1->height     == fmt2->height     &&
-           ff_props_equal(fmt1, fmt2);
+           fmt1->interlaced == fmt2->interlaced &&
+           fmt1->field      == fmt2->field      &&
+           fmt1->format     == fmt2->format     &&
+           fmt1->range      == fmt2->range      &&
+           fmt1->csp        == fmt2->csp        &&
+           fmt1->loc        == fmt2->loc        &&
+           ff_color_equal(&fmt1->color, &fmt2->color);
 }
 
 static inline int ff_fmt_align(enum AVPixelFormat fmt)
@@ -144,10 +145,28 @@ static inline int ff_fmt_align(enum AVPixelFormat fmt)
     }
 }
 
-int ff_test_fmt(const SwsFormat *fmt, int output);
+/* Internal helper to test a format for either the legacy backend or the
+ * ops-based backends, depending on `backends` (must be nonzero). */
+int ff_sws_test_pixfmt_backend(const SwsBackend backends,
+                               enum AVPixelFormat format, int output);
+
+/**
+ * Statically test if a given format is supported by the given set of
+ * backends. This is a heuristic, which may have false positives if a
+ * specific backend does not actually implement all operations that would be
+ * required to support the format.
+ */
+int ff_test_fmt(SwsBackend backends, const SwsFormat *fmt, int output);
 
 /* Returns true if the formats are incomplete, false otherwise */
 bool ff_infer_colors(SwsColor *src, SwsColor *dst);
+
+/**
+ * Wrapper around av_chroma_location_enum_to_pos() that accounts for
+ * the per-field offset introduced by interlacing.
+ */
+void ff_sws_chroma_pos(const SwsFormat *fmt, bool *incomplete,
+                       int *out_xpos, int *out_ypos);
 
 typedef struct SwsOpList SwsOpList;
 typedef enum SwsPixelType SwsPixelType;
@@ -158,8 +177,8 @@ typedef enum SwsPixelType SwsPixelType;
  *
  * Returns 0 on success, or a negative error code on failure.
  */
-int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt);
-int ff_sws_encode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt);
+int ff_sws_decode_pixfmt(SwsOpList *ops, const SwsFormat *fmt);
+int ff_sws_encode_pixfmt(SwsOpList *ops, const SwsFormat *fmt);
 
 /**
  * Append a set of operations for transforming decoded pixel values to/from
@@ -172,6 +191,23 @@ int ff_sws_decode_colors(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
 int ff_sws_encode_colors(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
                          const SwsFormat *src, const SwsFormat *dst,
                          bool *incomplete);
+
+/**
+ * Append a set of operations for scaling pixels to a different resolution.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ */
+int ff_sws_add_filters(SwsContext *ctx, SwsPixelType type, SwsOpList *ops,
+                       const SwsFormat *src, const SwsFormat *dst);
+
+/**
+ * Generate an SwsOpList defining a conversion from `src` to `dst`.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ */
+int ff_sws_op_list_generate(SwsContext *ctx, const SwsFormat *src,
+                            const SwsFormat *dst, SwsOpList **out_ops,
+                            bool *incomplete);
 
 /**
  * Represents a view into a single field of frame data.
