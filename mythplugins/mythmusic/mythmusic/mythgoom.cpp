@@ -15,7 +15,6 @@
 #include <libmythbase/mythcorecontext.h>
 
 // Goom
-#include "libmythtv/visualisations/goom/goom_tools.h"
 #include "libmythtv/visualisations/goom/goom_core.h"
 
 Goom::Goom()

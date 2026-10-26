@@ -169,7 +169,7 @@ void BumpScope::generate_phongdat(void)
     }
 }
 
-static constexpr float  M_PI_F  { std::numbers::pi_v<float> };
+static constexpr float  k_degrees_to_radians  { std::numbers::pi_v<float> / 180.0F };
 void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
                           int *angle) const
 {
@@ -181,8 +181,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
-    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI_F/180.0F)));
+    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*k_degrees_to_radians));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -191,8 +191,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/(M_PI_F/180.0F));
-    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*(M_PI_F/180.0F)));
+    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
+    *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*k_degrees_to_radians));
 
     if (*xo >= -wd2 && *xo <= wd2) {
         *xd = (*xo>0)?-1:1;
@@ -202,8 +202,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting x to both maxes */
     *xo = WIDTH/2;
-    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI_F/180.0F)));
+    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*k_degrees_to_radians));
 
     if (*yo >= -hd2 && *yo <= hd2) {
         *yd = (*yo>0)?-1:1;
@@ -212,8 +212,8 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *xo = -*xo;
-    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/(M_PI_F/180.0F));
-    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*(M_PI_F/180.0F)));
+    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
+    *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*k_degrees_to_radians));
 
     /* if this isn't right, it's out of our range and we don't care */
     *yd = (*yo>0)?-1:1;
@@ -408,8 +408,8 @@ bool BumpScope::draw(QPainter *p, [[maybe_unused]] const QColor &back)
             m_wasMoving = 1;
         }
 
-        m_ilx = (int)((m_width / 2.0F) + (cosf(m_iangle * (M_PI_F / 180.0F)) * m_ixo));
-        m_ily = (int)((m_height / 2.0F) + (sinf(m_iangle * (M_PI_F / 180.0F)) * m_iyo));
+        m_ilx = (int)((m_width / 2.0F) + (cosf(m_iangle * k_degrees_to_radians) * m_ixo));
+        m_ily = (int)((m_height / 2.0F) + (sinf(m_iangle * k_degrees_to_radians) * m_iyo));
 
         m_iangle += 2;
         if (m_iangle >= 360)

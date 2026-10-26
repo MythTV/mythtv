@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cmath>
 #include <thread>
+#include <numbers>
 
 // POSIX headers
 #include <sys/time.h>
@@ -88,8 +89,8 @@ enum DISEQC_CMDS : std::uint8_t {
     DISEQC_CMD_GOTO_X       = 0x6e,
 };
 
-static constexpr double TO_RADS { M_PI / 180.0 };
-static constexpr double TO_DEC  { 180.0 / M_PI };
+static constexpr double TO_RADS { std::numbers::pi / 180.0 };
+static constexpr double TO_DEC  { 180.0 / std::numbers::pi };
 
 static constexpr double EPS     { 1E-4 };
 
