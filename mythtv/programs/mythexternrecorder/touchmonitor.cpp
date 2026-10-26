@@ -57,8 +57,7 @@ static QString toQString(const TouchConfig& config)
         if (!value)
             return "none";
 
-        return QString::fromStdString(
-            std::format("{}s", value->count()));
+        return QString::number(value->count()) + "s";
     };
 
     return QString("delay=%1, frequency=%2, command=\"%3\", "

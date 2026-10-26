@@ -1514,7 +1514,7 @@ SYSTEM_FUNCS="
     is_duration_v
     posix_fadvise
     close_range
-    is_duration_v
+    std_format
 "
 
 TYPES_LIST="
@@ -4813,6 +4813,19 @@ int main(int argc, char **argv){
 }
 EOF
 
+# test for std::format (C++20 <format>)
+check_ld_cxx <<EOF && enable std_format
+#include <format>
+#include <string>
+#if !defined(__cpp_lib_format) || __cpp_lib_format < 201907L
+#error "std::format not available"
+#endif
+int main(void){
+    std::string s = std::format("{} {}", 42, "x");
+    return s.empty() ? 1 : 0;
+}
+EOF
+
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
 else
@@ -6075,6 +6088,7 @@ echo ""
 
 echo "# Compilation Options"
 echo "C++ standard supported    ${CPP_STANDARD}"
+echo "Has std::format           ${std_format-no}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""

@@ -1,3 +1,5 @@
+#include "libmythbase/mythconfig.h"
+
 #include <cctype>
 #include <chrono>
 #include <charconv>
@@ -7,7 +9,9 @@
 #include <sstream>
 #include <strings.h>
 #include <string_view>
+#if HAVE_STD_FORMAT
 #include <format>
+#endif
 #include <regex>
 #include <stdexcept>
 #include <iterator>
@@ -75,9 +79,9 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
     const auto& recSection = m_section.at("RECORDER");
     if (!m_root.contains(recSection) || !m_root[recSection].is_table())
     {
-        m_errstrm << std::format("Configuration Error: "
-                                 "Missing required section [RECORDER] "
-                                 "(Note: Names are case-sensitive).\n");
+        m_errstrm << "Configuration Error: "
+                  << "Missing required section [RECORDER] "
+                  << "(Note: Names are case-sensitive).\n";
         m_fatal = true;
     }
 
@@ -270,7 +274,11 @@ std::optional<std::chrono::seconds>
     {
         if (*value < 0)
         {
+#if HAVE_STD_FORMAT
             m_errstrm << std::format("{} cannot be negative\n", name);
+#else
+            m_errstrm << name << " cannot be negative\n";
+#endif
             return std::nullopt;
         }
 
@@ -280,8 +288,12 @@ std::optional<std::chrono::seconds>
     const auto value = node.value<std::string_view>();
     if (!value)
     {
+#if HAVE_STD_FORMAT
         m_errstrm << std::format(
             "{} must be an integer or duration string\n", name);
+#else
+        m_errstrm << name << " must be an integer or duration string\n";
+#endif
         return std::nullopt;
     }
 
@@ -318,8 +330,13 @@ std::optional<std::chrono::seconds>
 
     if (!remaining.empty() || count == 0)
     {
+#if HAVE_STD_FORMAT
         m_errstrm << std::format("Invalid duration '{}' for {}\n",
                                  *value, name);
+#else
+        m_errstrm << "Invalid duration '" << *value
+                  << "' for " << name << "\n";
+#endif
         return std::nullopt;
     }
 
@@ -360,9 +377,14 @@ TouchConfig
     const auto* delay = table.get("delay");
     if (delay)
     {
+#if HAVE_STD_FORMAT
         config.delay = parseDuration(*delay,
                                      std::format("[TOUCH.{}].delay",
                                                  name));
+#else
+        std::string tmpstr = "[TOUCH." + name + "].delay";
+        config.delay = parseDuration(*delay, tmpstr);
+#endif
         if (!config.delay)
             return config;
     }
@@ -370,9 +392,14 @@ TouchConfig
     const auto* frequency = table.get("frequency");
     if (frequency)
     {
+#if HAVE_STD_FORMAT
         config.frequency = parseDuration(*frequency,
                                          std::format("[TOUCH.{}].frequency",
                                                      name));
+#else
+        std::string tmpstr = "[TOUCH." + name + "].frequency";
+        config.frequency = parseDuration(*frequency, tmpstr);
+#endif
         if (!config.frequency)
             return config;
     }
@@ -380,8 +407,11 @@ TouchConfig
     const auto command = table["command"].value<std::string>();
     if (!command)
     {
-        m_errstrm << std::format("[TOUCH.{}].command must be a string", name)
-                  << std::endl;
+#if HAVE_STD_FORMAT
+        m_errstrm << std::format("[TOUCH.{}].command must be a string\n", name);
+#else
+        m_errstrm << "[TOUCH." << name << "].command must be a string\n";
+#endif
         return {};
     }
     config.command = *command;
@@ -410,8 +440,11 @@ bool ExternTomlConfig::loadTouch(void)
     {
         if (!node.as_table())
         {
-            m_errstrm << std::format("[TOUCH.{}] must be a table", key.str())
-                      << std::endl;
+#if HAVE_STD_FORMAT
+            m_errstrm << std::format("[TOUCH.{}] must be a table\n", key.str());
+#else
+            m_errstrm << "[TOUCH." << key.str() << "] must be a table\n";
+#endif
             return false;
         }
 
@@ -501,9 +534,14 @@ std::string ExternTomlConfig::expandVariable(std::string_view varName) const
         return vb->get() ? "true" : "false";
     else
     {
+#if HAVE_STD_FORMAT
         m_errstrm << std::format("Configuration variable '{}' "
-                                 "is not a scalar value", varName)
-                  << std::endl;
+                                 "is not a scalar value\n", varName);
+#else
+        m_errstrm << "Configuration variable '"
+                  << varName
+                  << "' is not a scalar value\n";
+#endif
         return {};
     }
 }

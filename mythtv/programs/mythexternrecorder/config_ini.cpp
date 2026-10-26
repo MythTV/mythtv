@@ -1,8 +1,12 @@
+#include "libmythbase/mythconfig.h"
+
 #include <QMetaType>
 #include <QFile>
 
 #include <algorithm>
+#if HAVE_STD_FORMAT
 #include <format>
+#endif
 #include <iostream>
 #include <utility>
 #include <regex>
@@ -25,9 +29,15 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
     std::ifstream checkStream(filename);
     if (!checkStream.is_open())
     {
+#if HAVE_STD_FORMAT
         m_errstrm << std::format("Unable to read configuration file '{}': "
                                  "Permission denied or file missing.\n",
                                  filename.string());
+#else
+        m_errstrm << "Unable to read configuration file '"
+                  << filename.string()
+                  << "': Permission denied or file missing.\n";
+#endif
         m_fatal = true;
         return;
     }
@@ -44,9 +54,15 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
     // Validate Format and Parse Status
     if (m_settings.status() == QSettings::FormatError)
     {
+#if HAVE_STD_FORMAT
         m_errstrm << std::format("Malformed syntax detected in '{}'. "
                                  "Check formatting tokens.\n",
                                  filename.string());
+#else
+        m_errstrm << "Malformed syntax detected in '"
+                  << filename.string()
+                  << "'. Check formatting tokens.\n";
+#endif
         m_fatal = true;
         return;
     }
@@ -340,10 +356,13 @@ bool ExternIniConfig::loadChannels(void)
 
     if (settings->status() != QSettings::NoError)
     {
-        m_errstrm << std::format("Unable to load channel configuration '{}'",
-                                 channelsPath.string())
-                  << std::endl;
-
+#if HAVE_STD_FORMAT
+        m_errstrm << std::format("Unable to load channel configuration '{}'\n",
+                                 channelsPath.string());
+#else
+        m_errstrm << "Unable to load channel configuration '"
+                  << channelsPath.string() << "'\n";
+#endif
         return false;
     }
 
