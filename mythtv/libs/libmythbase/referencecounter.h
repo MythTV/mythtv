@@ -38,7 +38,7 @@ class MBASE_PUBLIC ReferenceCounter
     virtual int DecrRef(void);
 
     /// Returns current reference count
-    int GetRefCount(void) { return static_cast<int>(m_referenceCount); };
+    int GetRefCount(void) { return static_cast<int>(m_referenceCount); }
 
     /// Print out any leaks if that level of debugging is enabled.
     static void PrintDebug(void);
