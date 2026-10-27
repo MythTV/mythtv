@@ -172,17 +172,6 @@ void MultipleStringStructure::Parse(void) const
     }
 }
 
-bool CaptionServiceDescriptor::Parse(void)
-{
-    m_ptrs.clear();
-    m_ptrs[Index(0,-1)] = m_data+3;
-
-    for (uint i = 0; i < ServicesCount(); i++)
-        m_ptrs[Index(i+1,-1)] = Offset(i,-1) + 6;
-
-    return true;
-}
-
 QString CaptionServiceDescriptor::toString(void) const
 {
     QString str("Caption Service Descriptor  ");

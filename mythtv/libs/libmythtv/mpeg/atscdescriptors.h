@@ -77,8 +77,6 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     explicit CaptionServiceDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::caption_service)
     {
-        if (m_data && !Parse())
-            m_data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
@@ -89,7 +87,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
     //uimsbf for (i=0;i<number_of_services;i++) {
     //   language             8*3  0.0
     int LanguageKey(int i) const
-        { return iso639_str3_to_key(Offset(i,-1)); }
+        { return iso639_str3_to_key(Service(i)); }
     QString LanguageString(int i) const
         { return iso639_key_to_str3(LanguageKey(i)); }
     int CanonicalLanguageKey(int i) const
@@ -98,35 +96,33 @@ class CaptionServiceDescriptor : public MPEGDescriptor
         { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   uimsbf cc_type         1  3.0
     bool Type(int i) const
-        { return (((Offset(i,-1)[3])>>7) & 1) != 0; }
+        { return (((Service(i)[3])>>7) & 1) != 0; }
     //   bslbf reserved         1  3.1           1
     //   if (cc_type==line21) {
     //      reserved            5  3.2        0x1f
     //      line21_field        1  3.7
     bool Line21Field(int i) const
-        { return bool((Offset(i,-1)[3]) & 1); }
+        { return bool((Service(i)[3]) & 1); }
     //   } else
     //      cap_service_number  6  3.2
     int CaptionServiceNumber(int i) const
-        { return (Offset(i,-1)[3]) & 0x3f; }
+        { return (Service(i)[3]) & 0x3f; }
     //   easy_reader            1  4.0
     bool EasyReader(int i) const
-        { return bool(((Offset(i,-1)[4])>>7) & 1); }
+        { return bool(((Service(i)[4])>>7) & 1); }
     //   wide_aspect_ratio      1  4.1
     bool WideAspectRatio(int i) const
-        { return bool(((Offset(i,-1)[4])>>6) & 1); }
+        { return bool(((Service(i)[4])>>6) & 1); }
     //   reserved              14  4.2      0x3fff
     //}                            6.0
-    bool Parse(void);
     QString toString() const override; // MPEGDescriptor
 
   private:
-    static int Index(int i, int j) { return (i<<8) | (j & 0xff); }
-    const unsigned char *Offset(int i, int j) const
-        { return m_ptrs[Index(i,j)]; }
+    const unsigned char *Service(int i) const
+    {
+        return m_data + 3 + 6 * i;
+    }
 
-  private:
-    IntToBuf m_ptrs;
 };
 
 class ContentAdvisoryDescriptor : public MPEGDescriptor
