@@ -59,7 +59,7 @@ void DecoderBase::Reset(bool reset_video_data, bool seek_reset, bool reset_file)
         m_frameCounter += 100;
         m_fpsSkip = 0;
         m_framesRead = 0;
-        m_totalDuration = MythAVRational(0);
+        m_totalDuration = 0ns;
         m_dontSyncPositionMap = false;
     }
 
@@ -875,7 +875,7 @@ void DecoderBase::FileChanged(void)
     ResetPosMap();
     m_framesPlayed = 0;
     m_framesRead = 0;
-    m_totalDuration = MythAVRational(0);
+    m_totalDuration = 0ns;
 
     m_waitingForChange = false;
     m_justAfterChange = true;
@@ -1267,10 +1267,10 @@ QString toString(AudioTrackType type)
 
 void DecoderBase::SaveTotalDuration(void)
 {
-    if (!m_playbackInfo || !m_totalDuration.isNonzero() || !m_totalDuration.isValid())
+    if (!m_playbackInfo || m_totalDuration == 0ns)
         return;
 
-    m_playbackInfo->SaveTotalDuration(std::chrono::milliseconds{m_totalDuration.toFixed(1000)});
+    m_playbackInfo->SaveTotalDuration(duration_cast<std::chrono::milliseconds>(m_totalDuration));
 }
 
 void DecoderBase::SaveTotalFrames(void)
