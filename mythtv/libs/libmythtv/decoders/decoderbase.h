@@ -2,12 +2,13 @@
 #define DECODERBASE_H_
 
 #include <array>
+#include <chrono>
+using namespace std::chrono_literals;
 #include <cstdint>
 #include <vector>
 
 #include "libmythbase/mythdbcon.h"
 #include "libmythtv/io/mythmediabuffer.h"
-#include "libmythtv/mythavrational.h"
 #include "libmythtv/mythavutil.h"
 #include "libmythtv/mythcodecid.h"
 #include "libmythtv/mythvideoprofile.h"
@@ -243,7 +244,7 @@ class DecoderBase
     virtual bool SetVideoByComponentTag(int /*tag*/) { return false; }
 
     void SaveTotalDuration(void);
-    void ResetTotalDuration(void) { m_totalDuration = MythAVRational(0); }
+    void ResetTotalDuration(void) { m_totalDuration = 0ns; }
     void SaveTotalFrames(void);
     void TrackTotalDuration(bool track) { m_trackTotalDuration = track; }
     int GetfpsMultiplier(void) const { return m_fpsMultiplier; }
@@ -287,7 +288,7 @@ class DecoderBase
     long long            m_framesPlayed            {0};
     long long            m_framesRead              {0};
     uint64_t             m_frameCounter            {0};
-    MythAVRational       m_totalDuration           {0};
+    std::chrono::nanoseconds m_totalDuration       {0ns};
     int                  m_keyframeDist            {-1};
     long long            m_lastKey                 {0};
     long long            m_indexOffset             {0};
