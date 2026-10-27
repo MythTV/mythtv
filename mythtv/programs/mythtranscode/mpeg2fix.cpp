@@ -3,6 +3,8 @@
 //support analyze-only mode
 
 // C++ headers
+#include <chrono>
+using namespace std::chrono_literals;
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -2936,7 +2938,7 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    MythAVRational totalDuration {0};
+    std::chrono::nanoseconds duration {0};
     while (av_read_frame(m_inputFC, pkt) >= 0)
     {
         if (pkt->stream_index == m_vidId)
@@ -2944,7 +2946,7 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
             if (pkt->flags & AV_PKT_FLAG_KEY)
             {
                 posMap[count] = pkt->pos;
-                durMap[count] = totalDuration.toFixed(1000LL);
+                durMap[count] = duration_cast<std::chrono::milliseconds>(duration).count();
             }
 
             // XXX totalDuration untested.  Results should be the same
@@ -2961,7 +2963,8 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
             {
                 pkt_dur = MythAVRational(1001, 60000); // 1501.5/90000
             }
-            totalDuration += pkt_dur;
+            constexpr std::chrono::nanoseconds k_s_in_ns {1s};
+            duration += std::chrono::nanoseconds{pkt_dur.toFixed(k_s_in_ns.count())};
             count++;
         }
         av_packet_unref(pkt);
