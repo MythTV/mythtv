@@ -430,80 +430,69 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     QString fontname;
     bool    res = false;  // Return true if paragraph changed.
 
-    if (GetFontProperties()->hasOutline())
-    {
-        int outlineSize = 0;
-        int outlineAlpha = 255;
-        QColor outlineColor;
-
-        GetFontProperties()->GetOutline(outlineColor, outlineSize,
-                                        outlineAlpha);
-
-        outlineColor.setAlpha(outlineAlpha);
-
-        MythPoint  outline(outlineSize, outlineSize);
-        outline.NormPoint(); // scale it to screen resolution
-
-        QPen pen;
-        pen.setBrush(outlineColor);
-        pen.setWidth(outline.x());
-
-        range.start = 0;
-        range.length = paragraph.size();
-        range.format.setTextOutline(pen);
-        formats.push_back(range);
-    }
-
+    // Seed 'range' with the base font so leading text (if any) is formatted,
+    // and we only ever have to track a single 'range' state.
     range.start = 0;
-    range.length = 0;
+    range.length = -1;
+    range.format.setFont(GetFontProperties()->face());
+    range.format.setFontStyleHint(QFont::SansSerif);
+    range.format.setForeground(GetFontProperties()->GetBrush());
 
     int pos = 0;
     int end = 0;
+
     while ((pos = paragraph.indexOf("[font]", pos, Qt::CaseInsensitive)) != -1)
     {
         end = paragraph.indexOf("[/font]", pos + 1, Qt::CaseInsensitive);
         if (end != -1)
         {
+            // Close out the active range if any characters preceded this tag
             if (range.length == -1)
             {
-                // End of the affected text
                 range.length = pos - range.start;
                 if (range.length > 0)
                 {
                     formats.push_back(range);
-                    LOG(VB_GUI, LOG_DEBUG,
-                        QString("'%1' Setting \"%2\" with FONT %3")
-                        .arg(objectName(),
-                             paragraph.mid(range.start, range.length),
-                             fontname));
                 }
-                range.length = 0;
             }
 
+            // Parse font name and strip the [font]...[/font] tag
             int len = end - pos - 6;
             fontname = paragraph.mid(pos + 6, len);
+            paragraph.remove(pos, end + 7 - pos);
+            res = true;
 
-            if (GetGlobalFontMap()->Contains(fontname))
+            // Configure the next styling block starting at 'pos'
+            MythFontProperties *fp = GetFont(fontname);
+            if (!fp)
+                fp = GetGlobalFontMap()->GetFont(fontname);
+
+            range.format = QTextCharFormat();
+            range.start = pos;
+            range.length = -1;
+
+            if (fp)
             {
-                MythFontProperties *fnt = GetGlobalFontMap()->GetFont(fontname);
-                range.start = pos;
-                range.length = -1;  // Need to find the end of the effect
-                range.format.setFont(fnt->face());
+                MythFontProperties fnt = *fp;
+                MythMainWindow *window = GetMythMainWindow();
+                fnt.Rescale(window->GetUIScreenRect().height());
+                fnt.AdjustStretch(window->GetFontStretch());
+
+                range.format.setFont(fnt.face());
                 range.format.setFontStyleHint(QFont::SansSerif);
-                range.format.setForeground(fnt->GetBrush());
+                range.format.setForeground(fnt.GetBrush());
             }
             else
             {
                 LOG(VB_GUI, LOG_ERR,
                     QString("'%1' Unknown Font '%2' specified in template.")
                     .arg(objectName(), fontname));
-            }
 
-            LOG(VB_GUI, LOG_DEBUG, QString("Removing %1 through %2 '%3'")
-                .arg(pos).arg(end + 7 - pos).arg(paragraph.mid(pos,
-                                                               end + 7 - pos)));
-            paragraph.remove(pos, end + 7 - pos);
-            res = true;
+                // Fallback to base font properties
+                range.format.setFont(GetFontProperties()->face());
+                range.format.setFontStyleHint(QFont::SansSerif);
+                range.format.setForeground(GetFontProperties()->GetBrush());
+            }
         }
         else
         {
@@ -514,15 +503,40 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
         }
     }
 
-    if (range.length == -1) // To the end
+    // Close out the final trailing text block
+    if (range.length == -1)
     {
         range.length = paragraph.length() - range.start;
-        formats.push_back(range);
-        LOG(VB_GUI, LOG_DEBUG,
-            QString("'%1' Setting \"%2\" with FONT %3")
-            .arg(objectName(),
-                 paragraph.mid(range.start, range.length),
-                 fontname));
+        if (range.length > 0)
+        {
+            formats.push_back(range);
+        }
+    }
+
+    if (GetFontProperties()->hasOutline())
+    {
+        // Apply outline across the final stripped paragraph length
+
+        int outlineSize = 0;
+        int outlineAlpha = 255;
+        QColor outlineColor;
+
+        GetFontProperties()->GetOutline(outlineColor, outlineSize,
+                                        outlineAlpha);
+        outlineColor.setAlpha(outlineAlpha);
+
+        MythPoint outline(outlineSize, outlineSize);
+        outline.NormPoint(); // scale it to screen resolution
+
+        QPen pen;
+        pen.setBrush(outlineColor);
+        pen.setWidth(outline.x());
+
+        QTextLayout::FormatRange outlineRange;
+        outlineRange.start = 0;
+        outlineRange.length = paragraph.size();
+        outlineRange.format.setTextOutline(pen);
+        formats.push_back(outlineRange);
     }
 
     if (!formats.empty())
@@ -538,7 +552,6 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 {
     int last_line = 0;
 
-    FormatTemplate(paragraph, layout);
     layout->setText(paragraph);
     layout->beginLayout();
     num_lines = 0;
@@ -558,6 +571,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                 QFontMetrics fm(GetFontProperties()->face());
                 paragraph = fm.elidedText(paragraph, m_cutdown,
                                           width - fm.averageCharWidth());
+                layout->endLayout(); // Cleanly close the aborted layout pass
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -592,6 +606,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                     paragraph = paragraph.left(last_line) + cut_line;
                     if (last_line == 0)
                         min_rect |= line.naturalTextRect();
+                    layout->endLayout();
                     return false;
                 }
                 overflow = true;
@@ -654,12 +669,14 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
         layout->setFont(m_font->face());
 
         QString para = *Ipara;
+        FormatTemplate(para, layout);
+
         qreal saved_height = height;
         QRectF saved_rect = min_rect;
         if (!Layout(para, layout, final, overflow, width, height, false,
                     last_line_width, min_rect, num_lines))
         {
-            // Again, with cut down
+            // Again, with cut down (formats on 'layout' are preserved!)
             min_rect = saved_rect;
             height = saved_height;
             Layout(para, layout, final, overflow, width, height, true,
