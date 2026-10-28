@@ -45,6 +45,6 @@ int get_TT(vm_t *vm, int vtsN, int vts_ttn);
 int get_ID(vm_t *vm, int id);
 int get_PGCN(vm_t *vm);
 
-pgcit_t* get_MENU_PGCIT(vm_t *vm, ifo_handle_t *h, uint16_t lang);
-pgcit_t* get_PGCIT(vm_t *vm);
+const pgcit_t* get_MENU_PGCIT(vm_t *vm, ifo_handle_t *h, uint16_t lang);
+const pgcit_t* get_PGCIT(vm_t *vm);
 

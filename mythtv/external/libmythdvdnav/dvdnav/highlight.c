@@ -22,6 +22,9 @@
 #include "config.h"
 #endif
 
+#include <dvdread/nav_types.h>
+#include "dvdnav/dvdnav.h"
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -29,8 +32,6 @@
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
-#include <dvdread/nav_types.h>
-#include "dvdnav/dvdnav.h"
 #include "vm/decoder.h"
 #include "vm/vm.h"
 #include "vm/vmcmd.h"
@@ -220,7 +221,7 @@ dvdnav_status_t dvdnav_get_current_highlight(dvdnav_t *this, int32_t *button) {
   return DVDNAV_STATUS_OK;
 }
 
-static btni_t *get_current_button(dvdnav_t *this, pci_t *pci) {
+static const btni_t *get_current_button(dvdnav_t *this, pci_t *pci) {
   int32_t button = 0;
 
   if(!pci->hli.hl_gi.hli_ss) {
@@ -241,7 +242,7 @@ static btni_t *get_current_button(dvdnav_t *this, pci_t *pci) {
 }
 
 static dvdnav_status_t button_auto_action(dvdnav_t *this, pci_t *pci) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
   if ((button_ptr = get_current_button(this, pci)) == NULL)
       return DVDNAV_STATUS_ERR;
 
@@ -252,7 +253,7 @@ static dvdnav_status_t button_auto_action(dvdnav_t *this, pci_t *pci) {
 }
 
 dvdnav_status_t dvdnav_upper_button_select(dvdnav_t *this, pci_t *pci) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
 
   if(!(button_ptr = get_current_button(this, pci)))
     return DVDNAV_STATUS_ERR;
@@ -262,7 +263,7 @@ dvdnav_status_t dvdnav_upper_button_select(dvdnav_t *this, pci_t *pci) {
 }
 
 dvdnav_status_t dvdnav_lower_button_select(dvdnav_t *this, pci_t *pci) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
 
   if(!(button_ptr = get_current_button(this, pci)))
     return DVDNAV_STATUS_ERR;
@@ -272,7 +273,7 @@ dvdnav_status_t dvdnav_lower_button_select(dvdnav_t *this, pci_t *pci) {
 }
 
 dvdnav_status_t dvdnav_right_button_select(dvdnav_t *this, pci_t *pci) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
 
   if(!(button_ptr = get_current_button(this, pci)))
     return DVDNAV_STATUS_ERR;
@@ -282,7 +283,7 @@ dvdnav_status_t dvdnav_right_button_select(dvdnav_t *this, pci_t *pci) {
 }
 
 dvdnav_status_t dvdnav_left_button_select(dvdnav_t *this, pci_t *pci) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
 
   if(!(button_ptr = get_current_button(this, pci)))
     return DVDNAV_STATUS_ERR;
@@ -293,7 +294,7 @@ dvdnav_status_t dvdnav_left_button_select(dvdnav_t *this, pci_t *pci) {
 
 dvdnav_status_t dvdnav_get_highlight_area(pci_t *nav_pci , int32_t button, int32_t mode,
                                           dvdnav_highlight_area_t *highlight) {
-  btni_t *button_ptr;
+  const btni_t *button_ptr;
 
 #ifdef BUTTON_TESTING
   fprintf(MSG_OUT, "libdvdnav: Button get_highlight_area %i\n", button);
@@ -391,7 +392,7 @@ dvdnav_status_t dvdnav_get_highlight_area_from_group(pci_t *nav_pci, DVDBtnGrp_t
 
 dvdnav_status_t dvdnav_button_activate(dvdnav_t *this, pci_t *pci) {
   int32_t button;
-  btni_t *button_ptr = NULL;
+  const btni_t *button_ptr = NULL;
 
   if(!pci->hli.hl_gi.hli_ss) {
     printerr("Not in a menu.");
@@ -540,7 +541,7 @@ dvdnav_status_t dvdnav_mouse_select(dvdnav_t *this, pci_t *pci, int32_t x, int32
 
   /* Loop through all buttons */
   for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++) {
-    btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+    const btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
     if((x >= button_ptr->x_start) && (x <= button_ptr->x_end) &&
        (y >= button_ptr->y_start) && (y <= button_ptr->y_end)) {

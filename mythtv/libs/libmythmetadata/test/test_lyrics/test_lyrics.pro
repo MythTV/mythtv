@@ -24,7 +24,9 @@ LIBS += -L../../../../external/FFmpeg/libavutil -lmythavutil
 LIBS += -L../../../../external/FFmpeg/libswresample -lmythswresample
 LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter
 LIBS += -L../.. -lmythmetadata-$$LIBVERSION
-
+LIBS += -L../../../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libmythdvdnav
 
 using_system_libexiv2 {
 LIBS += -lexiv2
