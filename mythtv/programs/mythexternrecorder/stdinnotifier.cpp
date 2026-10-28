@@ -10,15 +10,13 @@
 #include <fcntl.h>
 
 StdinNotifier::StdinNotifier(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_notifier(new QSocketNotifier(fileno(stdin),
+                                     QSocketNotifier::Read,
+                                     this))
 {
     int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
-
-    m_notifier = new QSocketNotifier(
-                                     fileno(stdin),
-                                     QSocketNotifier::Read,
-                                     this);
 
     connect(m_notifier,
             &QSocketNotifier::activated,
@@ -90,7 +88,7 @@ void StdinNotifier::handleReadyRead()
             continue;
         }
 
-        QJsonParseError jsonError;
+        QJsonParseError jsonError {};
         QJsonDocument jsonDoc =
             QJsonDocument::fromJson(line, &jsonError);
 

@@ -346,7 +346,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     posix_spawnattr_setpgroup(&attr, 0);
 
     // Spawn process
-    pid_t pid;
+    pid_t pid = 0;
     int spawnrc = posix_spawn(&pid, progPath.toLocal8Bit().constData(),
                               &actions, &attr, argv.data(), envp.data());
 

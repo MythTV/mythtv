@@ -1170,7 +1170,7 @@ bool ExternalStreamHandler::StartStreaming(bool recording,
                                            const QString& reason)
 {
     QString result;
-    bool    res;
+    bool    res = false;
 
     QMutexLocker locker(&m_streamLock);
 
@@ -1242,7 +1242,7 @@ bool ExternalStreamHandler::StartStreaming(bool recording,
 bool ExternalStreamHandler::StopStreaming(const QString& reason)
 {
     QString result;
-    bool    res;
+    bool    res = false;
 
     QMutexLocker locker(&m_streamLock);
 

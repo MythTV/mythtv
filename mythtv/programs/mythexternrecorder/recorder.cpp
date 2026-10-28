@@ -466,7 +466,7 @@ bool Recorder::blockSize(const QJsonObject &params)
 
 bool Recorder::lockTimeout(const QJsonObject &params)
 {
-    bool ok;
+    bool ok = false;
     QString str = getTunerValue("timeout", "3000");
     int value   = str.toInt(&ok);
 
@@ -1279,9 +1279,7 @@ void Recorder::stderrLoop(int fd)
             StderrLine(message);
     }
 
-    if (line)
-        free(line);
-
+    free(line); // NOLINT(cppcoreguidelines-no-malloc) getline requires free
     fclose(stream);
 }
 
