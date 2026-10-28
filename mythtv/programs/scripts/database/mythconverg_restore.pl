@@ -20,9 +20,9 @@
     our ($partial_restore, $with_plugin_data, $restore_xmltvids);
     our ($mysql_client, $uncompress, $drop_database, $create_database);
     our ($change_hostname, $old_hostname, $new_hostname);
-    our ($usage, $debug, $show_version, $show_version_script, $dbh);
+    our ($usage, $debug, $show_version, $show_version_script, $dbh, $mysql_ver);
     our ($d_mysql_client, $d_db_name, $d_uncompress);
-    our ($db_hostname, $db_port, $db_username, $db_name, $db_schema_version);
+    our ($db_hostname, $db_port, $db_username, $db_name, $db_schema_version, $db_ssl);
 # This script does not accept a database password on the command-line.
 # Any packager who enables the functionality should modify the --help output.
 #    our ($db_password);
@@ -34,7 +34,8 @@
                         'db_user'       => '',
                         'db_pass'       => '',
                         'db_name'       => '',
-                        'db_schemaver'  => ''
+                        'db_schemaver'  => '',
+                        'db_ssl'        => ''
                         );
     our %backup_conf = ('directory'     => '',
                         'filename'      => ''
@@ -467,6 +468,7 @@ EOF
                 "         DBHostName: $mysql_conf{'db_host'}",
                 "             DBPort: $mysql_conf{'db_port'}",
                 "         DBUserName: $mysql_conf{'db_user'}",
+                "          MySQL_ssl: $mysql_conf{'db_ssl'}",
                 '         DBPassword: ' .
                     ( $mysql_conf{'db_pass'} ? 'XXX' : '' ),
                   #  "$mysql_conf{'db_pass'}",
@@ -501,6 +503,19 @@ EOF
                     '     - new_hostname: '.$new_hostname);
         }
     }
+    
+    sub get_mysql_ver
+	{
+		 # Get mysql version to set the right security level later on
+        my $sql_ver = qx/mysql -V/;
+        my ($mysql_ver) = $sql_ver =~ /(?<=Ver )([0-9]+\.[0-9]+)/g;
+        print "Extracted version: $mysql_ver\n";
+        if ($mysql_ver >= 8) {
+            $mysql_conf{'db_ssl'} = 1;
+        } else {
+            $mysql_conf{'db_ssl'} = 0;
+        }
+	}
 
     sub configure_environment
     {
@@ -926,6 +941,7 @@ EOF
         }
         $connect_string .= ":host=$temp_host";
         $connect_string .= ":port=$mysql_conf{'db_port'}";
+        $connect_string .= ":mysql_ssl=$mysql_conf{'db_ssl'}";
         if ($use_db)
         {
             $connect_string .= ":database=$mysql_conf{'db_name'}";
@@ -942,7 +958,8 @@ EOF
                     '', 'Unable to connect to database.',
                     "           database: $mysql_conf{'db_name'}",
                     "               host: $mysql_conf{'db_host'}",
-                    "           username: $mysql_conf{'db_user'}"
+                    "           username: $mysql_conf{'db_user'}",
+                    "           ssl_mode: $mysql_conf{'db_ssl'}"
                    );
             if ($debug < $verbose_level_debug)
             {
@@ -1746,6 +1763,7 @@ EOF
 # information file.
     $database_information_file = shift;
 
+    get_mysql_ver;
     configure_environment;
     read_config;
     check_config;
