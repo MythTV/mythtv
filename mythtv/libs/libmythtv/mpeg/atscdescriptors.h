@@ -11,8 +11,6 @@
 
 #include "mpegdescriptors.h"
 
-using IntToBuf = QMap<int, const unsigned char*>;
-
 class MTV_PUBLIC MultipleStringStructure
 {
   public:
@@ -68,7 +66,7 @@ class MTV_PUBLIC MultipleStringStructure
 
   private:
     const unsigned char *m_data;
-    mutable IntToBuf m_ptrs;
+    mutable QMap<int, const unsigned char*> m_ptrs;
 };
 
 class CaptionServiceDescriptor : public MPEGDescriptor
@@ -131,8 +129,6 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     explicit ContentAdvisoryDescriptor(const unsigned char *data, int len = 300) :
         MPEGDescriptor(data, len, DescriptorID::content_advisory)
     {
-        if (m_data && !Parse())
-            m_data = nullptr;
     }
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x87
@@ -143,40 +139,47 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     // for (i=0; i<rating_region_count; i++) {
     //   rating_region          8 x+0.0
     uint RatingRegion(uint i) const
-        { return *Offset(i,-1); }
+        { return region(i)[0]; }
     //   rated_dimensions       8 x+1.0
     uint RatedDimensions(uint i) const
-        { return *(Offset(i,-1) + 1); }
+        { return region(i)[1]; }
     //   for (j=0;j<rated_dimensions;j++) {
     //     rating_dimension_j   8 y+0.0
     uint RatingDimension(uint i, uint j) const
-        { return *Offset(i,j); }
+        { return region(i)[2 + 2 * j]; }
     //     reserved             4 y+1.0       0x0f
     //     rating_value         4 y+1.4
     uint RatingValue(uint i, uint j) const
-        { return (*(Offset(i,j) + 1)) & 0xf; }
+        { return (region(i)[2 + 2 * j + 1]) & 0xf; }
     //   }
     //   rating_desc_length     8 x+2+(rated_dimensions*2)+0.0
     uint RatingDescriptionLength(uint i) const
-        { return (*(Offset(i,-1) + 2 + (RatedDimensions(i)<<1)));  }
+    {
+        const unsigned char *ret = region(i);
+        ret += 2 + ret[1] * 2;
+        return *ret;
+    }
     //   rating_desc_text         x+2+(rated_dimensions*2)+1.0
     MultipleStringStructure RatingDescription(uint i) const
     {
-        const unsigned char *data = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
+        const unsigned char *data = region(i);
+        data += 2 + data[1] * 2 + 1;
         return MultipleStringStructure(data);
     }
     // }
 
-    bool Parse(void);
     QString toString() const override; // MPEGDescriptor
   protected:
-    static int Index(int i, int j) { return (i<<8)|(j&0xff); }
-    const unsigned char *Offset(int i, int j) const
+    const unsigned char *region(int n) const
     {
-        IntToBuf::const_iterator it = m_ptrs.find(Index(i,j));
-        return (it != m_ptrs.end()) ? *it : nullptr;
+        const unsigned char *ret = m_data + 2;
+        for (int i = 0; i < n; i++)
+        {
+            ret += 2 + ret[1] * 2; // rating_region + rated_dimensions and values
+            ret += 1 + ret[1]; // rating_description_length + rating_description_text()
+        }
+        return ret;
     }
-    IntToBuf m_ptrs;
 };
 
 class ComponentNameDescriptor : public MPEGDescriptor

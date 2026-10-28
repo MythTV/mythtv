@@ -197,25 +197,6 @@ QString CaptionServiceDescriptor::toString(void) const
     return str;
 }
 
-bool ContentAdvisoryDescriptor::Parse(void)
-{
-    m_ptrs.clear();
-    m_ptrs[Index(0,-1)] = m_data + 2;
-
-    for (uint i = 0; i < RatingRegionCount(); i++)
-    {
-        m_ptrs[Index(i,0)] = Offset(i,-1)+2;
-        uint j = 0;
-        for (; j < RatedDimensions(i); j++)
-            m_ptrs[Index(i,j+1)] = Offset(i,j) + 2;
-        const unsigned char *tmp = Offset(i,-1) + 3 + (RatedDimensions(i)<<1);
-        uint len = RatingDescriptionLength(i);
-        m_ptrs[Index(i+1,-1)] = tmp + len;
-    }
-
-    return true;
-}
-
 QString ContentAdvisoryDescriptor::toString() const
 {
     return "ContentAdvisoryDescriptor::toString(): Not implemented";
