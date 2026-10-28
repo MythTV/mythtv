@@ -408,24 +408,17 @@ bool LoggerThread::logConsole(LoggingItem *item) const
 #ifndef Q_OS_ANDROID
     std::string line;
 
-    if (item->m_type & kStandardIO)
+#if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
+    if (true) // NOLINT(readability-simplify-boolean-expr)
+#else
+    if (m_loglong)
+#endif
     {
-        line = qPrintable(item->m_message);
+        line = item->toString();
     }
     else
     {
-#if !defined(NDEBUG) || CONFIG_FORCE_LOGLONG
-        if (true) // NOLINT(readability-simplify-boolean-expr)
-#else
-        if (m_loglong)
-#endif
-        {
-            line = item->toString();
-        }
-        else
-        {
-            line = item->toStringShort();
-        }
+        line = item->toStringShort();
     }
 
     std::cout << line << std::flush;
@@ -543,8 +536,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
                    const char *function, QString message)
 {
     int type = kMessage;
-    type |= (mask & VB_FLUSH) ? kFlush : 0;
-    type |= (mask & VB_STDIO) ? kStandardIO : 0;
     LoggingItem *item = LoggingItem::create(file, function, line, level,
                                             (LoggingType)type);
     if (!item)
@@ -566,10 +557,6 @@ void LogPrintLine( uint64_t mask, LogLevel_t level, const char *file, int line,
             item->DecrRef();
             qLock.relock();
         }
-    }
-    else if (logThread && !logThreadFinished && (type & kFlush))
-    {
-        logThread->flush();
     }
 }
 
