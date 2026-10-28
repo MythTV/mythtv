@@ -5,6 +5,7 @@
 #include <QJsonParseError>
 
 #include "stdinnotifier.h"
+#include <array>
 #include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
@@ -28,16 +29,16 @@ void StdinNotifier::handleReadyRead()
 {
     m_notifier->setEnabled(false);
 
-    char buffer[4096];
+    std::array<char, 4096> buffer {};
     bool immediateEof = false;
 
     for (;;)
     {
-        ssize_t count = ::read(STDIN_FILENO, buffer, sizeof(buffer));
+        ssize_t count = ::read(STDIN_FILENO, buffer.data(), buffer.size());
 
         if (count > 0)
         {
-            m_buffer.append(buffer, count);
+            m_buffer.append(buffer.data(), count);
             continue;
         }
 

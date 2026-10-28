@@ -637,7 +637,7 @@ std::string ExternTomlConfig::expandVars(std::string value) const
 
         const std::size_t position = offset +
                                      static_cast<std::size_t>(match.position());
-        const std::size_t length = static_cast<std::size_t>(match.length());
+        const auto length = static_cast<std::size_t>(match.length());
         const std::string name = match[1].str();
 
         if (!variableExists(name))
@@ -689,7 +689,7 @@ void ExternTomlConfig::updateVariable(std::string_view key,
     if (!variables)
         return;
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     variables->insert_or_assign(key, std::string(value));
     m_variables[std::string(key)] = std::string(value);
@@ -787,7 +787,7 @@ std::string ExternTomlConfig::tableAsString(const toml::table& tbl)
 
 std::string ExternTomlConfig::asString(void) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     std::string result;
 
@@ -836,7 +836,7 @@ ChannelInfo
 
 std::optional<ChannelInfo> ExternTomlConfig::firstChannel(void) const
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     m_channelIterValid = false;
 
@@ -853,7 +853,7 @@ std::optional<ChannelInfo> ExternTomlConfig::firstChannel(void) const
 
 std::optional<ChannelInfo> ExternTomlConfig::nextChannel(void) const
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     if (!m_channelIterValid)
         return std::nullopt;

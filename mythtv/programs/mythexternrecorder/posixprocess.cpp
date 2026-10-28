@@ -2,11 +2,12 @@
 #include <QStandardPaths>
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
-#include <signal.h>
+#include <csignal>
 #include <spawn.h>
 #include <string>
 #include <sys/wait.h>
@@ -116,7 +117,7 @@ void PosixProcess::killMatchingProcesses(const QString& targetCmd)
 
         std::string filename = entry.path().filename().string();
         if (filename.empty() ||
-            !std::all_of(filename.begin(), filename.end(), ::isdigit))
+            !std::ranges::all_of(filename, ::isdigit))
         {
             continue;
         }
@@ -276,11 +277,11 @@ LaunchResult PosixProcess::launch(const QString& command,
 
     envp.push_back(nullptr);
 
-    int stdoutPipe[2];
-    int stderrPipe[2];
+    std::array<int, 2> stdoutPipe {};
+    std::array<int, 2> stderrPipe {};
 
 #ifdef __APPLE__
-    if (pipe(stdoutPipe) < 0)
+    if (pipe(stdoutPipe.data()) < 0)
     {
         QString errStr = QString("Failed to create stdout pipe: %1")
                              .arg(QString::fromLocal8Bit(strerror(errno)));
@@ -290,7 +291,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     fcntl(stdoutPipe[0], F_SETFD, FD_CLOEXEC);
     fcntl(stdoutPipe[1], F_SETFD, FD_CLOEXEC);
 
-    if (pipe(stderrPipe) < 0)
+    if (pipe(stderrPipe.data()) < 0)
     {
         QString errStr = QString("Failed to create stderr pipe: %1")
                              .arg(QString::fromLocal8Bit(strerror(errno)));
@@ -303,7 +304,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     fcntl(stderrPipe[1], F_SETFD, FD_CLOEXEC);
 #else
     // Standard Linux path
-    if (pipe2(stdoutPipe, O_CLOEXEC) < 0)
+    if (pipe2(stdoutPipe.data(), O_CLOEXEC) < 0)
     {
         QString errStr = QString("Failed to create stdout pipe: %1")
                              .arg(QString::fromLocal8Bit(strerror(errno)));
@@ -311,7 +312,7 @@ LaunchResult PosixProcess::launch(const QString& command,
         return {false, errStr};
     }
 
-    if (pipe2(stderrPipe, O_CLOEXEC) < 0)
+    if (pipe2(stderrPipe.data(), O_CLOEXEC) < 0)
     {
         QString errStr = QString("Failed to create stderr pipe: %1")
                              .arg(QString::fromLocal8Bit(strerror(errno)));

@@ -19,8 +19,8 @@ class TouchMonitor : public QObject
     Q_OBJECT
 
   public:
-    explicit TouchMonitor(const QString& name,
-                          const TouchConfig& touch,
+    explicit TouchMonitor(QString name,
+                          TouchConfig touch,
                           Recorder* recorderParent);
     ~TouchMonitor(void) override;
 

@@ -32,7 +32,7 @@ class Process : public QObject
       };
     Q_ENUM(Result)
 
-      explicit Process(const QString& description = {},
+      explicit Process(QString description = {},
                        QObject* parent = nullptr);
     ~Process() override = default;
 

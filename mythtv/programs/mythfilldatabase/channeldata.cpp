@@ -217,7 +217,7 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
             QString filename(QString::number(id));
             filename.append("_").append((*i).m_xmltvId);
             filename.append("_").append(remotename);
-            filename.remove(QRegularExpression("[ \\\\/\\:\\*\\[\\]\\(\\)]"));
+            filename.remove(QRegularExpression(R"([ \\/\:\*\[\]\(\)])"));
 
             localfile = fileprefix + filename;
             QFile actualfile(localfile);

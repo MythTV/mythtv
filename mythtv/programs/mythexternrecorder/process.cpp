@@ -1,11 +1,12 @@
 #include "process.h"
+#include <utility>
 #include "libmythbase/mythlogging.h"
 
 #include <QProcessEnvironment>
 
-Process::Process(const QString& description, QObject* parent)
+Process::Process(QString description, QObject* parent)
     : QObject(parent)
-    , m_description(description)
+    , m_description(std::move(description))
 {
     m_process.setProcessChannelMode(QProcess::SeparateChannels);
 

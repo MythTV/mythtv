@@ -7,14 +7,15 @@
 
 #include <QStringList>
 #include <QDebug>
+#include <utility>
 
 
-TouchMonitor::TouchMonitor(const QString& name,
-                           const TouchConfig& touch,
+TouchMonitor::TouchMonitor(QString name,
+                           TouchConfig touch,
                            Recorder* recorderParent)
     : QObject(recorderParent)
-    , m_name(name)
-    , m_config(touch)
+    , m_name(std::move(name))
+    , m_config(std::move(touch))
     , m_recorder(recorderParent)
     , m_intervalTimer(new QTimer(this))
 {

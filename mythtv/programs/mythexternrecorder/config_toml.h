@@ -80,7 +80,7 @@ class ExternTomlConfig : public ExternConfig
                                         bool expand) const;
 
     [[nodiscard]]
-    virtual std::optional<std::string> getValue(std::string_view table,
+    std::optional<std::string> getValue(std::string_view table,
                                                 std::string_view key,
                                                 bool expand) const override;
 

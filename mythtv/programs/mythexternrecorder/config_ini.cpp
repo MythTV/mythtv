@@ -149,7 +149,7 @@ static std::string normalizeKey(std::string_view key)
 {
     std::string result(key);
 
-    std::transform(result.begin(), result.end(), result.begin(),
+    std::ranges::transform(result, result.begin(),
                    [](unsigned char c)
                    {
                        return static_cast<char>(std::tolower(c));
@@ -166,7 +166,7 @@ std::optional<std::string>
 {
     if (section == "VARIABLES")
     {
-        std::lock_guard lock(m_mutex);
+        std::scoped_lock lock(m_mutex);
 
         const auto it = m_variables.find(normalizeKey(key));
 
@@ -194,7 +194,7 @@ std::optional<std::string> ExternIniConfig::getValue(std::string_view table,
 void ExternIniConfig::updateVariable(std::string_view key,
                                      std::string_view value)
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     m_variables[normalizeKey(key)] = std::string(value);
 }
@@ -309,7 +309,7 @@ std::string ExternIniConfig::expandVars(std::string value) const
         const std::size_t position = offset +
                                      static_cast<std::size_t>(match.position());
 
-        const std::size_t length = static_cast<std::size_t>(match.length());
+        const auto length = static_cast<std::size_t>(match.length());
 
         const std::string name = match[1].str();
 
@@ -477,7 +477,7 @@ std::size_t ExternIniConfig::channelCount() const noexcept
 
 std::optional<ChannelInfo> ExternIniConfig::firstChannel() const
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     m_channelIterValid = false;
 
@@ -492,7 +492,7 @@ std::optional<ChannelInfo> ExternIniConfig::firstChannel() const
 
 std::optional<ChannelInfo> ExternIniConfig::nextChannel() const
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     if (!m_channelIterValid || m_channelIndex >= m_channels.size())
     {
@@ -505,7 +505,7 @@ std::optional<ChannelInfo> ExternIniConfig::nextChannel() const
 
 std::string ExternIniConfig::asString(const QSettings& settings) const
 {
-    std::lock_guard lock(m_mutex);
+    std::scoped_lock lock(m_mutex);
 
     std::string result;
 

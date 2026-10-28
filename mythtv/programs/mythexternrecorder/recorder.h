@@ -35,7 +35,7 @@ class Recorder : public QObject
     explicit Recorder(QObject* parent,
                       std::unique_ptr<ExternConfig> config,
                       QString desc);
-    ~Recorder(void);
+    ~Recorder(void) override;
 
     bool processCommand(const QJsonObject& message);
 

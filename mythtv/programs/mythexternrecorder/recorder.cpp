@@ -1,3 +1,4 @@
+#include <array>
 #include <cerrno>
 #include <cstdio>
 #include <exception>
@@ -1032,7 +1033,7 @@ void Recorder::executeCommand(QString command, QString desc, bool background,
         background = true;
     }
 
-    Process *myProcess = new Process(desc, this);
+    auto *myProcess = new Process(desc, this);
 
     // Capture standard error and output logs
     connect(myProcess, &Process::stdoutReady, this,
@@ -1153,7 +1154,7 @@ void Recorder::StderrLine(const QString &line)
         bool send_status;
     };
 
-    static const LevelInfo levels[] = {
+    static const auto levels = std::to_array<LevelInfo>({
         {u"crit",   "CRIT",  LOG_CRIT,    true},
         {u"err",    "ERR",   LOG_ERR,     true},
         {u"warn",   "WARN",  LOG_WARNING, true},
@@ -1161,7 +1162,7 @@ void Recorder::StderrLine(const QString &line)
         {u"info",   "INFO",  LOG_INFO,    false},
         {u"debug",  "DEBUG", LOG_DEBUG,   false},
         {u"trace",  "TRACE", LOG_TRACE,   false},
-    };
+    });
 
     const QString lower = line.trimmed().toLower();
 
@@ -1419,7 +1420,7 @@ void Recorder::initializeTouchTasks(void)
         LOG(VB_GENERAL, LOG_INFO,
             QString("Registering touch monitor task: %1")
             .arg(taskName));
-        TouchMonitor *monitor = new TouchMonitor(taskName, touch, this);
+        auto *monitor = new TouchMonitor(taskName, touch, this);
         m_touchMonitors.insert(taskName, monitor);
 
         monitor->start();
