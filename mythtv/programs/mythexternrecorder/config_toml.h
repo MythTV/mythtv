@@ -73,6 +73,7 @@ class ExternTomlConfig : public ExternConfig
 
     const toml::table variables(void) const;
 
+  public:
     [[nodiscard]]
     std::optional<std::string> getValue(const toml::table& tbl,
                                         std::string_view keyName,
@@ -89,13 +90,16 @@ class ExternTomlConfig : public ExternConfig
     [[nodiscard]]
     std::size_t channelCount() const noexcept override;
 
+  private:
     [[nodiscard]]
     ChannelInfo channelInfo(const toml::table::const_iterator& iter) const;
+  public:
     [[nodiscard]]
     std::optional<ChannelInfo> firstChannel(void) const override;
     [[nodiscard]]
     std::optional<ChannelInfo> nextChannel(void) const override;
 
+  private:
     mutable std::mutex m_mutex;
     toml::table m_root;
 
