@@ -75,6 +75,15 @@ enum PlayerFlags
     kMusicChoice          = 0x040000,
 };
 
+// Start recording playback or Live TV with Captions
+// Off, Captions On, or match the Last Caption state.
+enum StartCaptions : uint
+{
+    StartCaptionsOff  = 0,
+    StartCaptionsOn   = 1,
+    StartCaptionsLast = 2
+};
+
 // Padding between class members reduced from 113 to 73 bytes, but its
 // still higher than the default warning threshhold of 24 bytes.
 //
@@ -459,7 +468,8 @@ class MTV_PUBLIC MythPlayer : public QObject
     TeletextReader m_ttxReader;
     /// This allows us to enable captions/subtitles later if the streams
     /// are not immediately available when the video starts playing.
-    bool      m_captionsEnabledbyDefault  {false};
+    StartCaptions m_captionsEnabledbyDefault  {StartCaptionsOff};
+    bool      m_lastCaptionsEnabled       {false};
     bool      m_enableForcedSubtitles     {false};
     bool      m_disableForcedSubtitles    {false};
     bool      m_allowForcedSubtitles      {true};
