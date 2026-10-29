@@ -27,7 +27,7 @@
 static void AdjustFormatRanges(QTextLayout *layout, int cutStart,
                                int cutLen, int insertLen)
 {
-    auto formats = layout->formats();
+    const auto formats = layout->formats();
     if (formats.isEmpty() || cutLen <= 0)
         return;
 

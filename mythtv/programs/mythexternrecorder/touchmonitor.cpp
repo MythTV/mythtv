@@ -63,11 +63,11 @@ static QString toQString(const TouchConfig& config)
 
     return QString("delay=%1, frequency=%2, command=\"%3\", "
                    "damaged_on_failure=%4, log_level=\"%5\"")
-        .arg(formatSeconds(config.delay))
-        .arg(formatSeconds(config.frequency))
-        .arg(QString::fromStdString(config.command))
-        .arg(config.damagedOnFailure ? "true" : "false")
-        .arg(QString::fromStdString(config.logLevel));
+        .arg(formatSeconds(config.delay),
+             formatSeconds(config.frequency),
+             QString::fromStdString(config.command),
+             config.damagedOnFailure ? "true" : "false",
+             QString::fromStdString(config.logLevel));
 }
 
 void TouchMonitor::start(void)

@@ -99,8 +99,8 @@ bool Process::start(const QString& command, QProcessEnvironment& env,
 
     LOG(VB_GENERAL, LOG_DEBUG,
         QString("Process::Started '%1'%2")
-        .arg(m_command)
-        .arg(useShell ? QString(" via %1").arg(shellPath) : ""));
+        .arg(m_command,
+             useShell ? QString(" via %1").arg(shellPath) : ""));
 
     return true;
 }
@@ -255,8 +255,7 @@ void Process::processErrorOccurred(QProcess::ProcessError error)
 
     LOG(VB_GENERAL, LOG_WARNING,
         QString("Process::Error Failed '%1' '%2'")
-            .arg(m_errstr)
-            .arg(m_command));
+            .arg(m_errstr, m_command));
 }
 
 void Process::readStandardOutput()

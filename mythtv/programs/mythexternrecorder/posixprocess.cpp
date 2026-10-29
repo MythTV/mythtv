@@ -252,7 +252,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     std::vector<char*> argv;
     argv.reserve(finalArgs.size() + 1);
 
-    for (const QString& arg : finalArgs)
+    for (const QString& arg : std::as_const(finalArgs))
         storage.push_back(arg.toLocal8Bit());
 
     for (QByteArray& arg : storage)
@@ -267,7 +267,7 @@ LaunchResult PosixProcess::launch(const QString& command,
     std::vector<char*> envp;
     envp.reserve(envList.size() + 1);
 
-    for (const QString& env_var : envList)
+    for (const QString& env_var : std::as_const(envList))
         env_storage.push_back(env_var.toLocal8Bit());
 
     for (QByteArray& env_var : env_storage)

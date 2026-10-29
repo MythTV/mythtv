@@ -84,8 +84,9 @@ bool ExternIniConfig::hasTable(const std::string& table) const
 QString ExternIniConfig::getSectionName(std::string_view name) const
 {
     QString requested = QString::fromStdString(std::string(name));
+    const QStringList groups = m_settings.childGroups();
 
-    for (const auto &section : m_settings.childGroups())
+    for (const auto &section : groups)
     {
         if (section.compare(requested, Qt::CaseInsensitive) == 0)
             return section;
@@ -123,8 +124,9 @@ std::optional<QString> ExternIniConfig::findKey(const QSettings &settings,
     }
 
     const QString prefix = sectionName + '/';
+    const QStringList keys = settings.allKeys();
 
-    for (const auto &candidate : settings.allKeys())
+    for (const auto &candidate : keys)
     {
         if (!candidate.startsWith(prefix, Qt::CaseInsensitive))
             continue;
@@ -370,7 +372,8 @@ bool ExternIniConfig::loadChannels(void)
      *   [ABCNL]
      *   [ACC]
      */
-    for (const auto &section : settings->childGroups())
+    const QStringList groups = settings->childGroups();
+    for (const auto &section : groups)
     {
         const auto info = makeChannelInfo(*settings, section);
 
@@ -517,7 +520,9 @@ std::string ExternIniConfig::asString(const QSettings& settings) const
     }
 
     // Export the standard QSettings layout (unchanged)
-    for (const auto &section : settings.childGroups())
+    const QStringList keys = settings.allKeys();
+    const QStringList groups = settings.childGroups();
+    for (const auto &section : groups)
     {
         result += '[';
         result += section.toStdString();
@@ -525,7 +530,7 @@ std::string ExternIniConfig::asString(const QSettings& settings) const
 
         const QString prefix = section + '/';
 
-        for (const auto &key : settings.allKeys())
+        for (const auto &key : keys)
         {
             if (!key.startsWith(prefix))
                 continue;

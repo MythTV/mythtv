@@ -211,13 +211,14 @@ void ChannelData::handleChannels(int id, ChannelInfoList *chanlist) const
 
         if (!(*i).m_icon.isEmpty())
         {
+            static const auto bad_chars { QRegularExpression(R"([ \\/\:\*\[\]\(\)])") };
             QString remotename = QDir((*i).m_icon).dirName();
             // Define an unique icon filename for this channel and xmltv source
             // The most obvious format is <source_id>_<xmltv_id>_<remotename>
             QString filename(QString::number(id));
             filename.append("_").append((*i).m_xmltvId);
             filename.append("_").append(remotename);
-            filename.remove(QRegularExpression(R"([ \\/\:\*\[\]\(\)])"));
+            filename.remove(bad_chars);
 
             localfile = fileprefix + filename;
             QFile actualfile(localfile);

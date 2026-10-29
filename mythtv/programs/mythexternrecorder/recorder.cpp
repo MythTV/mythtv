@@ -787,8 +787,9 @@ bool Recorder::startStreaming(const QJsonObject &params)
     std::string profile;
     if (params.contains("profile"))
     {
+        static const auto whitespace { QRegularExpression("\\s") };
         QString p = params.value("profile").toString().toLower();
-        p.remove(QRegularExpression("\\s"));
+        p.remove(whitespace);
         profile = p.toStdString();
     }
 
@@ -1226,12 +1227,13 @@ void Recorder::StderrLine(const QString &line)
         break;
     }
 
+    static const auto trailing_space { QRegularExpression(R"(\s+$)") };
     if (send)
     {
         QJsonObject context = {{"command", "STATUS"}};
         QJsonObject response = {
             {"status", status},
-            {"message", message.remove(QRegularExpression(R"(\s+$)"))}
+            {"message", message.remove(trailing_space)}
         };
 
         sendResponse(context, response, level);
@@ -1239,7 +1241,7 @@ void Recorder::StderrLine(const QString &line)
     else
     {
         LOG(VB_GENERAL, level, QString("<> %1")
-            .arg(message.remove(QRegularExpression(R"(\s+$)"))));
+            .arg(message.remove(trailing_space)));
     }
 }
 

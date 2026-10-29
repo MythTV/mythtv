@@ -133,8 +133,8 @@ toml::table ExternTomlConfig::parseFile(const std::filesystem::path& filepath,
         toml::table tbl = toml::parse_file(filepath.string());
 
         LOG(VB_GENERAL, LOG_DEBUG, QString("Loaded '%1'\n%2")
-            .arg(QString::fromStdString(filepath.string()))
-            .arg(QString::fromStdString(tableAsString(tbl))));
+            .arg(QString::fromStdString(filepath.string()),
+                 QString::fromStdString(tableAsString(tbl))));
 
         return tbl;
     }
