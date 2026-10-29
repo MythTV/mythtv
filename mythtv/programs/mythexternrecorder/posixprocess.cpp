@@ -85,7 +85,7 @@ static bool matchCmdline(const std::vector<std::string>& procArgs,
     {
         std::string baseExec =
             std::filesystem::path(procArgs[0]).filename().string();
-        std::string flag = procArgs[1];
+        const std::string& flag = procArgs[1];
 
         // Check if the binary is a common shell executing a string command
         if ((baseExec == "sh" || baseExec == "bash" || baseExec == "zsh" ||

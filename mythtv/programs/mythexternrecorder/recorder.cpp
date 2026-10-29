@@ -134,7 +134,7 @@ void Recorder::terminateProcesses(void)
     // Disconnect signals first to prevent finished() slot / deleteLater race.
     for (auto it = m_processes.begin(); it != m_processes.end(); ++it)
     {
-        QString key = it.key();
+        const QString& key = it.key();
         Process *myProcess = it.value();
 
         if (myProcess)
@@ -996,7 +996,7 @@ void Recorder::variablesToEnv(void)
     }
 }
 
-void Recorder::executeCommand(QString command, QString desc, bool background,
+void Recorder::executeCommand(QString command, const QString& desc, bool background,
                               bool flag_damaged, LogLevel_t logLvl)
 {
     command = command.trimmed();
@@ -1284,7 +1284,7 @@ void Recorder::stderrLoop(int fd)
     fclose(stream);
 }
 
-void Recorder::streamLoop(QString command)
+void Recorder::streamLoop(const QString& command)
 {
     // Launch POSIX child process - environment variables already safe inside m_env
     auto res = m_streamProcess->launch(command, m_env, m_shell);

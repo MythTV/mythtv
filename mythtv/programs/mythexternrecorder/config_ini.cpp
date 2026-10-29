@@ -90,7 +90,7 @@ bool ExternIniConfig::hasTable(const std::string& table) const
 
 QString ExternIniConfig::getSectionName(std::string_view name) const
 {
-    const QString requested = QString::fromStdString(std::string(name));
+    QString requested = QString::fromStdString(std::string(name));
 
     for (const auto &section : m_settings.childGroups())
     {
@@ -325,7 +325,7 @@ std::string ExternIniConfig::expandVars(std::string value) const
         if (++substitutions > maxSubstitutions)
         {
             m_errstrm << "Too many variable substitutions; "
-                      << "possible circular reference" << std::endl;
+                      << "possible circular reference\n";
             m_fatal = true;
             return {};
         }

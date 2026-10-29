@@ -157,8 +157,7 @@ bool ExternTomlConfig::loadIncludes(void)
 
                 if (!filename)
                 {
-                    m_errstrm << "'INCLUDE.files' entries must be strings"
-                              << std::endl;
+                    m_errstrm << "'INCLUDE.files' entries must be strings\n";
                     m_fatal = true;
                     return false;
                 }
@@ -208,7 +207,7 @@ bool ExternTomlConfig::loadIncludes(void)
         }
         else
         {
-            m_errstrm << "'files' missing from include section" << std::endl;
+            m_errstrm << "'files' missing from include section\n";
         }
     }
     return true;
@@ -247,7 +246,7 @@ bool ExternTomlConfig::loadChannels(void)
 
     if (!filename)
     {
-        m_errstrm << "TUNER/channels must be a string" << std::endl;
+        m_errstrm << "TUNER/channels must be a string\n";
         return false;
     }
 
@@ -652,7 +651,7 @@ std::string ExternTomlConfig::expandVars(std::string value) const
         if (++substitutions > maxSubstitutions)
         {
             m_errstrm << "Too many variable substitutions; "
-                      << "possible circular reference" << std::endl;
+                      << "possible circular reference\n";
             m_fatal = true;
             return {};
         }

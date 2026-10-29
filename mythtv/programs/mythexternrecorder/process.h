@@ -13,7 +13,7 @@ class Process : public QObject
     Q_OBJECT
 
   public:
-    enum class State
+    enum class State : uint8_t
     {
         Idle,
         Starting,
@@ -23,7 +23,7 @@ class Process : public QObject
     };
     Q_ENUM(State)
 
-      enum class Result
+      enum class Result : uint8_t
       {
           Unknown,
           Success,

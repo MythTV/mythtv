@@ -42,7 +42,7 @@ class Recorder : public QObject
     QString expandVariables(const std::string& value);
 
     void executeCommand(QString command,
-                        QString desc,
+                        const QString& desc,
                         bool background,
                         bool flagDamaged = false,
                         LogLevel_t logLvl = LOG_INFO);
@@ -78,7 +78,7 @@ class Recorder : public QObject
     bool xon(const QJsonObject& params);
     bool xoff(const QJsonObject& params);
     void stderrLoop(int fd);
-    void streamLoop(QString command);
+    void streamLoop(const QString& command);
 
     bool loadChannels(const QJsonObject& params);
     void channelInfo(const QJsonObject& params,
