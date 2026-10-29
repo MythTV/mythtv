@@ -1127,7 +1127,7 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     Reset();
 
                     m_imagesLock.lock();
-                    if (auto val = m_images.take(j)) // remove from hash
+                    if (auto *val = m_images.take(j)) // remove from hash
                     {
                         val->DecrRef();
                     }

@@ -73,10 +73,10 @@ class ExternIniConfig : public ExternConfig
     [[nodiscard]]
     QString getSectionName(std::string_view name) const;
 
-    [[nodiscard]]
+    [[nodiscard]] static
     std::optional<QString> findKey(const QSettings &settings,
                                    std::string_view section,
-                                   std::string_view key) const;
+                                   std::string_view key);
 
     [[nodiscard]]
     std::optional<std::string> getValue(const QSettings &settings,

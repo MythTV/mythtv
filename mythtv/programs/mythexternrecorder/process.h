@@ -41,7 +41,7 @@ class Process : public QObject
      * Returns false if the process could not be started.
      */
     bool start(const QString& command, QProcessEnvironment& env,
-               const QString& shell_path = "");
+               const QString& shellPath = "");
     static bool startDetached(const QString& command);
 
     /*
@@ -49,7 +49,7 @@ class Process : public QObject
      * Returns true if the process exited successfully.
      */
     bool execute(const QString& command, QProcessEnvironment& env,
-                 const QString& shell_path = "");
+                 const QString& shellPath = "");
 
     /*
      * Wait for a background process to complete.

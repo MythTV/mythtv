@@ -116,7 +116,9 @@ void TouchMonitor::triggerCommand(void)
          parseLogLevel(QString::fromStdString(m_config.logLevel)));
 
     if (m_config.frequency)
+    {
         m_intervalTimer->start(*m_config.frequency);
+    }
     else
     {
         m_intervalTimer->stop();

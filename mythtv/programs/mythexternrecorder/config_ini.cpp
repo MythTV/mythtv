@@ -77,15 +77,8 @@ void ExternIniConfig::load(const std::filesystem::path &filename)
 
 bool ExternIniConfig::hasTable(const std::string& table) const
 {
-    const QString requested = QString::fromStdString(table);
-
-    for (const auto &section : m_settings.childGroups())
-    {
-        if (section.compare(requested, Qt::CaseInsensitive) == 0)
-            return true;
-    }
-
-    return false;
+    return m_settings.childGroups().contains(QString::fromStdString(table),
+                                             Qt::CaseInsensitive);
 }
 
 QString ExternIniConfig::getSectionName(std::string_view name) const
@@ -103,7 +96,7 @@ QString ExternIniConfig::getSectionName(std::string_view name) const
 
 std::optional<QString> ExternIniConfig::findKey(const QSettings &settings,
                                                 std::string_view section,
-                                                std::string_view key) const
+                                                std::string_view key)
 {
     QString sectionName;
     QString requestedKey;

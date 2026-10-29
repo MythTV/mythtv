@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
                          {
                              if (!recorder.processCommand(json))
                              {
-                                 app.quit();
+                                 QCoreApplication::quit();
                              }
                          }
                          catch (const std::exception& e)
@@ -187,13 +187,13 @@ int main(int argc, char *argv[])
                              LOG(VB_GENERAL, LOG_ERR,
                                  QString("Exception processing command: %1")
                                  .arg(e.what()));
-                             app.quit();
+                             QCoreApplication::quit();
                          }
                          catch (...)
                          {
                              LOG(VB_GENERAL, LOG_ERR,
                                  "Unknown exception processing command.");
-                             app.quit();
+                             QCoreApplication::quit();
                              throw;
                          }
                      });
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
                      &QCoreApplication::quit);
 
     // Start the Qt event loop
-    int exitCode = app.exec();
+    int exitCode = QCoreApplication::exec();
 
     LOG(VB_GENERAL, LOG_DEBUG, "Finished.");
     logStop();

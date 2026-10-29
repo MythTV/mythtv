@@ -9,8 +9,6 @@
 #include <chrono>
 #include <map>
 #include <mutex>
-#include <string>
-#include <string_view>
 
 #include "config_base.h"
 #include "touchmonitor.h"
@@ -48,12 +46,12 @@ class ExternTomlConfig : public ExternConfig
 
     bool loadTouch(void);
 
-    std::string getSectionName(const toml::table& tbl,
-                               std::string_view name) const;
+    static std::string getSectionName(const toml::table& tbl,
+                               std::string_view name);
     const toml::table* getTable(std::string_view sectionKey) const;
     toml::table* getTable(std::string_view sectionKey);
 
-    toml::table parseFile(const std::filesystem::path& filename,
+    toml::table parseFile(const std::filesystem::path& filepath,
                           const std::string& where);
 
     std::optional<std::chrono::seconds>
@@ -71,7 +69,7 @@ class ExternTomlConfig : public ExternConfig
 
     bool variableExists(std::string_view name) const;
 
-    const toml::table variables(void) const;
+    toml::table variables(void) const;
 
   public:
     [[nodiscard]]
@@ -91,8 +89,8 @@ class ExternTomlConfig : public ExternConfig
     std::size_t channelCount() const noexcept override;
 
   private:
-    [[nodiscard]]
-    ChannelInfo channelInfo(const toml::table::const_iterator& iter) const;
+    [[nodiscard]] static
+    ChannelInfo channelInfo(const toml::table::const_iterator& iter);
   public:
     [[nodiscard]]
     std::optional<ChannelInfo> firstChannel(void) const override;

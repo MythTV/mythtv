@@ -22,7 +22,7 @@ class PosixProcess
 
     LaunchResult launch(const QString& command,
                         const QProcessEnvironment& env,
-                        const QString& shell_path = "");
+                        const QString& shellPath = "");
 
     bool isRunning(void);
     void terminate(void);
@@ -43,7 +43,7 @@ class PosixProcess
 
   private:
     void closeFds(void);
-    void killMatchingProcesses(const QString& comamnd);
+    static void killMatchingProcesses(const QString& targetCmd);
 
     pid_t m_pid {-1};
     int   m_exitCode {0};

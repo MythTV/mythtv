@@ -31,7 +31,7 @@ class TouchMonitor : public QObject
     void triggerCommand();
 
   private:
-    LogLevel_t parseLogLevel(const QString& levelStr);
+    static LogLevel_t parseLogLevel(const QString& levelStr);
 
     QString     m_name;
     TouchConfig m_config;

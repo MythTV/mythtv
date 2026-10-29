@@ -44,15 +44,15 @@ class Recorder : public QObject
     void executeCommand(QString command,
                         const QString& desc,
                         bool background,
-                        bool flagDamaged = false,
+                        bool flag_damaged = false,
                         LogLevel_t logLvl = LOG_INFO);
-    bool executeDetachedCommand(const QString& command,
+    static bool executeDetachedCommand(const QString& command,
                                 const QString& desc,
                                 LogLevel_t logLvl = LOG_INFO);
 
   private:
     void sendResponse(const QJsonObject& originalMsg,
-                       const QJsonObject& responseData,
+                       const QJsonObject& respData,
                        LogLevel_t level = LOG_INFO);
 
     QString getTunerValue(const QString& searchKey,

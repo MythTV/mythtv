@@ -488,7 +488,7 @@ ThemeInfo *ThemeChooser::loadThemeInfo(const QFileInfo &theme)
         return nullptr;
     }
 
-    if (auto oldti = m_themeFileNameInfos.take(theme.filePath()))
+    if (auto *oldti = m_themeFileNameInfos.take(theme.filePath()))
     {
         // We're about to overwrite a ThemeInfo* which was
         // dynamically allocated. We can't delete it now
@@ -500,7 +500,7 @@ ThemeInfo *ThemeChooser::loadThemeInfo(const QFileInfo &theme)
     }
     m_themeFileNameInfos[theme.filePath()] = themeinfo;
 
-    if (auto oldti = m_themeNameInfos.take(theme.fileName()))
+    if (auto *oldti = m_themeNameInfos.take(theme.fileName()))
     {
         // Insert ThemeInfo* into set to be deleted later.
         m_themeInfosToDelete.insert(oldti);

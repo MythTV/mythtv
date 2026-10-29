@@ -448,7 +448,9 @@ bool Recorder::blockSize(const QJsonObject &params)
         int blockSize = 0;
 
         if (value.isString())
+        {
             blockSize = value.toString().toInt(&ok);
+        }
         else if (value.isDouble())
         {
             blockSize = value.toInt();
@@ -490,7 +492,9 @@ bool Recorder::signalStrength(const QJsonObject &params)
     LogLevel_t level = LOG_INFO;
 
     if (m_recDirectTune || !m_hasTuner)
+    {
         strength = 100;
+    }
     else
     {
         QHash<QString, Process *>::const_iterator it =
@@ -508,7 +512,9 @@ bool Recorder::signalStrength(const QJsonObject &params)
             else if (tuneProc->state() == Process::State::Finished)
             {
                 if (tuneProc->succeeded())
+                {
                     strength = 100;
+                }
                 else
                 {
                     strength = 0;
@@ -532,7 +538,9 @@ bool Recorder::hasLock(const QJsonObject &params)
     LogLevel_t level = LOG_INFO;
 
     if (m_recDirectTune || !m_hasTuner)
+    {
         message = "Yes";
+    }
     else
     {
         QHash<QString, Process *>::const_iterator it =
@@ -544,7 +552,9 @@ bool Recorder::hasLock(const QJsonObject &params)
             if (tuneProc->state() == Process::State::Finished)
             {
                 if (tuneProc->succeeded())
+                {
                     message = "Yes";
+                }
                 else
                 {
                     message = "No";
@@ -663,7 +673,9 @@ bool Recorder::tuneStatus(const QJsonObject &params)
 
     // Some recorders tune themselves (HDHomeRun, etc.).
     if (m_recDirectTune)
+    {
         message = "Tuned";
+    }
     else
     {
         // Find Tune process.
@@ -671,7 +683,9 @@ bool Recorder::tuneStatus(const QJsonObject &params)
             m_processes.constFind("Tune");
 
         if (it == m_processes.constEnd() || it.value() == nullptr)
+        {
             message = "Idle";
+        }
         else
         {
             const Process *tuneProc = it.value();
@@ -689,7 +703,9 @@ bool Recorder::tuneStatus(const QJsonObject &params)
                 {
                     // Check if it finished successfully or failed/crashed
                     if (tuneProc->succeeded())
+                    {
                         message = "Tuned";
+                    }
                     else
                     {
                         message = "Failed";
@@ -1203,7 +1219,9 @@ void Recorder::StderrLine(const QString &line)
             send = true;
         }
         else
+        {
             status = info.status;
+        }
 
         break;
     }

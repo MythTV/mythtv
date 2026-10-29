@@ -1,5 +1,6 @@
 #include "libmythbase/mythconfig.h"
 
+#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <charconv>
@@ -19,6 +20,15 @@
 #include "config_toml.h"
 
 #include "libmythbase/mythlogging.h"
+
+// Convert a character to lower case.  Used in calls to std::ranges::equal.
+namespace
+{
+    constexpr char asciiLower(char c) noexcept
+    {
+            return (c >= 'A' && c <= 'Z') ? static_cast<char>(c | 0x20) : c;
+    }
+}
 
 ExternTomlConfig::ExternTomlConfig(const std::filesystem::path& filename)
 {
@@ -101,15 +111,14 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
 }
 
 std::string ExternTomlConfig::getSectionName(const toml::table& tbl,
-                                             std::string_view name) const
+                                             std::string_view name)
 {
     for (const auto& [k, n] : tbl)
     {
         // Extract string_view from toml::key using .str()
         std::string_view keyView = k.str();
 
-        if (keyView.size() == name.size() &&
-            strncasecmp(keyView.data(), name.data(), name.size()) == 0)
+        if (std::ranges::equal(keyView, name, {}, asciiLower, asciiLower))
         {
             return std::string(keyView);
         }
@@ -351,15 +360,15 @@ std::optional<std::chrono::seconds>
           if (parts[1] >= 60)
               return std::nullopt;
 
-          total_seconds = parts[0] * 60 + parts[1];
+          total_seconds = (parts[0] * 60) + parts[1];
           break;
 
         case 3:
           if (parts[1] >= 60 || parts[2] >= 60)
               return std::nullopt;
 
-          total_seconds = parts[0] * 3600 +
-                          parts[1] * 60 +
+          total_seconds = (parts[0] * 3600) +
+                          (parts[1] * 60) +
                           parts[2];
           break;
     }
@@ -435,9 +444,12 @@ bool ExternTomlConfig::loadTouch(void)
     if (!touch)
         return true;
 
-    for (const auto& [key, node] : *touch)
+    return std::ranges::all_of(*touch, [this](const auto& entry)
     {
-        if (!node.as_table())
+        const auto& [key, node] = entry;
+
+        const toml::table* table = node.as_table();
+        if (!table)
         {
 #if HAVE_STD_FORMAT
             m_errstrm << std::format("[TOUCH.{}] must be a table\n", key.str());
@@ -447,13 +459,10 @@ bool ExternTomlConfig::loadTouch(void)
             return false;
         }
 
-        const toml::table table = *(node.as_table());
-        const std::string name = std::string(key.str());
-
-        m_touch.insert_or_assign(name, parseTouchConfig(name, table));
-    }
-
-    return true;
+        const std::string name { key.str() };
+        m_touch.insert_or_assign(name, parseTouchConfig(name, *table));
+        return true;
+    });
 }
 
 std::size_t ExternTomlConfig::channelCount() const noexcept
@@ -482,7 +491,9 @@ void ExternTomlConfig::mergeTable(const toml::table& source,
             destination.insert_or_assign(keyString, *sourceTable);
         }
         else
+        {
             destination.insert_or_assign(keyString, value);
+        }
     }
 }
 
@@ -492,16 +503,11 @@ bool ExternTomlConfig::variableExists(std::string_view varName) const
     if (!variables)
         return true;
 
-    for (const auto& [k, n] : *variables)
+    return std::ranges::any_of(*variables, [varName](const auto& entry)
     {
-        std::string_view keyView = k.str();
-        if (keyView.size() == varName.size() &&
-            strncasecmp(keyView.data(), varName.data(), varName.size()) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
+        return std::ranges::equal(entry.first.str(), varName, {},
+                                  asciiLower, asciiLower);
+    });
 }
 
 std::string ExternTomlConfig::expandVariable(std::string_view varName) const
@@ -513,9 +519,7 @@ std::string ExternTomlConfig::expandVariable(std::string_view varName) const
     const toml::node* node = nullptr;
     for (const auto& [k, n] : *variables)
     {
-        std::string_view keyView = k.str();
-        if (keyView.size() == varName.size() &&
-            strncasecmp(keyView.data(), varName.data(), varName.size()) == 0)
+        if (std::ranges::equal(k.str(), varName, {}, asciiLower, asciiLower))
         {
             node = &n;
             break;
@@ -525,24 +529,21 @@ std::string ExternTomlConfig::expandVariable(std::string_view varName) const
     if (!node)
         return {};
 
-    if (auto* vs = node->as_string())
+    if (const auto* vs = node->as_string())
         return expandVars(std::string(vs->get()));
-    else if (const auto* vi = node->as_integer())
+    if (const auto* vi = node->as_integer())
         return std::to_string(vi->get());
-    else if (const auto* vb = node->as_boolean())
+    if (const auto* vb = node->as_boolean())
         return vb->get() ? "true" : "false";
-    else
-    {
 #if HAVE_STD_FORMAT
-        m_errstrm << std::format("Configuration variable '{}' "
-                                 "is not a scalar value\n", varName);
+    m_errstrm << std::format("Configuration variable '{}' "
+                             "is not a scalar value\n", varName);
 #else
-        m_errstrm << "Configuration variable '"
-                  << varName
-                  << "' is not a scalar value\n";
+    m_errstrm << "Configuration variable '"
+              << varName
+              << "' is not a scalar value\n";
 #endif
-        return {};
-    }
+    return {};
 }
 
 std::string ExternTomlConfig::expandVars(std::string value) const
@@ -663,7 +664,7 @@ std::string ExternTomlConfig::expandVars(std::string value) const
     return value;
 }
 
-const toml::table ExternTomlConfig::variables(void) const
+toml::table ExternTomlConfig::variables(void) const
 {
     const toml::table* variables = getTable("VARIABLES");
     if (!variables)
@@ -702,9 +703,7 @@ std::optional<std::string>
     const toml::node* val = nullptr;
     for (const auto& [k, n] : tbl)
     {
-        std::string_view keyView = k.str();
-        if (keyView.size() == keyName.size() &&
-            strncasecmp(keyView.data(), keyName.data(), keyName.size()) == 0)
+        if (std::ranges::equal(k.str(), keyName, {}, asciiLower, asciiLower))
         {
             val = &n;
             break;
@@ -808,7 +807,7 @@ std::string ExternTomlConfig::asString(void) const
 }
 
 ChannelInfo
-  ExternTomlConfig::channelInfo(const toml::table::const_iterator& iter) const
+  ExternTomlConfig::channelInfo(const toml::table::const_iterator& iter)
 {
     const auto& [key, node] = *iter;
 

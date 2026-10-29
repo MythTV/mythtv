@@ -19,8 +19,6 @@
 
 #include "libmythbase/mythlogging.h"
 
-extern char** environ;
-
 PosixProcess::~PosixProcess(void)
 {
     this->terminate();
