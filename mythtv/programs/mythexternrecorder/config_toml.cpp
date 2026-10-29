@@ -70,12 +70,11 @@ void ExternTomlConfig::load(const std::filesystem::path& filename)
             {
                 if constexpr (toml::is_string<decltype(el)>)
                     strvalue = *el;
-                else if constexpr (toml::is_integer<decltype(el)>)
+                else if constexpr (toml::is_integer<decltype(el)> ||
+                                   toml::is_floating_point<decltype(el)>)
                     strvalue = std::to_string(*el);
                 else if constexpr (toml::is_boolean<decltype(el)>)
                     strvalue = (*el) ? "true" : "false";
-                else if constexpr (toml::is_floating_point<decltype(el)>)
-                    strvalue = std::to_string(*el);
             });
             m_variables[std::string(k.str())] = strvalue;
         }

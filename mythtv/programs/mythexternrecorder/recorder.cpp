@@ -342,11 +342,11 @@ QString Recorder::getTunerValue(const QString& searchKey,
     const std::string key = searchKey.toStdString();
     std::optional<std::string> value;
 
-    if ((value = m_config->getChannelValue(key, m_shell.isEmpty())) ||
-        (value = m_config->getValue("TUNER", key, m_shell.isEmpty())))
-    {
+    value = m_config->getChannelValue(key, m_shell.isEmpty());
+    if (!value)
+        value = m_config->getValue("TUNER", key, m_shell.isEmpty());
+    if (value)
         return QString::fromStdString(*value);
-    }
 
     return defaultValue;
 }
