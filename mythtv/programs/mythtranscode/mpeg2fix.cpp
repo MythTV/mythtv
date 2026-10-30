@@ -3,6 +3,8 @@
 //support analyze-only mode
 
 // C++ headers
+#include <chrono>
+using namespace std::chrono_literals;
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -27,6 +29,7 @@
 #include "libmythbase/mythcorecontext.h"
 #include "libmythbase/mythdate.h"
 #include "libmythbase/mythlogging.h"
+#include "libmythtv/mythavrational.h"
 
 extern "C" {
 #include "libavutil/cpu.h"
@@ -2923,7 +2926,7 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    uint64_t totalDuration = 0;
+    std::chrono::nanoseconds duration {0};
     while (av_read_frame(m_inputFC, pkt) >= 0)
     {
         if (pkt->stream_index == m_vidId)
@@ -2931,7 +2934,7 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
             if (pkt->flags & AV_PKT_FLAG_KEY)
             {
                 posMap[count] = pkt->pos;
-                durMap[count] = totalDuration;
+                durMap[count] = duration_cast<std::chrono::milliseconds>(duration).count();
             }
 
             // XXX totalDuration untested.  Results should be the same
@@ -2939,9 +2942,17 @@ int MPEG2fixup::BuildKeyframeIndex(const QString &file,
 
             // totalDuration calculation based on
             // AvFormatDecoder::PreProcessVideoPacket()
-            totalDuration +=
-                av_q2d(m_inputFC->streams[pkt->stream_index]->time_base) *
-                pkt->duration * 1000; // msec
+            // The ffmpeg libraries represent a frame interval of a
+            // 59.94fps video as 1501/90000 seconds, when it should
+            // actually be 1501.5/90000 seconds.
+            MythAVRational pkt_dur {static_cast<int>(pkt->duration)};
+            pkt_dur *= MythAVRational(m_inputFC->streams[pkt->stream_index]->time_base);
+            if (pkt_dur == MythAVRational(1501, 90000))
+            {
+                pkt_dur = MythAVRational(1001, 60000); // 1501.5/90000
+            }
+            constexpr std::chrono::nanoseconds k_s_in_ns {1s};
+            duration += std::chrono::nanoseconds{pkt_dur.toFixed(k_s_in_ns.count())};
             count++;
         }
         av_packet_unref(pkt);
