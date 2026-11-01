@@ -21,9 +21,62 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
+// Adjust QTextLayout FormatRanges when text is removed [cutStart,
+// cutStart + cutLen) and replaced with an ellipsis of length
+// insertLen.  NOTE: Must only be called AFTER layout->endLayout().
+static void AdjustFormatRanges(QTextLayout *layout, int cutStart,
+                               int cutLen, int insertLen)
+{
+    auto formats = layout->formats();
+    if (formats.isEmpty() || cutLen <= 0)
+        return;
+
+    int cutEnd = cutStart + cutLen;
+    int delta = insertLen - cutLen;
+    QVector<QTextLayout::FormatRange> updated;
+    updated.reserve(formats.size());
+
+    for (auto range : formats)
+    {
+        // Keep full-paragraph outline ranges spanning the new length
+        if (range.format.hasProperty(QTextFormat::TextOutline))
+        {
+            range.length += delta;
+            updated.push_back(range);
+            continue;
+        }
+
+        int rStart = range.start;
+        int rEnd = range.start + range.length;
+
+        if (rEnd <= cutStart)
+        {
+            updated.push_back(range);
+        }
+        else if (rStart >= cutEnd)
+        {
+            range.start += delta;
+            updated.push_back(range);
+        }
+        else
+        {
+            int newStart = std::min(rStart, cutStart);
+            int newEnd = (rEnd <= cutEnd)
+                         ? (cutStart + insertLen) : (rEnd + delta);
+            if (newEnd > newStart)
+            {
+                range.start = newStart;
+                range.length = newEnd - newStart;
+                updated.push_back(range);
+            }
+        }
+    }
+    layout->setFormats(updated);
+}
+
 MythUIText::MythUIText(MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-      m_font(new MythFontProperties())
+    : MythUIType(parent, name)
+    , m_font(new MythFontProperties())
 {
     m_enableInitiator = true;
 
@@ -34,13 +87,13 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
                        MythUIType *parent, const QString &name)
-    : MythUIType(parent, name),
-      m_origDisplayRect(displayRect), m_altDisplayRect(altDisplayRect),
-      m_canvas(0, 0, displayRect.width(), displayRect.height()),
-      m_drawRect(displayRect),
-      m_message(text.trimmed()),
-      m_defaultMessage(text),
-      m_font(new MythFontProperties())
+    : MythUIType(parent, name)
+    , m_origDisplayRect(displayRect), m_altDisplayRect(altDisplayRect)
+    , m_canvas(0, 0, displayRect.width(), displayRect.height())
+    , m_drawRect(displayRect)
+    , m_message(text.trimmed())
+    , m_defaultMessage(text)
+    , m_font(new MythFontProperties())
 {
 #if 0 // Not currently used
     m_usingAltArea = false;
@@ -84,14 +137,14 @@ void MythUIText::ResetMap(const InfoMap &map)
         newText = GetDefaultText();
 
     static const QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
-                           QRegularExpression::DotMatchesEverythingOption};
+        QRegularExpression::DotMatchesEverythingOption};
 
     bool replaced = map.contains(objectName());
 
     if (!replaced && !newText.isEmpty() && newText.contains(re))
     {
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
-                                                     newText.toUtf8().constData());
+                                                 newText.toUtf8().constData());
 
         QRegularExpressionMatchIterator i = re.globalMatch(translatedTemplate);
         while (i.hasNext()) {
@@ -143,12 +196,12 @@ void MythUIText::SetTextFromMap(const InfoMap &map)
         newText = GetDefaultText();
 
     static const QRegularExpression re {R"(%(([^\|%]+)?\||\|(.))?([\w#]+)(\|(.+?))?%)",
-                           QRegularExpression::DotMatchesEverythingOption};
+        QRegularExpression::DotMatchesEverythingOption};
 
     if (!newText.isEmpty() && newText.contains(re))
     {
         QString translatedTemplate = QCoreApplication::translate("ThemeUI",
-                                                     newText.toUtf8().constData());
+                                                  newText.toUtf8().constData());
 
         QString tempString = translatedTemplate;
         bool replaced = map.contains(objectName());
@@ -568,10 +621,67 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         {
             if (!force && m_cutdown != Qt::ElideNone)
             {
+                const QString ellipsis = QStringLiteral("...");
                 QFontMetrics fm(GetFontProperties()->face());
-                paragraph = fm.elidedText(paragraph, m_cutdown,
-                                          width - fm.averageCharWidth());
+                qreal availWidth = std::max<qreal>(0.0, width -
+                                                   fm.averageCharWidth());
+
+                // Expand to full line so QTextLine computes exact
+                // mixed-font glyph positions
+                line.setLineWidth(INT_MAX);
+                qreal totalWidth = line.naturalTextWidth();
+                qreal ellipsisWidth = fm.horizontalAdvance(ellipsis);
+
+                int cutStart = 0;
+                int cutLen = 0;
+
+                if (m_cutdown == Qt::ElideRight)
+                {
+                    cutStart = line.xToCursor(std::max<qreal>(0.0,
+                                                              availWidth -
+                                                              ellipsisWidth),
+                                              QTextLine::CursorOnCharacter);
+                    cutLen = paragraph.size() - cutStart;
+                    paragraph = paragraph.left(cutStart) + ellipsis;
+                }
+                else if (m_cutdown == Qt::ElideLeft)
+                {
+                    int keepStart =
+                        line.xToCursor(std::max<qreal>(0.0,
+                                                       totalWidth -
+                                                       (availWidth -
+                                                        ellipsisWidth)),
+                                       QTextLine::CursorOnCharacter);
+                    if (keepStart < paragraph.size())
+                        ++keepStart;
+                    cutStart = 0;
+                    cutLen = keepStart;
+                    paragraph = ellipsis + paragraph.mid(keepStart);
+                }
+                else if (m_cutdown == Qt::ElideMiddle)
+                {
+                    qreal halfAvail =
+                        std::max<qreal>(0.0, (availWidth - ellipsisWidth) / 2.0);
+                    int leftEnd = line.xToCursor(halfAvail,
+                                                 QTextLine::CursorOnCharacter);
+                    int rightStart =
+                        line.xToCursor(std::max<qreal>(0.0,
+                                                       totalWidth - halfAvail),
+                                       QTextLine::CursorOnCharacter);
+                    if (rightStart < paragraph.size())
+                        ++rightStart;
+                    if (leftEnd < rightStart)
+                    {
+                        cutStart = leftEnd;
+                        cutLen = rightStart - leftEnd;
+                        paragraph = paragraph.left(leftEnd) + ellipsis +
+                                    paragraph.mid(rightStart);
+                    }
+                }
                 layout->endLayout(); // Cleanly close the aborted layout pass
+                if (cutLen > 0)
+                    AdjustFormatRanges(layout, cutStart, cutLen,
+                                       ellipsis.size());
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -580,7 +690,9 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 
         height += m_leading;
         line.setPosition(QPointF(0, height));
-        height += m_lineHeight;
+        qreal actualLineHeight = std::max(static_cast<qreal>(m_lineHeight),
+                                          line.height());
+        height += actualLineHeight;
         if (!overflow)
         {
             if (height > m_area.height())
@@ -598,15 +710,35 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                     m_drawRect.setHeight(height);
                 if (m_cutdown != Qt::ElideNone)
                 {
+                    const QString ellipsis = QStringLiteral("...");
                     QFontMetrics fm(GetFontProperties()->face());
-                    QString cut_line = fm.elidedText
-                                       (paragraph.mid(last_line),
-                                        Qt::ElideRight,
-                                        width - fm.averageCharWidth());
-                    paragraph = paragraph.left(last_line) + cut_line;
+                    qreal availWidth =
+                        std::max<qreal>(0.0, width -
+                                        fm.averageCharWidth() -
+                                        fm.horizontalAdvance(ellipsis));
+
+                    int cutPos = last_line;
+                    if (layout->lineCount() >= 2)
+                    {
+                        QTextLine prevLine =
+                            layout->lineAt(layout->lineCount() - 2);
+                        cutPos =
+                            prevLine.xToCursor(availWidth,
+                                               QTextLine::CursorOnCharacter);
+                    }
+                    else
+                    {
+                        cutPos = line.xToCursor(availWidth,
+                                                QTextLine::CursorOnCharacter);
+                    }
+
+                    int cutLen = paragraph.size() - cutPos;
+                    paragraph = paragraph.left(cutPos) + ellipsis;
+
                     if (last_line == 0)
                         min_rect |= line.naturalTextRect();
                     layout->endLayout();
+                    AdjustFormatRanges(layout, cutPos, cutLen, ellipsis.size());
                     return false;
                 }
                 overflow = true;
@@ -624,7 +756,8 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         min_rect |= line.naturalTextRect();
         ++num_lines;
 
-        if (final && line.textLength())
+        if (final && line.textLength() > 0 &&
+            last_line + line.textLength() <= paragraph.size())
         {
         /**
          * FontMetrics::width() returns a value that is good for spacing
@@ -636,10 +769,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
          */
             QFontMetrics fm(GetFontProperties()->face());
 
-            int bearing = fm.leftBearing(m_cutMessage[last_line]);
+            int bearing = fm.leftBearing(paragraph[last_line]);
             m_leftBearing = std::min(m_leftBearing, bearing);
             bearing = fm.rightBearing
-                      (m_cutMessage[last_line + line.textLength() - 1]);
+                      (paragraph[last_line + line.textLength() - 1]);
             m_rightBearing = std::min(m_rightBearing, bearing);
         }
     }
@@ -901,9 +1034,19 @@ void MythUIText::FillCutMessage(void)
          * to make sure we have enough space for the *full* height or
          * characters could be clipped.
          */
-        QRect actual = fm.boundingRect(m_cutMessage);
-        m_ascent = -(actual.y() + fm.ascent());
-        m_descent = actual.height() - fm.height();
+        m_ascent = 0;
+        m_descent = 0;
+        if (!m_layouts.isEmpty() && m_layouts.first()->lineCount() > 0)
+        {
+            // Check if the rendered layout bounds exceed the nominal canvas
+            QRectF firstLineRect = m_layouts.first()->lineAt(0).naturalTextRect();
+            if (firstLineRect.top() < 0)
+                m_ascent = static_cast<int>(std::ceil(-firstLineRect.top()));
+
+            qreal maxBottom = min_rect.bottom();
+            if (maxBottom > height)
+                m_descent = static_cast<int>(std::ceil(maxBottom - height));
+        }
     }
 
     if (m_scrolling)
@@ -1039,8 +1182,9 @@ int MythUIText::MoveCursor(int lines)
 
             QTextLine line = layout->lineAt(y);
 
-            if (m_textCursor >= currPos && m_textCursor < currPos + line.textLength()
-                + (line.lineNumber() == layout->lineCount() - 1 ? 1 : 0))
+            if (m_textCursor >= currPos && m_textCursor < currPos +
+                line.textLength() +
+                (line.lineNumber() == layout->lineCount() - 1 ? 1 : 0))
             {
                 lineNo = lineCount - 1;
                 xPos = line.cursorToX(m_textCursor - layoutStartPos);
@@ -1193,14 +1337,15 @@ void MythUIText::Pulse(void)
 
     MythUIType::Pulse();
 
-    // Calculate interval since last update in msecs - clamped to 50msecs (20Hz)
-    // in case of UI blocking/pauses
+    // Calculate interval since last update in msecs - clamped to
+    // 50msecs (20Hz) in case of UI blocking/pauses
     int64_t currentmsecs = QDateTime::currentMSecsSinceEpoch();
-    int64_t interval = std::min(currentmsecs - m_lastUpdate, static_cast<int64_t>(50));
+    int64_t interval = std::min(currentmsecs - m_lastUpdate,
+                                static_cast<int64_t>(50));
     m_lastUpdate = currentmsecs;
 
-    // Rates are pixels per second (float) normalised to 70Hz for historical reasons.
-    // Convert interval accordingly.
+    // Rates are pixels per second (float) normalised to 70Hz for
+    // historical reasons.  Convert interval accordingly.
     float rate = (interval / 1000.0F) * DEFAULT_REFRESH_RATE;
 
     if (m_colorCycling)
@@ -1364,7 +1509,8 @@ void MythUIText::Pulse(void)
     }
 }
 
-void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor, int numSteps)
+void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor,
+                            int numSteps)
 {
     if (!GetPainter()->SupportsAnimation())
         return;
@@ -1449,8 +1595,9 @@ bool MythUIText::ParseElement(
     {
         if (element.attribute("lang", "").isEmpty())
         {
-            m_message = QCoreApplication::translate("ThemeUI",
-                                        parseText(element).toUtf8().constData());
+            m_message =
+                QCoreApplication::translate("ThemeUI",
+                                    parseText(element).toUtf8().constData());
         }
         else if ((element.attribute("lang", "").toLower() ==
                   gCoreContext->GetLanguageAndVariant()) ||
@@ -1552,13 +1699,15 @@ bool MythUIText::ParseElement(
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollStartDelay = static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
+                m_scrollStartDelay =
+                    static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
             }
             tmp = element.attribute("returndelay");
             if (!tmp.isEmpty())
             {
                 float seconds = tmp.toFloat();
-                m_scrollReturnDelay = static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
+                m_scrollReturnDelay =
+                    static_cast<int>(lroundf(seconds * DEFAULT_REFRESH_RATE));
             }
             tmp = element.attribute("rate");
             if (!tmp.isEmpty())
@@ -1568,7 +1717,8 @@ bool MythUIText::ParseElement(
                 m_scrollForwardRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollForwardRate = pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
+                m_scrollForwardRate =
+                    pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
 #endif
             }
             tmp = element.attribute("returnrate");
@@ -1579,7 +1729,8 @@ bool MythUIText::ParseElement(
                 m_scrollReturnRate = percent;
 #else // scroll rate as pixels per second
                 int pixels = tmp.toInt();
-                m_scrollReturnRate = pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
+                m_scrollReturnRate =
+                    pixels / static_cast<float>(DEFAULT_REFRESH_RATE);
 #endif
             }
 
@@ -1651,7 +1802,8 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_lineHeight = text->m_lineHeight;
     m_textCursor = text->m_textCursor;
 
-    for (auto it = text->m_fontStates.cbegin(); it != text->m_fontStates.cend(); ++it)
+    for (auto it = text->m_fontStates.cbegin();
+         it != text->m_fontStates.cend(); ++it)
         m_fontStates.insert(it.key(), it.value());
 
     *m_font = m_fontStates["default"];
