@@ -208,7 +208,10 @@ uint32_t HEVCParser::addBytes(const uint8_t  *bytes,
             {
                 LOG(VB_GENERAL, LOG_ERR, "HEVCParser::parseNAL: "
                     "NAL header forbidden_zero_bit is not zero!");
-                return false;
+                // Skip the bad header. Returning 0 bytes used made
+                // DTVRecorder hand the same bytes back forever.
+                resetRBSP();
+                return startP - bytes;
             }
 
             m_nalTemperalId = (nal_unit_header & 0x7) - 1;
