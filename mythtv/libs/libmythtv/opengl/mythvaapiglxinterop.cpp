@@ -272,7 +272,7 @@ MythVAAPIInteropGLXCopy::Acquire(MythRenderOpenGL* Context,
 
     // Retrieve the VASurface
     VASurfaceID id = VerifySurface(Context, Frame);
-    if (!id || !m_vaDisplay)
+    if ((id == VA_INVALID_SURFACE) || !m_vaDisplay)
         return result;
 
     // Initialise colourspace on first frame
@@ -370,7 +370,7 @@ MythVAAPIInteropGLXPixmap::Acquire(MythRenderOpenGL* Context,
 
     // Retrieve the VASurface
     VASurfaceID id = VerifySurface(Context, Frame);
-    if (!id || !m_vaDisplay)
+    if ((id == VA_INVALID_SURFACE) || !m_vaDisplay)
         return result;
 
     // Initialise colourspace on first frame
