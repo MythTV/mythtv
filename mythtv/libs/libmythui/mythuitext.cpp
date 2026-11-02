@@ -717,20 +717,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                                         fm.averageCharWidth() -
                                         fm.horizontalAdvance(ellipsis));
 
-                    int cutPos = last_line;
-                    if (layout->lineCount() >= 2)
-                    {
-                        QTextLine prevLine =
-                            layout->lineAt(layout->lineCount() - 2);
-                        cutPos =
-                            prevLine.xToCursor(availWidth,
-                                               QTextLine::CursorOnCharacter);
-                    }
-                    else
-                    {
-                        cutPos = line.xToCursor(availWidth,
-                                                QTextLine::CursorOnCharacter);
-                    }
+                    int cutPos = (layout->lineCount() >= 2)
+                        ? layout->lineAt(layout->lineCount() - 2)
+                              .xToCursor(availWidth, QTextLine::CursorOnCharacter)
+                        : line.xToCursor(availWidth, QTextLine::CursorOnCharacter);
 
                     int cutLen = paragraph.size() - cutPos;
                     paragraph = paragraph.left(cutPos) + ellipsis;
