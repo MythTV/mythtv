@@ -180,7 +180,7 @@ MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* Context,
         return result;
 
     VASurfaceID id = VerifySurface(Context, Frame);
-    if (!id || !m_vaDisplay)
+    if ((id == VA_INVALID_SURFACE) || !m_vaDisplay)
         return result;
 
     // Update frame colourspace and initialise on first frame
