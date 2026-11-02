@@ -1267,30 +1267,21 @@ void Recorder::stderrLoop(int fd)
 
     while (m_isStreaming.load())
     {
+        errno = 0;
         ssize_t length = getline(&line, &size, stream);
 
         if (length < 0)
         {
-            if (!m_isStreaming.load())
-                break;
+            int err = errno;
 
-            if (feof(stream))
-                break;
-
-            if (ferror(stream))
+            if (m_isStreaming.load() && ferror(stream))
             {
-                if (errno == EINTR)
-                {
-                    clearerr(stream);
-                    continue;
-                }
-
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("getline error on fd %1: %2")
                     .arg(fd)
-                    .arg(strerror(errno)));
-                break;
+                    .arg(strerror(err)));
             }
+            break;
         }
 
         QString message =
