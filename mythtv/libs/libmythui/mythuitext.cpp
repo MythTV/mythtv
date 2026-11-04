@@ -466,6 +466,13 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
             MythFontProperties *fp = GetFont(fontname);
             if (!fp)
                 fp = GetGlobalFontMap()->GetFont(fontname);
+            if (!fp && m_textCase != CaseNormal)
+            {
+                fontname = fontname.toLower();
+                fp = GetFont(fontname);
+                if (!fp)
+                    fp = GetGlobalFontMap()->GetFont(fontname);
+            }
 
             range.format = QTextCharFormat();
             range.start = pos;
@@ -555,6 +562,23 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
     layout->setText(paragraph);
     layout->beginLayout();
     num_lines = 0;
+
+    // Helper lambda get the active QFont at a specific character
+    // index in layout
+    auto getFontAt = [&](int pos) -> QFont {
+        QFont f = GetFontProperties()->face();
+        const auto formats = layout->formats();
+        for (const auto &range : formats)
+        {
+            if (pos >= range.start && pos < range.start + range.length &&
+                range.format.hasProperty(QTextFormat::FontFamily))
+            {
+                f = range.format.font();
+            }
+        }
+        return f;
+    };
+
     for (;;)
     {
         QTextLine line = layout->createLine();
@@ -568,9 +592,22 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         {
             if (!force && m_cutdown != Qt::ElideNone)
             {
-                QFontMetrics fm(GetFontProperties()->face());
-                paragraph = fm.elidedText(paragraph, m_cutdown,
-                                          width - fm.averageCharWidth());
+                QFontMetrics fm(getFontAt(line.textLength()));
+                if (m_cutdown == Qt::ElideRight)
+                {
+                    int elideWidth = std::max(0, static_cast<int>(width) -
+                                              fm.horizontalAdvance("..."));
+                    int cutIdx = line.xToCursor(elideWidth,
+                                                QTextLine::CursorOnCharacter);
+                    paragraph = (cutIdx < paragraph.size())
+                        ? paragraph.left(cutIdx) + "..."
+                        : paragraph.left(paragraph.size() - 1) + "...";
+                }
+                else
+                {
+                    paragraph = fm.elidedText(paragraph, m_cutdown,
+                                              width - fm.averageCharWidth());
+                }
                 layout->endLayout(); // Cleanly close the aborted layout pass
                 return false;
             }
@@ -578,9 +615,14 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
             line.setLineWidth(INT_MAX);
         }
 
-        height += m_leading;
+        qreal lineLeading =
+            m_multiLine
+            ? std::max<qreal>(0.0, line.leading()) + m_extraLeading
+            : m_extraLeading;
+        height += lineLeading;
         line.setPosition(QPointF(0, height));
-        height += m_lineHeight;
+        height += line.height();
+
         if (!overflow)
         {
             if (height > m_area.height())
@@ -596,16 +638,16 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 
                 if (!m_multiLine)
                     m_drawRect.setHeight(height);
-                if (m_cutdown != Qt::ElideNone)
+                if (!force && num_lines > 0 && m_cutdown != Qt::ElideNone)
                 {
-                    QFontMetrics fm(GetFontProperties()->face());
-                    QString cut_line = fm.elidedText
-                                       (paragraph.mid(last_line),
-                                        Qt::ElideRight,
-                                        width - fm.averageCharWidth());
-                    paragraph = paragraph.left(last_line) + cut_line;
-                    if (last_line == 0)
-                        min_rect |= line.naturalTextRect();
+                    QTextLine prevLine = layout->lineAt(num_lines - 1);
+                    int prevEnd = prevLine.textStart() + prevLine.textLength();
+                    QFontMetrics fm(getFontAt(std::max(0, prevEnd - 1)));
+                    int elideWidth = std::max(0, static_cast<int>(width) -
+                                              fm.horizontalAdvance("..."));
+                    int cutIdx = prevLine.xToCursor(elideWidth,
+                                                  QTextLine::CursorOnCharacter);
+                    paragraph = paragraph.left(cutIdx) + "...";
                     layout->endLayout();
                     return false;
                 }
@@ -626,20 +668,23 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 
         if (final && line.textLength())
         {
-        /**
-         * FontMetrics::width() returns a value that is good for spacing
-         * the characters, but may not represent the *full* width.  We need
-         * to make sure we have enough space for the *full* width or
-         * characters could be clipped.
-         *
-         * bearing will be negative if the char 'leans' over the "width"
-         */
-            QFontMetrics fm(GetFontProperties()->face());
-
-            int bearing = fm.leftBearing(m_cutMessage[last_line]);
+            /**
+             * FontMetrics::width() returns a value that is good for
+             * spacing the characters, but may not represent the
+             * *full* width.  We need to make sure we have enough
+             * space for the *full* width or characters could be
+             * clipped.
+             *
+             * bearing will be negative if the char 'leans' over the
+             * "width"
+             */
+            QFontMetrics fmLeft(getFontAt(last_line));
+            int bearing = fmLeft.leftBearing(paragraph[last_line]);
             m_leftBearing = std::min(m_leftBearing, bearing);
-            bearing = fm.rightBearing
-                      (m_cutMessage[last_line + line.textLength() - 1]);
+
+            int lastCharPos = last_line + line.textLength() - 1;
+            QFontMetrics fmRight(getFontAt(lastCharPos));
+            bearing = fmRight.rightBearing(paragraph[lastCharPos]);
             m_rightBearing = std::min(m_rightBearing, bearing);
         }
     }
@@ -676,7 +721,18 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
         if (!Layout(para, layout, final, overflow, width, height, false,
                     last_line_width, min_rect, num_lines))
         {
-            // Again, with cut down (formats on 'layout' are preserved!)
+            // Clamp format ranges so they do not exceed the newly
+            // elided paragraph length
+            auto formats = layout->formats();
+            for (auto &range : formats)
+            {
+                if (range.start + range.length > para.size())
+                    range.length =
+                        std::max(0, static_cast<int>(para.size()) -
+                                 range.start);
+            }
+            layout->setFormats(formats);
+
             min_rect = saved_rect;
             height = saved_height;
             Layout(para, layout, final, overflow, width, height, true,
@@ -698,7 +754,6 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
     Qt::TextElideMode cutdown = m_cutdown;
     m_cutdown = Qt::ElideNone;
 
-    int line_height = m_leading + m_lineHeight;
     width = m_area.width() / 2.0;
     int best_width = m_area.width();
     int too_narrow = 0;
@@ -715,6 +770,8 @@ bool MythUIText::GetNarrowWidth(const QStringList & paragraphs,
 
         if (num_lines <= 0)
             return false;
+
+        qreal line_height = height / num_lines;
 
         if (height > m_drawRect.height())
         {
@@ -901,9 +958,31 @@ void MythUIText::FillCutMessage(void)
          * to make sure we have enough space for the *full* height or
          * characters could be clipped.
          */
-        QRect actual = fm.boundingRect(m_cutMessage);
-        m_ascent = -(actual.y() + fm.ascent());
-        m_descent = actual.height() - fm.height();
+        m_ascent = 0;
+        m_descent = 0;
+        for (const auto *layout : std::as_const(m_layouts))
+        {
+            const QString &text = layout->text();
+            if (text.isEmpty() || layout->lineCount() == 0)
+                continue;
+
+            const auto formats = layout->formats();
+            for (const auto &range : formats)
+            {
+                if (!range.format.hasProperty(QTextFormat::FontFamily) ||
+                    range.length <= 0)
+                    continue;
+
+                QFontMetrics rangeFm(range.format.font());
+                QString sub = text.mid(range.start, range.length);
+                QRect actual = rangeFm.boundingRect(sub);
+
+                m_ascent = std::max(m_ascent,
+                                    -(actual.y() + rangeFm.ascent()));
+                m_descent = std::max(m_descent, actual.height() -
+                                     rangeFm.height());
+            }
+        }
     }
 
     if (m_scrolling)
@@ -1027,13 +1106,13 @@ int MythUIText::MoveCursor(int lines)
     int layoutStartPos = 0;
     int xPos = 0;
 
-    for (int x = 0; x < m_layouts.count(); x++)
+    for (int x = 0; x < m_layouts.count(); ++x)
     {
         QTextLayout *layout = m_layouts.at(x);
 
-        for (int y = 0; y < layout->lineCount(); y++)
+        for (int y = 0; y < layout->lineCount(); ++y)
         {
-            lineCount++;
+            ++lineCount;
             if (lineNo != -1)
                 continue;
 
@@ -1067,27 +1146,25 @@ int MythUIText::MoveCursor(int lines)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("'%1' (%2) MoveCursor offset %3 not found in ANY paragraph!")
-            .arg(objectName(), GetXMLLocation(), QString::number(m_textCursor)));
+            .arg(objectName(), GetXMLLocation(),
+                 QString::number(m_textCursor)));
         return m_textCursor;
     }
 
-    int newLine = lineNo + lines;
-
-    newLine = std::max(newLine, 0);
-
+    int newLine = std::max(lineNo + lines, 0);
     if (newLine >= lineCount)
         newLine = lineCount - 1;
 
     lineNo = -1;
     layoutStartPos = 0;
 
-    for (int x = 0; x < m_layouts.count(); x++)
+    for (int x = 0; x < m_layouts.count(); ++x)
     {
         QTextLayout *layout = m_layouts.at(x);
 
-        for (int y = 0; y < layout->lineCount(); y++)
+        for (int y = 0; y < layout->lineCount(); ++y)
         {
-            lineNo++;
+            ++lineNo;
             QTextLine line = layout->lineAt(y);
 
             if (lineNo == newLine)
@@ -1211,7 +1288,7 @@ void MythUIText::Pulse(void)
         m_curG += m_incG;
         m_curB += m_incB;
 
-        m_curStep++;
+        ++m_curStep;
 
         if (m_curStep >= m_numSteps)
         {
