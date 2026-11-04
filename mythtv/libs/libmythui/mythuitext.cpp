@@ -21,59 +21,6 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-// Adjust QTextLayout FormatRanges when text is removed [cutStart,
-// cutStart + cutLen) and replaced with an ellipsis of length
-// insertLen.  NOTE: Must only be called AFTER layout->endLayout().
-static void AdjustFormatRanges(QTextLayout *layout, int cutStart,
-                               int cutLen, int insertLen)
-{
-    const auto formats = layout->formats();
-    if (formats.isEmpty() || cutLen <= 0)
-        return;
-
-    int cutEnd = cutStart + cutLen;
-    int delta = insertLen - cutLen;
-    QVector<QTextLayout::FormatRange> updated;
-    updated.reserve(formats.size());
-
-    for (auto range : formats)
-    {
-        // Keep full-paragraph outline ranges spanning the new length
-        if (range.format.hasProperty(QTextFormat::TextOutline))
-        {
-            range.length += delta;
-            updated.push_back(range);
-            continue;
-        }
-
-        int rStart = range.start;
-        int rEnd = range.start + range.length;
-
-        if (rEnd <= cutStart)
-        {
-            updated.push_back(range);
-        }
-        else if (rStart >= cutEnd)
-        {
-            range.start += delta;
-            updated.push_back(range);
-        }
-        else
-        {
-            int newStart = std::min(rStart, cutStart);
-            int newEnd = (rEnd <= cutEnd)
-                         ? (cutStart + insertLen) : (rEnd + delta);
-            if (newEnd > newStart)
-            {
-                range.start = newStart;
-                range.length = newEnd - newStart;
-                updated.push_back(range);
-            }
-        }
-    }
-    layout->setFormats(updated);
-}
-
 MythUIText::MythUIText(MythUIType *parent, const QString &name)
     : MythUIType(parent, name)
     , m_font(new MythFontProperties())
@@ -621,67 +568,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         {
             if (!force && m_cutdown != Qt::ElideNone)
             {
-                const QString ellipsis = QStringLiteral("...");
                 QFontMetrics fm(GetFontProperties()->face());
-                qreal availWidth = std::max<qreal>(0.0, width -
-                                                   fm.averageCharWidth());
-
-                // Expand to full line so QTextLine computes exact
-                // mixed-font glyph positions
-                line.setLineWidth(INT_MAX);
-                qreal totalWidth = line.naturalTextWidth();
-                qreal ellipsisWidth = fm.horizontalAdvance(ellipsis);
-
-                int cutStart = 0;
-                int cutLen = 0;
-
-                if (m_cutdown == Qt::ElideRight)
-                {
-                    cutStart = line.xToCursor(std::max<qreal>(0.0,
-                                                              availWidth -
-                                                              ellipsisWidth),
-                                              QTextLine::CursorOnCharacter);
-                    cutLen = paragraph.size() - cutStart;
-                    paragraph = paragraph.left(cutStart) + ellipsis;
-                }
-                else if (m_cutdown == Qt::ElideLeft)
-                {
-                    int keepStart =
-                        line.xToCursor(std::max<qreal>(0.0,
-                                                       totalWidth -
-                                                       (availWidth -
-                                                        ellipsisWidth)),
-                                       QTextLine::CursorOnCharacter);
-                    if (keepStart < paragraph.size())
-                        ++keepStart;
-                    cutStart = 0;
-                    cutLen = keepStart;
-                    paragraph = ellipsis + paragraph.mid(keepStart);
-                }
-                else if (m_cutdown == Qt::ElideMiddle)
-                {
-                    qreal halfAvail =
-                        std::max<qreal>(0.0, (availWidth - ellipsisWidth) / 2.0);
-                    int leftEnd = line.xToCursor(halfAvail,
-                                                 QTextLine::CursorOnCharacter);
-                    int rightStart =
-                        line.xToCursor(std::max<qreal>(0.0,
-                                                       totalWidth - halfAvail),
-                                       QTextLine::CursorOnCharacter);
-                    if (rightStart < paragraph.size())
-                        ++rightStart;
-                    if (leftEnd < rightStart)
-                    {
-                        cutStart = leftEnd;
-                        cutLen = rightStart - leftEnd;
-                        paragraph = paragraph.left(leftEnd) + ellipsis +
-                                    paragraph.mid(rightStart);
-                    }
-                }
+                paragraph = fm.elidedText(paragraph, m_cutdown,
+                                          width - fm.averageCharWidth());
                 layout->endLayout(); // Cleanly close the aborted layout pass
-                if (cutLen > 0)
-                    AdjustFormatRanges(layout, cutStart, cutLen,
-                                       ellipsis.size());
                 return false;
             }
             // If text does not fit, then expand so canvas size is correct
@@ -690,9 +580,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
 
         height += m_leading;
         line.setPosition(QPointF(0, height));
-        qreal actualLineHeight = std::max(static_cast<qreal>(m_lineHeight),
-                                          line.height());
-        height += actualLineHeight;
+        height += m_lineHeight;
         if (!overflow)
         {
             if (height > m_area.height())
@@ -710,25 +598,15 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
                     m_drawRect.setHeight(height);
                 if (m_cutdown != Qt::ElideNone)
                 {
-                    const QString ellipsis = QStringLiteral("...");
                     QFontMetrics fm(GetFontProperties()->face());
-                    qreal availWidth =
-                        std::max<qreal>(0.0, width -
-                                        fm.averageCharWidth() -
-                                        fm.horizontalAdvance(ellipsis));
-
-                    int cutPos = (layout->lineCount() >= 2)
-                        ? layout->lineAt(layout->lineCount() - 2)
-                              .xToCursor(availWidth, QTextLine::CursorOnCharacter)
-                        : line.xToCursor(availWidth, QTextLine::CursorOnCharacter);
-
-                    int cutLen = paragraph.size() - cutPos;
-                    paragraph = paragraph.left(cutPos) + ellipsis;
-
+                    QString cut_line = fm.elidedText
+                                       (paragraph.mid(last_line),
+                                        Qt::ElideRight,
+                                        width - fm.averageCharWidth());
+                    paragraph = paragraph.left(last_line) + cut_line;
                     if (last_line == 0)
                         min_rect |= line.naturalTextRect();
                     layout->endLayout();
-                    AdjustFormatRanges(layout, cutPos, cutLen, ellipsis.size());
                     return false;
                 }
                 overflow = true;
@@ -746,8 +624,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         min_rect |= line.naturalTextRect();
         ++num_lines;
 
-        if (final && line.textLength() > 0 &&
-            last_line + line.textLength() <= paragraph.size())
+        if (final && line.textLength())
         {
         /**
          * FontMetrics::width() returns a value that is good for spacing
@@ -759,10 +636,10 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
          */
             QFontMetrics fm(GetFontProperties()->face());
 
-            int bearing = fm.leftBearing(paragraph[last_line]);
+            int bearing = fm.leftBearing(m_cutMessage[last_line]);
             m_leftBearing = std::min(m_leftBearing, bearing);
             bearing = fm.rightBearing
-                      (paragraph[last_line + line.textLength() - 1]);
+                      (m_cutMessage[last_line + line.textLength() - 1]);
             m_rightBearing = std::min(m_rightBearing, bearing);
         }
     }
@@ -1024,19 +901,9 @@ void MythUIText::FillCutMessage(void)
          * to make sure we have enough space for the *full* height or
          * characters could be clipped.
          */
-        m_ascent = 0;
-        m_descent = 0;
-        if (!m_layouts.isEmpty() && m_layouts.first()->lineCount() > 0)
-        {
-            // Check if the rendered layout bounds exceed the nominal canvas
-            QRectF firstLineRect = m_layouts.first()->lineAt(0).naturalTextRect();
-            if (firstLineRect.top() < 0)
-                m_ascent = static_cast<int>(std::ceil(-firstLineRect.top()));
-
-            qreal maxBottom = min_rect.bottom();
-            if (maxBottom > height)
-                m_descent = static_cast<int>(std::ceil(maxBottom - height));
-        }
+        QRect actual = fm.boundingRect(m_cutMessage);
+        m_ascent = -(actual.y() + fm.ascent());
+        m_descent = actual.height() - fm.height();
     }
 
     if (m_scrolling)
@@ -1172,9 +1039,9 @@ int MythUIText::MoveCursor(int lines)
 
             QTextLine line = layout->lineAt(y);
 
-            if (m_textCursor >= currPos && m_textCursor < currPos +
-                line.textLength() +
-                (line.lineNumber() == layout->lineCount() - 1 ? 1 : 0))
+            if (m_textCursor >= currPos &&
+                m_textCursor < currPos + line.textLength()
+                + (line.lineNumber() == layout->lineCount() - 1 ? 1 : 0))
             {
                 lineNo = lineCount - 1;
                 xPos = line.cursorToX(m_textCursor - layoutStartPos);
@@ -1330,8 +1197,8 @@ void MythUIText::Pulse(void)
     // Calculate interval since last update in msecs - clamped to
     // 50msecs (20Hz) in case of UI blocking/pauses
     int64_t currentmsecs = QDateTime::currentMSecsSinceEpoch();
-    int64_t interval = std::min(currentmsecs - m_lastUpdate,
-                                static_cast<int64_t>(50));
+    int64_t interval =
+        std::min(currentmsecs - m_lastUpdate, static_cast<int64_t>(50));
     m_lastUpdate = currentmsecs;
 
     // Rates are pixels per second (float) normalised to 70Hz for
