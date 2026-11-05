@@ -436,7 +436,6 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
     range.length = -1;
     range.format.setFont(GetFontProperties()->face());
     range.format.setFontStyleHint(QFont::SansSerif);
-    range.format.setForeground(GetFontProperties()->GetBrush());
 
     int pos = 0;
     int end = 0;
@@ -498,7 +497,6 @@ bool MythUIText::FormatTemplate(QString & paragraph, QTextLayout *layout)
                 // Fallback to base font properties
                 range.format.setFont(GetFontProperties()->face());
                 range.format.setFontStyleHint(QFont::SansSerif);
-                range.format.setForeground(GetFontProperties()->GetBrush());
             }
         }
         else
@@ -1454,7 +1452,6 @@ void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor,
     m_numSteps = numSteps;
     m_curStep = 0;
 
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     m_curR = startColor.red();
     m_curG = startColor.green();
     m_curB = startColor.blue();
@@ -1462,15 +1459,6 @@ void MythUIText::CycleColor(const QColor& startColor, const QColor& endColor,
     m_incR = ((endColor.red()   * 1.0F) - m_curR) / m_numSteps;
     m_incG = ((endColor.green() * 1.0F) - m_curG) / m_numSteps;
     m_incB = ((endColor.blue()  * 1.0F) - m_curB) / m_numSteps;
-#else
-    m_curR = startColor.redF();
-    m_curG = startColor.greenF();
-    m_curB = startColor.blueF();
-
-    m_incR = (endColor.redF()   - m_curR) / m_numSteps;
-    m_incG = (endColor.greenF() - m_curG) / m_numSteps;
-    m_incB = (endColor.blueF()  - m_curB) / m_numSteps;
-#endif
     m_colorCycling = true;
 }
 

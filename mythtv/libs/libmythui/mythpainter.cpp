@@ -431,14 +431,22 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
 
             painter.setPen(shadowColor);
             for (auto *layout : std::as_const(layouts))
-                layout->draw(&painter, shadowRect.topLeft(), formats, clip);
+            {
+                QTextLayout::FormatRange shadowRange;
+                shadowRange.start = 0;
+                shadowRange.length = layout->text().length();
+                shadowRange.format.setForeground(shadowColor);
+                shadowRange.format.setTextOutline(Qt::NoPen);
+
+                layout->draw(&painter, shadowRect.topLeft(),
+                             {shadowRange}, clip);
+            }
         }
 
         painter.setPen(QPen(font.GetBrush(), 0));
         for (auto *layout : std::as_const(layouts))
         {
-            layout->draw(&painter, canvas.topLeft(),
-                           layout->formats(), clip);
+            layout->draw(&painter, canvas.topLeft(), formats, clip);
         }
         painter.end();
 
