@@ -1,0 +1,6 @@
+[Paths]
+Prefix = ..
+Plugins = PlugIns
+Imports = Qml2
+QmlImports = Qml2
+EOF
