@@ -289,6 +289,9 @@ file(COPY ${APP_NAME}.icns DESTINATION ${RSRC_DIR})
 message(VERBOSE "  Copying startup script and python alias")
 configure_file("${CMAKE_SOURCE_DIR}/startup_script.zsh.in" "${MACOS_DIR}/${APP_NAME}.zsh" @ONLY)
 
+# Copy the qt.conf file into the RSRC_DIR directory.
+configure_file("${CMAKE_SOURCE_DIR}/qt.conf.in" "${RSRC_DIR}/qt.conf" @ONLY)
+
 # Update the files in share (e.g. python shebang's) to point to internally to the App
 # Run theses as separate commands in case one fails
 message(VERBOSE "  Fixing python shebangs")

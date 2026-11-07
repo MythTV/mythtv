@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-# This script sets the Python and Mythtv paths
+# This script sets the Python, Mythtv, MySQL, and Qt paths
 
 # First set the default language so the python
 # metadata grabbes work correctly
@@ -39,6 +39,11 @@ export MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
 # Define the runtime path to the bundled database plugins
 export MARIADB_PLUGIN_DIR="$PLUGIN_DIR/@QT_MYSQL_PROVIDER@/plugin"
 export MYSQL_PLUGIN_DIR="$PLUGIN_DIR/@QT_MYSQL_PROVIDER@/plugin"
+
+# Define the Qt Plugin Paths
+unset QT_PLUGIN_PATH
+export QT_PLUGIN_PATH="$PLUGIN_DIR"
+export QT_AUTOLOAD_PLUGINS=0
 
 cd $BASE_DIR
 ./@APP_EXE_NAME@ $@
