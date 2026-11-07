@@ -303,12 +303,6 @@ jobs:
     strategy:
       matrix:
         os:
-          - desc: 'macOS 14 (Sonoma) arm64'
-            runner: 'macOS-14'
-            arch: 'arm64'
-            qt_version: 'qt6'
-            database_version: 'mariadb'
-            extrapkgs: ''
           - desc: 'macOS 15 (Sequoia) arm64'
             runner: 'macOS-15'
             arch: 'arm64'
