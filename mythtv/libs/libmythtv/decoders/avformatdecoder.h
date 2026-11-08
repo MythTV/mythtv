@@ -85,6 +85,7 @@ class AvFormatDecoder : public DecoderBase
 
     void UpdateFramesPlayed(void) override; // DecoderBase
     void SetEof(bool eof) override; // DecoderBase
+    void SetEofState(EofState eof) override; // DecoderBase
 
     MythCodecMap* CodecMap(void);
     void CloseCodecs();
@@ -181,6 +182,8 @@ class AvFormatDecoder : public DecoderBase
     bool PreProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
     virtual bool ProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt, bool &Retry);
     virtual bool ProcessVideoFrame(AVCodecContext* codecContext, AVStream *Stream, AVFrame *AvFrame);
+    bool DrainVideoDecoder(bool &Retry);
+    void ResetDrainState(bool FlushDecoder);
     bool ProcessAudioPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
     bool ProcessSubtitlePacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
@@ -252,6 +255,15 @@ class AvFormatDecoder : public DecoderBase
     int                m_seqCount                     {0};
 
     QList<AVPacket*>   m_storedPackets;
+
+    /// The demuxer has returned AVERROR_EOF. Stored packets are still
+    /// decoded and the video decoder drained before EOF is signalled.
+    bool               m_demuxEof                     {false};
+    /// Stream index of the video decoder that was sent a drain (null)
+    /// packet, or -1. It must be flushed before it can decode again.
+    int                m_drainedVideoStream           {-1};
+    /// Consecutive EAGAIN results while draining, to avoid waiting forever.
+    int                m_drainRetries                 {0};
 
     int                m_prevGopPos                   {0};
 

@@ -690,6 +690,11 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     QMutexLocker locker(&m_avCodecLock);
 
+    // Any seek means the demuxer is no longer at the end of the file. A
+    // flushing seek flushes every decoder below, so only a non-flushing
+    // seek needs to flush a drained video decoder here.
+    ResetDrainState(!doflush);
+
     // Discard all the queued up decoded frames
     if (discardFrames)
     {
@@ -810,7 +815,123 @@ void AvFormatDecoder::SetEof(bool eof)
                 .arg(m_livetv).arg(m_ic->pb->eof_reached));
         m_ic->pb->eof_reached = 0;
     }
+    // Only forget the drain once EOF has actually been signalled. Clearing
+    // EOF while a drain is in progress (e.g. pause/play during the last few
+    // frames) must not throw away the frames still to come. Seeks reset the
+    // drain state in SeekReset.
+    if (!eof && m_atEof != kEofStateNone)
+        ResetDrainState(true);
     DecoderBase::SetEof(eof);
+}
+
+void AvFormatDecoder::SetEofState(EofState eof)
+{
+    if (eof == kEofStateNone && m_atEof != kEofStateNone)
+        ResetDrainState(true);
+    DecoderBase::SetEofState(eof);
+}
+
+/*! \brief Forget that the demuxer reached the end of the file.
+ *
+ * If the video decoder was sent a drain packet it will refuse any further
+ * input until it is flushed, so flush it when requested.
+ */
+void AvFormatDecoder::ResetDrainState(bool FlushDecoder)
+{
+    QMutexLocker locker(&m_avCodecLock);
+    if (FlushDecoder && m_drainedVideoStream >= 0 && m_ic &&
+        m_drainedVideoStream < static_cast<int>(m_ic->nb_streams))
+    {
+        AVCodecContext *context =
+            m_codecMap.FindCodecContext(m_ic->streams[m_drainedVideoStream]);
+        if (context && avcodec_is_open(context))
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Flushing drained video decoder");
+            avcodec_flush_buffers(context);
+        }
+    }
+    m_demuxEof = false;
+    m_drainedVideoStream = -1;
+    m_drainRetries = 0;
+}
+
+/*! \brief Return the next frame still held inside the video decoder after
+ *         the demuxer has reached the end of the file.
+ *
+ * Decoders, and hardware decoders such as NVDEC (cuvid) in particular, keep a
+ * queue of decoded frames that is only released once they are sent a null
+ * packet. Without this the last frames of a file are never displayed.
+ *
+ * \return true if a frame was produced (or Retry was set), false once the
+ *         decoder is empty or cannot be drained.
+ */
+bool AvFormatDecoder::DrainVideoDecoder(bool &Retry)
+{
+    static constexpr int kMaxDrainRetries { 1000 };
+
+    int index = m_selectedTrack[kTrackTypeVideo].m_av_stream_index;
+    if (!m_ic || !m_mythCodecCtx || index < 0 ||
+        index >= static_cast<int>(m_ic->nb_streams))
+        return false;
+
+    AVStream *stream = m_ic->streams[index];
+    AVCodecContext *context = m_codecMap.FindCodecContext(stream);
+    if (!context || !avcodec_is_open(context))
+        return false;
+
+    MythAVFrame avframe;
+    if (!avframe)
+        return false;
+
+    int ret = 0;
+    {
+        QMutexLocker locker(&m_avCodecLock);
+        if (m_drainedVideoStream != index)
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Draining video decoder");
+            m_drainedVideoStream = index;
+            ret = avcodec_send_packet(context, nullptr);
+            if (ret < 0 && ret != AVERROR_EOF)
+            {
+                std::string error;
+                LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                    QString("Failed to start video decoder drain: %1")
+                    .arg(av_make_error_stdstring(error, ret)));
+                return false;
+            }
+        }
+        ret = m_mythCodecCtx->FilteredReceiveFrame(context, avframe);
+    }
+
+    if (ret == AVERROR(EAGAIN))
+    {
+        if (++m_drainRetries > kMaxDrainRetries)
+        {
+            LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out draining video decoder");
+            return false;
+        }
+        Retry = true;
+        return true;
+    }
+    m_drainRetries = 0;
+
+    if (ret < 0)
+    {
+        if (ret != AVERROR_EOF)
+        {
+            std::string error;
+            LOG(VB_PLAYBACK, LOG_WARNING, LOC +
+                QString("Error draining video decoder: %1")
+                .arg(av_make_error_stdstring(error, ret)));
+        }
+        else
+        {
+            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Video decoder drained");
+        }
+        return false;
+    }
+
+    return ProcessVideoFrame(context, stream, avframe);
 }
 
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset,
@@ -4646,6 +4767,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 m_allowedQuit = true;
             }
             else if ((decodetype & kDecodeAV) == kDecodeAV &&
+                     !m_demuxEof &&
                      (m_storedPackets.count() < kMaxVideoQueueSize) &&
                      // buffer audio to prevent audio buffer
                      // underruns in case you are setting negative values
@@ -4675,6 +4797,22 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 av_packet_free(&pkt);
             pkt = m_storedPackets.takeFirst();
         }
+        else if (m_demuxEof)
+        {
+            // Every packet has been read and decoded. Collect the frames
+            // still queued inside the video decoder before signalling EOF,
+            // otherwise the last part of the video is never shown.
+            av_packet_free(&pkt);
+            if ((decodetype & kDecodeVideo) && DrainVideoDecoder(Retry))
+            {
+                if (Retry)
+                    break;
+                m_frameDecoded = 1;
+                continue;
+            }
+            SetEof(true);
+            return false;
+        }
         else
         {
             if (!pkt)
@@ -4688,20 +4826,22 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                 if (retval == -EAGAIN)
                     continue;
 
-                SetEof(true);
-                av_packet_free(&pkt);
-
                 if (retval == AVERROR_EOF)
                 {
-                    // Reaching the end of file isn't an error
+                    // Reaching the end of file isn't an error. Decode any
+                    // video packets stored while reading ahead for audio and
+                    // drain the video decoder before signalling EOF.
                     LOG(VB_GENERAL, LOG_INFO, QString("decoding reached end of file"));
+                    m_demuxEof = true;
+                    storevideoframes = false;
+                    continue;
                 }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
-                        .arg(QString::fromStdString(av_make_error_stdstring_unknown(retval)),
-                            QString::number(retval)));
-                }
+
+                SetEof(true);
+                av_packet_free(&pkt);
+                LOG(VB_GENERAL, LOG_ERR, QString("decoding error %1 (%2)")
+                    .arg(QString::fromStdString(av_make_error_stdstring_unknown(retval)),
+                        QString::number(retval)));
                 return false;
             }
 
