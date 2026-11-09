@@ -569,7 +569,7 @@ bool MythUIText::Layout(QString & paragraph, QTextLayout *layout, bool final,
         for (const auto &range : formats)
         {
             if (pos >= range.start && pos < range.start + range.length &&
-                range.format.hasProperty(QTextFormat::FontFamily))
+                range.format.hasProperty(QTextFormat::FontFamilies))
             {
                 f = range.format.font();
             }
@@ -725,10 +725,12 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
             for (auto &range : formats)
             {
                 if (range.start + range.length > para.size())
+                {
                     range.length =
                         // NOLINTNEXTLINE(readability-redundant-casting) qt5 vs qt6
                         std::max(0, static_cast<int>(para.size()) -
                                  range.start);
+                }
             }
             layout->setFormats(formats);
 
@@ -970,7 +972,7 @@ void MythUIText::FillCutMessage(void)
             const auto formats = layout->formats();
             for (const auto &range : formats)
             {
-                if (!range.format.hasProperty(QTextFormat::FontFamily) ||
+                if (!range.format.hasProperty(QTextFormat::FontFamilies) ||
                     range.length <= 0)
                     continue;
 
