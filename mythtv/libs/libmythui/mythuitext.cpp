@@ -726,6 +726,7 @@ bool MythUIText::LayoutParagraphs(const QStringList & paragraphs,
             {
                 if (range.start + range.length > para.size())
                     range.length =
+                        // NOLINTNEXTLINE(readability-redundant-casting) qt5 vs qt6
                         std::max(0, static_cast<int>(para.size()) -
                                  range.start);
             }
