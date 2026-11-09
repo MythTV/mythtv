@@ -290,7 +290,7 @@ void NetworkControl::run(void)
         // cppcheck-suppress knownConditionTrueFalse
         if (!m_stopCommandThread)
         {
-            NetworkCommand *nc = m_networkControlCommands.front();
+            NetworkCommand *nc = m_networkControlCommands.constFirst();
             m_networkControlCommands.pop_front();
             locker.unlock();
             processNetworkControlCommand(nc);
@@ -509,7 +509,7 @@ QString NetworkControl::processKey(NetworkCommand *nc)
         }
         else if (m_keyMap.contains(nc->getArg(curToken)))
         {
-            int keyCode = m_keyMap[nc->getArg(curToken)];
+            int keyCode = m_keyMap.value(nc->getArg(curToken));
             QString keyText;
 
             if (m_keyTextMap.contains(keyCode))
@@ -1688,7 +1688,7 @@ void NetworkControl::customEvent(QEvent *e)
 
         while (!m_networkControlReplies.isEmpty())
         {
-            NetworkCommand *nc = m_networkControlReplies.front();
+            NetworkCommand *nc = m_networkControlReplies.constFirst();
             m_networkControlReplies.pop_front();
 
             reply = nc->getCommand();

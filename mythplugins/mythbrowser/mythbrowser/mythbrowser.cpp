@@ -127,8 +127,8 @@ bool MythBrowser::Create(void)
 MythUIWebBrowser* MythBrowser::activeBrowser(void)
 {
     if (m_currentBrowser >=0 && m_currentBrowser < m_browserList.size())
-        return m_browserList[m_currentBrowser]->getBrowser();
-    return m_browserList[0]->getBrowser();
+        return m_browserList.at(m_currentBrowser)->getBrowser();
+    return m_browserList.at(0)->getBrowser();
 }
 
 void MythBrowser::slotEnterURL(void) const
@@ -150,7 +150,7 @@ void MythBrowser::slotEnterURL(void) const
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 {
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
-    auto *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(),
+    auto *page = new WebPage(this, m_browserList.at(0)->getBrowser()->GetArea(),
                              name.toLatin1().constData());
     m_browserList.append(page);
 
@@ -205,11 +205,11 @@ void MythBrowser::switchTab(int newTab)
         return;
 
     if (m_currentBrowser >= 0 && m_currentBrowser < m_browserList.size())
-        m_browserList[m_currentBrowser]->SetActive(false);
+        m_browserList.at(m_currentBrowser)->SetActive(false);
 
     BuildFocusList();
 
-    m_browserList[newTab]->SetActive(true);
+    m_browserList.at(newTab)->SetActive(true);
 
     m_currentBrowser = newTab;
 

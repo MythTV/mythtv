@@ -38,7 +38,7 @@ class WeatherScreen : public MythScreenType
                                          ScreenListInfo *screenDefn, int id);
 
     void setValue(const QString &key, const QString &value);
-    QString getValue(const QString &key) { return m_dataValueMap[key]; }
+    QString getValue(const QString &key) { return m_dataValueMap.value(key); }
     bool containsKey(const QString &key) { return m_dataValueMap.contains(key); }
     virtual bool canShowScreen();
     void setUnits(units_t units) { m_units = units; }

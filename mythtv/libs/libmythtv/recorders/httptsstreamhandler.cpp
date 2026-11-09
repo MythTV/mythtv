@@ -23,9 +23,7 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HTTPTSStreamHandler*>::iterator it = s_httphandlers.find(devkey);
-
-    if (it == s_httphandlers.end())
+    if (!s_httphandlers.contains(devkey))
     {
         auto* newhandler = new HTTPTSStreamHandler(tuning, inputid);
         newhandler->Start();
@@ -39,14 +37,14 @@ HTTPTSStreamHandler* HTTPTSStreamHandler::Get(const IPTVTuningData& tuning,
     else
     {
         s_httphandlers_refcnt[devkey]++;
-        uint rcount = s_httphandlers_refcnt[devkey];
+        uint rcount = s_httphandlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("HTTPTSSH[%1]: Using existing stream handler %2 for %3")
             .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_httphandlers[devkey];
+    return s_httphandlers.value(devkey);
 }
 
 void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref, int inputid)
@@ -55,6 +53,7 @@ void HTTPTSStreamHandler::Return(HTTPTSStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_httphandlers_refcnt.find(devname);
     if (rit == s_httphandlers_refcnt.end())
         return;

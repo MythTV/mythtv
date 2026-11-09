@@ -270,8 +270,8 @@ DiSEqCDevTree *DiSEqCDevTrees::FindTree(uint cardid)
 {
     QMutexLocker lock(&m_treesLock);
 
-    cardid_to_diseqc_tree_t::iterator it = m_trees.find(cardid);
-    if (it != m_trees.end())
+    const auto it = m_trees.constFind(cardid);
+    if (it != m_trees.constEnd())
         return *it;
 
     auto *tree = new DiSEqCDevTree;
@@ -2008,7 +2008,7 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings& /*setttings*/,
 {
     // determine stored position from position map
     dbl_to_uint_t::const_iterator it =
-        m_posmap.lowerBound(angle - EPS); // clazy:exclude=strict-iterators
+        std::as_const(m_posmap).lowerBound(angle - EPS);
     cmd_vec_t index { static_cast<uint8_t>(angle) };
     if (it != m_posmap.cend())
     {

@@ -1218,11 +1218,10 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault )
+QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefault ) const
 {
-    auto it = m_mapHeaders.find( sKey.toLower() );
-
-    if ( it == m_mapHeaders.end())
+    auto it = m_mapHeaders.constFind( sKey.toLower() );
+    if ( it == m_mapHeaders.constEnd())
         return sDefault;
 
     return *it;
@@ -1233,17 +1232,22 @@ QString HTTPRequest::GetRequestHeader( const QString &sKey, const QString &sDefa
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString HTTPRequest::GetResponseHeaders( void )
+QString HTTPRequest::GetResponseHeaders( void ) const
 {
     QString sHeader = s_szServerHeaders;
 
-    for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
-                               it != m_mapRespHeaders.end();
-                             ++it )
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for ( auto it = m_mapRespHeaders.constBegin();
+               it != m_mapRespHeaders.constEnd();
+             ++it )
     {
         sHeader += it.key()  + ": ";
         sHeader += *it + "\r\n";
     }
+#else
+    for (const auto& [name, value] : std::as_const(m_mapRespHeaders).asKeyValueRange())
+        sHeader += name + ": " + value + "\r\n";
+#endif
 
     return sHeader;
 }
@@ -1252,7 +1256,7 @@ QString HTTPRequest::GetResponseHeaders( void )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HTTPRequest::ParseKeepAlive()
+bool HTTPRequest::ParseKeepAlive() const
 {
     // TODO: Think about whether we should use a longer timeout if the client
     //       has explicitly specified 'Keep-alive'
@@ -1372,11 +1376,17 @@ bool HTTPRequest::ParseRequest()
         }
 
         // Dump request header
-        for ( auto it = m_mapHeaders.begin(); it != m_mapHeaders.end(); ++it )
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for ( auto it = m_mapHeaders.constBegin(); it != m_mapHeaders.constEnd(); ++it )
         {
             LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
                                             .arg(it.key(), *it));
         }
+#else
+        for ( const auto& [name, value] : std::as_const(m_mapHeaders).asKeyValueRange() )
+            LOG(VB_HTTP, LOG_INFO, QString("(Request Header) %1: %2")
+                                            .arg(name, value));
+#endif
 
         // Parse Cookies
         ParseCookies();
@@ -1411,7 +1421,7 @@ bool HTTPRequest::ParseRequest()
         // Allow session resumption for TLS connections
         if (m_mapCookies.contains("sessionToken"))
         {
-            QString sessionToken = m_mapCookies["sessionToken"];
+            QString sessionToken = m_mapCookies.value("sessionToken");
             MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
             MythUserSession session = sessionManager->GetSession(sessionToken);
 

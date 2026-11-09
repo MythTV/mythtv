@@ -92,9 +92,9 @@ void MusicFileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_f
         {
 
             QString dir(filename);
-            dir.remove(0, m_startDirs.last().length());
+            dir.remove(0, m_startDirs.constLast().length());
 
-            newparentid = m_directoryid[dir];
+            newparentid = m_directoryid.value(dir);
 
             if (newparentid == 0)
             {
@@ -259,11 +259,11 @@ void MusicFileScanner::AddMusicToDB(const QString &filename, const QString &star
         QString album_cache_string;
 
         // Set values from cache
-        int did = m_directoryid[directory];
+        int did = m_directoryid.value(directory);
         if (did >= 0)
             data->setDirectoryId(did);
 
-        int aid = m_artistid[data->Artist().toLower()];
+        int aid = m_artistid.value(data->Artist().toLower());
         if (aid > 0)
         {
             data->setArtistId(aid);
@@ -272,15 +272,15 @@ void MusicFileScanner::AddMusicToDB(const QString &filename, const QString &star
             album_cache_string = QString::number(data->getArtistId()) + "#"
                 + data->Album().toLower();
 
-            if (m_albumid[album_cache_string] > 0)
+            if (m_albumid.value(album_cache_string) > 0)
                 data->setAlbumId(m_albumid[album_cache_string]);
         }
 
-        int caid = m_artistid[data->CompilationArtist().toLower()];
+        int caid = m_artistid.value(data->CompilationArtist().toLower());
         if (caid > 0)
             data->setCompilationArtistId(caid);
 
-        int gid = m_genreid[data->Genre().toLower()];
+        int gid = m_genreid.value(data->Genre().toLower());
         if (gid > 0)
             data->setGenreId(gid);
 
@@ -586,11 +586,11 @@ void MusicFileScanner::UpdateMusicInDB(const QString &filename, const QString &s
         QString album_cache_string;
 
         // Set values from cache
-        int did = m_directoryid[directory];
+        int did = m_directoryid.value(directory);
         if (did > 0)
             disk_meta->setDirectoryId(did);
 
-        int aid = m_artistid[disk_meta->Artist().toLower()];
+        int aid = m_artistid.value(disk_meta->Artist().toLower());
         if (aid > 0)
         {
             disk_meta->setArtistId(aid);
@@ -599,15 +599,15 @@ void MusicFileScanner::UpdateMusicInDB(const QString &filename, const QString &s
             album_cache_string = QString::number(disk_meta->getArtistId()) + "#" +
                 disk_meta->Album().toLower();
 
-            if (m_albumid[album_cache_string] > 0)
+            if (m_albumid.value(album_cache_string) > 0)
                 disk_meta->setAlbumId(m_albumid[album_cache_string]);
         }
 
-        int caid = m_artistid[disk_meta->CompilationArtist().toLower()];
+        int caid = m_artistid.value(disk_meta->CompilationArtist().toLower());
         if (caid > 0)
             disk_meta->setCompilationArtistId(caid);
 
-        int gid = m_genreid[disk_meta->Genre().toLower()];
+        int gid = m_genreid.value(disk_meta->Genre().toLower());
         if (gid > 0)
             disk_meta->setGenreId(gid);
 

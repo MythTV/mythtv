@@ -158,17 +158,10 @@ ThreadedFileWriter::~ThreadedFileWriter()
         m_writeThread = nullptr;
     }
 
-    while (!m_writeBuffers.empty())
-    {
-        delete m_writeBuffers.front();
-        m_writeBuffers.pop_front();
-    }
-
-    while (!m_emptyBuffers.empty())
-    {
-        delete m_emptyBuffers.front();
-        m_emptyBuffers.pop_front();
-    }
+    qDeleteAll(m_writeBuffers);
+    m_writeBuffers.clear();
+    qDeleteAll(m_emptyBuffers);
+    m_emptyBuffers.clear();
 
     if (m_syncThread)
     {
@@ -247,16 +240,16 @@ int ThreadedFileWriter::Write(const void *data, uint count)
         TFWBuffer *buf = nullptr;
 
         if (!m_writeBuffers.empty() &&
-            (m_writeBuffers.back()->data.size() + towrite) < kMinWriteSize)
+            (m_writeBuffers.constLast()->data.size() + towrite) < kMinWriteSize)
         {
-            buf = m_writeBuffers.back();
+            buf = m_writeBuffers.constLast();
             m_writeBuffers.pop_back();
         }
         else
         {
             if (!m_emptyBuffers.empty())
             {
-                buf = m_emptyBuffers.front();
+                buf = m_emptyBuffers.constFirst();
                 m_emptyBuffers.pop_front();
                 buf->data.clear();
             }
@@ -435,16 +428,10 @@ void ThreadedFileWriter::DiskLoop(void)
     {
         if (m_ignoreWrites)
         {
-            while (!m_writeBuffers.empty())
-            {
-                delete m_writeBuffers.front();
-                m_writeBuffers.pop_front();
-            }
-            while (!m_emptyBuffers.empty())
-            {
-                delete m_emptyBuffers.front();
-                m_emptyBuffers.pop_front();
-            }
+            qDeleteAll(m_writeBuffers);
+            m_writeBuffers.clear();
+            qDeleteAll(m_emptyBuffers);
+            m_emptyBuffers.clear();
             m_bufferEmpty.wakeAll();
             m_bufferHasData.wait(locker.mutex());
             continue;
@@ -473,7 +460,7 @@ void ThreadedFileWriter::DiskLoop(void)
             continue;
         }
 
-        TFWBuffer *buf = m_writeBuffers.front();
+        TFWBuffer *buf = m_writeBuffers.constFirst();
         m_writeBuffers.pop_front();
         m_totalBufferUse -= buf->data.size();
         m_bufferWasFreed.wakeAll();
@@ -594,6 +581,8 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
     QDateTime cur = MythDate::current();
     QDateTime cur_m_60 = cur.addSecs(-60);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QList<TFWBuffer*>::iterator it = m_emptyBuffers.begin();
     while (it != m_emptyBuffers.end())
     {
@@ -607,6 +596,16 @@ void ThreadedFileWriter::TrimEmptyBuffers(void)
         }
         ++it;
     }
+#else
+    m_emptyBuffers.removeIf( [&cur_m_60](auto *buf) {
+        bool deleteit = (buf->lastUsed < cur_m_60);
+        deleteit |= (buf->data.capacity() > 3 * buf->data.size() &&
+                     buf->data.capacity() > 64 * 1024LL);
+        if (deleteit)
+            delete buf;
+        return deleteit;
+    } );
+#endif
 }
 
 /**

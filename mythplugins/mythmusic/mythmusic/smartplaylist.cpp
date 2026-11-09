@@ -371,11 +371,8 @@ QString SmartPLCriteriaRow::toString(void) const
 
 SmartPlaylistEditor::~SmartPlaylistEditor(void)
 {
-    while (!m_criteriaRows.empty())
-    {
-        delete m_criteriaRows.back();
-        m_criteriaRows.pop_back();
-    }
+    qDeleteAll(m_criteriaRows);
+    m_criteriaRows.clear();
 
     delete m_tempCriteriaRow;
 }

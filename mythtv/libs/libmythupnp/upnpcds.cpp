@@ -368,18 +368,18 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     UPnpCDSRequest           request;
 
     DetermineClient( pRequest, &request );
-    request.m_sObjectId         = pRequest->m_mapParams[ "objectid"      ];
+    request.m_sObjectId         = pRequest->m_mapParams.value( "objectid" );
     request.m_sParentId         = "0";
     request.m_eBrowseFlag       =
-        GetBrowseFlag( pRequest->m_mapParams[ "browseflag"    ] );
-    request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
-    request.m_nStartingIndex    = std::max(pRequest->m_mapParams[ "startingindex" ].toUShort(),
+        GetBrowseFlag( pRequest->m_mapParams.value( "browseflag"    ) );
+    request.m_sFilter           = pRequest->m_mapParams.value( "filter" );
+    request.m_nStartingIndex    = std::max(pRequest->m_mapParams.value( "startingindex" ).toUShort(),
                                       uint16_t(0));
     request.m_nRequestedCount   =
-        pRequest->m_mapParams[ "requestedcount"].toUShort();
+        pRequest->m_mapParams.value( "requestedcount" ).toUShort();
     if (request.m_nRequestedCount == 0)
         request.m_nRequestedCount = UINT16_MAX;
-    request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
+    request.m_sSortCriteria     = pRequest->m_mapParams.value( "sortcriteria" );
 
 
     LOG(VB_UPNP, LOG_DEBUG, QString("UPnpCDS::ProcessRequest \n"
@@ -460,7 +460,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                          (nNumberReturned < nCount);
                      i++)
                 {
-                    UPnpCDSExtension *pExtension = m_extensions[i];
+                    UPnpCDSExtension *pExtension = m_extensions.at(i);
                     CDSObject* pExtensionRoot = pExtension->GetRoot();
                     sResultXML += pExtensionRoot->toXml(filter, true); // Ignore Children
                     nNumberReturned ++;
@@ -477,14 +477,14 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         // Look for a CDS Extension that knows how to handle this ObjectID
         // ------------------------------------------------------------------
 
-        UPnpCDSExtensionList::iterator it = m_extensions.begin();
-        for (; (it != m_extensions.end()) && !pResult; ++it)
+        for (auto* ext : std::as_const(m_extensions))
         {
             LOG(VB_UPNP, LOG_INFO,
                 QString("UPNP Browse : Searching for : %1  / ObjectID : %2")
-                    .arg((*it)->m_sExtensionId, request.m_sObjectId));
+                    .arg(ext->m_sExtensionId, request.m_sObjectId));
 
-            pResult = (*it)->Browse(&request);
+            pResult = ext->Browse(&request);
+            if (pResult) break;
         }
 
         if (pResult != nullptr)
@@ -556,15 +556,15 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     QString       sResultXML;
 
     DetermineClient( pRequest, &request );
-    request.m_sObjectId         = pRequest->m_mapParams[ "objectid"      ];
-    request.m_sContainerID      = pRequest->m_mapParams[ "containerid"   ];
-    request.m_sFilter           = pRequest->m_mapParams[ "filter"        ];
+    request.m_sObjectId         = pRequest->m_mapParams.value( "objectid"      );
+    request.m_sContainerID      = pRequest->m_mapParams.value( "containerid"   );
+    request.m_sFilter           = pRequest->m_mapParams.value( "filter"        );
     request.m_nStartingIndex    =
-        pRequest->m_mapParams[ "startingindex" ].toLong();
+        pRequest->m_mapParams.value( "startingindex" ).toLong();
     request.m_nRequestedCount   =
-        pRequest->m_mapParams[ "requestedcount"].toLong();
-    request.m_sSortCriteria     = pRequest->m_mapParams[ "sortcriteria"  ];
-    request.m_sSearchCriteria   = pRequest->m_mapParams[ "searchcriteria"];
+        pRequest->m_mapParams.value( "requestedcount" ).toLong();
+    request.m_sSortCriteria     = pRequest->m_mapParams.value( "sortcriteria"  );
+    request.m_sSearchCriteria   = pRequest->m_mapParams.value( "searchcriteria");
 
     LOG(VB_UPNP, LOG_INFO,
         QString("UPnpCDS::HandleSearch ObjectID=%1, ContainerId=%2")
@@ -586,13 +586,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     //          Just focus on the "upnp:class derivedfrom" expression
     // ----------------------------------------------------------------------
 
-    for ( QStringList::Iterator it  = request.m_sSearchList.begin();
-                                it != request.m_sSearchList.end();
-                              ++it )
+    for ( const auto& expr : std::as_const(request.m_sSearchList))
     {
-        if ((*it).contains("upnp:class derivedfrom", Qt::CaseInsensitive))
+        if (expr.contains("upnp:class derivedfrom", Qt::CaseInsensitive))
         {
-            QStringList sParts = (*it).split(' ', Qt::SkipEmptyParts);
+            QStringList sParts = expr.split(' ', Qt::SkipEmptyParts);
             if (sParts.count() > 2)
             {
                 request.m_sSearchClass = sParts[2].trimmed();
@@ -630,9 +628,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     bool bSearchDone = false;
 #endif
 
-    UPnpCDSExtensionList::iterator it = m_extensions.begin();
-    for (; (it != m_extensions.end()) && !pResult; ++it)
-        pResult = (*it)->Search(&request);
+    for (auto* ext : std::as_const(m_extensions))
+    {
+        pResult = ext->Search(&request);
+        if (pResult) break;
+    }
 
     if (pResult != nullptr)
     {

@@ -117,9 +117,9 @@ bool UPnp::Initialize( QList<QHostAddress> &sIPAddrList, int nServicePort, HttpS
         // remove this address
         // If IPV6 support is disabled and this is an IPV6 address,
         // remove this address
-        if ((g_IPAddrList[it].protocol() == QAbstractSocket::IPv4Protocol
+        if ((g_IPAddrList.at(it).protocol() == QAbstractSocket::IPv4Protocol
                 && ! ipv4)
-          ||(g_IPAddrList[it].protocol() == QAbstractSocket::IPv6Protocol
+          ||(g_IPAddrList.at(it).protocol() == QAbstractSocket::IPv6Protocol
                 && ! ipv6))
             g_IPAddrList.removeAt(it--);
     }

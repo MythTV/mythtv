@@ -51,6 +51,7 @@ void MythBDOverlay::Wipe(int Left, int Top, int Width, int Height)
 {
     if (m_image.format() == QImage::Format_Indexed8)
     {
+        // clazy:exclude-next-line=detaching-member (updating item)
         uint8_t *data = m_image.bits();
         int32_t offset = (Top * m_image.bytesPerLine()) + Left;
         for (int i = 0; i < Height; i++ )

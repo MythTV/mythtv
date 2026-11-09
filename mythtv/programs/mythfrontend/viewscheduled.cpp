@@ -315,18 +315,17 @@ void ViewScheduled::LoadList(bool useExistingData)
     if (m_groupList)
     {
         QString label;
-        QMap<QDate,ProgramList>::iterator dateit = m_recgroupList.begin();
-        while (dateit != m_recgroupList.end())
+        for (auto dateit = m_recgroupList.keyBegin();
+             dateit != m_recgroupList.keyEnd(); dateit++)
         {
-            if (dateit.key().isNull())
+            if (dateit->isNull())
                 label = tr("All");
             else
                 label = MythDate::toString(
-                    dateit.key(), MythDate::kDateFull | MythDate::kSimplify);
+                    *dateit, MythDate::kDateFull | MythDate::kSimplify);
 
             new MythUIButtonListItem(m_groupList, label,
-                                     QVariant::fromValue(dateit.key()));
-            ++dateit;
+                                     QVariant::fromValue(*dateit));
         }
 
         // Restore group
@@ -343,7 +342,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     // Restore position after a list update
     if (!callsign.isEmpty())
     {
-        ProgramList plist = m_recgroupList[m_currentGroup];
+        ProgramList plist = m_recgroupList.value(m_currentGroup);
 
         int listPos = ((int) plist.size()) - 1;
         for (int i = listPos; i >= 0; --i)
@@ -584,7 +583,7 @@ void ViewScheduled::viewInputs()
     m_curinput++;
     while (m_curinput <= m_maxinput)
     {
-        if (m_inputref[m_curinput] > 0)
+        if (m_inputref.value(m_curinput) > 0)
             return;
         m_curinput++;
     }

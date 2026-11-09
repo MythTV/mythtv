@@ -79,10 +79,7 @@ AvailableStatusType PBHEventHandler::CheckAvailability(const QStringList &slist)
 
     {
         QMutexLocker locker(&m_pbh.m_lock);
-        QHash<uint, QStringList>::iterator cit =
-            m_checkAvailability.find(evinfo.GetRecordingID());
-        if (cit != m_checkAvailability.end())
-            m_checkAvailability.erase(cit);
+        m_checkAvailability.remove(evinfo.GetRecordingID());
         if (m_checkAvailability.empty() && m_checkAvailabilityTimerId)
         {
             killTimer(m_checkAvailabilityTimerId);
@@ -163,9 +160,8 @@ bool PBHEventHandler::event(QEvent *e)
             QStringList slist;
             {
                 QMutexLocker locker(&m_pbh.m_lock);
-                QHash<uint, QStringList>::iterator it =
-                    m_checkAvailability.begin();
-                if (it != m_checkAvailability.end())
+                auto it = m_checkAvailability.constBegin();
+                if (it != m_checkAvailability.constEnd())
                     slist = *it;
             }
 
@@ -435,6 +431,7 @@ void PlaybackBoxHelper::CheckAvailability(
     QString catstr = QString::number((int)cat);
     QMutexLocker locker(&m_lock);
     QHash<uint, QStringList>::iterator it =
+        // clazy:exclude-next-line=detaching-member (modifies item)
         m_eventHandler->m_checkAvailability.find(pginfo.GetRecordingID());
     if (it == m_eventHandler->m_checkAvailability.end())
     {

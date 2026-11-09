@@ -1087,7 +1087,7 @@ void ImportCoverArtDialog::updateStatus()
         fullFilename = MythCoreContext::GenMythURL(url.host(), 0, saveFilename, "Music");
         QString dir = fullFilename.section( '/', 0, -2);
 
-        QFileInfo fi(m_filelist[m_currentFile]);
+        QFileInfo fi(m_filelist.at(m_currentFile));
         switch (m_typeList->GetItemCurrent()->GetData().toInt())
         {
             case IT_FRONTCOVER:
@@ -1135,7 +1135,7 @@ void ImportCoverArtDialog::updateTypeSelector()
     if (m_filelist.empty())
         return;
 
-    QString filename = m_filelist[m_currentFile];
+    QString filename = m_filelist.at(m_currentFile);
     QFileInfo fi(filename);
     filename = fi.fileName();
 

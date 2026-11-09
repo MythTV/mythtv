@@ -454,7 +454,7 @@ void ProgLister::UpdateKeywordInDB(const QString &text, const QString &oldValue)
 
     if (oldview >= 0)
     {
-        QString qphrase = m_viewList[oldview];
+        QString qphrase = m_viewList.at(oldview);
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM keyword "
@@ -534,7 +534,7 @@ void ProgLister::ShowChooseViewMenu(void)
         {
             auto *dialog = new PhrasePopup(
                 popupStack, this, m_searchType, m_viewTextList,
-                (m_curView >= 0) ? m_viewList[m_curView] : QString());
+                (m_curView >= 0) ? m_viewList.at(m_curView) : QString());
             if (!dialog)
                 return;
             connect(dialog, &PhrasePopup::haveResult,
@@ -546,7 +546,7 @@ void ProgLister::ShowChooseViewMenu(void)
         {
             auto *dialog = new PowerSearchPopup(
                 popupStack, this, m_searchType, m_viewTextList,
-                (m_curView >= 0) ? m_viewList[m_curView] : QString());
+                (m_curView >= 0) ? m_viewList.at(m_curView) : QString());
             if (!dialog)
                 return;
             connect(dialog, &PowerSearchPopup::haveResult,
@@ -1162,7 +1162,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
         return;
 
     QString where;
-    QString qphrase = m_viewList[m_curView];
+    QString qphrase = m_viewList.at(m_curView);
 
     MSqlBindings bindings;
 
@@ -1305,7 +1305,7 @@ void ProgLister::FillItemList(bool restorePosition, bool updateDisp)
                 "  AND program.category = :PGILPHRASE3 ";
             bindings[":PGILPHRASE3"] = qphrase;
         }
-        else if (m_viewList[m_curView].indexOf(":/:") < 0)
+        else if (m_viewList.at(m_curView).indexOf(":/:") < 0)
         {
             where = "JOIN programgenres g ON "
                 "  program.chanid = g.chanid AND "

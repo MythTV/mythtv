@@ -718,7 +718,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     infoMap["title"] = grouplabel;
     infoMap["show"] =
         groupname.isEmpty() ? ProgramInfo::i18n("All Programs") : grouplabel;
-    int countInGroup = m_progLists[groupname].size();
+    int countInGroup = m_progLists.value(groupname).size();
 
     if (m_artImage[kArtworkFanart])
     {
@@ -749,7 +749,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
     if (countInGroup >= 1)
     {
-        ProgramList  group     = m_progLists[groupname];
+        ProgramList  group     = m_progLists.value(groupname);
         float        groupSize = 0.0;
 
         for (auto *info : group)
@@ -1151,16 +1151,9 @@ void PlaybackBox::HandlePreviewEvent(const QStringList &list)
     const QString& message      = list[2];
 
     bool found = false;
+
     for (uint i = 4; i < (uint) list.size(); i++)
-    {
-        const QString& token = list[i];
-        QSet<QString>::iterator it = m_previewTokens.find(token);
-        if (it != m_previewTokens.end())
-        {
-            found = true;
-            m_previewTokens.erase(it);
-        }
-    }
+        found |= m_previewTokens.remove(list[i]);
 
     if (!found)
     {
@@ -1440,11 +1433,10 @@ void PlaybackBox::UpdateUIRecGroupList(void)
 
     m_recgroupList->Reset();
 
-    int idx = 0;
-    QStringList::iterator it = m_recGroups.begin();
-    for (; it != m_recGroups.end(); (++it), (++idx))
+    int idx = -1;
+    for (const auto& key : std::as_const(m_recGroups))
     {
-        const QString& key = (*it);
+        idx++;
         QString tmp = (key == "All Programs") ? "All" : key;
         QString name = ProgramInfo::i18n(tmp);
 
@@ -1501,7 +1493,7 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
             item->SetText(displayName, "name");
             item->SetText(displayName);
 
-            int count = m_progLists[groupname.toLower()].size();
+            int count = m_progLists.value(groupname.toLower()).size();
             item->SetText(QString::number(count), "reccount");
         }
 
@@ -1515,12 +1507,12 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
         if (m_groupAlphaList)
         {
-            for (auto Iqs = m_groupAlphabet.keyValueBegin();
-                 Iqs != m_groupAlphabet.keyValueEnd(); ++Iqs)
+            for (auto Iqs = m_groupAlphabet.keyBegin();
+                 Iqs != m_groupAlphabet.keyEnd(); ++Iqs)
             {
                 auto *item = new MythUIButtonListItem(m_groupAlphaList, "",
-                                               QVariant::fromValue(Iqs->first));
-                item->SetText(Iqs->first);
+                                               QVariant::fromValue(*Iqs));
+                item->SetText(*Iqs);
             }
         }
     }
@@ -1568,13 +1560,13 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     m_recordingList->Reset();
 
-    ProgramMap::iterator pmit = m_progLists.find(groupname);
-    if (pmit == m_progLists.end())
+    auto pmit = m_progLists.constFind(groupname);
+    if (pmit == m_progLists.constEnd())
         return;
 
-    ProgramList &progList = *pmit;
+    const ProgramList &progList = *pmit;
 
-    for (auto & prog : progList)
+    for (const auto & prog : progList)
     {
         if (prog->GetAvailableStatus() == asPendingDelete ||
             prog->GetAvailableStatus() == asDeleted)
@@ -1787,7 +1779,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (!m_progLists.isEmpty())
     {
-        for (auto & prog : m_progLists[""])
+        for (const auto & prog : m_progLists.value(""))
         {
             uint asRecordingID = prog->GetRecordingID();
             asCache[asRecordingID] = prog->GetAvailableStatus();
@@ -2023,7 +2015,7 @@ bool PlaybackBox::UpdateUILists(void)
     if (sortedList.empty())
     {
         LOG(VB_GENERAL, LOG_WARNING, LOC + "SortedList is Empty");
-        m_progLists[""];
+        m_progLists.value("");
         m_titleList << "";
         m_playList.clear();
         if (!isAllProgsGroup)
@@ -2647,7 +2639,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     }
     else if (m_delList.size() >= 3)
     {
-        delItem = FindProgramInUILists(m_delList[0].toUInt());
+        delItem = FindProgramInUILists(m_delList.at(0).toUInt());
     }
 
     if (!delItem)
@@ -3774,6 +3766,7 @@ void PlaybackBox::togglePlayListTitle(void)
 {
     QString groupname = m_groupList->GetItemCurrent()->GetData().toString();
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     for (auto *pl : std::as_const(m_progLists[groupname]))
     {
         if (pl && (pl->GetAvailableStatus() == asAvailable))
@@ -4269,12 +4262,7 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "PREVIEW_FAILED" && me->ExtraDataCount() >= 5)
         {
             for (uint i = 4; i < (uint) me->ExtraDataCount(); i++)
-            {
-                const QString& token = me->ExtraData(i);
-                QSet<QString>::iterator it = m_previewTokens.find(token);
-                if (it != m_previewTokens.end())
-                    m_previewTokens.erase(it);
-            }
+                m_previewTokens.remove(me->ExtraData(i));
         }
         else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
         {
@@ -4345,13 +4333,13 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if ((message == "PLAY_PLAYLIST") && !m_playListPlay.empty())
         {
-            uint recordingID = m_playListPlay.front();
+            uint recordingID = m_playListPlay.constFirst();
             m_playListPlay.pop_front();
 
             if (!m_playListPlay.empty())
             {
                 const ProgramInfo *pginfo =
-                    FindProgramInUILists(m_playListPlay.front());
+                    FindProgramInUILists(m_playListPlay.constFirst());
                 if (pginfo)
                     m_helper.CheckAvailability(*pginfo, kCheckForCache);
             }
@@ -4429,6 +4417,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(uint recordingID)
     if (sel_item)
         groupname = sel_item->GetData().toString();
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     ProgramMap::iterator git = m_progLists.begin();
     while (git != m_progLists.end())
     {

@@ -691,7 +691,7 @@ bool Xsd::RenderMapXSD( HTTPRequest   *pRequest,
                         bool           bCustomType )
 {
     QString     sArrayName   = "MapOfString" + sClassName;
-    QString     sMapItemName = pRequest->m_mapParams[ "name" ];
+    QString     sMapItemName = pRequest->m_mapParams.value( "name" );
     QString     sType;
 
     if (sMapItemName.isEmpty())

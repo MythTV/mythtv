@@ -67,11 +67,10 @@ void RSSManager::slotRefreshRSS()
         return;
     }
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto i = m_sites.begin(); i != m_sites.end(); ++i)
+    for (auto *site : std::as_const(m_sites))
     {
-        (*i)->retrieve();
-        m_inprogress.append(*i);
+        site->retrieve();
+        m_inprogress.append(site);
     }
 }
 

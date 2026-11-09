@@ -175,12 +175,21 @@ void EITFixUp::Fix(DBEventEIT &event)
     // Are any items left unhandled? report them to allow fixups improvements
     if (!event.m_items.empty())
     {
-        for (auto i = event.m_items.begin(); i != event.m_items.end(); ++i)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto i = event.m_items.constBegin(); i != event.m_items.constEnd(); ++i)
         {
             LOG(VB_EIT, LOG_DEBUG, QString("Unhandled item in EIT for"
                 " channel id \"%1\", \"%2\": %3").arg(event.m_chanid)
                 .arg(i.key(), i.value()));
         }
+#else
+        for (const auto& [role, person] : std::as_const(event.m_items).asKeyValueRange())
+        {
+            LOG(VB_EIT, LOG_DEBUG, QString("Unhandled item in EIT for"
+                " channel id \"%1\", \"%2\": %3").arg(event.m_chanid)
+                .arg(role, person));
+        }
+#endif
     }
 }
 
@@ -3015,6 +3024,7 @@ void EITFixUp::FixUnitymedia(DBEventEIT &event)
 
     // handle cast and crew in items in the DVB Extended Event Descriptor
     // remove handled items from the map, so the left overs can be reported
+    // clazy:exclude-next-line=detaching-member (erases item)
     auto i = event.m_items.begin();
     while (i != event.m_items.end())
     {

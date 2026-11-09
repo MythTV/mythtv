@@ -216,7 +216,7 @@ MythUIGroup *MythUIButtonList::PrepareButton(int buttonIdx, int itemIdx,
                                              int &selectedIdx,
                                              int &button_shift)
 {
-    MythUIButtonListItem *buttonItem = m_itemList[itemIdx];
+    MythUIButtonListItem *buttonItem = m_itemList.at(itemIdx);
 
     buttonIdx += button_shift;
 
@@ -248,7 +248,7 @@ MythUIGroup *MythUIButtonList::PrepareButton(int buttonIdx, int itemIdx,
         ++m_maxVisible;
     }
 
-    MythUIStateType *realButton = m_buttonList[buttonIdx];
+    MythUIStateType *realButton = m_buttonList.at(buttonIdx);
     m_buttonToItem[buttonIdx] = buttonItem;
     buttonItem->SetToRealButton(realButton, itemIdx == m_selPosition);
     auto *buttonstate =
@@ -601,7 +601,7 @@ bool MythUIButtonList::DistributeRow(int &first_button, int &last_button,
     for (buttonIdx = begin, col_idx = 0;
          buttonIdx < end; ++buttonIdx, ++col_idx)
     {
-        realButton = m_buttonList[buttonIdx];
+        realButton = m_buttonList.at(buttonIdx);
         buttonstate = dynamic_cast<MythUIGroup *>
                       (realButton->GetCurrentState());
         if (!buttonstate)
@@ -783,8 +783,8 @@ bool MythUIButtonList::DistributeButtons(void)
     {
         for (int i = 0; i < m_buttonList.count(); ++i)
         {
-            if (m_buttonList[i])
-                m_buttonList[i]->SetVisible(false);
+            if (m_buttonList.at(i))
+                m_buttonList.at(i)->SetVisible(false);
         }
 
         return false;
@@ -1210,7 +1210,7 @@ bool MythUIButtonList::DistributeButtons(void)
         {
             if (buttonIdx >= first_button)
             {
-                MythUIStateType *realButton = m_buttonList[buttonIdx];
+                MythUIStateType *realButton = m_buttonList.at(buttonIdx);
                 auto *buttonstate = dynamic_cast<MythUIGroup *>
                     (realButton->GetCurrentState());
                 if (!buttonstate)
@@ -1265,11 +1265,11 @@ bool MythUIButtonList::DistributeButtons(void)
 
     // Hide buttons before first active button
     for (buttonIdx = 0; buttonIdx < first_button; ++buttonIdx)
-        m_buttonList[buttonIdx]->SetVisible(false);
+        m_buttonList.at(buttonIdx)->SetVisible(false);
 
     // Hide buttons after last active buttons.
     for (buttonIdx = m_maxVisible - 1; buttonIdx > last_button; --buttonIdx)
-        m_buttonList[buttonIdx]->SetVisible(false);
+        m_buttonList.at(buttonIdx)->SetVisible(false);
 
     // Set m_topPosition so arrows are displayed correctly.
     if (m_scrollStyle == ScrollCenter || m_scrollStyle == ScrollGroupCenter)
@@ -1370,7 +1370,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     }
 
     for (int i = 0; i < button; ++i)
-        m_buttonList[i]->SetVisible(false);
+        m_buttonList.at(i)->SetVisible(false);
 
     bool seenSelected = false;
 
@@ -1384,7 +1384,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
 
     while (it < m_itemList.end() && button < m_itemsVisible)
     {
-        realButton = m_buttonList[button];
+        realButton = m_buttonList.at(button);
         buttonItem = *it;
 
         if (!realButton || !buttonItem)
@@ -1418,7 +1418,7 @@ void MythUIButtonList::CalculateButtonPositions(void)
     }
 
     for (; button < m_itemsVisible; ++button)
-        m_buttonList[button]->SetVisible(false);
+        m_buttonList.at(button)->SetVisible(false);
 }
 
 void MythUIButtonList::SanitizePosition(void)
@@ -1536,6 +1536,8 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     if (curIndex == -1)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<int, MythUIButtonListItem*>::iterator it = m_buttonToItem.begin();
     while (it != m_buttonToItem.end())
     {
@@ -1546,6 +1548,9 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
         }
         ++it;
     }
+#else
+    m_buttonToItem.removeIf( [&item](auto it){return *it==item;} );
+#endif
 
     if (curIndex < m_topPosition &&
         m_topPosition > 0)
@@ -1747,7 +1752,7 @@ int MythUIButtonList::GetItemPos(MythUIButtonListItem *item) const
 void MythUIButtonList::InitButton(int itemIdx, MythUIStateType* & realButton,
                                   MythUIButtonListItem* & buttonItem)
 {
-    buttonItem = m_itemList[itemIdx];
+    buttonItem = m_itemList.at(itemIdx);
 
     if (m_maxVisible == 0)
     {
@@ -1759,7 +1764,7 @@ void MythUIButtonList::InitButton(int itemIdx, MythUIStateType* & realButton,
         ++m_maxVisible;
     }
 
-    realButton = m_buttonList[0];
+    realButton = m_buttonList.at(0);
     m_buttonToItem[0] = buttonItem;
 }
 
@@ -2342,17 +2347,14 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
 
     bool found_it = false;
     int selectedPosition = 0;
-    QList<MythUIButtonListItem *>::iterator it = m_itemList.begin();
-
-    while (it != m_itemList.end())
+    for (const auto* item : std::as_const(m_itemList))
     {
-        if ((*it)->GetText() == position_name)
+        if (item->GetText() == position_name)
         {
             found_it = true;
             break;
         }
 
-        ++it;
         ++selectedPosition;
     }
 
@@ -2368,10 +2370,10 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
     if (GetItemCurrent() != item)
         return false;
 
-    if (item == m_itemList.first() && up)
+    if (item == m_itemList.constFirst() && up)
         return false;
 
-    if (item == m_itemList.last() && !up)
+    if (item == m_itemList.constLast() && !up)
         return false;
 
     int oldpos = m_selPosition;
@@ -2382,7 +2384,7 @@ bool MythUIButtonList::MoveItemUpDown(MythUIButtonListItem *item, bool up)
     {
         insertat = m_selPosition - 1;
 
-        if (item == m_itemList.last())
+        if (item == m_itemList.constLast())
             dolast = true;
         else
             ++m_selPosition;
@@ -2553,7 +2555,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *event)
         if (!m_actionRemap.contains(action))
             continue;
 
-        QString key = m_actionRemap[action];
+        QString key = m_actionRemap.value(action);
         if (key.isEmpty())
             return true;
 
@@ -3157,10 +3159,10 @@ void MythUIButtonList::updateLCD(void)
 
         for (int x = 0; x < m_lcdColumns.count(); ++x)
         {
-            if (!m_lcdColumns[x].isEmpty() && item->m_strings.contains(m_lcdColumns[x]))
+            if (!m_lcdColumns.at(x).isEmpty() && item->m_strings.contains(m_lcdColumns.at(x)))
             {
                 // named text column
-                TextProperties props = item->m_strings[m_lcdColumns[x]];
+                TextProperties props = item->m_strings.value(m_lcdColumns.at(x));
 
                 if (text.isEmpty())
                     text = props.text;
@@ -3524,6 +3526,7 @@ void MythUIButtonListItem::SetImage(MythImage *image, const QString &name)
 
     if (!name.isEmpty())
     {
+        // clazy:exclude-next-line=detaching-member (replaces or erases item)
         QMap<QString, MythImage*>::iterator it = m_images.find(name);
         if (it != m_images.end())
         {
@@ -3565,8 +3568,8 @@ MythImage *MythUIButtonListItem::GetImage(const QString &name)
 {
     if (!name.isEmpty())
     {
-        QMap<QString, MythImage*>::iterator it = m_images.find(name);
-        if (it != m_images.end())
+        auto it = m_images.constFind(name);
+        if (it != m_images.constEnd())
         {
             (*it)->IncrRef();
             return (*it);
@@ -3588,6 +3591,7 @@ void MythUIButtonListItem::SetImage(
 
     if (!name.isEmpty())
     {
+        // clazy:exclude-next-line=detaching-member (updates value)
         InfoMap::iterator it = m_imageFilenames.find(name);
 
         if (it == m_imageFilenames.end())
@@ -3658,6 +3662,7 @@ void MythUIButtonListItem::DisplayState(const QString &state,
         return;
 
     bool do_update = false;
+    // clazy:exclude-next-line=detaching-member (updates value)
     InfoMap::iterator it = m_states.find(name);
 
     if (it == m_states.end())
@@ -3698,7 +3703,7 @@ QString MythUIButtonListItem::GetState(const QString &name)
             return result;
     }
     if (m_states.contains(name))
-        return m_states[name];
+        return m_states.value(name);
     return {};
 }
 
@@ -4005,7 +4010,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button,
             DoButtonLookupFilename (dynamic_cast<MythUIImage *>(obj), filename);
 
         if (m_images.contains(name))
-            DoButtonLookupImage(dynamic_cast<MythUIImage *>(obj), m_images[name]);
+            DoButtonLookupImage(dynamic_cast<MythUIImage *>(obj), m_images.value(name));
 
         QString luState = GetState(name);
         if (!luState.isEmpty())

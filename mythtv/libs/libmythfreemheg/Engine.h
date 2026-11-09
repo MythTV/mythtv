@@ -176,7 +176,7 @@ class MHEngine: public MHEG {
     MHApplication *CurrentApp() {
         if (m_applicationStack.isEmpty())
             return nullptr;
-        return m_applicationStack.top();
+        return std::as_const(m_applicationStack).top();
     }
     MHScene *CurrentScene() {
         MHApplication *app = CurrentApp();

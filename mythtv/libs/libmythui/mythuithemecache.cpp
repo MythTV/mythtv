@@ -35,14 +35,13 @@ MythUIThemeCache::~MythUIThemeCache()
     PruneCacheDir(GetRemoteCacheDir());
     PruneCacheDir(GetThumbnailDir());
 
-    for (auto i = m_imageCache.begin();
-          i != m_imageCache.end();
-         /* no inc */)
+    for (auto *image : std::as_const(m_imageCache))
     {
-        i.value()->SetIsInCache(false);
-        i.value()->DecrRef();
-        i = m_imageCache.erase(i);
+        image->SetIsInCache(false);
+        image->DecrRef();
     }
+    m_imageCache.clear();
+
     m_cacheTrack.clear();
 
     delete m_imageThreadPool;
@@ -62,14 +61,12 @@ void MythUIThemeCache::UpdateImageCache()
 {
     QMutexLocker locker(&m_cacheLock);
 
-    for (auto i = m_imageCache.begin();
-          i != m_imageCache.end();
-         /* no inc */)
+    for (auto *image : std::as_const(m_imageCache))
     {
-        i.value()->SetIsInCache(false);
-        i.value()->DecrRef();
-        i = m_imageCache.erase(i);
+        image->SetIsInCache(false);
+        image->DecrRef();
     }
+    m_imageCache.clear();
 
     m_cacheTrack.clear();
     m_cacheSize.fetchAndStoreOrdered(0);
@@ -281,8 +278,8 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
         if (m_imageCache.contains(Label) &&
             m_cacheTrack[Label] + kImageCacheTimeout > now)
         {
-            m_imageCache[Label]->IncrRef();
-            return m_imageCache[Label];
+            m_imageCache.value(Label)->IncrRef();
+            return m_imageCache.value(Label);
         }
     }
 
@@ -415,8 +412,8 @@ MythImage* MythUIThemeCache::GetImageFromCache(const QString& URL)
     if (m_imageCache.contains(URL))
     {
         m_cacheTrack[URL] = SystemClock::now();
-        m_imageCache[URL]->IncrRef();
-        return m_imageCache[URL];
+        m_imageCache.value(URL)->IncrRef();
+        return m_imageCache.value(URL);
     }
 
     /*
@@ -450,23 +447,30 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     while ((m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes()) >=
            m_maxCacheSize.fetchAndAddOrdered(0) && !m_imageCache.empty())
     {
-        QMap<QString, MythImage *>::iterator it = m_imageCache.begin();
         auto oldestTime = SystemClock::now();
-        QString oldestKey = it.key();
+        QString oldestKey = m_imageCache.firstKey();
 
         int count = 0;
 
-        for (; it != m_imageCache.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_imageCache.constBegin();
+             it != m_imageCache.constEnd(); ++it)
         {
-            if (m_cacheTrack[it.key()] < oldestTime)
+            const QString& key = it.key();
+            MythImage* value = it.value();
+#else
+        for (auto [key, value] : std::as_const(m_imageCache).asKeyValueRange())
+        {
+#endif
+            if (m_cacheTrack[key] < oldestTime)
             {
-                if ((2 == it.value()->IncrRef()) && (it.value() != Image))
+                if ((2 == value->IncrRef()) && (value != Image))
                 {
-                    oldestTime = m_cacheTrack[it.key()];
-                    oldestKey = it.key();
+                    oldestTime = m_cacheTrack[key];
+                    oldestKey = key;
                     count++;
                 }
-                it.value()->DecrRef();
+                value->DecrRef();
             }
         }
 
@@ -477,8 +481,8 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
                 .arg(m_cacheSize.fetchAndAddOrdered(0) + Image->sizeInBytes())
                 .arg(oldestKey));
 
-            m_imageCache[oldestKey]->SetIsInCache(false);
-            m_imageCache[oldestKey]->DecrRef();
+            m_imageCache.value(oldestKey)->SetIsInCache(false);
+            m_imageCache.value(oldestKey)->DecrRef();
             m_imageCache.remove(oldestKey);
             m_cacheTrack.remove(oldestKey);
         }
@@ -488,9 +492,7 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
         }
     }
 
-    QMap<QString, MythImage *>::iterator it = m_imageCache.find(URL);
-
-    if (it == m_imageCache.end())
+    if (!m_imageCache.contains(URL))
     {
         Image->IncrRef();
         m_imageCache[URL] = Image;
@@ -505,18 +507,17 @@ MythImage *MythUIThemeCache::CacheImage(const QString& URL, MythImage* Image, bo
     LOG(VB_GUI | VB_FILE, LOG_INFO, LOC + QString("MythUIHelper::CacheImage : Cache Count = :%1: size :%2:")
         .arg(m_imageCache.count()).arg(m_cacheSize.fetchAndAddRelaxed(0)));
 
-    return m_imageCache[URL];
+    return m_imageCache.value(URL);
 }
 
 void MythUIThemeCache::RemoveFromCacheByURL(const QString& URL)
 {
     QMutexLocker locker(&m_cacheLock);
-    QMap<QString, MythImage *>::iterator it = m_imageCache.find(URL);
 
-    if (it != m_imageCache.end())
+    if (m_imageCache.contains(URL))
     {
-        m_imageCache[URL]->SetIsInCache(false);
-        m_imageCache[URL]->DecrRef();
+        m_imageCache.value(URL)->SetIsInCache(false);
+        m_imageCache.value(URL)->DecrRef();
         m_imageCache.remove(URL);
         m_cacheTrack.remove(URL);
     }

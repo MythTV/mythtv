@@ -519,11 +519,11 @@ fsit != fsInfos.end(); ++fsit)
         }
 
         if (std::max((int64_t)0LL, fsit->getFreeSpace()) <
-            m_desiredSpace[fsit->getFSysID()])
+            m_desiredSpace.value(fsit->getFSysID()))
         {
             LOG(VB_FILE, LOG_INFO,
                 QString("    Not Enough Free Space!  We want %1 MB")
-                    .arg(m_desiredSpace[fsit->getFSysID()] / 1024));
+                    .arg(m_desiredSpace.value(fsit->getFSysID()) / 1024));
 
             QMap<QString, int> dirList;
 
@@ -547,7 +547,7 @@ fsit != fsInfos.end(); ++fsit)
             auto it = expireList.begin();
             while ((it != expireList.end()) &&
                    (std::max((int64_t)0LL, fsit->getFreeSpace()) <
-                    m_desiredSpace[fsit->getFSysID()]))
+                    m_desiredSpace.value(fsit->getFSysID())))
             {
                 ProgramInfo *p = *it;
                 ++it;

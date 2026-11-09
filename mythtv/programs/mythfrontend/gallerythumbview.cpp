@@ -120,7 +120,7 @@ protected:
 
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("%1: Failed to copy/move %2 -> %3")
-                    .arg(objectName(), im->m_url, m_files[im]));
+                    .arg(objectName(), im->m_url, m_files.value(im)));
             }
 
             progressSize += im->m_size;

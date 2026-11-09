@@ -85,7 +85,7 @@ public:
              std::chrono::milliseconds expireTime) :
         MythUIImage(parent, name),
         SubWrapper(area, expireTime) {}
-    MythImage *GetImage(void) { return m_images[0]; }
+    MythImage *GetImage(void) { return m_images.value(0); }
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -274,12 +274,12 @@ SubtitleFormat::GetFont(const QString &family,
     QString prefix = MakePrefix(family, attr);
     if (!m_fontMap.contains(prefix))
         Load(family, attr);
-    MythFontProperties *result = m_fontMap[prefix];
+    MythFontProperties *result = m_fontMap.value(prefix);
 
     // Apply the scaling factor to pixelSize even if the theme
     // explicitly sets pixelSize.
     if (!IsUnlocked(prefix, kSubAttrPixelsize))
-        pixelSize = m_pixelSizeMap[prefix];
+        pixelSize = m_pixelSizeMap.value(prefix);
     pixelSize *= scale;
     result->GetFace()->setPixelSize(pixelSize);
 
@@ -352,7 +352,7 @@ SubtitleFormat::GetFont(const QString &family,
     }
     else
     {
-        off = m_outlineSizeMap[prefix];
+        off = m_outlineSizeMap.value(prefix);
         MythPoint point(off, off);
         point.NormPoint();
         off = lroundf(point.x() * scale);
@@ -369,13 +369,12 @@ SubtitleFormat::GetFont(const QString &family,
 
 SubtitleFormat::~SubtitleFormat(void)
 {
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_cleanup.size(); ++i)
+    for (const auto& cleanup : std::as_const(m_cleanup))
     {
-        m_cleanup[i]->DeleteAllChildren();
-        m_cleanup[i]->deleteLater();
-        m_cleanup[i] = nullptr; // just to be safe
+        cleanup->DeleteAllChildren();
+        cleanup->deleteLater();
     }
+    m_cleanup.clear();
     qDeleteAll(m_dynamAllocated);
     m_dynamAllocated.clear();
     m_fontMap.clear();
@@ -651,11 +650,11 @@ SubtitleFormat::GetBackground(MythUIType *parent, const QString &name,
     QString prefix = MakePrefix(family, attr);
     if (!m_shapeMap.contains(prefix))
         Load(family, attr);
-    if (m_shapeMap[prefix]->GetAlpha() == 0)
+    if (m_shapeMap.value(prefix)->GetAlpha() == 0)
         return nullptr;
     auto *result = new SubShape(parent, name, area, whichImageCache,
                                 start + duration);
-    result->CopyFrom(m_shapeMap[prefix]);
+    result->CopyFrom(m_shapeMap.value(prefix));
     if (family == kSubFamily708)
     {
         if (IsUnlocked(prefix, kSubAttrBGfill))
@@ -855,34 +854,33 @@ void FormattedTextSubtitle::Layout(void)
 
     // Fill in missing coordinates
     int y = anchor_y;
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (int i = 0; i < m_lines.size(); i++)
+    for (auto& line : m_lines)
     {
-        if (m_lines[i].m_xIndent < 0)
-            m_lines[i].m_xIndent = anchor_x;
-        if (m_lines[i].m_yIndent < 0)
-            m_lines[i].m_yIndent = y;
-        y += m_lines[i].CalcSize(LINE_SPACING).height();
+        if (line.m_xIndent < 0)
+            line.m_xIndent = anchor_x;
+        if (line.m_yIndent < 0)
+            line.m_yIndent = y;
+        y += line.CalcSize(LINE_SPACING).height();
         // Prune leading all-whitespace chunks.
-        while (!m_lines[i].chunks.isEmpty() &&
-               m_lines[i].chunks.first().m_text.trimmed().isEmpty())
+        while (!line.chunks.isEmpty() &&
+               line.chunks.constFirst().m_text.trimmed().isEmpty())
         {
-            m_lines[i].m_xIndent +=
-                m_lines[i].chunks.first().CalcSize().width();
-            m_lines[i].chunks.removeFirst();
+            line.m_xIndent +=
+                line.chunks.constFirst().CalcSize().width();
+            line.chunks.removeFirst();
         }
         // Prune trailing all-whitespace chunks.
-        while (!m_lines[i].chunks.isEmpty() &&
-               m_lines[i].chunks.last().m_text.trimmed().isEmpty())
+        while (!line.chunks.isEmpty() &&
+               line.chunks.constLast().m_text.trimmed().isEmpty())
         {
-            m_lines[i].chunks.removeLast();
+            line.chunks.removeLast();
         }
         // Trim trailing whitespace from last chunk.  (Trimming
         // leading whitespace from all chunks is handled in the Draw()
         // routine.)
-        if (!m_lines[i].chunks.isEmpty())
+        if (!line.chunks.isEmpty())
         {
-            QString *str = &m_lines[i].chunks.last().m_text;
+            QString *str = &line.chunks.last().m_text;
             int idx = str->length() - 1;
             while (idx >= 0 && str->at(idx) == ' ')
                 --idx;
@@ -1143,7 +1141,7 @@ void FormattedTextSubtitleSRT::WrapLongLines(void)
         // least one chunk on the current line.
         while (width > maxWidth && m_lines[i].chunks.size() > 1)
         {
-            width -= m_lines[i].chunks.back().CalcSize().width();
+            width -= m_lines[i].chunks.constLast().CalcSize().width();
             // Make sure there's a next line to wrap into.
             if (m_lines.size() == i + 1)
                 m_lines += FormattedTextLine(m_lines[i].m_xIndent,
@@ -1244,10 +1242,10 @@ void FormattedTextSubtitle608::Layout(void)
     for (int i = 0; i < m_lines.size(); i++)
     {
         m_lines[i].m_yIndent = std::max(m_lines[i].m_yIndent, prevY); // avoid overlap
-        int y = m_lines[i].m_yIndent;
+        int y = m_lines.value(i).m_yIndent;
         if (i == 0)
             firstY = prevY = y;
-        int height = m_lines[i].CalcSize().height();
+        int height = m_lines.value(i).CalcSize().height();
         heights[i] = height;
         spaceBefore[i] = y - prevY;
         totalSpace += (y - prevY);
@@ -1266,7 +1264,7 @@ void FormattedTextSubtitle608::Layout(void)
         for (int i = 0; i < m_lines.size(); i++)
         {
             m_lines[i].m_yIndent = prevY + (spaceBefore[i] * shrink);
-            prevY = m_lines[i].m_yIndent + heights[i];
+            prevY = m_lines.value(i).m_yIndent + heights[i];
         }
     }
 

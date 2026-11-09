@@ -32,7 +32,7 @@ MythScreenStack::~MythScreenStack()
 
     while (!m_children.isEmpty())
     {
-        MythScreenType *child = m_children.back();
+        MythScreenType *child = m_children.constLast();
         MythScreenStack::PopScreen(child, false, true); // Don't fade, do delete
     }
 }
@@ -303,7 +303,10 @@ void MythScreenStack::CheckDeletes(bool force)
 
     bool changed = false;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QVector<MythScreenType *>::Iterator it = m_toDelete.begin();
+    // clazy:exclude-next-line=detaching-member (erases item)
     while (it != m_toDelete.end() && !m_toDelete.isEmpty())
     {
         bool deleteit = false;
@@ -314,35 +317,11 @@ void MythScreenStack::CheckDeletes(bool force)
         }
 
         if (!deleteit)
-        {
-            bool found = false;
-
-            for (const auto *test : std::as_const(m_drawOrder))
-            {
-                if (*it == test)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                deleteit = true;
-        }
+            deleteit = !m_drawOrder.contains(*it);
 
         if (deleteit)
         {
-            // NOLINTNEXTLINE(readability-qualified-auto) for Qt6
-            for (auto test = m_children.begin();
-                 test != m_children.end();
-                 ++test)
-            {
-                if (*test == *it)
-                {
-                    m_children.erase(test);
-                    break;
-                }
-            }
+            m_children.removeAll(*it);
 
             if (*it == m_newTop)
                 m_newTop = nullptr;
@@ -354,6 +333,20 @@ void MythScreenStack::CheckDeletes(bool force)
 
         ++it;
     }
+#else
+    changed = m_toDelete.removeIf( [this,force](const auto* screen) {
+        bool deleteit = force;
+        deleteit |= screen->GetAlpha() <= 0;
+        deleteit |= !m_drawOrder.contains(screen);
+        if (!deleteit)
+            return false;
+        m_children.removeAll(screen);
+        if (screen == m_newTop)
+            m_newTop = nullptr;
+        delete screen;
+        return true;
+    } );
+#endif
 
     if (changed)
     {

@@ -879,7 +879,7 @@ void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
 {
     QMutexLocker locker(&m_cacheLock);
 
-    DeleteCachedTable(m_cachedTvcts[pid]);
+    DeleteCachedTable(m_cachedTvcts.value(pid));
     m_cachedTvcts[pid] = tvct;
 }
 
@@ -887,7 +887,7 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
 {
     QMutexLocker locker(&m_cacheLock);
 
-    DeleteCachedTable(m_cachedCvcts[pid]);
+    DeleteCachedTable(m_cachedCvcts.value(pid));
     m_cachedCvcts[pid] = cvct;
 }
 
@@ -897,7 +897,7 @@ bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
         return false;
 
     QMutexLocker locker(&m_cacheLock);
-    if (m_cachedRefCnt[psip] > 0)
+    if (m_cachedRefCnt.value(psip) > 0)
     {
         m_cachedSlatedForDeletion[psip] = 1;
         return false;
@@ -909,13 +909,13 @@ bool ATSCStreamData::DeleteCachedTable(const PSIPTable *psip) const
         delete psip;
     }
     else if ((TableID::TVCT == psip->TableID()) &&
-             m_cachedTvcts[psip->tsheader()->PID()])
+             m_cachedTvcts.value(psip->tsheader()->PID()))
     {
         m_cachedTvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;
     }
     else if ((TableID::CVCT == psip->TableID()) &&
-             m_cachedCvcts[psip->tsheader()->PID()])
+             m_cachedCvcts.value(psip->tsheader()->PID()))
     {
         m_cachedCvcts[psip->tsheader()->PID()] = nullptr;
         delete psip;

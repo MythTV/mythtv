@@ -763,21 +763,14 @@ UPnpDevice::UPnpDevice() :
 
 UPnpDevice::~UPnpDevice()
 {
-    while (!m_listIcons.empty())
-    {
-        delete m_listIcons.back();
-        m_listIcons.pop_back();
-    }
-    while (!m_listServices.empty())
-    {
-        delete m_listServices.back();
-        m_listServices.pop_back();
-    }
-    while (!m_listDevices.empty())
-    {
-        delete m_listDevices.back();
-        m_listDevices.pop_back();
-    }
+    qDeleteAll(m_listIcons);
+    m_listIcons.clear();
+
+    qDeleteAll(m_listServices);
+    m_listServices.clear();
+
+    qDeleteAll(m_listDevices);
+    m_listDevices.clear();
 }
 
 QString UPnpDevice::GetUDN(void) const

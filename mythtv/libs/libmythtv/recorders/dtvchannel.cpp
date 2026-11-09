@@ -136,8 +136,8 @@ void DTVChannel::DeregisterForMaster(const QString &key)
 DTVChannel *DTVChannel::GetMasterLock(const QString &key)
 {
     s_master_map_lock.lockForRead();
-    MasterMap::iterator mit = s_master_map.find(key);
-    if (mit == s_master_map.end() || (*mit).empty())
+    auto mit = s_master_map.constFind(key);
+    if (mit == s_master_map.constEnd() || (*mit).empty())
     {
         s_master_map_lock.unlock();
         return nullptr;

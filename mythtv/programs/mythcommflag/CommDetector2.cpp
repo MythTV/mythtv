@@ -703,10 +703,15 @@ void CommDetector2::GetCommercialBreakList(frm_dir_map_t &marks)
 
     /* Create break list. */
     long long breakframes = 0;
-    for (auto bb = m_breaks.begin(); bb != m_breaks.end(); ++bb)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto bb = m_breaks.constBegin(); bb != m_breaks.constEnd(); ++bb)
     {
         long long segb = bb.key();
         long long seglen = *bb;
+#else
+    for (auto [segb,seglen] : std::as_const(m_breaks).asKeyValueRange())
+    {
+#endif
         long long sege = segb + seglen - 1;
 
         if (segb < sege)

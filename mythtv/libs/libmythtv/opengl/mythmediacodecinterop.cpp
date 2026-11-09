@@ -122,7 +122,7 @@ MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
     if (!Frame->m_buffer)
     {
         if (!m_openglTextures.isEmpty())
-            return m_openglTextures[DUMMY_INTEROP_ID];
+            return m_openglTextures.value(DUMMY_INTEROP_ID);
         return result;
     }
 
@@ -171,5 +171,5 @@ MythMediaCodecInterop::Acquire(MythRenderOpenGL *Context,
     m_openglTextures[DUMMY_INTEROP_ID][0]->m_transform = &m_transform;
     m_openglTextures[DUMMY_INTEROP_ID][0]->m_flip = false;
 
-    return m_openglTextures[DUMMY_INTEROP_ID];
+    return m_openglTextures.value(DUMMY_INTEROP_ID);
 }

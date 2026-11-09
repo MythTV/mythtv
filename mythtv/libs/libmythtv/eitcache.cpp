@@ -260,7 +260,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
 
 bool EITCache::WriteChannelToDB(QStringList &value_clauses, uint chanid)
 {
-    event_map_t * eventMap = m_channelMap[chanid];
+    event_map_t * eventMap = m_channelMap.value(chanid);
 
     if (!eventMap)
         return false;
@@ -330,6 +330,8 @@ void EITCache::WriteToDB(void)
     QMutexLocker locker(&m_eventMapLock);
 
     QStringList value_clauses;
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     key_map_t::iterator it = m_channelMap.begin();
     while (it != m_channelMap.end())
     {
@@ -338,6 +340,11 @@ void EITCache::WriteToDB(void)
         else
             ++it;
     }
+#else
+    m_channelMap.removeIf( [this,&value_clauses](auto it) {
+        return !WriteChannelToDB(value_clauses, it.key());
+    } );
+#endif
 
     if (m_persistent)
     {
@@ -394,7 +401,7 @@ bool EITCache::IsNewEIT(uint chanid,  uint tableid,   uint version,
         return false;
     }
 
-    event_map_t * eventMap = m_channelMap[chanid];
+    event_map_t * eventMap = m_channelMap.value(chanid);
     event_map_t::iterator it = eventMap->find(eventid);
     if (it != eventMap->end())
     {

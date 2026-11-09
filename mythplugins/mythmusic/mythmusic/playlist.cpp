@@ -459,9 +459,8 @@ void Playlist::shuffleTracks(MusicPlayer::ShuffleMode shuffleMode)
         default:
         {
             // copy the raw song list to the shuffled track list
-            // NOLINTNEXTLINE(modernize-loop-convert)
-            for (auto it = m_songs.begin(); it != m_songs.end(); ++it)
-                m_shuffledSongs.append(*it);
+            for (auto song : std::as_const(m_songs))
+                m_shuffledSongs.append(song);
 
             break;
         }

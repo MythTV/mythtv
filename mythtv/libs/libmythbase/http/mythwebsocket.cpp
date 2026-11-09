@@ -272,7 +272,7 @@ void MythWebSocket::Read()
                 // unmask payload - TODO Optimise this (e.g SIMD)
                 if (valid && m_currentFrame->m_masked)
                     for (int i = 0; i < payload->size(); ++i)
-                        payload->data()[i] ^= m_currentFrame->m_mask[i % 4];
+                        payload->data()[i] ^= m_currentFrame->m_mask.at(i % 4);
 
                 // Ensure we have the current *message* opcode
                 auto messageopcode = m_currentFrame->m_opCode;

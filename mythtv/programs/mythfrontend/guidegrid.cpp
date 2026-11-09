@@ -281,7 +281,7 @@ public:
                     m_guide->getProgramListFromProgram(m_chanNums[i]);
             fillProgramRowInfosWith(row,
                                     m_currentStartTime,
-                                    m_proglists[i]);
+                                    m_proglists.at(i));
         }
         return true;
     }
@@ -384,12 +384,12 @@ public:
     static bool IsLoading(GuideGrid *guide)
     {
         QMutexLocker locker(&s_lock);
-        return s_loading[guide] != 0U;
+        return s_loading.value(guide) != 0U;
     }
     static void Wait(GuideGrid *guide)
     {
         QMutexLocker locker(&s_lock);
-        while (s_loading[guide])
+        while (s_loading.value(guide))
         {
             if (!s_wait.wait(locker.mutex(), 15000UL))
                 return;
@@ -1178,7 +1178,7 @@ void GuideGrid::ShowRecordingMenu(void)
 
 ChannelInfo *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 {
-    sel = (sel >= 0) ? sel : m_channelInfoIdx[chan_idx];
+    sel = (sel >= 0) ? sel : m_channelInfoIdx.value(chan_idx);
 
     if (chan_idx >= GetChannelCount())
         return nullptr;
@@ -2155,7 +2155,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
 
             // Try alternates with same channum if applicable
             uint alt = GetAlternateChannelIndex(chanNumber, true);
-            if (alt != m_channelInfoIdx[chanNumber])
+            if (alt != m_channelInfoIdx.value(chanNumber))
             {
                 unavailable = false;
                 m_channelInfoIdx[chanNumber] = alt;
@@ -2167,7 +2167,7 @@ void GuideGrid::updateChannelsNonUI(QVector<ChannelInfo *> &chinfos,
                 !GetProgramList(chinfo->m_chanId).empty())
             {
                 alt = GetAlternateChannelIndex(chanNumber, false);
-                unavailable = (alt == m_channelInfoIdx[chanNumber]);
+                unavailable = (alt == m_channelInfoIdx.value(chanNumber));
             }
         }
         chinfos.push_back(chinfo);

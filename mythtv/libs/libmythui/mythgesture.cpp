@@ -275,7 +275,7 @@ QString MythGesture::Translate(bool Timeout)
 
     while (!m_points.empty())
     {
-        QPoint pt = m_points.front();
+        QPoint pt = m_points.constFirst();
         m_points.pop_front();
 
         /* figure out which bin the point falls in */
@@ -346,17 +346,17 @@ bool MythGesture::Record(QPoint Point, Qt::MouseButton Button)
     }
 
     /* interpolate between last and current point */
-    int delx = Point.x() - m_points.back().x();
-    int dely = Point.y() - m_points.back().y();
+    int delx = Point.x() - m_points.constLast().x();
+    int dely = Point.y() - m_points.constLast().y();
 
     /* step by the greatest delta direction */
     if (abs(delx) > abs(dely))
     {
-        float fy = m_points.back().y();
+        float fy = m_points.constLast().y();
 
         /* go from the last point to the current, whatever direction
          * it may be */
-        for (int ix = m_points.back().x();
+        for (int ix = m_points.constLast().x();
              (delx > 0) ? (ix < Point.x()) : (ix > Point.x());
              ix += (delx > 0) ? 1 : -1)
         {
@@ -372,11 +372,11 @@ bool MythGesture::Record(QPoint Point, Qt::MouseButton Button)
     }
     else /* same thing, but for dely larger than delx case... */
     {
-        float fx = m_points.back().x();
+        float fx = m_points.constLast().x();
 
         /* go from the last point to the current, whatever direction
            it may be */
-        for (int iy = m_points.back().y();
+        for (int iy = m_points.constLast().y();
              (dely > 0) ? (iy < Point.y()) : (iy > Point.y());
              iy += (dely > 0) ? 1 : -1)
         {

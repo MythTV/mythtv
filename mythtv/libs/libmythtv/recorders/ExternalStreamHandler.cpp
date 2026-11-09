@@ -444,9 +444,9 @@ void ExternIO::Fork(void)
     char **arguments = new char*[m_args.size() + 1];
     for (int i = 0; i < m_args.size(); ++i)
     {
-        int len = m_args[i].size() + 1;
+        int len = m_args.at(i).size() + 1;
         arguments[i] = new char[len];
-        memcpy(arguments[i], m_args[i].toStdString().c_str(), len);
+        memcpy(arguments[i], m_args.at(i).toStdString().c_str(), len);
     }
     arguments[m_args.size()] = nullptr;
 
@@ -481,9 +481,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<int, ExternalStreamHandler*>::iterator it = s_handlers.find(majorid);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(majorid))
     {
         auto *newhandler = new ExternalStreamHandler(devname, inputid, majorid);
         s_handlers[majorid] = newhandler;
@@ -497,7 +495,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
     else
     {
         ++s_handlersRefCnt[majorid];
-        uint rcount = s_handlersRefCnt[majorid];
+        uint rcount = s_handlersRefCnt.value(majorid);
         LOG(VB_RECORD, LOG_INFO,
             QString("ExternSH[%1:%2]: Using existing stream handler for %3")
             .arg(inputid).arg(majorid).arg(devname) +
@@ -511,7 +509,7 @@ ExternalStreamHandler *ExternalStreamHandler::Get(const QString &devname,
         QString("ExternSH[%1:%2]: Used by %3")
         .arg(inputid).arg(majorid).arg(refs));
 
-    return s_handlers[majorid];
+    return s_handlers.value(majorid);
 }
 
 void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
@@ -521,12 +519,13 @@ void ExternalStreamHandler::Return(ExternalStreamHandler * & ref,
 
     int majorid = ref->m_majorId;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<int, uint>::iterator rit = s_handlersRefCnt.find(majorid);
     if (rit == s_handlersRefCnt.end())
         return;
 
     QMap<int, ExternalStreamHandler*>::iterator it =
-        s_handlers.find(majorid);
+        s_handlers.find(majorid); // clazy:exclude=detaching-member (modifies item)
 
     s_handlers[majorid]->m_refs.remove(from);
 

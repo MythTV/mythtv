@@ -485,7 +485,7 @@ void RecordingSelector::updateCategorySelector(void)
 
         for (int x = 0; x < m_categories.count(); x++)
         {
-            new MythUIButtonListItem(m_categorySelector, m_categories[x]);
+            new MythUIButtonListItem(m_categorySelector, m_categories.at(x));
         }
     }
 }

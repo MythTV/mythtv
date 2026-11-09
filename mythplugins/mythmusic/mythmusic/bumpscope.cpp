@@ -255,6 +255,7 @@ void BumpScope::render_light(int lx, int ly)
 
     int prev_y = m_bpl + 1;
     int out_y = 0;
+    // clazy:exclude-next-line=detaching-member (modifies item)
     unsigned char *outputbuf = m_image->bits();
 
     for (dy = (-ly) + (PHONGRES / 2), j = 0; j < m_height; j++, dy++,

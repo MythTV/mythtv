@@ -273,7 +273,7 @@ void MythDownloadManager::run(void)
         m_infoLock->lock();
         if (!m_downloadQueue.isEmpty())
         {
-            MythDownloadInfo *dlInfo = m_downloadQueue.front();
+            MythDownloadInfo *dlInfo = m_downloadQueue.constFirst();
 
             m_downloadQueue.pop_front();
 
@@ -794,7 +794,7 @@ void MythDownloadManager::authCallback(QNetworkReply *reply,
     if (!reply)
         return;
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;
@@ -1032,6 +1032,8 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
     m_infoLock->lock();
     for (const auto& url : std::as_const(urls))
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         for (auto lit = m_downloadQueue.begin();
              lit != m_downloadQueue.end();
              /* no inc */)
@@ -1048,10 +1050,19 @@ void MythDownloadManager::cancelDownload(const QStringList &urls, bool block)
                 ++lit;
             }
         }
+#else
+        m_downloadQueue.removeIf( [this,url](MythDownloadInfo *dlInfo) {
+            if (dlInfo->m_url != url)
+                return false;
+            if (!m_cancellationQueue.contains(dlInfo))
+                m_cancellationQueue.append(dlInfo);
+            return true;
+        } );
+#endif
 
         if (m_downloadInfos.contains(url))
         {
-            MythDownloadInfo *dlInfo = m_downloadInfos[url];
+            MythDownloadInfo *dlInfo = m_downloadInfos.value(url);
 
             if (!m_cancellationQueue.contains(dlInfo))
                 m_cancellationQueue.append(dlInfo);
@@ -1086,6 +1097,7 @@ void MythDownloadManager::downloadCanceled()
 {
     QMutexLocker locker(m_infoLock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto lit = m_cancellationQueue.begin();
          lit != m_cancellationQueue.end();
          /* no inc */)
@@ -1119,28 +1131,22 @@ void MythDownloadManager::removeListener(QObject *caller)
 {
     QMutexLocker locker(m_infoLock);
 
-    QList <MythDownloadInfo*>::iterator lit = m_downloadQueue.begin();
-    for (; lit != m_downloadQueue.end(); ++lit)
+    for (auto* dlInfo : std::as_const(m_downloadQueue))
     {
-        MythDownloadInfo *dlInfo = *lit;
-        if (dlInfo->m_caller == caller)
-        {
-            dlInfo->m_caller  = nullptr;
-            dlInfo->m_outFile = QString();
-            dlInfo->m_data    = nullptr;
-        }
+        if (dlInfo->m_caller != caller)
+            continue;
+        dlInfo->m_caller  = nullptr;
+        dlInfo->m_outFile = QString();
+        dlInfo->m_data    = nullptr;
     }
 
-    QMap <QString, MythDownloadInfo*>::iterator mit = m_downloadInfos.begin();
-    for (; mit != m_downloadInfos.end(); ++mit)
+    for (auto* dlInfo : std::as_const(m_downloadInfos))
     {
-        MythDownloadInfo *dlInfo = mit.value();
-        if (dlInfo->m_caller == caller)
-        {
-            dlInfo->m_caller  = nullptr;
-            dlInfo->m_outFile = QString();
-            dlInfo->m_data    = nullptr;
-        }
+        if (dlInfo->m_caller != caller)
+            continue;
+        dlInfo->m_caller  = nullptr;
+        dlInfo->m_outFile = QString();
+        dlInfo->m_data    = nullptr;
     }
 }
 
@@ -1163,7 +1169,7 @@ void MythDownloadManager::downloadError(QNetworkReply::NetworkError errorCode)
         return;
     }
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;
@@ -1203,7 +1209,7 @@ void MythDownloadManager::downloadFinished(QNetworkReply* reply)
         return;
     }
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo || !dlInfo->m_reply)
         return;
@@ -1457,7 +1463,7 @@ void MythDownloadManager::downloadProgress(qint64 bytesReceived,
     if (!m_downloadReplies.contains(reply))
         return;
 
-    MythDownloadInfo *dlInfo = m_downloadReplies[reply];
+    MythDownloadInfo *dlInfo = m_downloadReplies.value(reply);
 
     if (!dlInfo)
         return;

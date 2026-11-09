@@ -626,7 +626,7 @@ void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
 
     m_currentEncryptionStatus[pnum] = encrypted ? kEncEncrypted : kEncDecrypted;
 
-    if (kEncDecrypted == m_currentEncryptionStatus[pnum])
+    if (kEncDecrypted == m_currentEncryptionStatus.value(pnum))
         m_currentTestingDecryption = false;
 
     UpdateChannelInfo(true);
@@ -1812,7 +1812,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
     {
         uint pnum = dbchan_it.key();
         ChannelInsertInfo &info = *dbchan_it;
-        info.m_decryptionStatus = scan_info->m_programEncryptionStatus[pnum];
+        info.m_decryptionStatus = scan_info->m_programEncryptionStatus.value(pnum);
     }
 
     return pnum_to_dbchan;
@@ -2162,18 +2162,23 @@ void ChannelScanSM::HandleActiveScan(void)
     else if (!m_extendTransports.isEmpty())
     {
         --m_current;
-        QMap<uint32_t,DTVMultiplex>::iterator it = m_extendTransports.begin();
-        while (it != m_extendTransports.end())
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = m_extendTransports.constBegin(); it != m_extendTransports.constEnd(); it++)
         {
-            if (!m_tsScanned.contains(it.key()))
+            uint32_t index = it.key();
+            const DTVMultiplex& mplex = it.value();
+#else
+        for (auto [index, mplex] : std::as_const(m_extendTransports).asKeyValueRange())
+        {
+#endif
+            if (!m_tsScanned.contains(index))
             {
-                QString name = QString("TransportID %1").arg(it.key() & 0xffff);
-                TransportScanItem item(m_sourceID, name, *it, m_signalTimeout);
+                QString name = QString("TransportID %1").arg(index & 0xffff);
+                TransportScanItem item(m_sourceID, name, mplex, m_signalTimeout);
                 LOG(VB_CHANSCAN, LOG_INFO, LOC + "Adding " + name + ' ' + item.m_tuning.toString());
                 m_scanTransports.push_back(item);
-                m_tsScanned.insert(it.key());
+                m_tsScanned.insert(index);
             }
-            ++it;
         }
         m_extendTransports.clear();
         m_nextIt = m_current;

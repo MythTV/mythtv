@@ -133,7 +133,7 @@ void PhrasePopup::deleteClicked(void)
     if (view < 0)
         return;
 
-    QString text = m_list[view];
+    QString text = m_list.at(view);
     const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -319,7 +319,7 @@ void PowerSearchPopup::deleteClicked(void)
     if (view < 0)
         return;
 
-    QString text = m_list[view];
+    QString text = m_list.at(view);
     const QString& qphrase = text;
 
     MSqlQuery query(MSqlQuery::InitCon());

@@ -122,9 +122,6 @@ class UPNP_PUBLIC SSDPCache : public QObject,
         void Lock       () { m_mutex.lock();   }
         void Unlock     () { m_mutex.unlock(); }
 
-        SSDPCacheEntriesMap::Iterator Begin() { return m_cache.begin(); }
-        SSDPCacheEntriesMap::Iterator End  () { return m_cache.end();   }
-
         int  Count      () { return m_cache.count(); }
         void Clear      ();
         void Add        ( const QString &sURI,

@@ -230,14 +230,14 @@ void MainVisual::timeout()
             }
 
             if (m_vis)
-                m_vis->processUndisplayed(m_nodes.first());
+                m_vis->processUndisplayed(m_nodes.constFirst());
 
-            delete m_nodes.first();
+            delete m_nodes.constFirst();
             m_nodes.removeFirst();
         }
 
         if (!m_nodes.isEmpty())
-            node = m_nodes.first();
+            node = m_nodes.constFirst();
     }
 
     bool stop = true;

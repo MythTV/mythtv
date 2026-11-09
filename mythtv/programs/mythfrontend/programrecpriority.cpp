@@ -1045,7 +1045,7 @@ void ProgramRecPriority::saveRecPriority(void)
 
         // if this program's recording priority changed from when we entered
         // save new value out to db
-        if (progInfo->GetRecordingPriority() != m_origRecPriorityData[key])
+        if (progInfo->GetRecordingPriority() != m_origRecPriorityData.value(key))
             progInfo->ApplyRecordRecPriorityChange(
                 progInfo->GetRecordingPriority());
     }
@@ -1113,9 +1113,9 @@ void ProgramRecPriority::FillList(void)
 
             progInfo->m_recType = recType;
             progInfo->m_matchCount =
-                m_listMatch[progInfo->GetRecordingRuleID()];
+                m_listMatch.value(progInfo->GetRecordingRuleID());
             progInfo->m_recCount =
-                m_recMatch[progInfo->GetRecordingRuleID()];
+                m_recMatch.value(progInfo->GetRecordingRuleID());
             progInfo->m_last_record = lastrec;
             progInfo->m_avg_delay = avgd;
             progInfo->m_profile = profile;
@@ -1124,11 +1124,11 @@ void ProgramRecPriority::FillList(void)
 
             if (inactive)
                 progInfo->m_recStatus = RecStatus::Inactive;
-            else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
+            else if (m_conMatch.value(progInfo->GetRecordingRuleID()) > 0)
                 progInfo->m_recStatus = RecStatus::Conflict;
-            else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
+            else if (m_nowMatch.value(progInfo->GetRecordingRuleID()) > 0)
                 progInfo->m_recStatus = RecStatus::Recording;
-            else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0)
+            else if (m_recMatch.value(progInfo->GetRecordingRuleID()) > 0)
                 progInfo->m_recStatus = RecStatus::WillRecord;
             else
                 progInfo->m_recStatus = RecStatus::Unknown;
@@ -1267,12 +1267,12 @@ void ProgramRecPriority::UpdateList()
             (progInfo->m_recType != kTemplateRecord &&
              progInfo->m_recStatus == RecStatus::Inactive))
             state = "disabled";
-        else if (m_conMatch[progInfo->GetRecordingRuleID()] > 0)
+        else if (m_conMatch.value(progInfo->GetRecordingRuleID()) > 0)
             state = "error";
-        else if (m_recMatch[progInfo->GetRecordingRuleID()] > 0 ||
+        else if (m_recMatch.value(progInfo->GetRecordingRuleID()) > 0 ||
                  progInfo->m_recType == kTemplateRecord)
             state = "normal";
-        else if (m_nowMatch[progInfo->GetRecordingRuleID()] > 0)
+        else if (m_nowMatch.value(progInfo->GetRecordingRuleID()) > 0)
             state = "running";
         else
             state = "warning";
@@ -1294,15 +1294,15 @@ void ProgramRecPriority::UpdateList()
         if (progInfo->GetRecordingStatus() == RecStatus::Inactive)
         {
             matchInfo = QString("%1 %2")
-                        .arg(m_listMatch[progInfo->GetRecordingRuleID()])
+                        .arg(m_listMatch.value(progInfo->GetRecordingRuleID()))
                         .arg(RecStatus::toString(progInfo->GetRecordingStatus(),
                                       progInfo->GetRecordingRuleType()));
         }
         else
         {
             matchInfo = tr("Recording %1 of %2")
-                        .arg(m_recMatch[progInfo->GetRecordingRuleID()])
-                        .arg(m_listMatch[progInfo->GetRecordingRuleID()]);
+                        .arg(m_recMatch.value(progInfo->GetRecordingRuleID()))
+                        .arg(m_listMatch.value(progInfo->GetRecordingRuleID()));
         }
 
         subtitle = QString("(%1) %2").arg(matchInfo, subtitle);

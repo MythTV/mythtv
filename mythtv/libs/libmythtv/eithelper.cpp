@@ -169,6 +169,7 @@ void EITHelper::AddEIT(uint atsc_major, uint atsc_minor,
                        const EventInformationTable *eit)
 {
     uint atsc_key = (atsc_major << 16) | atsc_minor;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     EventIDToATSCEvent &events = m_incompleteEvents[atsc_key];
 
     for (uint i = 0; i < eit->EventCount(); i++)
@@ -210,6 +211,7 @@ void EITHelper::AddETT(uint atsc_major, uint atsc_minor,
     // Find the matching incomplete EIT event for this ETT
     // If we have no EIT event then just discard the ETT.
     uint atsc_key = (atsc_major << 16) | atsc_minor;
+    // clazy:exclude-next-line=detaching-member (erases item)
     ATSCSRCToEvents::iterator eits_it = m_incompleteEvents.find(atsc_key);
     if (eits_it != m_incompleteEvents.end())
     {

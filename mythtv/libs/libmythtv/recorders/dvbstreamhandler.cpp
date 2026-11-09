@@ -47,10 +47,7 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<QString,DVBStreamHandler*>::iterator it =
-        s_handlers.find(devname);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devname))
     {
         s_handlers[devname] = new DVBStreamHandler(devname, inputid);
         s_handlersRefCnt[devname] = 1;
@@ -62,14 +59,14 @@ DVBStreamHandler *DVBStreamHandler::Get(const QString &devname,
     else
     {
         s_handlersRefCnt[devname]++;
-        uint rcount = s_handlersRefCnt[devname];
+        uint rcount = s_handlersRefCnt.value(devname);
         LOG(VB_RECORD, LOG_INFO,
             QString("DVBSH[%1]: Using existing stream handler for %2")
             .arg(inputid)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devname];
+    return s_handlers.value(devname);
 }
 
 void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
@@ -78,10 +75,12 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (updates value)
     QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
     if (rit == s_handlersRefCnt.end())
         return;
 
+    // clazy:exclude-next-line=detaching-member (updates value)
     QMap<QString,DVBStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)
@@ -421,7 +420,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
             if (closed == priority_queue[i].end())
                 break; // something is broken
 
-            if (m_pidInfo[*closed]->Open(m_device, m_usingSectionReader))
+            if (m_pidInfo.value(*closed)->Open(m_device, m_usingSectionReader))
             {
                 m_openPidFilters++;
                 priority_open_cnt[i]++;
@@ -439,7 +438,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
 
                 for (uint k = 0; (k < priority_queue[j].size()) && !freed; k++)
                 {
-                    PIDInfo *info = m_pidInfo[priority_queue[j][k]];
+                    PIDInfo *info = m_pidInfo.value(priority_queue[j][k]);
                     if (!info->IsOpen())
                         continue;
 
@@ -454,7 +453,7 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
             if (freed)
             {
                 // if we can open a filter, just do it
-                if (m_pidInfo[*closed]->Open(
+                if (m_pidInfo.value(*closed)->Open(
                         m_device, m_usingSectionReader))
                 {
                     m_openPidFilters++;
@@ -472,12 +471,12 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
                 break; // nothing to close..
 
             // close "open"
-            bool ok = m_pidInfo[*open]->Close(m_device);
+            bool ok = m_pidInfo.value(*open)->Close(m_device);
             m_openPidFilters--;
             priority_open_cnt[i]--;
 
             // open "closed"
-            if (ok && m_pidInfo[*closed]->
+            if (ok && m_pidInfo.value(*closed)->
                 Open(m_device, m_usingSectionReader))
             {
                 m_openPidFilters++;

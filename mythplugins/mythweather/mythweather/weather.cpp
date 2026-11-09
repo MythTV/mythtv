@@ -97,7 +97,7 @@ void Weather::clearScreens()
     m_curScreenNum = 0;
     while (!m_screens.empty())
     {
-        WeatherScreen *screen = m_screens.back();
+        WeatherScreen *screen = m_screens.constLast();
         m_weatherStack->PopScreen(screen, false, false);
         m_screens.pop_back();
         delete screen;
@@ -170,6 +170,7 @@ bool Weather::SetupScreens()
             units_t units = db.value(2).toUInt();
             uint draworder = db.value(3).toUInt();
 
+            // clazy:exclude-next-line=detaching-member (can't reference temporary)
             ScreenListInfo &screenListInfo = m_allScreens[container];
 
             WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, &screenListInfo, id);
@@ -210,7 +211,7 @@ bool Weather::SetupScreens()
 
 void Weather::screenReady(WeatherScreen *ws)
 {
-    if (m_firstRun && !m_screens.empty() && ws == m_screens[m_curScreenNum])
+    if (m_firstRun && !m_screens.empty() && ws == m_screens.value(m_curScreenNum))
     {
         m_firstRun = false;
         showScreen(ws);
@@ -225,7 +226,7 @@ WeatherScreen *Weather::nextScreen(void)
         return nullptr;
 
     m_curScreenNum = (m_curScreenNum + 1) % m_screens.size();
-    return m_screens[m_curScreenNum];
+    return m_screens.value(m_curScreenNum);
 }
 
 WeatherScreen *Weather::prevScreen(void)
@@ -235,7 +236,7 @@ WeatherScreen *Weather::prevScreen(void)
 
     m_curScreenNum = (m_curScreenNum < 0) ? 0 : m_curScreenNum;
     m_curScreenNum = (m_curScreenNum + m_screens.size() - 1) % m_screens.size();
-    return m_screens[m_curScreenNum];
+    return m_screens.value(m_curScreenNum);
 }
 
 bool Weather::keyPressEvent(QKeyEvent *event)

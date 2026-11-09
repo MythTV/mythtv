@@ -68,11 +68,8 @@ std::chrono::milliseconds VideoVisual::SetLastUpdate(void)
 // caller holds lock
 void VideoVisual::DeleteNodes(void)
 {
-    while (!m_nodes.empty())
-    {
-        delete m_nodes.back();
-        m_nodes.pop_back();
-    }
+    qDeleteAll(m_nodes);
+    m_nodes.clear();
 }
 
 // caller holds lock
@@ -89,14 +86,14 @@ VisualNode* VideoVisual::GetNode(void)
     {
         if (m_nodes.front()->m_offset > timestamp)
             break;
-        delete m_nodes.front();
+        delete m_nodes.constFirst();
         m_nodes.pop_front();
     }
 
     if (m_nodes.isEmpty())
         return nullptr;
 
-    return m_nodes.first();
+    return m_nodes.constFirst();
 }
 
 // TODO Add MMX path

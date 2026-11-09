@@ -179,14 +179,14 @@ class UPNP_PUBLIC HTTPRequest
 
         QString         GetResponseStatus   ( void ) const;
         QString         GetResponseType     ( void ) const;
-        QString         GetResponseHeaders  ( void );
+        QString         GetResponseHeaders  ( void ) const;
 
         bool            ParseRange          ( QString sRange,
                                               long long   llSize,
                                               long long *pllStart,
                                               long long *pllEnd   );
 
-        bool            ParseKeepAlive      ( void );
+        bool            ParseKeepAlive      ( void ) const;
 
         void            ParseCookies        ( void );
 
@@ -228,7 +228,7 @@ class UPNP_PUBLIC HTTPRequest
                                     const QDateTime &expiryDate,
                                     bool secure );
 
-        QString         GetRequestHeader  ( const QString &sKey, const QString &sDefault );
+        QString         GetRequestHeader  ( const QString &sKey, const QString &sDefault ) const;
 
         bool            GetKeepAlive () const { return m_bKeepAlive; }
 

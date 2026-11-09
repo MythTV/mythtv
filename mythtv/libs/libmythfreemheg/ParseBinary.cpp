@@ -45,7 +45,7 @@ unsigned char MHParseBinary::GetNextChar()
         MHERROR("Unexpected end of file");
     }
 
-    return m_data[m_p++];
+    return m_data.at(m_p++);
 }
 
 

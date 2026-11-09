@@ -319,7 +319,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
 #if REUSE_CONNECTION
     if (reuse)
     {
-        db = m_inuse[QThread::currentThread()];
+        db = m_inuse.value(QThread::currentThread());
         if (db != nullptr)
         {
             m_inuseCount[QThread::currentThread()]++;
@@ -329,6 +329,7 @@ MSqlDatabase *MDBManager::popConnection(bool reuse)
     }
 #endif
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &list = m_pool[QThread::currentThread()];
     if (list.isEmpty())
     {
@@ -365,7 +366,7 @@ void MDBManager::pushConnection(MSqlDatabase *db)
     m_lock.lock();
 
 #if REUSE_CONNECTION
-    if (db == m_inuse[QThread::currentThread()])
+    if (db == m_inuse.value(QThread::currentThread()))
     {
         int cnt = --m_inuseCount[QThread::currentThread()];
         if (cnt > 0)
@@ -395,6 +396,7 @@ void MDBManager::PurgeIdleConnections(bool leaveOne)
     leaveOne = leaveOne || (gCoreContext && gCoreContext->IsUIThread());
 
     QDateTime now = MythDate::current();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &list = m_pool[QThread::currentThread()];
     DBList::iterator it = list.begin();
 
@@ -486,7 +488,7 @@ MSqlDatabase *MDBManager::getChannelCon()
 void MDBManager::CloseDatabases()
 {
     m_lock.lock();
-    DBList list = m_pool[QThread::currentThread()];
+    DBList list = m_pool.value(QThread::currentThread());
     m_pool[QThread::currentThread()].clear();
     m_lock.unlock();
 
@@ -500,6 +502,7 @@ void MDBManager::CloseDatabases()
     }
 
     m_lock.lock();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     DBList &slist = m_staticPool[QThread::currentThread()];
     while (!slist.isEmpty())
     {

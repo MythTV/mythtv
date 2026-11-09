@@ -112,7 +112,7 @@ void StreamView::customEvent(QEvent *event)
         // add the new track to the list
         if (m_playedTracksList && !gPlayer->getPlayedTracksList().isEmpty())
         {
-            MusicMetadata *mdata = gPlayer->getPlayedTracksList().last();
+            MusicMetadata *mdata = gPlayer->getPlayedTracksList().constLast();
 
             auto *item = new MythUIButtonListItem(m_playedTracksList, "",
                                                   QVariant::fromValue(mdata), 0);

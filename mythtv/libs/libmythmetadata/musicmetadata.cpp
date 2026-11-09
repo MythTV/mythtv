@@ -1442,17 +1442,11 @@ AllMusic::AllMusic(void)
 
 AllMusic::~AllMusic()
 {
-    while (!m_allMusic.empty())
-    {
-        delete m_allMusic.back();
-        m_allMusic.pop_back();
-    }
+    qDeleteAll(m_allMusic);
+    m_allMusic.clear();
 
-    while (!m_cdData.empty())
-    {
-        delete m_cdData.back();
-        m_cdData.pop_back();
-    }
+    qDeleteAll(m_cdData);
+    m_cdData.clear();
 
     m_metadataLoader->wait();
     delete m_metadataLoader;
@@ -1585,7 +1579,7 @@ void AllMusic::resync()
             else
             {
                 // existing track, check for any changes
-                MusicMetadata *cacheMeta = m_musicMap[id];
+                MusicMetadata *cacheMeta = m_musicMap.value(id);
 
                 if (cacheMeta && !cacheMeta->compare(dbMeta))
                 {
@@ -1635,7 +1629,7 @@ void AllMusic::resync()
     // remove the no longer available tracks
     for (uint id : deleteList)
     {
-        MusicMetadata *mdata = m_musicMap[id];
+        MusicMetadata *mdata = m_musicMap.value(id);
         m_allMusic.removeAll(mdata);
         m_musicMap.remove(id);
         removed++;
@@ -1653,7 +1647,7 @@ void AllMusic::resync()
 MusicMetadata* AllMusic::getMetadata(int an_id)
 {
     if (m_musicMap.contains(an_id))
-        return m_musicMap[an_id];
+        return m_musicMap.value(an_id);
 
     return nullptr;
 }
@@ -1692,11 +1686,11 @@ void AllMusic::clearCDData(void)
 {
     while (!m_cdData.empty())
     {
-        MusicMetadata *mdata = m_cdData.back();
+        MusicMetadata *mdata = m_cdData.constLast();
         if (m_musicMap.contains(mdata->ID()))
             m_musicMap.remove(mdata->ID());
 
-        delete m_cdData.back();
+        delete m_cdData.constLast();
         m_cdData.pop_back();
     }
 
@@ -1742,11 +1736,8 @@ AllStream::AllStream(void)
 
 AllStream::~AllStream(void)
 {
-    while (!m_streamList.empty())
-    {
-        delete m_streamList.back();
-        m_streamList.pop_back();
-    }
+    qDeleteAll(m_streamList);
+    m_streamList.clear();
 }
 
 bool AllStream::isValidID(MusicMetadata::IdType an_id)
@@ -1773,11 +1764,8 @@ MusicMetadata *AllStream::getMetadata(MusicMetadata::IdType an_id)
 
 void AllStream::loadStreams(void)
 {
-    while (!m_streamList.empty())
-    {
-        delete m_streamList.back();
-        m_streamList.pop_back();
-    }
+    qDeleteAll(m_streamList);
+    m_streamList.clear();
 
     QString aquery = "SELECT intid, broadcaster, channel, description, url1, url2, url3, url4, url5,"
                      "logourl, genre, metaformat, country, language, format "
@@ -1929,20 +1917,14 @@ AlbumArtImages::AlbumArtImages(MusicMetadata *metadata, const AlbumArtImages &ot
 
 AlbumArtImages::~AlbumArtImages()
 {
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 }
 
 void AlbumArtImages::findImages(void)
 {
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 
     if (m_parent == nullptr)
         return;
@@ -2090,11 +2072,8 @@ void AlbumArtImages::scanForImages()
     if (busy)
         busy->Close();
 
-    while (!m_imageList.empty())
-    {
-        delete m_imageList.back();
-        m_imageList.pop_back();
-    }
+    qDeleteAll(m_imageList);
+    m_imageList.clear();
 
     for (int x = 2; x < strList.count(); x += 6)
     {
@@ -2170,7 +2149,7 @@ QStringList AlbumArtImages::getImageFilenames(void) const
 AlbumArtImage *AlbumArtImages::getImageAt(uint index)
 {
     if (index < (uint)m_imageList.size())
-        return m_imageList[index];
+        return m_imageList.at(index);
 
     return nullptr;
 }

@@ -172,7 +172,7 @@ void ProgramInfoCache::Refresh(void)
             {
                 // An entry using that key already exists in hash.
                 // Free allocated memory for the entry to be replaced.
-                delete m_cache[it->GetRecordingID()];
+                delete m_cache.value(it->GetRecordingID());
             }
 
             m_cache[it->GetRecordingID()] = it;
@@ -182,6 +182,8 @@ void ProgramInfoCache::Refresh(void)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_cache.begin(); it != m_cache.end(); )
     {
         if ((*it)->GetAvailableStatus() == asDeleted)
@@ -194,6 +196,14 @@ void ProgramInfoCache::Refresh(void)
             it++;
         }
     }
+#else
+    m_cache.removeIf( [](auto it){
+            if ((*it)->GetAvailableStatus() != asDeleted)
+                return false;
+            delete (*it);
+            return true;
+    } );
+#endif
 }
 
 /** \brief Updates a ProgramInfo in the cache.
@@ -205,9 +215,9 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
     QMutexLocker locker(&m_lock);
 
     uint recordingId = pginfo.GetRecordingID();
-    Cache::iterator it = m_cache.find(recordingId);
 
-    if (it == m_cache.end())
+    auto it = m_cache.constFind(recordingId);
+    if (it == m_cache.constEnd())
         return PIC_NO_ACTION;
 
     ProgramInfo& pg = **it;
@@ -243,14 +253,13 @@ ProgramInfoCache::UpdateStates ProgramInfoCache::Update(const ProgramInfo &pginf
 void ProgramInfoCache::UpdateFileSize(uint recordingID, uint64_t filesize,
                                       UpdateStates flags)
 {
-    Cache::iterator it = m_cache.find(recordingID);
-    if (it == m_cache.end())
-        return;
-
-    if ((*it)->GetAvailableStatus() != asAvailable)
+    auto it = m_cache.constFind(recordingID);
+    if (it == m_cache.constEnd())
         return;
 
     ProgramInfo *pg = *it;
+    if (pg->GetAvailableStatus() != asAvailable)
+        return;
 
     pg->CalculateProgress(pg->QueryLastPlayPos());
 
@@ -296,12 +305,12 @@ void ProgramInfoCache::Add(const ProgramInfo &pginfo)
  */
 bool ProgramInfoCache::Remove(uint recordingID)
 {
-    Cache::iterator it = m_cache.find(recordingID);
+    auto it = m_cache.constFind(recordingID);
 
-    if (it != m_cache.end())
+    if (it != m_cache.constEnd())
         (*it)->SetAvailableStatus(asDeleted, "PIC::Remove");
 
-    return it != m_cache.end();
+    return it != m_cache.constEnd();
 }
 
 // two helper functions that are used only in this file

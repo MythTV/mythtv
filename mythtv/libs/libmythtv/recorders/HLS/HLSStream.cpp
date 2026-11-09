@@ -159,6 +159,7 @@ bool HLSRecStream::DecodeData(MythSingleDownload& downloader,
         QString(" keypath:%1..%2").arg(keypath.left(20),keypath.right(20)) +
         QString(" sequence:%1").arg(sequence));
 
+    // clazy:exclude-next-line=detaching-member (can insert)
     AESKeyMap::iterator Ikey = m_aesKeys.find(keypath);
     if (Ikey == m_aesKeys.end())
     {

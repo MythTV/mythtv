@@ -1267,9 +1267,9 @@ QString ChannelUtil::GetDefaultAuthority(uint chanid)
         }
     }
 
-    QMap<uint,QString>::iterator it = s_channelDefaultAuthorityMap.find(chanid);
+    const auto it = s_channelDefaultAuthorityMap.constFind(chanid);
     QString ret;
-    if (it != s_channelDefaultAuthorityMap.end())
+    if (it != s_channelDefaultAuthorityMap.constEnd())
         ret = *it;
     s_channelDefaultAuthorityMapLock.unlock();
 
