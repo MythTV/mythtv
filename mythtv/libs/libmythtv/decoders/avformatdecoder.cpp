@@ -87,6 +87,7 @@ enum V4L2_MPEG_LINE_TYPES : std::uint8_t {
 #include "libmythtv/audio/audiooutputsettings.h"
 #include "libmythtv/mythaverror.h"
 #include "libmythtv/mythavframe.h"
+#include "libmythtv/mythavrational.h"
 #include "libmythbase/iso639.h"
 #include "libmythbase/lcddevice.h"
 #include "libmythbase/mythchrono.h"
@@ -2990,7 +2991,7 @@ void AvFormatDecoder::HandleGopStart(
             m_positionMap.push_back(entry);
             if (m_trackTotalDuration)
             {
-                long long duration = m_totalDuration.toFixed(1000LL);
+                long long duration = duration_cast<std::chrono::milliseconds>(m_totalDuration).count();
                 m_frameToDurMap[m_framesRead] = duration;
                 m_durToFrameMap[duration]     = m_framesRead;
             }
@@ -3260,7 +3261,8 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *c
         pkt_dur *= MythAVRational(curstream->time_base);
         if (pkt_dur == MythAVRational(1501, 90000))
             pkt_dur = MythAVRational(1001, 60000); // 1501.5/90000
-        m_totalDuration += pkt_dur;
+        constexpr std::chrono::nanoseconds k_s_in_ns {1s};
+        m_totalDuration += std::chrono::nanoseconds{pkt_dur.toFixed(k_s_in_ns.count())};
     }
 
     m_justAfterChange = false;
