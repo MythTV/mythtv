@@ -185,6 +185,7 @@ MythDownloadManager::~MythDownloadManager()
 
     wait();
 
+    delete m_proxy;
     delete m_infoLock;
     delete m_inCookieJar;
 }
