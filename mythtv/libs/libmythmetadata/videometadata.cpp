@@ -1271,6 +1271,10 @@ VideoMetadata &VideoMetadata::operator=(const VideoMetadata &rhs)
 {
     if (this != &rhs)
     {
+        if (m_imp)
+        {
+            delete m_imp;
+        }
         m_imp = new VideoMetadataImp(*(rhs.m_imp));
     }
 
