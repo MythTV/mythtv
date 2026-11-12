@@ -932,6 +932,9 @@ void TestLirc::test_tcp_sending(void)
 
 void TestLirc::test_udp_sending(void)
 {
+    if (!qEnvironmentVariableIsSet("MYTHTV_TEST_LIRC_SOCKETS"))
+        QSKIP("not testing sockets");
+
     auto *sock = new QLocalSocket();
     auto del_fn = [](QLocalSocket **sock2) { delete *sock2; };
     std::unique_ptr<QLocalSocket*,decltype(del_fn)> const cleanup { &sock, del_fn };
@@ -951,6 +954,9 @@ void TestLirc::test_udp_sending(void)
 
 void TestLirc::test_identify(void)
 {
+    if (!qEnvironmentVariableIsSet("MYTHTV_TEST_LIRC_SOCKETS"))
+        QSKIP("not testing sockets");
+
     m_state = lirc_init("/etc/lircrc", ".lircrc", "test_lirc", nullptr, 0);
     QVERIFY(m_state != nullptr);
 
@@ -1028,6 +1034,9 @@ void TestLirc::test_identify(void)
 
 void TestLirc::test_send_command(void)
 {
+    if (!qEnvironmentVariableIsSet("MYTHTV_TEST_LIRC_SOCKETS"))
+        QSKIP("not testing sockets");
+
     m_state = lirc_init("/etc/lircrc", ".lircrc", "test_lirc", nullptr, 0);
     QVERIFY(m_state != nullptr);
 
