@@ -196,6 +196,7 @@ include(ExternalProject)
 include(FindPkgConfig)
 include(GNUInstallDirs)
 include(ProcessorCount)
+include(CTest)
 
 #
 # Inject code from mythtv provided modules
