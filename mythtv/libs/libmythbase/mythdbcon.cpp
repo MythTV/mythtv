@@ -87,10 +87,11 @@ MSqlDatabase::MSqlDatabase(QString name, QString driver)
 {
     if (!QSqlDatabase::isDriverAvailable(m_driver))
     {
-        LOG(VB_FLUSH, LOG_CRIT,
+        LOG(VB_GENERAL, LOG_CRIT,
             QString("FATAL: Unable to load the QT %1 driver, is it installed?")
             .arg(m_driver));
-        exit(GENERIC_EXIT_DB_ERROR); // Exits before we can process the log queue
+        logStop(); // flush log before exit
+        exit(GENERIC_EXIT_DB_ERROR);
         //return;
     }
 
@@ -99,9 +100,10 @@ MSqlDatabase::MSqlDatabase(QString name, QString driver)
 
     if (!m_db.isValid() || m_db.isOpenError())
     {
-        LOG(VB_FLUSH, LOG_CRIT, MythDB::DBErrorMessage(m_db.lastError()));
-        LOG(VB_FLUSH, LOG_CRIT, QString("FATAL: Unable to create database object (%1), the installed QT driver may be invalid.").arg(m_name));
-        exit(GENERIC_EXIT_DB_ERROR); // Exits before we can process the log queue
+        LOG(VB_GENERAL, LOG_CRIT, MythDB::DBErrorMessage(m_db.lastError()));
+        LOG(VB_GENERAL, LOG_CRIT, QString("FATAL: Unable to create database object (%1), the installed QT driver may be invalid.").arg(m_name));
+        logStop(); // flush log before exit
+        exit(GENERIC_EXIT_DB_ERROR);
         //return;
     }
     m_lastDBKick = MythDate::current().addSecs(-60);
