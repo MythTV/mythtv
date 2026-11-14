@@ -91,6 +91,12 @@ typedef struct MOVDref {
     int16_t nlvl_to, nlvl_from;
 } MOVDref;
 
+typedef struct MovTref {
+    uint32_t    name;
+    int         nb_id;
+    uint32_t   *id; ///< trackID of the referenced track
+} MovTref;
+
 typedef struct MOVAtom {
     uint32_t type;
     int64_t size; /* total size (excluding the size and type fields) */
@@ -222,9 +228,8 @@ typedef struct MOVStreamContext {
     unsigned drefs_count;
     MOVDref *drefs;
     int dref_id;
-    unsigned tref_flags;
-    int tref_id;
-    int timecode_track;
+    int nb_tref_tags;
+    MovTref *tref_tags;
     int width;            ///< tkhd width
     int height;           ///< tkhd height
     int h_spacing;        ///< pasp hSpacing
@@ -236,7 +241,6 @@ typedef struct MOVStreamContext {
     uint32_t tmcd_flags;  ///< tmcd track flags
     uint8_t tmcd_nb_frames;  ///< tmcd number of frames per tick / second
     int64_t track_end;    ///< used for dts generation in fragmented movie files
-    int start_pad;        ///< amount of samples to skip due to enc-dec delay
     unsigned int rap_group_count;
     MOVSbgp *rap_group;
     unsigned int sync_group_count;
@@ -386,6 +390,7 @@ typedef struct MOVContext {
     int64_t idat_offset;
     int interleaved_read;
     AVDictionary* decryption_keys;
+    unsigned heif_icc_profile_items;
 } MOVContext;
 
 int ff_mp4_read_descr_len(AVIOContext *pb);
@@ -433,8 +438,6 @@ void ff_mp4_parse_es_descr(AVIOContext *pb, int *es_id);
 #define MOV_SAMPLE_DEPENDENCY_UNKNOWN 0x0
 #define MOV_SAMPLE_DEPENDENCY_YES     0x1
 #define MOV_SAMPLE_DEPENDENCY_NO      0x2
-
-#define MOV_TREF_FLAG_ENHANCEMENT     0x1
 
 #define TAG_IS_AVCI(tag)                    \
     ((tag) == MKTAG('a', 'i', '5', 'p') ||  \

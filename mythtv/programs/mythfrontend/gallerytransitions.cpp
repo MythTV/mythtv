@@ -406,7 +406,7 @@ void TransitionRandom::Start(Slide &from, Slide &to, bool forwards, float speed)
 {
     // Select a random peer.
     int rand = MythRandom(0, m_peers.size() - 1);
-    m_current = m_peers[rand];
+    m_current = m_peers.value(rand);
     // Invoke peer
     connect(m_current, &Transition::finished, this, &TransitionRandom::Finished);
     m_current->Start(from, to, forwards, speed);

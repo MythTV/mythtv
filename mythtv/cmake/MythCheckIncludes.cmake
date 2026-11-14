@@ -11,7 +11,7 @@ include(CheckCCompilerFlag)
 include(CheckCSourceCompiles)
 include(CheckIncludeFile)
 include(CheckSymbolExists)
-include(CheckCXXSymbolExists)
+include(CheckCXXSourceCompiles)
 include(CheckCXXSymbolExists)
 include(CheckFunctionExists)
 include(CMakePushCheckState)
@@ -128,6 +128,18 @@ endif()
 if(CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
   set(HAVE_BIGENDIAN 1)
 endif()
+
+check_cxx_source_compiles([=[
+#include <format>
+#include <string>
+#if !defined(__cpp_lib_format) || __cpp_lib_format < 201907L
+#error "std::format not available"
+#endif
+int main() {
+    std::string s = std::format("{} {}", 42, "x");
+    return s.empty();
+}
+]=] HAVE_STD_FORMAT)
 
 #
 # Random constant

@@ -13,6 +13,10 @@ fate-aes_ctr: libavutil/tests/aes_ctr$(EXESUF)
 fate-aes_ctr: CMD = run libavutil/tests/aes_ctr$(EXESUF)
 fate-aes_ctr: CMP = null
 
+FATE_LIBAVUTIL += fate-ambient_viewing_environment
+fate-ambient_viewing_environment: libavutil/tests/ambient_viewing_environment$(EXESUF)
+fate-ambient_viewing_environment: CMD = run libavutil/tests/ambient_viewing_environment$(EXESUF)
+
 FATE_LIBAVUTIL += fate-camellia
 fate-camellia: libavutil/tests/camellia$(EXESUF)
 fate-camellia: CMD = run libavutil/tests/camellia$(EXESUF)
@@ -47,6 +51,10 @@ FATE_LIBAVUTIL += fate-bprint
 fate-bprint: libavutil/tests/bprint$(EXESUF)
 fate-bprint: CMD = run libavutil/tests/bprint$(EXESUF)
 
+FATE_LIBAVUTIL += fate-buffer
+fate-buffer: libavutil/tests/buffer$(EXESUF)
+fate-buffer: CMD = run libavutil/tests/buffer$(EXESUF)
+
 FATE_LIBAVUTIL += fate-cpu
 fate-cpu: libavutil/tests/cpu$(EXESUF)
 fate-cpu: CMD = runecho libavutil/tests/cpu$(EXESUF) $(CPUFLAGS:%=-c%) $(THREADS:%=-t%)
@@ -65,10 +73,18 @@ FATE_LIBAVUTIL += fate-color_utils
 fate-color_utils: libavutil/tests/color_utils$(EXESUF)
 fate-color_utils: CMD = run libavutil/tests/color_utils$(EXESUF)
 
+FATE_LIBAVUTIL += fate-csp
+fate-csp: libavutil/tests/csp$(EXESUF)
+fate-csp: CMD = run libavutil/tests/csp$(EXESUF)
+
 FATE_LIBAVUTIL += fate-des
 fate-des: libavutil/tests/des$(EXESUF)
 fate-des: CMD = run libavutil/tests/des$(EXESUF)
 fate-des: CMP = null
+
+FATE_LIBAVUTIL += fate-detection_bbox
+fate-detection_bbox: libavutil/tests/detection_bbox$(EXESUF)
+fate-detection_bbox: CMD = run libavutil/tests/detection_bbox$(EXESUF)
 
 FATE_LIBAVUTIL += fate-dict
 fate-dict: libavutil/tests/dict$(EXESUF)
@@ -87,9 +103,17 @@ FATE_LIBAVUTIL += fate-fifo
 fate-fifo: libavutil/tests/fifo$(EXESUF)
 fate-fifo: CMD = run libavutil/tests/fifo$(EXESUF)
 
+FATE_LIBAVUTIL += fate-film_grain_params
+fate-film_grain_params: libavutil/tests/film_grain_params$(EXESUF)
+fate-film_grain_params: CMD = run libavutil/tests/film_grain_params$(EXESUF)
+
 FATE_LIBAVUTIL += fate-hash
 fate-hash: libavutil/tests/hash$(EXESUF)
 fate-hash: CMD = run libavutil/tests/hash$(EXESUF)
+
+FATE_LIBAVUTIL += fate-hdr_dynamic_vivid_metadata
+fate-hdr_dynamic_vivid_metadata: libavutil/tests/hdr_dynamic_vivid_metadata$(EXESUF)
+fate-hdr_dynamic_vivid_metadata: CMD = run libavutil/tests/hdr_dynamic_vivid_metadata$(EXESUF)
 
 FATE_LIBAVUTIL += fate-hmac
 fate-hmac: libavutil/tests/hmac$(EXESUF)
@@ -107,6 +131,10 @@ fate-integer: CMP = null
 FATE_LIBAVUTIL += fate-lfg
 fate-lfg: libavutil/tests/lfg$(EXESUF)
 fate-lfg: CMD = run libavutil/tests/lfg$(EXESUF)
+
+FATE_LIBAVUTIL += fate-mathematics
+fate-mathematics: libavutil/tests/mathematics$(EXESUF)
+fate-mathematics: CMD = run libavutil/tests/mathematics$(EXESUF)
 
 FATE_LIBAVUTIL += fate-md5
 fate-md5: libavutil/tests/md5$(EXESUF)
@@ -136,6 +164,10 @@ FATE_LIBAVUTIL += fate-random_seed
 fate-random_seed: libavutil/tests/random_seed$(EXESUF)
 fate-random_seed: CMD = run libavutil/tests/random_seed$(EXESUF)
 
+FATE_LIBAVUTIL += fate-rc4
+fate-rc4: libavutil/tests/rc4$(EXESUF)
+fate-rc4: CMD = run libavutil/tests/rc4$(EXESUF)
+
 FATE_LIBAVUTIL += fate-ripemd
 fate-ripemd: libavutil/tests/ripemd$(EXESUF)
 fate-ripemd: CMD = run libavutil/tests/ripemd$(EXESUF)
@@ -148,9 +180,25 @@ FATE_LIBAVUTIL += fate-sha512
 fate-sha512: libavutil/tests/sha512$(EXESUF)
 fate-sha512: CMD = run libavutil/tests/sha512$(EXESUF)
 
+FATE_LIBAVUTIL += fate-samplefmt
+fate-samplefmt: libavutil/tests/samplefmt$(EXESUF)
+fate-samplefmt: CMD = run libavutil/tests/samplefmt$(EXESUF)
+
 FATE_LIBAVUTIL += fate-side_data_array
 fate-side_data_array: libavutil/tests/side_data_array$(EXESUF)
 fate-side_data_array: CMD = run libavutil/tests/side_data_array$(EXESUF)
+
+FATE_LIBAVUTIL += fate-spherical
+fate-spherical: libavutil/tests/spherical$(EXESUF)
+fate-spherical: CMD = run libavutil/tests/spherical$(EXESUF)
+
+FATE_LIBAVUTIL += fate-stereo3d
+fate-stereo3d: libavutil/tests/stereo3d$(EXESUF)
+fate-stereo3d: CMD = run libavutil/tests/stereo3d$(EXESUF)
+
+FATE_LIBAVUTIL += fate-tdrdi
+fate-tdrdi: libavutil/tests/tdrdi$(EXESUF)
+fate-tdrdi: CMD = run libavutil/tests/tdrdi$(EXESUF)
 
 FATE_LIBAVUTIL += fate-tree
 fate-tree: libavutil/tests/tree$(EXESUF)
@@ -178,6 +226,23 @@ FATE_LIBAVUTIL += fate-uuid
 fate-uuid: libavutil/tests/uuid$(EXESUF)
 fate-uuid: CMD = run libavutil/tests/uuid$(EXESUF)
 fate-uuid: CMP = null
+
+FATE_LIBAVUTIL += fate-video_enc_params
+fate-video_enc_params: libavutil/tests/video_enc_params$(EXESUF)
+fate-video_enc_params: CMD = run libavutil/tests/video_enc_params$(EXESUF)
+
+FATE_LIBAVUTIL += fate-file
+fate-file: libavutil/tests/file$(EXESUF)
+fate-file: CMD = run libavutil/tests/file$(EXESUF) $(SRC_PATH)/libavutil/tests/file.c
+fate-file: CMP = null
+
+FATE_LIBAVUTIL += fate-timecode
+fate-timecode: libavutil/tests/timecode$(EXESUF)
+fate-timecode: CMD = run libavutil/tests/timecode$(EXESUF)
+
+FATE_LIBAVUTIL += fate-timestamp
+fate-timestamp: libavutil/tests/timestamp$(EXESUF)
+fate-timestamp: CMD = run libavutil/tests/timestamp$(EXESUF)
 
 FATE_LIBAVUTIL += $(FATE_LIBAVUTIL-yes)
 FATE-$(CONFIG_AVUTIL) += $(FATE_LIBAVUTIL)

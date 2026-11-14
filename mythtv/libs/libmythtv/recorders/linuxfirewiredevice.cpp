@@ -910,10 +910,10 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
     item.m_port = -1;
     item.m_node = -1;
-    for (auto it = m_priv->m_devices.begin(); it != m_priv->m_devices.end(); ++it)
+    for (auto it = m_priv->m_devices.keyBegin(); it != m_priv->m_devices.keyEnd(); ++it)
     {
-        if (!guid_online[it.key()])
-            UpdateDeviceListItem(it.key(), &item);
+        if (!guid_online[*it])
+            UpdateDeviceListItem(*it, &item);
     }
 
     return true;
@@ -921,6 +921,7 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
 
 void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 {
+    // clazy:exclude-next-line=detaching-member (modifies item)
     avcinfo_list_t::iterator it = m_priv->m_devices.find(guid);
 
     if (it == m_priv->m_devices.end())
@@ -949,8 +950,8 @@ LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void)
     if (!m_priv)
         return nullptr;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
-    return (it == m_priv->m_devices.end()) ? nullptr : *it;
+    auto it = m_priv->m_devices.constFind(m_guid);
+    return (it == m_priv->m_devices.constEnd()) ? nullptr : *it;
 }
 
 const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
@@ -958,8 +959,8 @@ const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
     if (!m_priv)
         return nullptr;
 
-    avcinfo_list_t::iterator it = m_priv->m_devices.find(m_guid);
-    return (it == m_priv->m_devices.end()) ? nullptr : *it;
+    auto it = m_priv->m_devices.constFind(m_guid);
+    return (it == m_priv->m_devices.constEnd()) ? nullptr : *it;
 }
 
 int linux_firewire_device_tspacket_handler(
@@ -1010,6 +1011,7 @@ static int linux_firewire_device_bus_reset_handler(
 {
     QMutexLocker locker(&LFDPriv::s_lock);
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     handle_to_lfd_t::iterator it = LFDPriv::s_handle_info.find(handle);
 
     if (it != LFDPriv::s_handle_info.end())

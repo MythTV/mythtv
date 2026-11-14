@@ -126,8 +126,8 @@ MythScreenType *MythNotificationScreenStack::GetTopScreen(void) const
         return nullptr;
     // The top screen is the only currently displayed first, if there's a
     // fullscreen notification displayed, it's the last one
-    MythScreenType *top = m_children.front();
-    QVector<MythScreenType *>::const_iterator it = m_children.end() - 1;
+    MythScreenType *top = m_children.constFirst();
+    QVector<MythScreenType *>::const_iterator it = m_children.constEnd() - 1;
 
     // loop from last to 2nd
     for (; it != m_children.begin(); --it)
@@ -818,7 +818,7 @@ void NCPrivate::ScreenDeleted(void)
     // remove the converted equivalent screen if any
     if (m_converted.contains(screen))
     {
-        delete m_converted[screen];
+        delete m_converted.value(screen);
     }
     m_converted.remove(screen);
 
@@ -871,7 +871,7 @@ bool NCPrivate::Queue(const MythNotification &notification)
     {
         // quick sanity check to ensure the right caller is attempting
         // to register a notification
-        if (!m_registrations.contains(id) || m_clients[id] != parent)
+        if (!m_registrations.contains(id) || m_clients.value(id) != parent)
         {
             LOG(VB_GENERAL, LOG_DEBUG, LOC +
                 QString("Queue: 0x%1, not registered for id (%2)")
@@ -918,7 +918,7 @@ void NCPrivate::ProcessQueue(void)
 
         if (id > 0)
         {
-            screen = m_registrations[id];
+            screen = m_registrations.value(id);
         }
         if (!screen)
         {
@@ -1035,7 +1035,7 @@ void NCPrivate::UnRegister(void *from, int id, bool closeimemdiately)
         return;
     }
 
-    if (m_clients[id] != from)
+    if (m_clients.value(id) != from)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("UnRegister: 0x%1, not registered for id (%2")
@@ -1070,7 +1070,7 @@ void NCPrivate::DeleteAllScreens(void)
     // delete all screens waiting to be deleted
     while(!m_deletedScreens.isEmpty())
     {
-        MythNotificationScreen *screen = m_deletedScreens.last();
+        MythNotificationScreen *screen = m_deletedScreens.constLast();
         // we remove the screen from the list before deleting the screen
         // so the MythScreenType::Exiting() signal won't process it a second time
         m_deletedScreens.removeLast();
@@ -1101,15 +1101,20 @@ void NCPrivate::DeleteUnregistered(void)
 {
     bool needdelete = false;
 
-    for (auto it = m_unregistered.begin(); it != m_unregistered.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_unregistered.constBegin(); it != m_unregistered.constEnd(); it++)
     {
         int id = it.key();
         bool closeimemdiately = it.value();
+#else
+    for (auto [id, closeimemdiately] : std::as_const(m_unregistered).asKeyValueRange())
+    {
+#endif
         MythNotificationScreen *screen = nullptr;
 
         if (m_registrations.contains(id))
         {
-            screen = m_registrations[id];
+            screen = m_registrations.value(id);
             if (screen != nullptr && !m_suspended.contains(id))
             {
                 // mark the screen for deletion if no timer is set
@@ -1143,7 +1148,9 @@ void NCPrivate::DeleteUnregistered(void)
  */
 int NCPrivate::InsertScreen(MythNotificationScreen *screen)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
 
 //    if (screen->m_id > 0)
@@ -1172,7 +1179,9 @@ int NCPrivate::InsertScreen(MythNotificationScreen *screen)
  */
 int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
+    // clazy:exclude-next-line=detaching-member (inserts item)
     QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
 
     for (; it != itend; ++it)
@@ -1194,22 +1203,19 @@ int NCPrivate::RemoveScreen(MythNotificationScreen *screen)
  */
 void NCPrivate::RefreshScreenPosition(int /*from*/)
 {
-    QList<MythNotificationScreen*>::iterator it       = m_screens.begin();
-    QList<MythNotificationScreen*>::iterator itend    = m_screens.end();
-
     int position = 0;
 
-    for (; it != itend; ++it)
+    for (auto* screen : std::as_const(m_screens))
     {
-        if ((*it)->IsVisible())
+        if (screen->IsVisible())
         {
-            (*it)->AdjustIndex(position++, true);
+            screen->AdjustIndex(position++, true);
         }
         else
         {
-            (*it)->AdjustIndex(position, true);
+            screen->AdjustIndex(position, true);
         }
-        if ((*it)->m_fullscreen)
+        if (screen->m_fullscreen)
         {
             position = 0;
             continue;
@@ -1251,7 +1257,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
             }
             else
             {
-                newscreen = m_converted[screen];
+                newscreen = m_converted.value(screen);
                 // Copy new content in case it has changed
                 newscreen->UpdateFrom(*screen);
             }
@@ -1290,8 +1296,8 @@ bool NCPrivate::RemoveFirst(void)
 
     // The top screen is the only currently displayed first, if there's a
     // fullscreen notification displayed, it's the last one
-    MythNotificationScreen *top = m_screens.front();
-    QList<MythNotificationScreen *>::const_iterator it = m_screens.cend() - 1;
+    MythNotificationScreen *top = m_screens.constFirst();
+    QList<MythNotificationScreen *>::const_iterator it = m_screens.constEnd() - 1;
 
     // loop from last to 2nd
     for (; it != m_screens.cbegin(); --it)

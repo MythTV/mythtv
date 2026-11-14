@@ -259,12 +259,10 @@ void MThreadPool::Stop(void)
 {
     QMutexLocker locker(&m_priv->m_lock);
     m_priv->m_running = false;
-    QSet<MPoolThread*>::iterator it = m_priv->m_availThreads.begin();
-    for (; it != m_priv->m_availThreads.end(); ++it)
-        (*it)->Shutdown();
-    it = m_priv->m_runningThreads.begin();
-    for (; it != m_priv->m_runningThreads.end(); ++it)
-        (*it)->Shutdown();
+    for (auto *const thread : std::as_const(m_priv->m_availThreads))
+        thread->Shutdown();
+    for (auto *const thread : std::as_const(m_priv->m_runningThreads))
+        thread->Shutdown();
     m_priv->m_wait.wakeAll();
 }
 
@@ -281,14 +279,14 @@ void MThreadPool::DeletePoolThreads(void)
 
     while (!m_priv->m_deleteThreads.empty())
     {
-        MPoolThread *thread = m_priv->m_deleteThreads.back();
+        MPoolThread *thread = m_priv->m_deleteThreads.constLast();
         locker.unlock();
 
         thread->wait();
 
         locker.relock();
         delete thread;
-        if (m_priv->m_deleteThreads.back() == thread)
+        if (m_priv->m_deleteThreads.constLast() == thread)
             m_priv->m_deleteThreads.pop_back();
         else
             m_priv->m_deleteThreads.removeAll(thread);
@@ -336,6 +334,7 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
     if (TryStartInternal(runnable, debugName, false))
         return;
 
+    // clazy:exclude-next-line=detaching-member
     MPoolQueues::iterator it = m_priv->m_runQueues.find(priority);
     if (it != m_priv->m_runQueues.end())
     {
@@ -385,11 +384,12 @@ bool MThreadPool::TryStartInternal(
 
     while (!m_priv->m_deleteThreads.empty())
     {
-        m_priv->m_deleteThreads.back()->wait();
-        delete m_priv->m_deleteThreads.back();
+        m_priv->m_deleteThreads.constLast()->wait();
+        delete m_priv->m_deleteThreads.constLast();
         m_priv->m_deleteThreads.pop_back();
     }
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto iter = m_priv->m_availThreads.begin();
          iter != m_priv->m_availThreads.end(); )
     {
@@ -451,6 +451,7 @@ void MThreadPool::NotifyAvailable(MPoolThread *thread)
         return;
     }
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     MPoolQueues::iterator it = m_priv->m_runQueues.begin();
     if (it == m_priv->m_runQueues.end())
     {
@@ -562,8 +563,8 @@ void MThreadPool::waitForDone(void)
     {
         while (!m_priv->m_deleteThreads.empty())
         {
-            m_priv->m_deleteThreads.back()->wait();
-            delete m_priv->m_deleteThreads.back();
+            m_priv->m_deleteThreads.constLast()->wait();
+            delete m_priv->m_deleteThreads.constLast();
             m_priv->m_deleteThreads.pop_back();
         }
 

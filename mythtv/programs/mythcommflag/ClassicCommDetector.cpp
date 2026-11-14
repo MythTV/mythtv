@@ -790,6 +790,7 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     fInfo.format = COMM_FORMAT_NORMAL;
     fInfo.flagMask = 0;
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     int& flagMask = m_frameInfo[m_curFrameNumber].flagMask;
 
     // Fill in dummy info records for skipped frames.
@@ -797,8 +798,8 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     {
         if (m_lastFrameNumber > 0)
         {
-            fInfo.aspect = m_frameInfo[m_lastFrameNumber].aspect;
-            fInfo.format = m_frameInfo[m_lastFrameNumber].format;
+            fInfo.aspect = m_frameInfo.value(m_lastFrameNumber).aspect;
+            fInfo.format = m_frameInfo.value(m_lastFrameNumber).format;
         }
         fInfo.flagMask = COMM_FRAME_SKIPPED;
 
@@ -967,13 +968,13 @@ void ClassicCommDetector::ProcessFrame(MythVideoFrame *frame,
     {
         LOG(VB_COMMFLAG, LOG_DEBUG, QString("Frame: %1 -> %2 %3 %4 %5 %6 %7 %8")
             .arg(m_curFrameNumber, 6)
-            .arg(m_frameInfo[m_curFrameNumber].minBrightness, 3)
-            .arg(m_frameInfo[m_curFrameNumber].maxBrightness, 3)
-            .arg(m_frameInfo[m_curFrameNumber].avgBrightness, 3)
-            .arg(m_frameInfo[m_curFrameNumber].sceneChangePercent, 3)
-            .arg(m_frameInfo[m_curFrameNumber].format, 1)
-            .arg(m_frameInfo[m_curFrameNumber].aspect, 1)
-            .arg(m_frameInfo[m_curFrameNumber].flagMask, 4, 16, QChar('0')));
+            .arg(m_frameInfo.value(m_curFrameNumber).minBrightness, 3)
+            .arg(m_frameInfo.value(m_curFrameNumber).maxBrightness, 3)
+            .arg(m_frameInfo.value(m_curFrameNumber).avgBrightness, 3)
+            .arg(m_frameInfo.value(m_curFrameNumber).sceneChangePercent, 3)
+            .arg(m_frameInfo.value(m_curFrameNumber).format, 1)
+            .arg(m_frameInfo.value(m_curFrameNumber).aspect, 1)
+            .arg(m_frameInfo.value(m_curFrameNumber).flagMask, 4, 16, QChar('0')));
     }
 
     m_framesProcessed++;
@@ -1194,7 +1195,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
              i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++)
         {
             if ((m_frameInfo.contains(i)) &&
-                (m_frameInfo[i].aspect == COMM_ASPECT_NORMAL))
+                (m_frameInfo.value(i).aspect == COMM_ASPECT_NORMAL))
                 aspectFrames++;
         }
 
@@ -1212,8 +1213,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             i < ((int64_t)m_framesProcessed - (int64_t)m_postRoll); i++ )
         {
             if ((m_frameInfo.contains(i)) &&
-                (m_frameInfo[i].format >= 0) &&
-                (m_frameInfo[i].format < COMM_FORMAT_MAX))
+                (m_frameInfo.value(i).format >= 0) &&
+                (m_frameInfo.value(i).format < COMM_FORMAT_MAX))
                 formatCounts[m_frameInfo[i].format]++;
         }
 
@@ -1230,10 +1231,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     while (curFrame <= m_framesProcessed)
     {
-        int value = m_frameInfo[curFrame].flagMask;
+        int value = m_frameInfo.value(curFrame).flagMask;
 
         bool nextFrameIsBlank = ((curFrame + 1) <= m_framesProcessed) &&
-            ((m_frameInfo[curFrame + 1].flagMask & COMM_FRAME_BLANK) != 0);
+            ((m_frameInfo.value(curFrame + 1).flagMask & COMM_FRAME_BLANK) != 0);
 
         if (value & COMM_FRAME_BLANK)
         {
@@ -1241,7 +1242,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
             if (!nextFrameIsBlank || !lastFrameWasBlank)
             {
-                UpdateFrameBlock(fbp, m_frameInfo[curFrame], format, aspect);
+                UpdateFrameBlock(fbp, m_frameInfo.value(curFrame), format, aspect);
 
                 fbp->end = curFrame;
                 fbp->frames = fbp->end - fbp->start + 1;
@@ -1271,7 +1272,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             lastFrameWasBlank = false;
         }
 
-        UpdateFrameBlock(fbp, m_frameInfo[curFrame], format, aspect);
+        UpdateFrameBlock(fbp, m_frameInfo.value(curFrame), format, aspect);
 
         if ((value & COMM_FRAME_LOGO_PRESENT) &&
             (firstLogoFrame == -1))
@@ -1810,10 +1811,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastStartLower = it.key();
             uint64_t lastStartUpper = it.key();
             while ((lastStartLower > 0) &&
-                   ((m_frameInfo[lastStartLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
+                   ((m_frameInfo.value(lastStartLower - 1).flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartLower--;
             while ((lastStartUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   ((m_frameInfo[lastStartUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
+                   ((m_frameInfo.value(lastStartUpper + 1).flagMask & COMM_FRAME_BLANK) != 0))
                 lastStartUpper++;
             uint64_t adj = (lastStartUpper - lastStartLower) / 2;
             adj = std::min<uint64_t>(adj, MAX_BLANK_FRAMES);
@@ -1830,10 +1831,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             uint64_t lastEndLower = it.key();
             uint64_t lastEndUpper = it.key();
             while ((lastEndUpper < (m_framesProcessed - (2 * m_fps))) &&
-                   ((m_frameInfo[lastEndUpper + 1].flagMask & COMM_FRAME_BLANK) != 0))
+                   ((m_frameInfo.value(lastEndUpper + 1).flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndUpper++;
             while ((lastEndLower > 0) &&
-                   ((m_frameInfo[lastEndLower - 1].flagMask & COMM_FRAME_BLANK) != 0))
+                   ((m_frameInfo.value(lastEndLower - 1).flagMask & COMM_FRAME_BLANK) != 0))
                 lastEndLower--;
             uint64_t adj = (lastEndUpper - lastEndLower) / 2;
             adj = std::min<uint64_t>(adj, MAX_BLANK_FRAMES);
@@ -1872,7 +1873,7 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 
     m_blankCommMap.clear();
 
-    for (auto it = m_blankFrameMap.begin(); it != m_blankFrameMap.end(); ++it)
+    for (auto it = m_blankFrameMap.cbegin(); it != m_blankFrameMap.cend(); ++it)
         bframes[frames++] = it.key();
 
     // detect individual commercials from blank frames
@@ -2002,17 +2003,29 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     delete[] c_end;
     delete[] bframes;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
     LOG(VB_COMMFLAG, LOG_INFO, "Blank-Frame Commercial Map" );
-    for(auto it = m_blankCommMap.begin(); it != m_blankCommMap.end(); ++it)
+    for(auto it = m_blankCommMap.constBegin(); it != m_blankCommMap.constEnd(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
 
     MergeBlankCommList();
 
     LOG(VB_COMMFLAG, LOG_INFO, "Merged Blank-Frame Commercial Break Map" );
-    for(auto it = m_blankCommBreakMap.begin(); it != m_blankCommBreakMap.end(); ++it)
+    for(auto it = m_blankCommBreakMap.constBegin(); it != m_blankCommBreakMap.constEnd(); ++it)
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
                 .arg(it.key()).arg(*it));
+#else
+    LOG(VB_COMMFLAG, LOG_INFO, "Blank-Frame Commercial Map" );
+    for (auto [key, value] : std::as_const(m_blankCommMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+
+    MergeBlankCommList();
+
+    LOG(VB_COMMFLAG, LOG_INFO, "Merged Blank-Frame Commercial Break Map" );
+    for (auto [key, value] : std::as_const(m_blankCommBreakMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+#endif
 }
 
 
@@ -2061,10 +2074,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
             {
                 if (m_sceneMap.contains(f))
                 {
-                    frm_dir_map_t::iterator dit =  m_sceneCommBreakMap.find(f);
-                    if (dit != m_sceneCommBreakMap.end())
-                        m_sceneCommBreakMap.erase(dit);
-                    else
+                    if (0 == m_sceneCommBreakMap.remove(f))
                         m_sceneCommBreakMap[f] = MARK_COMM_END;
                     i = (int)(m_fps) + 1;
                     found_end = true;
@@ -2085,12 +2095,12 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         m_sceneCommBreakMap[m_framesProcessed] = MARK_COMM_END;
 
     frm_dir_map_t deleteMap;
-    frm_dir_map_t::iterator it = m_sceneCommBreakMap.begin();
-    frm_dir_map_t::iterator prev = it;
-    if (it != m_sceneCommBreakMap.end())
+    auto it = m_sceneCommBreakMap.constBegin();
+    auto prev = it;
+    if (it != m_sceneCommBreakMap.constEnd())
     {
         ++it;
-        while (it != m_sceneCommBreakMap.end())
+        while (it != m_sceneCommBreakMap.constEnd())
         {
             if ((*it == MARK_COMM_END) &&
                 (it.key() - prev.key()) < (30 * m_fps))
@@ -2099,21 +2109,26 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
                 deleteMap[prev.key()] = MARK_CUT_START;
             }
             ++prev;
-            if (it != m_sceneCommBreakMap.end())
+            if (it != m_sceneCommBreakMap.constEnd())
                 ++it;
         }
 
-        frm_dir_map_t::iterator dit;
-        for (dit = deleteMap.begin(); dit != deleteMap.end(); ++dit)
-            m_sceneCommBreakMap.remove(dit.key());
+        for (auto dit = deleteMap.keyBegin(); dit != deleteMap.keyEnd(); ++dit)
+            m_sceneCommBreakMap.remove(*dit);
     }
 
     LOG(VB_COMMFLAG, LOG_INFO, "Scene-Change Commercial Break Map" );
-    for (it = m_sceneCommBreakMap.begin(); it != m_sceneCommBreakMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it2 = m_sceneCommBreakMap.constBegin();
+         it2 != m_sceneCommBreakMap.constEnd(); ++it2)
     {
         LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2")
-            .arg(it.key()).arg(*it));
+            .arg(it2.key()).arg(*it2));
     }
+#else
+    for (auto [key, value] : std::as_const(m_sceneCommBreakMap).asKeyValueRange())
+        LOG(VB_COMMFLAG, LOG_INFO, QString("    %1:%2").arg(key).arg(value));
+#endif
 }
 
 
@@ -2399,11 +2414,11 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 
         for (uint64_t i = 1; i <= m_framesProcessed; i++)
         {
-            int value = m_frameInfo[i].flagMask;
+            int value = m_frameInfo.value(i).flagMask;
             m_frameInfo[i].flagMask = value & ~COMM_FRAME_BLANK;
 
-            if (( (m_frameInfo[i].flagMask & COMM_FRAME_BLANK) == 0) &&
-                (m_frameInfo[i].avgBrightness < newThreshold))
+            if (( (m_frameInfo.value(i).flagMask & COMM_FRAME_BLANK) == 0) &&
+                (m_frameInfo.value(i).avgBrightness < newThreshold))
             {
                 m_frameInfo[i].flagMask = value | COMM_FRAME_BLANK;
                 m_blankFrameMap[i] = MARK_BLANK_FRAME;
@@ -2424,15 +2439,15 @@ void ClassicCommDetector::CleanupFrameInfo(void)
 
         int before = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if ((m_frameInfo[i - offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
+            if ((m_frameInfo.value(i - offset).flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 before++;
 
         int after = 0;
         for (int offset = 1; offset <= 10; offset++)
-            if ((m_frameInfo[i + offset].flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
+            if ((m_frameInfo.value(i + offset).flagMask & COMM_FRAME_LOGO_PRESENT) != 0)
                 after++;
 
-        int value = m_frameInfo[i].flagMask;
+        int value = m_frameInfo.value(i).flagMask;
         if (value == -1)
             m_frameInfo[i].flagMask = 0;
 
@@ -2460,7 +2475,7 @@ void ClassicCommDetector::GetLogoCommBreakMap(show_map_t &map)
     for (uint64_t curFrame = 1 ; curFrame <= m_framesProcessed; curFrame++)
     {
         bool CurrentFrameLogo =
-            (m_frameInfo[curFrame].flagMask & COMM_FRAME_LOGO_PRESENT) != 0;
+            (m_frameInfo.value(curFrame).flagMask & COMM_FRAME_LOGO_PRESENT) != 0;
 
         if (!PrevFrameLogo && CurrentFrameLogo)
             map[curFrame] = MARK_START;

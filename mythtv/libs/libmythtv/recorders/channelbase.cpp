@@ -863,3 +863,8 @@ int ChannelBase::GetMajorID(void)
 {
     return m_pParent ? m_pParent->GetMajorId() : m_inputId;
 }
+
+QString ChannelBase::GetProfileName(void) const
+{
+    return m_pParent ? m_pParent->GetProfileName() : "";
+}

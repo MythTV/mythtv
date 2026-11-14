@@ -74,9 +74,11 @@ class ExternalStreamHandler : public StreamHandler
                      TOO_FAST_SIZE = TS_PACKET_SIZE * 32768 };
 
   public:
-    static ExternalStreamHandler *Get(const QString &devname,
-                                      int inputid, int majorid);
-    static void Return(ExternalStreamHandler * & ref, int inputid);
+    static ExternalStreamHandler *Get(const QString& devname,
+                                      int inputid, int majorid,
+                                      const QString& ref);
+    static void Return(ExternalStreamHandler * & ref, int inputid,
+                       const QString& from);
 
   public:
     explicit ExternalStreamHandler(const QString & path, int inputid,
@@ -100,8 +102,9 @@ class ExternalStreamHandler : public StreamHandler
     void UnlockReplay(bool enable_replay = false)
         { m_replay = enable_replay; m_replayLock.unlock(); }
     void ReplayStream(void);
-    bool StartStreaming(bool recording);
-    bool StopStreaming(void);
+    bool StartStreaming(bool recording, const QString& profile,
+                        const QString& reason);
+    bool StopStreaming(const QString& reason);
 
     bool Monitor(void);
 
@@ -120,6 +123,8 @@ class ExternalStreamHandler : public StreamHandler
                      std::chrono::milliseconds timeout = 4s,
                      uint retry_cnt = 3);
     int APIVersion(void) const { return m_apiVersion; }
+
+    QString ErrorString(void) const { return m_errMsg; }
 
   protected:
     void run(void) override; // MThread
@@ -146,6 +151,7 @@ class ExternalStreamHandler : public StreamHandler
     bool          m_hasPictureAttributes {false};
 
     QByteArray    m_replayBuffer;
+    QString       m_profile;
     bool          m_replay               {false};
     bool          m_xon                  {false};
     bool          m_recording            {false};
@@ -160,6 +166,9 @@ class ExternalStreamHandler : public StreamHandler
     QMutex        m_streamLock;
     QMutex        m_replayLock;
     QMutex        m_processLock;
+
+    QString       m_errMsg;
+    QSet<QString> m_refs;
 };
 
 #endif // EXTERNAL_STREAMHANDLER_H

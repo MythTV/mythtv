@@ -142,6 +142,15 @@ SECTION .text
 
     mova         m2, %1
     mova         m5, %2
+%if ARCH_X86_64
+    SUMSUB_BA    w, 5, 2, 8
+    SUMSUB_BA    w, 6, 5, 8
+    SUMSUB_BA    w, 4, 2, 8
+    SUMSUB_BA    w, 7, 6, 8
+    SUMSUB_BA    w, 0, 4, 8
+    SUMSUB_BA    w, 3, 2, 8
+    SUMSUB_BA    w, 1, 5, 8
+%else
     SUMSUB_BA    w, 5, 2
     SUMSUB_BA    w, 6, 5
     SUMSUB_BA    w, 4, 2
@@ -149,6 +158,7 @@ SECTION .text
     SUMSUB_BA    w, 0, 4
     SUMSUB_BA    w, 3, 2
     SUMSUB_BA    w, 1, 5
+%endif
     SWAP         7, 6, 4, 5, 2, 3, 1, 0 ; 70315246 -> 01234567
 %endmacro
 
@@ -647,7 +657,7 @@ RET
 %endmacro
 
 INIT_XMM sse2
-cglobal h264_luma_dc_dequant_idct, 3, 4, 7
+cglobal h264_luma_dc_dequant_idct, 3, 4, 6
     movq        m3, [r1+24]
     movq        m2, [r1+16]
     movq        m1, [r1+ 8]
@@ -683,6 +693,7 @@ cglobal h264_luma_dc_dequant_idct, 3, 4, 7
     RET
 .big_qmul:
     bsr        t0d, t3d
+    WIN64_PUSH_XMM 7
     add        t3d, 128 << 16
     mov        t1d, 7
     cmp        t0d, t1d

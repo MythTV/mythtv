@@ -18,19 +18,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <inttypes.h>
 #include <limits.h>
+#include <math.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "libavutil/mem.h"
 #include "libavutil/avassert.h"
+#include "libavutil/avutil.h"
 #include "libavutil/base64.h"
 #include "libavutil/bprint.h"
+#include "libavutil/common.h"
 #include "libavutil/error.h"
 #include "libavutil/hash.h"
-#include "libavutil/intreadwrite.h"
 #include "libavutil/macros.h"
 #include "libavutil/opt.h"
 #include "avtextformat.h"
@@ -238,12 +240,7 @@ fail:
     return ret;
 }
 
-/* Temporary definitions during refactoring */
 static const char unit_second_str[]         = "s";
-static const char unit_hertz_str[]          = "Hz";
-static const char unit_byte_str[]           = "byte";
-static const char unit_bit_per_second_str[] = "bit/s";
-
 
 void avtext_print_section_header(AVTextFormatContext *tctx, const void *data, int section_id)
 {
@@ -367,24 +364,30 @@ struct unit_value {
         int64_t i;
     } val;
 
+    AVTextFormatValueFormat fmt;
     const char *unit;
 };
 
+static const char float_fmt_full[] = "%f";
+static const char float_fmt_singledigit[] = "%.1f";
 static char *value_string(const AVTextFormatContext *tctx, char *buf, int buf_size, struct unit_value uv)
 {
     double vald;
     int64_t vali = 0;
-    int show_float = 0;
+    const char *float_fmt = 0;
 
-    if (uv.unit == unit_second_str) {
+    if (uv.fmt == AV_TEXTFORMAT_VALUE_FMT_DECIBEL) {
+        vald = 20 * log10(uv.val.d);
+        float_fmt = float_fmt_singledigit;
+    } else if (uv.fmt >= AV_TEXTFORMAT_VALUE_FMT_DOUBLE) {
         vald = uv.val.d;
-        show_float = 1;
+        float_fmt = float_fmt_full;
     } else {
         vald = (double)uv.val.i;
         vali = uv.val.i;
     }
 
-    if (uv.unit == unit_second_str && tctx->opts.use_value_sexagesimal_format) {
+    if (uv.fmt == AV_TEXTFORMAT_VALUE_FMT_SECOND && tctx->opts.use_value_sexagesimal_format) {
         double secs;
         int hours, mins;
         secs  = vald;
@@ -399,7 +402,7 @@ static char *value_string(const AVTextFormatContext *tctx, char *buf, int buf_si
         if (tctx->opts.use_value_prefix && vald > 1) {
             int64_t index;
 
-            if (uv.unit == unit_byte_str && tctx->opts.use_byte_value_binary_prefix) {
+            if (uv.fmt == AV_TEXTFORMAT_VALUE_FMT_BYTE && tctx->opts.use_byte_value_binary_prefix) {
                 index = (int64_t)(log2(vald) / 10);
                 index = av_clip64(index, 0, FF_ARRAY_ELEMS(si_prefixes) - 1);
                 vald /= si_prefixes[index].bin_val;
@@ -413,28 +416,45 @@ static char *value_string(const AVTextFormatContext *tctx, char *buf, int buf_si
             vali = (int64_t)vald;
         }
 
-        if (show_float || (tctx->opts.use_value_prefix && vald != (int64_t)vald))
-            snprintf(buf, buf_size, "%f", vald);
+        if (float_fmt || (tctx->opts.use_value_prefix && vald != (int64_t)vald))
+            snprintf(buf, buf_size, float_fmt ? float_fmt : "%f", vald);
         else
             snprintf(buf, buf_size, "%"PRId64, vali);
 
-        av_strlcatf(buf, buf_size, "%s%s%s", *prefix_string || tctx->opts.show_value_unit ? " " : "",
-                    prefix_string, tctx->opts.show_value_unit ? uv.unit : "");
+        av_strlcatf(buf, buf_size, "%s%s%s", *prefix_string || tctx->opts.show_value_unit && uv.unit && *uv.unit ? " " : "",
+                    prefix_string, tctx->opts.show_value_unit && uv.unit ? uv.unit : "");
     }
 
     return buf;
 }
 
 
-void avtext_print_unit_integer(AVTextFormatContext *tctx, const char *key, int64_t val, const char *unit)
+void avtext_print_unit_integer(AVTextFormatContext *tctx, const char *key, int64_t val, AVTextFormatValueFormat fmt, const char *unit)
 {
     char val_str[128];
     struct unit_value uv;
+
+    av_assert0(fmt < AV_TEXTFORMAT_VALUE_FMT_DOUBLE);
+
     uv.val.i = val;
+    uv.fmt = fmt;
     uv.unit = unit;
     avtext_print_string(tctx, key, value_string(tctx, val_str, sizeof(val_str), uv), 0);
 }
 
+
+void avtext_print_unit_double(AVTextFormatContext *tctx, const char *key, double val, AVTextFormatValueFormat fmt, const char *unit)
+{
+    char val_str[128];
+    struct unit_value uv;
+
+    av_assert0(fmt >= AV_TEXTFORMAT_VALUE_FMT_DOUBLE);
+
+    uv.val.d = val;
+    uv.fmt = fmt;
+    uv.unit = unit;
+    avtext_print_string(tctx, key, value_string(tctx, val_str, sizeof(val_str), uv), 0);
+}
 
 int avtext_print_string(AVTextFormatContext *tctx, const char *key, const char *val, int flags)
 {
@@ -495,6 +515,7 @@ void avtext_print_time(AVTextFormatContext *tctx, const char *key,
         double d = av_q2d(*time_base) * ts;
         struct unit_value uv;
         uv.val.d = d;
+        uv.fmt = AV_TEXTFORMAT_VALUE_FMT_SECOND;
         uv.unit = unit_second_str;
         value_string(tctx, buf, sizeof(buf), uv);
         avtext_print_string(tctx, key, buf, 0);

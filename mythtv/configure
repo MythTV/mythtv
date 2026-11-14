@@ -1514,7 +1514,7 @@ SYSTEM_FUNCS="
     is_duration_v
     posix_fadvise
     close_range
-    is_duration_v
+    std_format
 "
 
 TYPES_LIST="
@@ -1541,6 +1541,7 @@ HAVE_LIST="
     vdpau_x11
     libbluray
     libudfread
+    tomlplusplus
 "
 
 # options emitted with CONFIG_ prefix but not available on the command line
@@ -1648,6 +1649,7 @@ USING_LIST='
     waylandextras
     qtprivateheaders
     qtwebengine
+    tomlplusplus
 '
 
 CMDLINE_SELECT="
@@ -3054,7 +3056,11 @@ if test "$cpu" = host; then
                             q
                         }" $TMPE
             }
-            cpu=$(check_native -march || check_native -mcpu)
+            if cpu=$(check_native -march); then
+                native_cpuflags="-march=native"
+            elif cpu=$(check_native -mcpu); then
+                native_cpuflags="-mcpu=native"
+            fi
         ;;
         clang)
             check_native(){
@@ -3065,7 +3071,7 @@ if test "$cpu" = host; then
                             q
                         }" $TMPE
             }
-            cpu=$(check_native -march)
+            cpu=$(check_native -march) && native_cpuflags="-march=native"
         ;;
     esac
 
@@ -3629,6 +3635,9 @@ EOF
 fi
 
 if [ "$cpu" != generic ]; then
+    # For --cpu=host, use the compiler's =native for codegen. $cpu is
+    # only the resolved name used for feature gating above.
+    test -n "$native_cpuflags" && cpuflags=$native_cpuflags
     add_cflags  $cpuflags
     add_asflags $cpuflags
     add_cxxflags $cpuflags
@@ -4804,6 +4813,19 @@ int main(int argc, char **argv){
 }
 EOF
 
+# test for std::format (C++20 <format>)
+check_ld_cxx <<EOF && enable std_format
+#include <format>
+#include <string>
+#if !defined(__cpp_lib_format) || __cpp_lib_format < 201907L
+#error "std::format not available"
+#endif
+int main(void){
+    std::string s = std::format("{} {}", 42, "x");
+    return s.empty() ? 1 : 0;
+}
+EOF
+
 if require_pkg_config libfreetype2 freetype2 "ft2build.h FT_FREETYPE_H" FT_Init_FreeType ; then
     enable freetype2
 else
@@ -5041,6 +5063,19 @@ enabled asi && check_cc <<EOF || disable asi
 #include <dveo/master.h>
 int main(void) { return 1; }
 EOF
+
+# Check for tomlplusplus support
+if enabled backend; then
+    check_cxx <<EOF && enable tomlplusplus || disable tomlplusplus
+#include <toml++/toml.h>
+int main(void) {
+    toml::table tbl;
+    return tbl.empty() ? 0 : 1;
+}
+EOF
+else
+    disable tomlplusplus
+fi
 
 if enabled systemd_notify ; then
     if check_pkg_config systemd_notify libsystemd-daemon systemd/sd-daemon.h sd_notify ; then
@@ -5727,15 +5762,28 @@ ffmpeg_optenableif() {
     done
 }
 
+if [ -n "$native_cpuflags" ]; then
+    cpu_detected="$cpu"
+    cpu="host"
+fi
+
 ffopts=
 ffmpeg_optset arch cross_prefix sysroot sysinclude cc cxx ld cpu
 ffmpeg_optset extra_cxxflags extra_ldflags target_os
 ffmpeg_optset pkg_config prefix libdir as objcc dep_cc host_cc
 ffmpeg_optset host_ld
 ffmpeg_optset ar nm ranlib
+# Always tag embedded FFmpeg wrappers with Myth's library version
+# (libmythavcodec-37). ffmpeg_optset would emit --build_suffix (underscore).
+build_suffix="-$MYTHTV_LIBVERSION"
+ffopts="$ffopts '--build-suffix=$build_suffix'"
 ffmpeg_optenable cross_compile libmp3lame libx264 libx265 libvpx libxvid
 ffmpeg_optenable vdpau libxml2 libass dxva2
 ffmpeg_optenable libbluray libfontconfig libfreetype libiec61883
+
+if [ -n "$native_cpuflags" ]; then
+    cpu="$cpu_detected"
+fi
 
 if test $target_os = "android"; then
     enabled mediacodec && enable jni
@@ -5947,6 +5995,7 @@ if enabled backend; then
   echo "V@Box TV Gateway support  ${vbox-no}"
   echo "Ceton support             ${ceton-no}"
   echo "DVEO ASI support          ${asi-no}"
+  echo "tomlplusplus support      ${tomlplusplus-no}"
   echo
 fi
 
@@ -6043,6 +6092,7 @@ echo ""
 
 echo "# Compilation Options"
 echo "C++ standard supported    ${CPP_STANDARD}"
+echo "Has std::format           ${std_format-no}"
 echo "Enforce c++11 nullptr     ${enforce_nullptr-no}"
 echo "Enforce shadowed vars     ${enforce_wshadow-no}"
 echo ""

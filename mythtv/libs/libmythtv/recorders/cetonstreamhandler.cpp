@@ -35,10 +35,7 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
     QMutexLocker locker(&s_handlersLock);
 
     QString devkey = devname.toUpper();
-
-    QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devkey);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devkey))
     {
         auto *newhandler = new CetonStreamHandler(devkey, inputid);
         newhandler->Open();
@@ -52,14 +49,14 @@ CetonStreamHandler *CetonStreamHandler::Get(const QString &devname,
     else
     {
         s_handlersRefCnt[devkey]++;
-        uint rcount = s_handlersRefCnt[devkey];
+        uint rcount = s_handlersRefCnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("CetonSH[%1]: Using existing stream handler %2 for %3")
                 .arg(QString::number(inputid), devkey, devname) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_handlers.value(devkey);
 }
 
 void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
@@ -68,10 +65,12 @@ void CetonStreamHandler::Return(CetonStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_handlersRefCnt.find(devname);
     if (rit == s_handlersRefCnt.end())
         return;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,CetonStreamHandler*>::iterator it = s_handlers.find(devname);
 
     if (*rit > 1)

@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <numbers>
 
 // Qt
 #include <QtGlobal>
@@ -1171,8 +1172,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
                 mult = mult + ((1 - mult) *
                     (1 - ((float)(start - k) / (float)(start - i))));
             }
-            m_sigL[k] = mult * m_sigL[i + k];
-            m_sigR[k] = mult * m_sigR[i + k];
+            m_sigL[k] = mult * m_sigL.at(i + k);
+            m_sigR[k] = mult * m_sigR.at(i + k);
         }
         for (int k = 0; k < i; k++) // append current samples
         {
@@ -1189,8 +1190,8 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
                 mult = (float)(m_fftlen - k) / (float)end;
             else
                 mult = 1;
-            m_dftL[k] = m_sigL[k] * mult;
-            m_dftR[k] = m_sigR[k] * mult;
+            m_dftL[k] = m_sigL.at(k) * mult;
+            m_dftR[k] = m_sigR.at(k) * mult;
         }
     }
     // run the real FFT!
@@ -1493,8 +1494,8 @@ bool Spectrum::processUndisplayed(VisualNode *node)
                 mult = mult + ((1 - mult) *
                     (1 - ((float)(start - k) / (float)(start - i))));
             }
-            m_sigL[k] = mult * m_sigL[i + k];
-            m_sigR[k] = mult * m_sigR[i + k];
+            m_sigL[k] = mult * m_sigL.at(i + k);
+            m_sigR[k] = mult * m_sigR.at(i + k);
         }
         for (int k = 0; k < i; k++) // append current samples
         {
@@ -1511,8 +1512,8 @@ bool Spectrum::processUndisplayed(VisualNode *node)
                 mult = static_cast<float>(m_fftlen - k) / end;
             else
                 mult = 1;
-            m_dftL[k] = m_sigL[k] * mult;
-            m_dftR[k] = m_sigR[k] * mult;
+            m_dftL[k] = m_sigL.at(k) * mult;
+            m_dftR[k] = m_sigR.at(k) * mult;
         }
     }
     // run the real FFT!
@@ -1523,9 +1524,9 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     m_rdftTmp[1] = m_rdftTmp[m_fftlen];
     memcpy(m_dftR, m_rdftTmp, m_fftlen * sizeof(float));
 
-    QRect *rectspL = m_rectsL.data();
-    QRect *rectspR = m_rectsR.data();
-    float *magnitudesp = m_magnitudes.data();
+    QRect *rectspL = m_rectsL.data();         // clazy:exclude=detaching-member
+    QRect *rectspR = m_rectsR.data();         // clazy:exclude=detaching-member
+    float *magnitudesp = m_magnitudes.data(); // clazy:exclude=detaching-member
 
     int index = 1;              // frequency index of this pixel
     int prev = 0;               // frequency index of previous pixel
@@ -1590,8 +1591,8 @@ bool Spectrum::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectspL = m_rectsL.data();
-    QRect *rectspR = m_rectsR.data();
+    QRect *rectspL = m_rectsL.data(); // clazy:exclude=detaching-member
+    QRect *rectspR = m_rectsR.data(); // clazy:exclude=detaching-member
 
     p->fillRect(0, 0, m_size.width(), m_size.height(), back);
     for (uint i = 0; i < (uint)m_rectsL.size(); i++)
@@ -1674,7 +1675,7 @@ void Squares::resize (const QSize &newsize) {
     m_actualSize = newsize;
 }
 
-void Squares::drawRect(QPainter *p, QRect *rect, int i, int c, int w, int h)
+void Squares::drawRect(QPainter *p, const QRect *rect, int i, int c, int w, int h)
 {
     double per = NAN;
     int correction = (m_actualSize.width() % m_rectsL.size ());
@@ -1715,10 +1716,10 @@ bool Squares::draw(QPainter *p, const QColor &back)
     int h = w;
     int center = m_actualSize.height() / 2;
 
-    QRect *rectsp = m_rectsL.data();
+    const QRect *rectsp = m_rectsL.constData();
     for (uint i = 0; i < (uint)m_rectsL.size() * 2; i += 2)
         drawRect(p, &(rectsp[i]), i, center, w, h);
-    rectsp = m_rectsR.data();
+    rectsp = m_rectsR.constData();
     for (uint i = 1; i < ((uint)m_rectsR.size() * 2) + 1; i += 2)
         drawRect(p, &(rectsp[i]), i, center, w, h);
 
@@ -1769,7 +1770,7 @@ Piano::Piano()
     for (uint key = 0; key < kPianoNumKeys; key++)
     {
         // This is constant through time
-        m_pianoData[key].coeff = (goertzel_data)(2.0 * cos(2.0 * M_PI * current_freq / sample_rate));
+        m_pianoData[key].coeff = (goertzel_data)(2.0 * cos(2.0 * std::numbers::pi * current_freq / sample_rate));
 
         // Want 20 whole cycles of the current waveform at least
         double samples_required = sample_rate/current_freq * 20.0;

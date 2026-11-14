@@ -92,9 +92,13 @@ uint8_t *MythPreviewPlayer::GetScreenGrabAtFrame(uint64_t FrameNum, bool Absolut
         FrameWidth = 640;
         FrameHeight = 480;
         AspectRatio = 4.0F / 3.0F;
-        BufferSize = FrameWidth * FrameHeight * 4;
-        auto *result = new uint8_t[static_cast<size_t>(BufferSize)];
-        memset(result, 0x3f, static_cast<size_t>(BufferSize) * sizeof(char));
+        size_t size = MythVideoFrame::GetBufferSize(FMT_RGB32, FrameWidth, FrameHeight);
+        BufferSize = static_cast<int>(size);
+        uint8_t* result = MythVideoFrame::GetAlignedBuffer(size);
+        if (result)
+        {
+            memset(result, 0x3f, size);
+        }
         return result;
     }
 

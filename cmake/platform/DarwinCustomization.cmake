@@ -68,6 +68,25 @@ elseif(_DETECT_HOMEBREW EQUAL 0)
   set(QT_PKG_NAME_HB "qt@${QT_VERSION_MAJOR}")
   set(_QT_BASE "${HOMEBREW_PREFIX}/opt/${QT_PKG_NAME_HB}")
 
+  # In QT 6.12, qtwebengine was split out as a separate package. Due to this we need
+  # to tell CMake where to find the split-out QtWebEngine formula
+  list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}/opt/qtwebengine")
+
+  # Intercept find_package to dynamically repair Homebrew's split-out WebEngine targets
+  macro(find_package)
+    _find_package(${ARGV})
+    foreach(_tgt Qt6::WebEngineQuick Qt6::WebEngineWidgets Qt6::WebEngineCore)
+      if(TARGET ${_tgt})
+        get_target_property(_dirs ${_tgt} INTERFACE_INCLUDE_DIRECTORIES)
+        if(_dirs)
+          # Directly swap the broken path prefix with the real standalone package prefix
+          list(TRANSFORM _dirs REPLACE "${_QT_BASE}" "${HOMEBREW_PREFIX}/opt/qtwebengine")
+          set_target_properties(${_tgt} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_dirs}")
+        endif()
+      endif()
+    endforeach()
+  endmacro()
+
   # Provide the default Homebrew location for Python3, if the the user hasn't
   # already specified a value in their options override file. This prevents
   # finding the Apple installed version.

@@ -83,10 +83,9 @@ def _query_yielded(record, path, params, listname=None):
                 for item in datalist:
                     yield record(item)
             else:
-                raise StopIteration
+                return
         else:
-            #break
-            raise StopIteration
+            return
         curr_page += 1
         params['page'] = curr_page
 

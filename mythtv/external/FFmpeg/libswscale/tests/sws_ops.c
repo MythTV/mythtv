@@ -18,8 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mem.h"
 #include "libavutil/pixdesc.h"
 #include "libswscale/ops.h"
+#include "libswscale/ops_dispatch.h"
+#include "libswscale/ops_internal.h"
 #include "libswscale/format.h"
 
 #ifdef _WIN32
@@ -27,69 +30,94 @@
 #include <fcntl.h>
 #endif
 
-static int run_test(SwsContext *const ctx, AVFrame *frame,
-                    const AVPixFmtDescriptor *const src_desc,
-                    const AVPixFmtDescriptor *const dst_desc)
+static int pass_idx;
+
+static int print_ops(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out)
 {
-    /* Reuse ff_fmt_from_frame() to ensure correctly sanitized metadata */
-    frame->format = av_pix_fmt_desc_get_id(src_desc);
-    SwsFormat src = ff_fmt_from_frame(frame, 0);
-    frame->format = av_pix_fmt_desc_get_id(dst_desc);
-    SwsFormat dst = ff_fmt_from_frame(frame, 0);
-    bool incomplete = ff_infer_colors(&src.color, &dst.color);
-
-    SwsOpList *ops = ff_sws_op_list_alloc();
-    if (!ops)
+    SwsUOpList *uops = ff_sws_uop_list_alloc();
+    if (!uops)
         return AVERROR(ENOMEM);
-    ops->src = src;
-    ops->dst = dst;
 
-    if (ff_sws_decode_pixfmt(ops, src.format) < 0)
-        goto fail;
-    if (ff_sws_decode_colors(ctx, SWS_PIXEL_F32, ops, &src, &incomplete) < 0)
-        goto fail;
-    if (ff_sws_encode_colors(ctx, SWS_PIXEL_F32, ops, &src, &dst, &incomplete) < 0)
-        goto fail;
-    if (ff_sws_encode_pixfmt(ops, dst.format) < 0)
+    int ret = ff_sws_ops_translate(ctx, ops, 0, uops);
+    if (ret == AVERROR(ENOTSUP))
         goto fail;
 
-    av_log(NULL, AV_LOG_INFO, "%s -> %s:\n",
-           av_get_pix_fmt_name(src.format), av_get_pix_fmt_name(dst.format));
+    if (pass_idx > 0)
+        av_log(NULL, AV_LOG_INFO, " Sub-pass #%d:\n", pass_idx);
 
-    ff_sws_op_list_optimize(ops);
-    if (ff_sws_op_list_is_noop(ops))
-        av_log(NULL, AV_LOG_INFO, "  (no-op)\n");
-    else
-        ff_sws_op_list_print(NULL, AV_LOG_INFO, AV_LOG_INFO, ops);
+    ff_sws_op_list_print(NULL, AV_LOG_INFO, AV_LOG_INFO, ops);
+    if (ret < 0) {
+        av_log(NULL, AV_LOG_ERROR, "Error translating ops: %s\n", av_err2str(ret));
+        goto fail;
+    }
+
+    av_log(NULL, AV_LOG_INFO, " translated micro-ops:\n");
+    for (int i = 0; i < uops->num_ops; i++) {
+        char name[SWS_UOP_NAME_MAX];
+        ff_sws_uop_name(&uops->ops[i], name);
+        av_log(NULL, AV_LOG_INFO, "    %s\n", name);
+    }
+
+    *out = (SwsCompiledOp) {0}; /* dummy value, will be immediately freed */
+    pass_idx++;
+    ret = 0;
 
 fail:
-    /* silently skip unsupported formats */
-    ff_sws_op_list_free(&ops);
-    return 0;
+    ff_sws_uop_list_free(&uops);
+    return ret;
 }
 
+/* Dummy backend that just prints all seen op lists */
+static const SwsOpBackend backend_print = {
+    .name    = "print_ops",
+    .compile = print_ops,
+};
+
+static int print_passes(SwsContext *ctx, void *graph, SwsOpList *ops)
+{
+    av_log(NULL, AV_LOG_INFO, "%s %dx%d -> %s %dx%d:\n",
+           av_get_pix_fmt_name(ops->src.format),
+           ops->src.width, ops->src.height,
+           av_get_pix_fmt_name(ops->dst.format),
+           ops->dst.width, ops->dst.height);
+
+    if (ff_sws_op_list_is_noop(ops)) {
+        av_log(NULL, AV_LOG_INFO, "  (no-op)\n");
+        return 0;
+    }
+
+    /* ff_sws_compile_pass() takes over ownership of `ops` */
+    SwsOpList *copy = ff_sws_op_list_duplicate(ops);
+    if (!copy)
+        return AVERROR(ENOMEM);
+
+    pass_idx = 0;
+    const int flags = SWS_OP_FLAG_DRY_RUN | SWS_OP_FLAG_SPLIT_MEMCPY;
+    return ff_sws_compile_pass(graph, &backend_print, &copy, flags, NULL, NULL);
+}
 static void log_stdout(void *avcl, int level, const char *fmt, va_list vl)
 {
     if (level != AV_LOG_INFO) {
         av_log_default_callback(avcl, level, fmt, vl);
-    } else {
+    } else if (av_log_get_level() >= AV_LOG_INFO) {
         vfprintf(stdout, fmt, vl);
     }
 }
 
 int main(int argc, char **argv)
 {
-    enum AVPixelFormat src_fmt_min = 0;
-    enum AVPixelFormat dst_fmt_min = 0;
-    enum AVPixelFormat src_fmt_max = AV_PIX_FMT_NB - 1;
-    enum AVPixelFormat dst_fmt_max = AV_PIX_FMT_NB - 1;
+    enum AVPixelFormat src_fmt = AV_PIX_FMT_NONE;
+    enum AVPixelFormat dst_fmt = AV_PIX_FMT_NONE;
+    SwsContext *ctx = NULL;
+    SwsGraph *graph = NULL;
+    bool macros_gen = false;
     int ret = 1;
 
 #ifdef _WIN32
     _setmode(_fileno(stdout), _O_BINARY);
 #endif
 
-    for (int i = 1; i < argc; i += 2) {
+    for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-help") || !strcmp(argv[i], "--help")) {
             fprintf(stderr,
                     "sws_ops [options...]\n"
@@ -99,57 +127,71 @@ int main(int argc, char **argv)
                     "       Only test the specified destination pixel format\n"
                     "   -src <pixfmt>\n"
                     "       Only test the specified source pixel format\n"
+                    "   -v <level>\n"
+                    "       Enable log verbosity at given level\n"
+                    "   -macros\n"
+                    "       Generate helper macros\n"
             );
             return 0;
         }
-        if (argv[i][0] != '-' || i + 1 == argc)
-            goto bad_option;
         if (!strcmp(argv[i], "-src")) {
-            src_fmt_min = src_fmt_max = av_get_pix_fmt(argv[i + 1]);
-            if (src_fmt_min == AV_PIX_FMT_NONE) {
+            if (i + 1 >= argc)
+                goto bad_option;
+            src_fmt = av_get_pix_fmt(argv[i + 1]);
+            if (src_fmt == AV_PIX_FMT_NONE) {
                 fprintf(stderr, "invalid pixel format %s\n", argv[i + 1]);
-                goto error;
+                return AVERROR(EINVAL);
             }
+            i++;
         } else if (!strcmp(argv[i], "-dst")) {
-            dst_fmt_min = dst_fmt_max = av_get_pix_fmt(argv[i + 1]);
-            if (dst_fmt_min == AV_PIX_FMT_NONE) {
+            if (i + 1 >= argc)
+                goto bad_option;
+            dst_fmt = av_get_pix_fmt(argv[i + 1]);
+            if (dst_fmt == AV_PIX_FMT_NONE) {
                 fprintf(stderr, "invalid pixel format %s\n", argv[i + 1]);
-                goto error;
+                return AVERROR(EINVAL);
             }
+            i++;
+        } else if (!strcmp(argv[i], "-v")) {
+            if (i + 1 >= argc)
+                goto bad_option;
+            av_log_set_level(atoi(argv[i + 1]));
+            i++;
+        } else if (!strcmp(argv[i], "-macros")) {
+            macros_gen = true;
         } else {
 bad_option:
             fprintf(stderr, "bad option or argument missing (%s) see -help\n", argv[i]);
-            goto error;
+            return AVERROR(EINVAL);
         }
     }
 
-    SwsContext *ctx = sws_alloc_context();
-    AVFrame *frame = av_frame_alloc();
-    if (!ctx || !frame)
+    if (macros_gen) {
+        char *macros = NULL;
+        ret = ff_sws_uops_macros_gen(&macros);
+        if (ret >= 0)
+            puts(macros);
+        av_free(macros);
+        return ret;
+    }
+    /* Allocate dummy graph and context for ff_sws_compile_pass() */
+    graph = ff_sws_graph_alloc();
+    if (!graph)
         goto fail;
-    frame->width = frame->height = 16;
+    graph->ctx = ctx = sws_alloc_context();
+    if (!ctx)
+        goto fail;
+    ctx->scaler = SWS_SCALE_BILINEAR; /* reduce filter generation overhead */
 
     av_log_set_callback(log_stdout);
-    for (const AVPixFmtDescriptor *src = NULL; (src = av_pix_fmt_desc_next(src));) {
-        enum AVPixelFormat src_fmt = av_pix_fmt_desc_get_id(src);
-        if (src_fmt < src_fmt_min || src_fmt > src_fmt_max)
-            continue;
-        for (const AVPixFmtDescriptor *dst = NULL; (dst = av_pix_fmt_desc_next(dst));) {
-            enum AVPixelFormat dst_fmt = av_pix_fmt_desc_get_id(dst);
-            if (dst_fmt < dst_fmt_min || dst_fmt > dst_fmt_max)
-                continue;
-            int err = run_test(ctx, frame, src, dst);
-            if (err < 0)
-                goto fail;
-        }
-    }
+
+    ret = ff_sws_enum_op_lists(ctx, graph, src_fmt, dst_fmt, print_passes);
+    if (ret < 0)
+        goto fail;
 
     ret = 0;
 fail:
-    av_frame_free(&frame);
     sws_free_context(&ctx);
+    ff_sws_graph_free(&graph);
     return ret;
-
-error:
-    return AVERROR(EINVAL);
 }

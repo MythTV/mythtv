@@ -23,6 +23,7 @@
 
 #include "config_components.h"
 
+#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/bprint.h"
 #include "libavutil/crc.h"
@@ -449,6 +450,9 @@ static int png_decode_idat(PNGDecContext *s, GetByteContext *gb,
     return 0;
 }
 
+/* Hard cap on decompressed zTXt/iCCP payloads to defeat decompression bombs. */
+#define PNG_ZBUF_MAX_DECOMPRESSED (16 * 1024 * 1024)
+
 static int decode_zbuf(AVBPrint *bp, const uint8_t *data,
                        const uint8_t *data_end, void *logctx)
 {
@@ -465,6 +469,13 @@ static int decode_zbuf(AVBPrint *bp, const uint8_t *data,
     av_bprint_init(bp, 0, AV_BPRINT_SIZE_UNLIMITED);
 
     while (zstream->avail_in > 0) {
+        if (bp->len > PNG_ZBUF_MAX_DECOMPRESSED) {
+            av_log(logctx, AV_LOG_ERROR,
+                   "Compressed PNG chunk expands beyond %d bytes, aborting\n",
+                   PNG_ZBUF_MAX_DECOMPRESSED);
+            ret = AVERROR_INVALIDDATA;
+            goto fail;
+        }
         av_bprint_get_buffer(bp, 2, &buf, &buf_size);
         if (buf_size < 2) {
             ret = AVERROR(ENOMEM);
@@ -558,7 +569,7 @@ static int decode_text_to_exif(PNGDecContext *s, const char *txt_utf8)
     }
 
     // first condition checks for overflow in 2 * exif_len
-    if ((exif_len & ~SIZE_MAX) || end - ptr < 2 * exif_len)
+    if (exif_len > SIZE_MAX / 2 || end - ptr < 2 * exif_len)
         return AVERROR_INVALIDDATA;
     if (exif_len < 10)
         return AVERROR_INVALIDDATA;
@@ -1583,7 +1594,7 @@ static int decode_frame_common(AVCodecContext *avctx, PNGDecContext *s,
                 goto fail;
             }
             bytestream2_get_be32(&gb_chunk);
-            /* fallthrough */
+            av_fallthrough;
         case MKTAG('I', 'D', 'A', 'T'):
             if (CONFIG_APNG_DECODER && avctx->codec_id == AV_CODEC_ID_APNG && !decode_next_dat)
                 continue;

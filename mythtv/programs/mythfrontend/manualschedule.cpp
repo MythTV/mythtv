@@ -245,7 +245,7 @@ void ManualSchedule::recordClicked(void)
     }
 
     ProgramInfo p(m_titleEdit->GetText().trimmed(),
-                  m_chanids[m_channelList->GetCurrentPos()],
+                  m_chanids.at(m_channelList->GetCurrentPos()),
                   m_startDateTime, endts);
 
     // Save the channel because we might want to use it as the

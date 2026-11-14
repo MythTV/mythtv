@@ -319,6 +319,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, std::chrono::seconds secsle
         LOG(VB_RECORD, LOG_INFO, LOC + "Pending recording revoked on " +
             QString("inputid [%1]").arg(rcinfo->GetInputID()));
 
+        // clazy:exclude-next-line=detaching-member (updates item)
         PendingMap::iterator it = m_pendingRecordings.find(rcinfo->GetInputID());
         if (it != m_pendingRecordings.end())
         {
@@ -390,6 +391,7 @@ void TVRec::CancelNextRecording(bool cancel)
     LOG(VB_RECORD, LOG_INFO, LOC +
         QString("CancelNextRecording(%1) -- begin").arg(cancel));
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
     if (it == m_pendingRecordings.end())
     {
@@ -486,6 +488,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
     PendingInfo pendinfo;
 
     m_pendingRecLock.lock();
+    // clazy:exclude-next-line=detaching-member (modifies item)
     PendingMap::iterator it = m_pendingRecordings.find(m_inputId);
     if (it != m_pendingRecordings.end())
     {
@@ -1015,6 +1018,7 @@ void TVRec::FinishedRecording(RecordingInfo *curRec, RecordingQuality *recq)
 
     // Handle JobQueue
     QHash<QString,int>::iterator autoJob =
+        // clazy:exclude-next-line=detaching-member (erases item)
         m_autoRunJobs.find(curRec->MakeUniqueKey());
     if (autoJob == m_autoRunJobs.end())
     {
@@ -1700,6 +1704,8 @@ void TVRec::HandlePendingRecordings(void)
 {
     QMutexLocker pendlock(&m_pendingRecLock);
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (replaces or erases item)
     for (auto it = m_pendingRecordings.begin(); it != m_pendingRecordings.end();)
     {
         if (MythDate::current() > (*it).m_recordingStart.addSecs(30))
@@ -1717,16 +1723,28 @@ void TVRec::HandlePendingRecordings(void)
             it++;
         }
     }
+#else
+    m_pendingRecordings.removeIf( [this](const auto it) {
+        if (MythDate::current() <= (*it).m_recordingStart.addSecs(30))
+            return false;
+        LOG(VB_RECORD, LOG_INFO, LOC + "Deleting stale pending recording " +
+            QString("[%1] '%2'")
+            .arg((*it).m_info->GetInputID())
+            .arg((*it).m_info->GetTitle()));
+        delete (*it).m_info;
+        return true;
+    } );
+#endif
 
     if (m_pendingRecordings.empty())
         return;
 
-    // Make sure EIT scan is stopped so it does't interfere
+    // Make sure active EIT scan is stopped so it does not interfere
     if (m_scanner && HasFlags(kFlagEITScannerRunning))
     {
         LOG(VB_CHANNEL, LOG_INFO,
-            LOC + "Stopping active EIT scan for pending recording.");
-        m_tuningRequests.enqueue(TuningRequest(kFlagNoRec));
+            LOC + "Stop active EIT scan for pending recording.");
+        m_tuningRequests.enqueue(TuningRequest(kFlagCloseRec));
     }
 
     // If we have a pending recording and AskAllowRecording
@@ -2872,7 +2890,7 @@ void TVRec::InitAutoRunJobs(RecordingInfo *rec, AutoRunInitType t,
     LOG(VB_JOBQUEUE, LOG_INFO,
         QString("InitAutoRunJobs for %1, line %2 -> 0x%3")
         .arg(rec->MakeUniqueKey()).arg(line)
-        .arg(m_autoRunJobs[rec->MakeUniqueKey()],0,16));
+        .arg(m_autoRunJobs.value(rec->MakeUniqueKey()),0,16));
 }
 
 /** \fn TVRec::SetLiveRecording(int)
@@ -2969,6 +2987,13 @@ void TVRec::StopLiveTV(void)
         m_tvChain->DecrRef();
     }
     m_tvChain = nullptr;
+}
+
+QString TVRec::GetProfileName(void) const
+{
+    return (m_curRecording
+            ? m_curRecording->GetProgramRecordingProfile()
+            : "");
 }
 
 /** \fn TVRec::PauseRecorder(void)

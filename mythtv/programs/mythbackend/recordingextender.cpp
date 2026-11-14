@@ -1596,6 +1596,7 @@ void RecordingExtender::processNewRecordings ()
 /// recording.  get data for this particular game.
 void RecordingExtender::processActiveRecordings ()
 {
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_activeGames.begin(); it != m_activeGames.end(); )
     {
         ActiveGame game = *it;

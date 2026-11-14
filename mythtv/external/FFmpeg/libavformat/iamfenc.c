@@ -197,5 +197,5 @@ const FFOutputFormat ff_iamf_muxer = {
     .write_packet      = iamf_write_packet,
     .write_trailer     = iamf_write_trailer,
     .p.codec_tag       = (const AVCodecTag* const []){ iamf_codec_tags, NULL },
-    .p.flags           = AVFMT_GLOBALHEADER | AVFMT_NOTIMESTAMPS,
+    .p.flags           = AVFMT_GLOBALHEADER | AVFMT_NOTIMESTAMPS | AVFMT_FIXED_FRAMESIZE,
 };

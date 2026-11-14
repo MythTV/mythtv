@@ -222,7 +222,7 @@ MythMainWindow::~MythMainWindow()
 
     while (!m_priv->m_stackList.isEmpty())
     {
-        MythScreenStack *stack = m_priv->m_stackList.back();
+        MythScreenStack *stack = m_priv->m_stackList.constLast();
         m_priv->m_stackList.pop_back();
 
         if (stack == m_priv->m_mainStack)
@@ -233,13 +233,8 @@ MythMainWindow::~MythMainWindow()
 
     delete m_themeBase;
 
-    for (auto iter = m_priv->m_keyContexts.begin();
-         iter != m_priv->m_keyContexts.end();
-         iter = m_priv->m_keyContexts.erase(iter))
-    {
-        KeyContext *context = *iter;
-        delete context;
-    }
+    qDeleteAll(m_priv->m_keyContexts);
+    m_priv->m_keyContexts.clear();
 
     delete m_deviceHandler;
     delete m_priv->m_nc;
@@ -307,7 +302,7 @@ void MythMainWindow::AddScreenStack(MythScreenStack* Stack, bool Main)
 
 void MythMainWindow::PopScreenStack()
 {
-    MythScreenStack *stack = m_priv->m_stackList.back();
+    MythScreenStack *stack = m_priv->m_stackList.constLast();
     m_priv->m_stackList.pop_back();
     if (stack == m_priv->m_mainStack)
         m_priv->m_mainStack = nullptr;
@@ -350,7 +345,7 @@ void MythMainWindow::Animate(void)
         redraw = true;
 
     // The call to GetDrawOrder can apparently alter m_stackList.
-    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6
+    // NOLINTNEXTLINE(modernize-loop-convert,readability-qualified-auto) // both, qt6 // clazy:exclude-next-line=detaching-member (modifies item)
     for (auto it = m_priv->m_stackList.begin(); it != m_priv->m_stackList.end(); ++it)
     {
         QVector<MythScreenType *> drawList;
@@ -1158,14 +1153,14 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
         keycontext && (keycontext->GetMapping(keynum, localActions)))
     {
-        if (localActions.contains(m_priv->m_jumpMap[keynum]->m_localAction))
+        if (localActions.contains(m_priv->m_jumpMap.value(keynum)->m_localAction))
             AllowJumps = false;
     }
 
     if (AllowJumps && m_priv->m_jumpMap.contains(keynum) &&
             !m_priv->m_jumpMap[keynum]->m_exittomain && m_priv->m_exitMenuCallback == nullptr)
     {
-        void (*callback)(void) = m_priv->m_jumpMap[keynum]->m_callback;
+        void (*callback)(void) = m_priv->m_jumpMap.value(keynum)->m_callback;
         callback();
         return true;
     }
@@ -1174,7 +1169,7 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
         m_priv->m_jumpMap.contains(keynum) && m_priv->m_exitMenuCallback == nullptr)
     {
         m_priv->m_exitingtomain = true;
-        m_priv->m_exitMenuCallback = m_priv->m_jumpMap[keynum]->m_callback;
+        m_priv->m_exitMenuCallback = m_priv->m_jumpMap.value(keynum)->m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return true;
@@ -1199,6 +1194,7 @@ void MythMainWindow::ClearKey(const QString& Context, const QString& Action)
     if (keycontext == nullptr)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
     for (auto it = keycontext->m_actionMap.begin();
          it != keycontext->m_actionMap.end();
          /* no inc */)
@@ -1210,6 +1206,13 @@ void MythMainWindow::ClearKey(const QString& Context, const QString& Action)
         else
             ++it;
     }
+#else
+    keycontext->m_actionMap.removeIf( [Action](auto it) {
+        QStringList list = it.value();
+        list.removeAll(Action);
+        return list.isEmpty();
+    } );
+#endif
 }
 
 void MythMainWindow::ClearKeyContext(const QString& Context)
@@ -1368,6 +1371,8 @@ void MythMainWindow::ClearJump(const QString& Destination)
        return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_priv->m_jumpMap.begin();
          it != m_priv->m_jumpMap.end();
          /* no inc */)
@@ -1378,6 +1383,12 @@ void MythMainWindow::ClearJump(const QString& Destination)
         else
             ++it;
     }
+#else
+    m_priv->m_jumpMap.removeIf( [Destination](auto it){
+        JumpData *jd = it.value();
+        return jd->m_destination == Destination;
+    } );
+#endif
 }
 
 
@@ -1475,7 +1486,7 @@ void MythMainWindow::JumpTo(const QString& Destination, bool Pop)
     {
         m_priv->m_exitingtomain = true;
         m_priv->m_popwindows = Pop;
-        m_priv->m_exitMenuCallback = m_priv->m_destinationMap[Destination].m_callback;
+        m_priv->m_exitMenuCallback = m_priv->m_destinationMap.value(Destination).m_callback;
         QCoreApplication::postEvent(
             this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return;
@@ -1523,7 +1534,7 @@ bool MythMainWindow::HandleMedia(const QString& Handler, const QString& Mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (m_priv->m_mediaPluginMap.contains(lhandler))
     {
-        m_priv->m_mediaPluginMap[lhandler].second(Mrl, Plot, Title, Subtitle,
+        m_priv->m_mediaPluginMap.value(lhandler).second(Mrl, Plot, Title, Subtitle,
                                                   Director, Season, Episode,
                                                   Inetref, LenMins, Year, Id,
                                                   UseBookmarks);

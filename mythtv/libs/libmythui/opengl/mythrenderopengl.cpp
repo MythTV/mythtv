@@ -820,7 +820,7 @@ void MythRenderOpenGL::DrawProcedural(QRect Area, int Alpha, QOpenGLFramebufferO
     SetShaderProjection(Program);
     Program->setUniformValue("u_time",  TimeVal);
     Program->setUniformValue("u_alpha", static_cast<float>(Alpha / 255.0F));
-    Program->setUniformValue("u_res",   QVector2D(m_window->width(), m_window->height()));
+    Program->setUniformValue("u_res", QVector2D(m_viewport.width(), m_viewport.height()));
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     QOpenGLBuffer::release(QOpenGLBuffer::VertexBuffer);
     glDisableVertexAttribArray(VERTEX_INDEX);
@@ -1246,7 +1246,7 @@ GLfloat* MythRenderOpenGL::GetCachedVertices(GLuint Type, const QRect Area)
     {
         m_vertexExpiry.removeOne(ref);
         m_vertexExpiry.append(ref);
-        return m_cachedVertices[ref];
+        return m_cachedVertices.value(ref);
     }
 
     auto *vertices = new GLfloat[8];
@@ -1273,7 +1273,7 @@ void MythRenderOpenGL::ExpireVertices(int Max)
 {
     while (m_vertexExpiry.size() > Max)
     {
-        uint64_t ref = m_vertexExpiry.first();
+        uint64_t ref = m_vertexExpiry.constFirst();
         m_vertexExpiry.removeFirst();
         GLfloat *vertices = nullptr;
         if (m_cachedVertices.contains(ref))
@@ -1322,7 +1322,7 @@ void MythRenderOpenGL::ExpireVBOS(int Max)
 {
     while (m_vboExpiry.size() > Max)
     {
-        uint64_t ref = m_vboExpiry.first();
+        uint64_t ref = m_vboExpiry.constFirst();
         m_vboExpiry.removeFirst();
         if (m_cachedVBOS.contains(ref))
         {
@@ -1378,7 +1378,7 @@ int MythRenderOpenGL::GetBufferSize(QSize Size, QOpenGLTexture::PixelFormat Form
 
 void MythRenderOpenGL::PushTransformation(const UIEffects &Fx, QPointF &Center)
 {
-    QMatrix4x4 newtop = m_transforms.top();
+    QMatrix4x4 newtop = std::as_const(m_transforms).top();
     if (Fx.m_hzoom != 1.0F || Fx.m_vzoom != 1.0F || Fx.m_angle != 0.0F)
     {
         newtop.translate(static_cast<GLfloat>(Center.x()), static_cast<GLfloat>(Center.y()));
@@ -1488,7 +1488,7 @@ void MythRenderOpenGL::SetShaderProjection(QOpenGLShaderProgram *Program)
     if (Program)
     {
         SetShaderProgramParams(Program, m_projection,       "u_projection");
-        SetShaderProgramParams(Program, m_transforms.top(), "u_transform");
+        SetShaderProgramParams(Program, std::as_const(m_transforms).top(), "u_transform");
     }
 }
 
@@ -1500,6 +1500,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
 
     // Uniform value cacheing
     QString tag = QString("%1-%2").arg(Program->programId()).arg(Uniform);
+    // clazy:exclude-next-line=detaching-member (updates value)
     QHash<QString,QMatrix4x4>::iterator it = m_cachedMatrixUniforms.find(tag);
     if (it == m_cachedMatrixUniforms.end())
         m_cachedMatrixUniforms.insert(tag, Value);
@@ -1511,6 +1512,7 @@ void MythRenderOpenGL::SetShaderProgramParams(QOpenGLShaderProgram *Program, con
     // Uniform location cacheing
     QByteArray uniform(Uniform);
     GLint location = 0;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     QHash<QByteArray, GLint> &uniforms = m_cachedUniformLocations[Program];
     if (uniforms.contains(uniform))
     {

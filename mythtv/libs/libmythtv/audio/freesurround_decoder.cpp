@@ -34,7 +34,6 @@ using cfloat = std::complex<float>;
 using InputBufs  = std::array<float*,2>;
 using OutputBufs = std::array<float*,6>;
 
-static const float PI = std::numbers::pi;
 static const float epsilon = 0.000001;
 static const float center_level = 0.5F*sqrtf(0.5F);
 
@@ -77,7 +76,7 @@ public:
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
         m_wnd.resize(m_n);
         for (unsigned k=0;k<m_n;k++)
-            m_wnd[k] = std::sqrt(0.5F*(1-std::cos(2*PI*k/m_n))/m_n);
+            m_wnd[k] = std::sqrt(0.5F*(1-std::cos(2*std::numbers::pi_v<float>*k/m_n))/m_n);
         m_currentBuf = 0;
         m_inbufs.fill(nullptr);
         m_outbufs.fill(nullptr);
@@ -172,7 +171,13 @@ public:
 
     // set the phase shifting mode
     void phase_mode(unsigned mode) {
-        const std::array<std::array<float,2>,4> modes {{ {0,0}, {0,PI}, {PI,0}, {-PI/2,PI/2} }};
+        const std::array<std::array<float,2>,4> modes
+        {{
+            {0,0},
+            {0,std::numbers::pi_v<float>},
+            {std::numbers::pi_v<float>,0},
+            {-std::numbers::pi_v<float>/2,std::numbers::pi_v<float>/2}
+        }};
         m_phaseOffsetL = modes[mode][0];
         m_phaseOffsetR = modes[mode][1];
     }
@@ -239,8 +244,8 @@ private:
             // calculate the amplitude/phase difference
             float ampDiff = clamp_unit_mag((ampL+ampR < epsilon) ? 0 : (ampR-ampL) / (ampR+ampL));
             float phaseDiff = phaseL - phaseR;
-            if (phaseDiff < -PI) phaseDiff += 2*PI;
-            if (phaseDiff > PI) phaseDiff -= 2*PI;
+            if (phaseDiff < -std::numbers::pi_v<float>) phaseDiff += 2*std::numbers::pi_v<float>;
+            if (phaseDiff > std::numbers::pi_v<float>) phaseDiff -= 2*std::numbers::pi_v<float>;
             phaseDiff = std::abs(phaseDiff);
 
             if (m_linearSteering) {
@@ -281,7 +286,7 @@ private:
                 m_xFs[f] = ampDiff;
 
                 // determine preliminary sound field y-position from phase difference
-                m_yFs[f] = 1 - ((phaseDiff/PI)*2);
+                m_yFs[f] = 1 - ((phaseDiff/std::numbers::pi_v<float>)*2);
 
                 if (std::abs(m_xFs[f]) > m_surroundBalance) {
                     // blend linearly between the surrounds and the fronts if the balance exceeds the surround encoding balance
@@ -337,7 +342,7 @@ private:
 #define FASTER_CALC
     // map from amplitude difference and phase difference to yfs
     static double get_yfs(double ampDiff, double phaseDiff) {
-        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/M_PI*2);
+        double x = 1-(((1-sqr(ampDiff))*phaseDiff)/std::numbers::pi*2);
 #ifdef FASTER_CALC
         double tanX = tan(x);
         return 0.16468622925824683 + (0.5009268347818189*x) - (0.06462757726992101*x*x)

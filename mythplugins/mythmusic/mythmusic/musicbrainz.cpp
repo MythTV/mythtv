@@ -178,6 +178,7 @@ std::string MusicBrainz::queryRelease(const std::string &discId)
                                              artistsToString(artists)));
 
                                     // fill metadata
+                                    // clazy:exclude-next-line=detaching-member (can't reference temporary)
                                     MusicMetadata &metadata = m_tracks[track->Position()];
                                     metadata.setAlbum(QString::fromStdString(albumTitle));
                                     metadata.setTitle(QString::fromStdString(recording->Title()));

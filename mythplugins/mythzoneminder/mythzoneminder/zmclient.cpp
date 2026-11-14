@@ -304,7 +304,7 @@ void ZMClient::updateMonitorStatus(void)
 
         if (m_monitorMap.contains(monID))
         {
-            Monitor *mon = m_monitorMap.find(monID).value();
+            Monitor *mon = m_monitorMap.constFind(monID).value();
             mon->name = strList[(x * 7) + 3];
             mon->zmcStatus = strList[(x * 7) + 4];
             mon->zmaStatus = strList[(x * 7) + 5];
@@ -377,7 +377,7 @@ bool ZMClient::updateAlarmStates(void)
 
         if (m_monitorMap.contains(monID))
         {
-            Monitor *mon = m_monitorMap.find(monID).value();
+            Monitor *mon = m_monitorMap.constFind(monID).value();
             if (mon->state != state)
             {
                 // alarm state has changed for this monitor
@@ -864,7 +864,7 @@ Monitor* ZMClient::getMonitorByID(int monID)
     QMutexLocker locker(&m_listLock);
 
     if (m_monitorMap.contains(monID))
-        return m_monitorMap.find(monID).value();
+        return m_monitorMap.constFind(monID).value();
 
     return nullptr;
 }

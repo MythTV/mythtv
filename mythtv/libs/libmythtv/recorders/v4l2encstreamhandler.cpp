@@ -59,9 +59,7 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
 
     const QString& devkey = devname;
 
-    QMap<QString,V4L2encStreamHandler*>::iterator it = s_handlers.find(devkey);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(devkey))
     {
         auto *newhandler = new V4L2encStreamHandler(devname, audioinput, inputid);
 
@@ -75,13 +73,13 @@ V4L2encStreamHandler *V4L2encStreamHandler::Get(const QString &devname,
     else
     {
         s_handlers_refcnt[devkey]++;
-        uint rcount = s_handlers_refcnt[devkey];
+        uint rcount = s_handlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("V4L2SH[%1]: Using existing stream handler for %2")
             .arg(inputid).arg(devkey) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[devkey];
+    return s_handlers.value(devkey);
 }
 
 void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
@@ -90,6 +88,7 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_handlers_refcnt.find(devname);
     if (rit == s_handlers_refcnt.end())
         return;
@@ -105,7 +104,7 @@ void V4L2encStreamHandler::Return(V4L2encStreamHandler * & ref, int inputid)
     }
 
     QMap<QString, V4L2encStreamHandler*>::iterator it =
-        s_handlers.find(devname);
+        s_handlers.find(devname); // clazy:exclude=detaching-member (modifies item)
     if ((it != s_handlers.end()) && (*it == ref))
     {
         LOG(VB_RECORD, LOG_INFO, QString("V4L2SH[%1]: Closing handler for %2")

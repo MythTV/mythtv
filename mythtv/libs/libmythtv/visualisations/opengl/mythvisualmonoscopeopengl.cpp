@@ -50,12 +50,13 @@ void MythVisualMonoScopeOpenGL::Draw(const QRect Area, MythPainter* /*Painter*/,
         }
 
         // drop oldest
-        auto vertex = m_vbos.front();
+        auto vertex = m_vbos.constFirst();
         m_vbos.pop_front();
         m_vbos.append(vertex);
     }
 
     // Update the newest vertex buffer
+    // clazy:exclude-next-line=detaching-member (modifies item)
     auto & vbo = m_vbos.back();
     vbo.second[0] = m_hue;
     vbo.second[1] = 1.0;

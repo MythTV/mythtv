@@ -284,7 +284,7 @@ class MTV_PUBLIC MPEGStreamData : public EITSource
     bool AssemblePSIP(PSIPTable& psip, TSPacket* tspacket);
     void SavePartialPSIP(uint pid, PSIPTable* packet);
     PSIPTable* GetPartialPSIP(uint pid)
-        { return m_partialPsipPacketCache[pid]; }
+        { return m_partialPsipPacketCache.value(pid); }
     void ClearPartialPSIP(uint pid)
         { m_partialPsipPacketCache.remove(pid); }
     void DeletePartialPSIP(uint pid);

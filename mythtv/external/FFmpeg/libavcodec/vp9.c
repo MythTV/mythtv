@@ -255,8 +255,10 @@ static int update_size(AVCodecContext *avctx, int w, int h)
         *fmtp = AV_PIX_FMT_NONE;
 
         ret = ff_get_format(avctx, pix_fmts);
-        if (ret < 0)
+        if (ret < 0) {
+            ff_set_dimensions(avctx, s->w, s->h);
             return ret;
+        }
 
         avctx->pix_fmt = ret;
         s->gf_fmt  = s->pix_fmt;
@@ -704,12 +706,6 @@ static int decode_frame_header(AVCodecContext *avctx,
     s->s.h.uvac_qdelta = get_bits1(&s->gb) ? get_sbits_inv(&s->gb, 4) : 0;
     s->s.h.lossless    = s->s.h.yac_qi == 0 && s->s.h.ydc_qdelta == 0 &&
                        s->s.h.uvdc_qdelta == 0 && s->s.h.uvac_qdelta == 0;
-#if FF_API_CODEC_PROPS
-FF_DISABLE_DEPRECATION_WARNINGS
-    if (s->s.h.lossless)
-        avctx->properties |= FF_CODEC_PROPERTY_LOSSLESS;
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
 
     /* segmentation header info */
     if ((s->s.h.segmentation.enabled = get_bits1(&s->gb))) {
@@ -1637,8 +1633,10 @@ static int vp9_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         vp9_frame_replace(&s->s.frames[REF_FRAME_SEGMAP], src);
     vp9_frame_replace(&s->s.frames[REF_FRAME_MVPAIR], src);
     vp9_frame_unref(&s->s.frames[CUR_FRAME]);
-    if ((ret = vp9_frame_alloc(avctx, &s->s.frames[CUR_FRAME])) < 0)
+    if ((ret = vp9_frame_alloc(avctx, &s->s.frames[CUR_FRAME])) < 0) {
+        ff_cbs_fragment_reset(&s->current_frag);
         return ret;
+    }
 
     s->s.frames[CUR_FRAME].header_ref = av_refstruct_ref(s->header_ref);
     s->s.frames[CUR_FRAME].frame_header = s->frame_header;
@@ -1825,6 +1823,7 @@ finish:
 
     return pkt->size;
 fail:
+    ff_cbs_fragment_reset(&s->current_frag);
     ff_progress_frame_report(&s->s.frames[CUR_FRAME].tf, INT_MAX);
     return ret;
 }

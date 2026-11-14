@@ -231,7 +231,7 @@ class UPNP_PUBLIC CDSObject : public ReferenceCounter
         ~CDSObject() override;
 
         Property         *AddProperty( Property *pProp  );
-        QList<Property*>  GetProperties( const QString &sName );
+        QList<Property*>  GetProperties( const QString &sName ) const;
         CDSObject        *AddChild   ( CDSObject   *pChild );
         CDSObjects        GetChildren( void ) const { return m_children; }
         CDSObject        *GetChild   ( const QString &sID );

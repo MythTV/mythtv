@@ -4,7 +4,7 @@
 # See the file LICENSE_FSF for licensing information.
 #
 
-if(NOT CMAKE_CROSSCOMPILING)
+if(BUILD_TESTING AND NOT CMAKE_CROSSCOMPILING)
   ExternalProject_Add_Step(
     MythTV tests
     COMMAND cmake --build . -t test

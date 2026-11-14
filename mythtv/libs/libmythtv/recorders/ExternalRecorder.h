@@ -14,7 +14,6 @@
 #include "dtvrecorder.h"
 
 class ExternalStreamHandler;
-class RecordingProfile;
 class ExternalChannel;
 class QString;
 class TVRec;
@@ -31,7 +30,8 @@ class ExternalRecorder : public DTVRecorder
 {
   public:
     ExternalRecorder(TVRec *rec, ExternalChannel *channel)
-        : DTVRecorder(rec), m_channel(channel) {}
+        : DTVRecorder(rec)
+        , m_channel(channel) {}
 
     void run(void) override; // RecorderBase
 
@@ -40,8 +40,8 @@ class ExternalRecorder : public DTVRecorder
     void Close(void);
 
   protected:
-    bool StartStreaming(void);
-    bool StopStreaming(void);
+    bool StartStreaming(const QString& reason);
+    bool StopStreaming(const QString& reason);
     void StartNewFile(void) override; // RecorderBase
     bool PauseAndWait(std::chrono::milliseconds timeout = 100ms) override; // RecorderBase
 

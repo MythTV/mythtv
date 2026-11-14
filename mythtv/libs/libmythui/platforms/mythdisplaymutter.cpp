@@ -316,12 +316,14 @@ const MythDisplayModes& MythDisplayMutter::GetVideoModes()
 
     m_videoModes.clear();
     m_modeMap.clear();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     MythMutterOutput& output = m_outputs[m_outputIdx];
     QSize physical(output.widthmm, output.heightmm);
     DisplayModeMap screenmap;
 
     for (auto & mode : output.modes)
     {
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         MythMutterMode& mmode = m_modes[static_cast<int32_t>(mode)];
 
         // the flags field will contain values dependant on enums for the
@@ -587,8 +589,8 @@ void MythDisplayMutter::UpdateResources()
     // retrieve details
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using device '%1'").arg(m_outputs[m_outputIdx].name));
 
-    int32_t mode    = m_crtcs[m_outputs[m_outputIdx].current_crtc].currentmode;
-    m_refreshRate   = m_modes[mode].frequency;
+    int32_t mode    = m_crtcs.at(m_outputs.at(m_outputIdx).current_crtc).currentmode;
+    m_refreshRate   = m_modes.at(mode).frequency;
     m_resolution    = QSize(static_cast<int>(m_modes[mode].width),
                             static_cast<int>(m_modes[mode].height));
     m_physicalSize  = QSize(m_outputs[m_outputIdx].widthmm, m_outputs[m_outputIdx].heightmm);

@@ -139,11 +139,11 @@ bool MythPluginManager::init_plugin(const QString &plugname)
         m_dict.insert(newname, new MythPlugin(newname, plugname));
     }
 
-    int result = m_dict[newname]->init(MYTH_BINARY_VERSION);
+    int result = m_dict.value(newname)->init(MYTH_BINARY_VERSION);
 
     if (result == -1)
     {
-        delete m_dict[newname];
+        delete m_dict.value(newname);
         m_dict.remove(newname);
         LOG(VB_GENERAL, LOG_ERR,
                  QString("Unable to initialize plugin '%1'.") .arg(plugname));
@@ -152,11 +152,11 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
     MythTranslation::load(plugname);
 
-    switch (m_dict[newname]->type())
+    switch (m_dict.value(newname)->type())
     {
         case kPluginType_Module:
         default:
-            m_moduleMap[newname] = m_dict[newname];
+            m_moduleMap[newname] = m_dict.value(newname);
             break;
     }
 
@@ -168,7 +168,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
 
-    if (!m_dict[newname] && !init_plugin(plugname))
+    if (!m_dict.value(newname) && !init_plugin(plugname))
     {
         LOG(VB_GENERAL, LOG_ALERT,
                  QString("Unable to run plugin '%1': not initialized")
@@ -176,7 +176,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
         return true;
     }
 
-    bool res = m_dict[newname]->run() != 0;
+    bool res = m_dict.value(newname)->run() != 0;
 
     return res;
 }
@@ -194,7 +194,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
         return true;
     }
 
-    bool res = m_dict[newname]->config() != 0;
+    bool res = m_dict.value(newname)->config() != 0;
 
     return res;
 }
@@ -211,7 +211,7 @@ bool MythPluginManager::destroy_plugin(const QString &plugname)
         return false;
     }
 
-    m_dict[newname]->destroy();
+    m_dict.value(newname)->destroy();
     return true;
 }
 
@@ -222,7 +222,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
     if (!m_moduleMap.contains(newname))
         return nullptr;
 
-    return m_moduleMap[newname];
+    return m_moduleMap.value(newname);
 }
 
 void MythPluginManager::DestroyAllPlugins(void)

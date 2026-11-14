@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides custom error codes"""
 
 from MythTV.static import ERRCODES

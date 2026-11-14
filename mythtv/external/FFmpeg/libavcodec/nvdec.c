@@ -413,8 +413,8 @@ int ff_nvdec_decode_init(AVCodecContext *avctx)
     params.OutputFormat        = output_format;
     params.CodecType           = cuvid_codec_type;
     params.ChromaFormat        = cuvid_chroma_format;
-    params.ulNumDecodeSurfaces = frames_ctx->initial_pool_size;
-    params.ulNumOutputSurfaces = unsafe_output ? frames_ctx->initial_pool_size : 1;
+    params.ulNumDecodeSurfaces = FFMIN(frames_ctx->initial_pool_size, 32);
+    params.ulNumOutputSurfaces = unsafe_output ? FFMIN(frames_ctx->initial_pool_size, 64) : 1;
 
     ret = nvdec_decoder_create(&ctx->decoder, frames_ctx->device_ref, &params, avctx);
     if (ret < 0) {
@@ -438,7 +438,7 @@ int ff_nvdec_decode_init(AVCodecContext *avctx)
         ret = AVERROR(ENOMEM);
         goto fail;
     }
-    pool->dpb_size = frames_ctx->initial_pool_size;
+    pool->dpb_size = FFMIN(frames_ctx->initial_pool_size, 32);
 
     ctx->decoder_pool = av_refstruct_pool_alloc_ext(sizeof(unsigned int), 0, pool,
                                                     nvdec_decoder_frame_init,
@@ -543,7 +543,6 @@ static int nvdec_retrieve_data(void *logctx, AVFrame *frame)
         goto copy_fail;
 
     unmap_data->idx = cf->idx;
-    unmap_data->idx_ref = av_refstruct_ref(cf->idx_ref);
     unmap_data->decoder = av_refstruct_ref(cf->decoder);
 
     av_pix_fmt_get_chroma_sub_sample(hwctx->sw_format, &shift_h, &shift_v);
@@ -601,7 +600,7 @@ int ff_nvdec_start_frame(AVCodecContext *avctx, AVFrame *frame)
 
     fdd->hwaccel_priv      = cf;
     fdd->hwaccel_priv_free = nvdec_fdd_priv_free;
-    fdd->post_process      = nvdec_retrieve_data;
+    fdd->hwaccel_priv_post_process = nvdec_retrieve_data;
 
     return 0;
 fail:
@@ -628,8 +627,7 @@ int ff_nvdec_start_frame_sep_ref(AVCodecContext *avctx, AVFrame *frame, int has_
             cf->ref_idx_ref = av_refstruct_pool_get(ctx->decoder_pool);
             if (!cf->ref_idx_ref) {
                 av_log(avctx, AV_LOG_ERROR, "No decoder surfaces left\n");
-                ret = AVERROR(ENOMEM);
-                goto fail;
+                return AVERROR(ENOMEM);
             }
         }
         cf->ref_idx = *cf->ref_idx_ref;
@@ -639,9 +637,6 @@ int ff_nvdec_start_frame_sep_ref(AVCodecContext *avctx, AVFrame *frame, int has_
     }
 
     return 0;
-fail:
-    nvdec_fdd_priv_free(cf);
-    return ret;
 }
 
 int ff_nvdec_end_frame(AVCodecContext *avctx)
@@ -733,8 +728,18 @@ int ff_nvdec_frame_params(AVCodecContext *avctx,
     chroma_444 = supports_444 && cuvid_chroma_format == cudaVideoChromaFormat_444;
 
     frames_ctx->format            = AV_PIX_FMT_CUDA;
-    frames_ctx->width             = (avctx->coded_width + 1) & ~1;
-    frames_ctx->height            = (avctx->coded_height + 1) & ~1;
+    // NVDEC target dimensions must be even-aligned for internal surface allocation.
+    // For chroma-subsampled formats (420/422), the output dimensions must also be
+    // even. For monochrome/444, keep the original output dimensions and only
+    // even-align the NVDEC target — the frame copy will crop to avctx dimensions.
+    if (cuvid_chroma_format == cudaVideoChromaFormat_420 ||
+        cuvid_chroma_format == cudaVideoChromaFormat_422) {
+        frames_ctx->width         = (avctx->coded_width  + 1) & ~1;
+        frames_ctx->height        = (avctx->coded_height + 1) & ~1;
+    } else {
+        frames_ctx->width         = avctx->coded_width;
+        frames_ctx->height        = avctx->coded_height;
+    }
     /*
      * We add two extra frames to the pool to account for deinterlacing filters
      * holding onto their frames.
@@ -755,11 +760,7 @@ int ff_nvdec_frame_params(AVCodecContext *avctx,
         break;
     case 10:
         if (chroma_444) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            frames_ctx->sw_format = AV_PIX_FMT_YUV444P16;
-#else
             frames_ctx->sw_format = AV_PIX_FMT_YUV444P10MSB;
-#endif
 #ifdef NVDEC_HAVE_422_SUPPORT
         } else if (cuvid_chroma_format == cudaVideoChromaFormat_422) {
             frames_ctx->sw_format = AV_PIX_FMT_P210;
@@ -770,25 +771,13 @@ int ff_nvdec_frame_params(AVCodecContext *avctx,
         break;
     case 12:
         if (chroma_444) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            frames_ctx->sw_format = AV_PIX_FMT_YUV444P16;
-#else
             frames_ctx->sw_format = AV_PIX_FMT_YUV444P12MSB;
-#endif
 #ifdef NVDEC_HAVE_422_SUPPORT
         } else if (cuvid_chroma_format == cudaVideoChromaFormat_422) {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            frames_ctx->sw_format = AV_PIX_FMT_P216;
-#else
             frames_ctx->sw_format = AV_PIX_FMT_P212;
 #endif
-#endif
         } else {
-#if FF_API_NVDEC_OLD_PIX_FMTS
-            frames_ctx->sw_format = AV_PIX_FMT_P016;
-#else
             frames_ctx->sw_format = AV_PIX_FMT_P012;
-#endif
         }
         break;
     default:

@@ -32,10 +32,12 @@
  * http://xiph.org/vorbis/doc/v-comment.html
  */
 const AVMetadataConv ff_vorbiscomment_metadata_conv[] = {
-    { "ALBUMARTIST", "album_artist"},
-    { "TRACKNUMBER", "track"  },
-    { "DISCNUMBER",  "disc"   },
-    { "DESCRIPTION", "comment" },
+    { "ALBUMARTIST",  "album_artist"  },
+    { "TRACKNUMBER",  "track"         },
+    { "DISCNUMBER",   "disc"          },
+    /* Adapted from <https://picard-docs.musicbrainz.org/en/appendices/tag_mapping.html#disc-subtitle> */
+    { "DISCSUBTITLE", "disc_subtitle" },
+    { "DESCRIPTION",  "comment"       },
     { 0 }
 };
 
@@ -57,7 +59,7 @@ int ff_vorbiscomment_length(const AVDictionary *m, const char *vendor_string,
     return len;
 }
 
-int ff_vorbiscomment_write(AVIOContext *pb, const AVDictionary *m,
+int ff_vorbiscomment_write(AVIOContext *pb, const AVDictionary *dict,
                            const char *vendor_string,
                            AVChapter **chapters, unsigned int nb_chapters)
 {
@@ -73,11 +75,11 @@ int ff_vorbiscomment_write(AVIOContext *pb, const AVDictionary *m,
             cm_count += av_dict_count(chapters[i]->metadata) + 1;
         }
     }
-    if (m) {
-        int count = av_dict_count(m) + cm_count;
+    if (dict) {
+        int count = av_dict_count(dict) + cm_count;
         const AVDictionaryEntry *tag = NULL;
         avio_wl32(pb, count);
-        while ((tag = av_dict_iterate(m, tag))) {
+        while ((tag = av_dict_iterate(dict, tag))) {
             int64_t len1 = strlen(tag->key);
             int64_t len2 = strlen(tag->value);
             if (len1+1+len2 > UINT32_MAX)

@@ -108,9 +108,9 @@ void InternetContent::GetInternetSearch( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 
-    QString grabber =  pRequest->m_mapParams[ "Grabber" ];
-    QString query   =  pRequest->m_mapParams[ "Query" ];
-    QString page    =  pRequest->m_mapParams[ "Page" ];
+    QString grabber =  pRequest->m_mapParams.value( "Grabber" );
+    QString query   =  pRequest->m_mapParams.value( "Query" );
+    QString page    =  pRequest->m_mapParams.value( "Page" );
 
     if (grabber.isEmpty() || query.isEmpty())
         return;
@@ -190,7 +190,7 @@ void InternetContent::GetInternetContent( HTTPRequest *pRequest )
 {
     pRequest->m_eResponseType   = ResponseTypeHTML;
 
-    QString grabber =  pRequest->m_mapParams[ "Grabber" ];
+    QString grabber =  pRequest->m_mapParams.value( "Grabber" );
 
     if (grabber.isEmpty())
         return;

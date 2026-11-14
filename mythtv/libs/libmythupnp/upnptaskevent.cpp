@@ -57,7 +57,7 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
         // Send NOTIFY message
         // ------------------------------------------------------------------
 
-        if (socket.write(m_pPayload->data(), m_pPayload->size(), timeout) != -1)
+        if (socket.write(m_pPayload->constData(), m_pPayload->size(), timeout) != -1)
         {
             // --------------------------------------------------------------
             // Read first line to determine success/Fail

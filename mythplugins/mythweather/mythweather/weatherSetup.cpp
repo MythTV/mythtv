@@ -490,12 +490,19 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         type_strs.reserve(si->m_types.size());
 
         TypeListMap types;
-        // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto it = si->m_types.begin(); it != si->m_types.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+        for (auto it = si->m_types.constBegin(); it != si->m_types.constEnd(); ++it)
         {
             types.insert(it.key(), *it);
             type_strs << it.key();
         }
+#else
+        for (auto [key, value] : std::as_const(si->m_types).asKeyValueRange())
+        {
+            types.insert(key, value);
+            type_strs << key;
+        }
+#endif
         bool hasUnits = si->m_hasUnits;
 
         QList<ScriptInfo *> tmp;
@@ -1004,7 +1011,7 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
     auto *ri = item->GetData().value<ResultListInfo *>();
     if (ri)
     {
-        // NOLINTNEXTLINE(modernize-loop-convert)
+        // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
         for (auto it = m_screenListInfo->m_types.begin();
              it != m_screenListInfo->m_types.end(); ++it)
         {

@@ -28,6 +28,7 @@
 #include "libavutil/display.h"
 #include "libavutil/error.h"
 #include "libavutil/intreadwrite.h"
+#include "libavutil/mastering_display_metadata.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/parseutils.h"
@@ -68,6 +69,8 @@ typedef struct DemuxStream {
     int                      autorotate;
     int                      apply_cropping;
     int                      force_display_matrix;
+    int                      force_mastering_display;
+    int                      force_content_light;
     int                      drop_changed;
 
 
@@ -96,12 +99,6 @@ typedef struct DemuxStream {
     uint64_t                 nb_packets;
     // combined size of all the packets read
     uint64_t                 data_size;
-    // latest wallclock time at which packet reading resumed after a stall - used for readrate
-    int64_t                  resume_wc;
-    // timestamp of first packet sent after the latest stall - used for readrate
-    int64_t                  resume_pts;
-    // measure of how far behind packet reading is against spceified readrate
-    int64_t                  lag;
 } DemuxStream;
 
 typedef struct DemuxStreamGroup {
@@ -143,6 +140,13 @@ typedef struct Demuxer {
     float                 readrate;
     double                readrate_initial_burst;
     float                 readrate_catchup;
+
+    // latest wallclock time at which packet reading resumed after a stall - used for readrate
+    int64_t               resume_wc;
+    // relative timestamp of first packet sent after the latest stall - used for readrate
+    int64_t               resume_progress;
+    // measure of how far behind packet reading is against spceified readrate
+    int64_t               lag;
 
     Scheduler            *sch;
 
@@ -514,43 +518,55 @@ static void readrate_sleep(Demuxer *d)
     int64_t initial_burst = AV_TIME_BASE * d->readrate_initial_burst;
     int resume_warn = 0;
 
+    DemuxStream *slowest = NULL;
+    int64_t progress = INT64_MAX;
+
     for (int i = 0; i < f->nb_streams; i++) {
         InputStream *ist = f->streams[i];
         DemuxStream  *ds = ds_from_ist(ist);
-        int64_t stream_ts_offset, pts, now, wc_elapsed, elapsed, lag, max_pts, limit_pts;
+        int64_t stream_ts_offset, pts, pts_diff;
+        if (ds->discard || ds->finished || ds->first_dts == AV_NOPTS_VALUE)
+            continue;
 
-        if (ds->discard) continue;
-
-        stream_ts_offset = FFMAX(ds->first_dts != AV_NOPTS_VALUE ? ds->first_dts : 0, file_start);
+        stream_ts_offset = FFMAX(ds->first_dts, file_start);
         pts = av_rescale(ds->dts, 1000000, AV_TIME_BASE);
-        now = av_gettime_relative();
-        wc_elapsed = now - d->wallclock_start;
-
-        if (pts <= stream_ts_offset + initial_burst) continue;
-
-        max_pts = stream_ts_offset + initial_burst + (int64_t)(wc_elapsed * d->readrate);
-        lag = FFMAX(max_pts - pts, 0);
-        if ( (!ds->lag && lag > 0.3 * AV_TIME_BASE) || ( lag > ds->lag + 0.3 * AV_TIME_BASE) ) {
-            ds->lag = lag;
-            ds->resume_wc = now;
-            ds->resume_pts = pts;
-            av_log_once(ds, AV_LOG_WARNING, AV_LOG_DEBUG, &resume_warn,
-                        "Resumed reading at pts %0.3f with rate %0.3f after a lag of %0.3fs\n",
-                        (float)pts/AV_TIME_BASE, d->readrate_catchup, (float)lag/AV_TIME_BASE);
+        pts_diff = pts - stream_ts_offset;
+        if (pts_diff < progress) {
+            progress = pts_diff;
+            slowest = ds;
         }
-        if (ds->lag && !lag)
-            ds->lag = ds->resume_wc = ds->resume_pts = 0;
-        if (ds->resume_wc) {
-            elapsed = now - ds->resume_wc;
-            limit_pts = ds->resume_pts + (int64_t)(elapsed * d->readrate_catchup);
-        } else {
-            elapsed = wc_elapsed;
-            limit_pts = max_pts;
-        }
-
-        if (pts > limit_pts)
-            av_usleep(pts - limit_pts);
     }
+
+    if (!slowest || progress <= initial_burst)
+        return;
+
+    int64_t now = av_gettime_relative();
+    int64_t wc_elapsed = now - d->wallclock_start;
+    int64_t max_prog = initial_burst + (int64_t)(wc_elapsed * d->readrate);
+    int64_t lag = FFMAX(max_prog - progress, 0);
+    int64_t limit;
+
+    if ( (!d->lag && lag > 0.3 * AV_TIME_BASE) || ( lag > d->lag + 0.3 * AV_TIME_BASE) ) {
+        d->lag = lag;
+        d->resume_wc = now;
+        d->resume_progress = progress;
+
+        int64_t pts = FFMAX(slowest->first_dts, file_start) + progress;
+        av_log_once(slowest, AV_LOG_WARNING, AV_LOG_DEBUG, &resume_warn,
+                    "Resumed reading at pts %0.3f with rate %0.3f after a lag of %0.3fs\n",
+                    (float)pts/AV_TIME_BASE, d->readrate_catchup, (float)lag/AV_TIME_BASE);
+    }
+    if (d->lag && !lag)
+        d->lag = d->resume_wc = d->resume_progress = 0;
+    if (d->resume_wc) {
+        int64_t elapsed = now - d->resume_wc;
+        limit = d->resume_progress + (int64_t)(elapsed * d->readrate_catchup);
+    } else {
+        limit = max_prog;
+    }
+
+    if (progress > limit)
+        av_usleep(progress - limit);
 }
 
 static int do_send(Demuxer *d, DemuxStream *ds, AVPacket *pkt, unsigned flags,
@@ -982,11 +998,7 @@ int ist_use(InputStream *ist, int decoding_needed,
 
         ds->dec_opts.flags |= (!!ist->fix_sub_duration * DECODER_FLAG_FIX_SUB_DURATION) |
                               (!!is_unreliable * DECODER_FLAG_TS_UNRELIABLE) |
-                              (!!(d->loop && is_audio) * DECODER_FLAG_SEND_END_TS)
-#if FFMPEG_OPT_TOP
-                              | ((ist->top_field_first >= 0) * DECODER_FLAG_TOP_FIELD_FIRST)
-#endif
-                             ;
+                              (!!(d->loop && is_audio) * DECODER_FLAG_SEND_END_TS);
 
         if (ist->framerate.num) {
             ds->dec_opts.flags     |= DECODER_FLAG_FRAMERATE_FORCED;
@@ -1248,6 +1260,125 @@ static int add_display_matrix_to_stream(const OptionsContext *o,
     return 0;
 }
 
+static int add_mastering_display_to_stream(const OptionsContext *o,
+                                           AVFormatContext *ctx, InputStream *ist)
+{
+    AVStream *st = ist->st;
+    DemuxStream *ds = ds_from_ist(ist);
+    AVMasteringDisplayMetadata *master_display;
+    AVPacketSideData *sd;
+    const char *p = NULL;
+    const int chroma_den = 50000;
+    const int luma_den = 10000;
+    size_t size;
+    int ret;
+
+    opt_match_per_stream_str(ist, &o->mastering_displays, ctx, st, &p);
+
+    if (!p)
+        return 0;
+
+    master_display = av_mastering_display_metadata_alloc_size(&size);
+    if (!master_display)
+        return AVERROR(ENOMEM);
+
+    ret = sscanf(p,
+                 "G(%u,%u)B(%u,%u)R(%u,%u)WP(%u,%u)L(%u,%u)",
+                 (unsigned*)&master_display->display_primaries[1][0].num,
+                 (unsigned*)&master_display->display_primaries[1][1].num,
+                 (unsigned*)&master_display->display_primaries[2][0].num,
+                 (unsigned*)&master_display->display_primaries[2][1].num,
+                 (unsigned*)&master_display->display_primaries[0][0].num,
+                 (unsigned*)&master_display->display_primaries[0][1].num,
+                 (unsigned*)&master_display->white_point[0].num,
+                 (unsigned*)&master_display->white_point[1].num,
+                 (unsigned*)&master_display->max_luminance.num,
+                 (unsigned*)&master_display->min_luminance.num);
+
+    if (ret != 10 ||
+        (unsigned)(master_display->display_primaries[1][0].num | master_display->display_primaries[1][1].num |
+                   master_display->display_primaries[2][0].num | master_display->display_primaries[2][1].num |
+                   master_display->display_primaries[0][0].num | master_display->display_primaries[0][1].num |
+                   master_display->white_point[0].num | master_display->white_point[1].num) > UINT16_MAX ||
+        (unsigned)(master_display->max_luminance.num  | master_display->min_luminance.num) > INT_MAX ||
+                   master_display->min_luminance.num  > master_display->max_luminance.num) {
+        av_freep(&master_display);
+        av_log(ist, AV_LOG_ERROR, "Failed to parse mastering display option\n");
+        return AVERROR(EINVAL);
+    }
+
+    master_display->display_primaries[1][0].den = chroma_den;
+    master_display->display_primaries[1][1].den = chroma_den;
+    master_display->display_primaries[2][0].den = chroma_den;
+    master_display->display_primaries[2][1].den = chroma_den;
+    master_display->display_primaries[0][0].den = chroma_den;
+    master_display->display_primaries[0][1].den = chroma_den;
+    master_display->white_point[0].den = chroma_den;
+    master_display->white_point[1].den = chroma_den;
+    master_display->max_luminance.den = luma_den;
+    master_display->min_luminance.den = luma_den;
+
+    master_display->has_primaries = 1;
+    master_display->has_luminance = 1;
+
+    sd = av_packet_side_data_add(&st->codecpar->coded_side_data,
+                                 &st->codecpar->nb_coded_side_data,
+                                 AV_PKT_DATA_MASTERING_DISPLAY_METADATA,
+                                 (uint8_t *)master_display, size, 0);
+    if (!sd) {
+        av_freep(&master_display);
+        return AVERROR(ENOMEM);
+    }
+
+    ds->force_mastering_display = 1;
+
+    return 0;
+}
+
+static int add_content_light_to_stream(const OptionsContext *o,
+                                       AVFormatContext *ctx, InputStream *ist)
+{
+    AVStream *st = ist->st;
+    DemuxStream *ds = ds_from_ist(ist);
+    AVContentLightMetadata *cll;
+    AVPacketSideData *sd;
+    const char *p = NULL;
+    size_t size;
+    int ret;
+
+    opt_match_per_stream_str(ist, &o->content_lights, ctx, st, &p);
+
+    if (!p)
+        return 0;
+
+    cll = av_content_light_metadata_alloc(&size);
+    if (!cll)
+        return AVERROR(ENOMEM);
+
+    ret = sscanf(p, "%u,%u",
+                 (unsigned*)&cll->MaxCLL,
+                 (unsigned*)&cll->MaxFALL);
+
+    if (ret != 2 || (unsigned)(cll->MaxCLL | cll->MaxFALL) > UINT16_MAX) {
+        av_freep(&cll);
+        av_log(ist, AV_LOG_ERROR, "Failed to parse content light option\n");
+        return AVERROR(EINVAL);
+    }
+
+    sd = av_packet_side_data_add(&st->codecpar->coded_side_data,
+                                 &st->codecpar->nb_coded_side_data,
+                                 AV_PKT_DATA_CONTENT_LIGHT_LEVEL,
+                                 (uint8_t *)cll, size, 0);
+    if (!sd) {
+        av_freep(&cll);
+        return AVERROR(ENOMEM);
+    }
+
+    ds->force_content_light = 1;
+
+    return 0;
+}
+
 static const char *input_stream_item_name(void *obj)
 {
     const DemuxStream *ds = obj;
@@ -1301,6 +1432,7 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
     const char *bsfs = NULL;
     char *next;
     const char *discard_str = NULL;
+    AVBPrint bp;
     int ret;
 
     ds  = demux_stream_alloc(d, st);
@@ -1363,6 +1495,14 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
 
     if (st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
         ret = add_display_matrix_to_stream(o, ic, ist);
+        if (ret < 0)
+            return ret;
+
+        ret = add_mastering_display_to_stream(o, ic, ist);
+        if (ret < 0)
+            return ret;
+
+        ret = add_content_light_to_stream(o, ic, ist);
         if (ret < 0)
             return ret;
 
@@ -1483,15 +1623,26 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
     av_dict_set_int(&ds->decoder_opts, "apply_cropping",
                     ds->apply_cropping && ds->apply_cropping != CROP_CONTAINER, 0);
 
+    av_bprint_init(&bp, 0, AV_BPRINT_SIZE_AUTOMATIC);
     if (ds->force_display_matrix) {
-        char buf[32];
         if (av_dict_get(ds->decoder_opts, "side_data_prefer_packet", NULL, 0))
-            buf[0] = ',';
-        else
-            buf[0] = '\0';
-        av_strlcat(buf, "displaymatrix", sizeof(buf));
-        av_dict_set(&ds->decoder_opts, "side_data_prefer_packet", buf, AV_DICT_APPEND);
+            av_bprintf(&bp, ",");
+        av_bprintf(&bp, "displaymatrix");
     }
+    if (ds->force_mastering_display) {
+        if (bp.len || av_dict_get(ds->decoder_opts, "side_data_prefer_packet", NULL, 0))
+            av_bprintf(&bp, ",");
+        av_bprintf(&bp, "mastering_display_metadata");
+    }
+    if (ds->force_content_light) {
+        if (bp.len || av_dict_get(ds->decoder_opts, "side_data_prefer_packet", NULL, 0))
+            av_bprintf(&bp, ",");
+        av_bprintf(&bp, "content_light_level");
+    }
+    if (bp.len)
+        av_dict_set(&ds->decoder_opts, "side_data_prefer_packet", bp.str, AV_DICT_APPEND);
+    av_bprint_finalize(&bp, NULL);
+
     /* Attached pics are sparse, therefore we would not want to delay their decoding
      * till EOF. */
     if (ist->st->disposition & AV_DISPOSITION_ATTACHED_PIC)
@@ -1508,12 +1659,6 @@ static int ist_add(const OptionsContext *o, Demuxer *d, AVStream *st, AVDictiona
                 return ret;
             }
         }
-
-#if FFMPEG_OPT_TOP
-        ist->top_field_first = -1;
-        opt_match_per_stream_int(ist, &o->top_field_first, ic, st, &ist->top_field_first);
-#endif
-
         break;
     case AVMEDIA_TYPE_AUDIO: {
         const char *ch_layout_str = NULL;
@@ -1659,6 +1804,11 @@ static int istg_parse_tile_grid(const OptionsContext *o, Demuxer *d, InputStream
 
     if (tg->nb_tiles == 1)
         return 0;
+    if (!tg->nb_tiles) {
+        av_log(istg, AV_LOG_FATAL, "A demuxer exported an invalid tile group stream group. "
+                                   "This is a bug, please report it.\n");
+        return AVERROR_BUG;
+    }
 
     memset(&opts, 0, sizeof(opts));
 

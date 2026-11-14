@@ -436,7 +436,7 @@ bool Slide::LoadSlide(const ImagePtrK& im, int direction, bool notifyCompletion)
 */
 void Slide::SlideLoaded()
 {
-    m_state = m_images[0] ? kLoaded : kFailed;
+    m_state = m_images.value(0) ? kLoaded : kFailed;
     if (m_state == kFailed)
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("Failed to load %1").arg(m_data->m_filePath));
@@ -549,7 +549,7 @@ void Slide::SetPan(QPoint pos)
     }
 
     // Determine zoom of largest dimension
-    QRect imageArea = m_images[m_curPos]->rect();
+    QRect imageArea = m_images.value(m_curPos)->rect();
     float hRatio    = float(imageArea.height()) / m_area.height();
     float wRatio    = float(imageArea.width()) / m_area.width();
     float ratio     = std::max(hRatio, wRatio); // TODO create a Rational number class
@@ -662,7 +662,7 @@ QString SlideBuffer::BufferState()
         QChar code(m_queue.at(i)->GetDebugState());
         state += (i == m_nextLoad ? code.toUpper() : code);
     }
-    return QString("[%1] (%2)").arg(state, m_queue.head()->objectName());
+    return QString("[%1] (%2)").arg(state, std::as_const(m_queue).head()->objectName());
 }
 
 
@@ -738,7 +738,7 @@ void SlideBuffer::ReleaseCurrent()
     LOG(VB_FILE, LOG_DEBUG, SBLOC + QString("Released %1").arg(name));
 
     // Flush any pending slides that originate from multiple requests (skipping)
-    Flush(m_queue.head(), "Pending");
+    Flush(std::as_const(m_queue).head(), "Pending");
 }
 
 

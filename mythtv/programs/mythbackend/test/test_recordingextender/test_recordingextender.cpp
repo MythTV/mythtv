@@ -944,7 +944,7 @@ void TestRecordingExtender::test_processNewRecordings(void)
     m_newRecordings.append(recordedID);
     processNewRecordings();
     QCOMPARE(m_activeGames.size(), 1);
-    ActiveGame game = m_activeGames[0];
+    ActiveGame game = m_activeGames.at(0);
     QVERIFY(game.getInfoUrl().url().endsWith(expectedInfoUrl));
     QVERIFY(game.getGameUrl().url().endsWith(expectedGameUrl));
 }

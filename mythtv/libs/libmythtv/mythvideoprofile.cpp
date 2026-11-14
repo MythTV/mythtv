@@ -415,7 +415,7 @@ bool MythVideoProfile::IsDecoderCompatible(const QString &Decoder) const
         return true;
 
     QMutexLocker locker(&kSafeLock);
-    return (kSafeEquivDec[dec].contains(Decoder));
+    return kSafeEquivDec.value(dec).contains(Decoder);
 }
 
 QString MythVideoProfile::GetPreference(const QString &Key) const

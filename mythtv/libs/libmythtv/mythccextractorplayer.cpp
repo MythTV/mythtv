@@ -306,7 +306,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
     };
 
     // for each CC of each video...
-    // NOLINTNEXTLINE(modernize-loop-convert)
+    // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
     for (auto it = m_cc608Info.begin(); it != m_cc608Info.end(); ++it)
     {
         while (true)
@@ -337,6 +337,7 @@ void MythCCExtractorPlayer::Ingest608Captions(void)
 
             textlist->m_lock.unlock();
 
+            // clazy:exclude-next-line=detaching-member (can't reference temporary)
             IngestSubtitle((*it).m_subs[ccIdx], content);
         }
     }
@@ -546,13 +547,13 @@ void MythCCExtractorPlayer::IngestTeletext(void)
         if (updatedPages.isEmpty())
             continue;
 
-        for (auto it = updatedPages.constBegin(); it != updatedPages.constEnd(); ++it)
+        for (auto [first, second] : std::as_const(updatedPages))
         {
-            (*ttxit).m_reader->SetPage((*it).first, (*it).second);
+            (*ttxit).m_reader->SetPage(first, second);
             TeletextSubPage *subpage = (*ttxit).m_reader->FindSubPage();
             if (subpage && subpage->subtitle)
             {
-                IngestSubtitle((*ttxit).m_subs[(*it).first],
+                IngestSubtitle((*ttxit).m_subs[first],
                                to_string_list(*subpage));
             }
         }
@@ -724,6 +725,7 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 {
     // Process (DVB) subtitle streams.
     int subtitleStreamCount = 0;
+    // clazy:exclude-next-line=detaching-member (modifies entries)
     for (auto subit = m_dvbsubInfo.begin(); subit != m_dvbsubInfo.end(); ++subit)
     {
         int langCode = 0;
@@ -790,40 +792,44 @@ void MythCCExtractorPlayer::ProcessDVBSubtitles(uint flags)
 
 CC708Reader *MythCCExtractorPlayer::GetCC708Reader(uint id)
 {
-    if (!m_cc708Info[id].m_reader)
+    auto& info = m_cc708Info[id];
+    if (!info.m_reader)
     {
-        m_cc708Info[id].m_reader = new CC708Reader();
-        m_cc708Info[id].m_reader->SetEnabled(true);
+        info.m_reader = new CC708Reader();
+        info.m_reader->SetEnabled(true);
         LOG(VB_GENERAL, LOG_INFO, "Created CC708Reader");
     }
-    return m_cc708Info[id].m_reader;
+    return info.m_reader;
 }
 
 CC608Reader *MythCCExtractorPlayer::GetCC608Reader(uint id)
 {
-    if (!m_cc608Info[id].m_reader)
+    auto& info = m_cc608Info[id];
+    if (!info.m_reader)
     {
-        m_cc608Info[id].m_reader = new CC608Reader(this);
-        m_cc608Info[id].m_reader->SetEnabled(true);
+        info.m_reader = new CC608Reader(this);
+        info.m_reader->SetEnabled(true);
     }
-    return m_cc608Info[id].m_reader;
+    return info.m_reader;
 }
 
 TeletextReader *MythCCExtractorPlayer::GetTeletextReader(uint id)
 {
-    if (!m_ttxInfo[id].m_reader)
-        m_ttxInfo[id].m_reader = new TeletextExtractorReader();
-    return m_ttxInfo[id].m_reader;
+    auto& info = m_ttxInfo[id];
+    if (!info.m_reader)
+        info.m_reader = new TeletextExtractorReader();
+    return info.m_reader;
 }
 
 SubtitleReader *MythCCExtractorPlayer::GetSubReader(uint id)
 {
-    if (!m_dvbsubInfo[id].m_reader)
+    auto& info = m_dvbsubInfo[id];
+    if (!info.m_reader)
     {
-        m_dvbsubInfo[id].m_reader = new SubtitleReader();
-        m_dvbsubInfo[id].m_reader->EnableAVSubtitles(true);
-        m_dvbsubInfo[id].m_reader->EnableTextSubtitles(true);
-        m_dvbsubInfo[id].m_reader->EnableRawTextSubtitles(true);
+        info.m_reader = new SubtitleReader();
+        info.m_reader->EnableAVSubtitles(true);
+        info.m_reader->EnableTextSubtitles(true);
+        info.m_reader->EnableRawTextSubtitles(true);
     }
-    return m_dvbsubInfo[id].m_reader;
+    return info.m_reader;
 }

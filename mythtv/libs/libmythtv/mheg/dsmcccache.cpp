@@ -127,10 +127,8 @@ bool operator < (const DSMCCCacheReference &ref1,
 DSMCCCacheDir *DSMCCCache::Srg(const DSMCCCacheReference &ref)
 {
     // Check to see that it isn't already there.  It shouldn't be.
-    QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
-        m_gateways.find(ref);
-
-    if (dir != m_gateways.end())
+    auto dir = m_gateways.constFind(ref);
+    if (dir != m_gateways.constEnd())
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen gateway %1")
                 .arg(ref.toString()));
@@ -150,10 +148,8 @@ DSMCCCacheDir *DSMCCCache::Srg(const DSMCCCacheReference &ref)
 DSMCCCacheDir *DSMCCCache::Directory(const DSMCCCacheReference &ref)
 {
     // Check to see that it isn't already there.  It shouldn't be.
-    QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
-        m_directories.find(ref);
-
-    if (dir != m_directories.end())
+    auto dir = m_directories.constFind(ref);
+    if (dir != m_directories.constEnd())
     {
         LOG(VB_DSMCC, LOG_ERR, QString("[DSMCCCache] Already seen directory %1")
                 .arg(ref.toString()));
@@ -178,11 +174,9 @@ void DSMCCCache::CacheFileData(const DSMCCCacheReference &ref,
         QString("[DSMCCCache] Adding file data size %1 for reference %2")
             .arg(data.size()).arg(ref.toString()));
 
-    QMap<DSMCCCacheReference, DSMCCCacheFile*>::Iterator fil =
-        m_files.find(ref);
-
     DSMCCCacheFile *pFile = nullptr;
-    if (fil == m_files.end())
+    auto fil = m_files.constFind(ref);
+    if (fil == m_files.constEnd())
     {
         pFile = new DSMCCCacheFile(ref);
         m_files.insert(ref, pFile);
@@ -231,10 +225,8 @@ void DSMCCCache::AddDirInfo(DSMCCCacheDir *pDir, const BiopBinding *pBB)
 DSMCCCacheFile *DSMCCCache::FindFileData(const DSMCCCacheReference &ref)
 {
     // Find a file.
-    QMap<DSMCCCacheReference, DSMCCCacheFile*>::Iterator fil =
-        m_files.find(ref);
-
-    if (fil == m_files.end())
+    auto fil = m_files.constFind(ref);
+    if (fil == m_files.constEnd())
         return nullptr;
 
     return *fil;
@@ -243,10 +235,8 @@ DSMCCCacheFile *DSMCCCache::FindFileData(const DSMCCCacheReference &ref)
 DSMCCCacheDir *DSMCCCache::FindDir(const DSMCCCacheReference &ref)
 {
     // Find a directory.
-    QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
-        m_directories.find(ref);
-
-    if (dir == m_directories.end())
+    auto dir = m_directories.constFind(ref);
+    if (dir == m_directories.constEnd())
         return nullptr;
 
     return *dir;
@@ -255,10 +245,8 @@ DSMCCCacheDir *DSMCCCache::FindDir(const DSMCCCacheReference &ref)
 DSMCCCacheDir *DSMCCCache::FindGateway(const DSMCCCacheReference &ref)
 {
     // Find a gateway.
-    QMap<DSMCCCacheReference, DSMCCCacheDir*>::Iterator dir =
-        m_gateways.find(ref);
-
-    if (dir == m_gateways.end())
+    auto dir = m_gateways.constFind(ref);
+    if (dir == m_gateways.constEnd())
         return nullptr;
 
     return *dir;
@@ -282,10 +270,8 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
         ++it;
         if (it == objectPath.end())
         { // It's a leaf - look in the file names
-            QMap<QString, DSMCCCacheReference>::Iterator ref =
-                dir->m_files.find(name);
-
-            if (ref == dir->m_files.end())
+            auto ref = dir->m_files.constFind(name);
+            if (ref == dir->m_files.constEnd())
                 return -1; // Not there.
 
             DSMCCCacheFile *fil = FindFileData(*ref);
@@ -298,10 +284,8 @@ int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
         }
 
         // It's a directory
-        QMap<QString, DSMCCCacheReference>::Iterator ref =
-            dir->m_subDirectories.find(name);
-
-        if (ref == dir->m_subDirectories.end())
+        auto ref = dir->m_subDirectories.constFind(name);
+        if (ref == dir->m_subDirectories.constEnd())
             return -1; // Not there
 
         dir = FindDir(*ref);

@@ -32,18 +32,12 @@ const QString ActionSet::kGlobalContext = "Global";
 
 ActionSet::~ActionSet()
 {
-    for (auto iter1 = m_contexts.begin();
-         iter1 != m_contexts.end();
-         iter1 = m_contexts.erase(iter1))
+    for (auto ctx : std::as_const(m_contexts))
     {
-        ActionContext &ctx = iter1.value();
-        for (auto iter2 = ctx.begin();
-             iter2 != ctx.end();
-             iter2 = ctx.erase(iter2))
-        {
-            delete iter2.value();
-        }
+        qDeleteAll(ctx);
+        ctx.clear();
     }
+    m_contexts.clear();
 }
 
 /** \fn ActionSet::Add(const ActionID&, const QString&)
@@ -69,6 +63,7 @@ bool ActionSet::Add(const ActionID &id, const QString &key)
         return false;
     }
 
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     ActionList &ids = m_keyToActionMap[key];
     ids.push_back(id);
     SetModifiedFlag(id, true);
@@ -101,7 +96,7 @@ bool ActionSet::Remove(const ActionID &id, const QString &key)
     m_keyToActionMap[key].removeAll(id);
 
     // remove the key if there isn't anything bound to it.
-    if (m_keyToActionMap[key].isEmpty())
+    if (m_keyToActionMap.value(key).isEmpty())
         m_keyToActionMap.remove(key);
 
     SetModifiedFlag(id, true);
@@ -201,6 +196,7 @@ bool ActionSet::AddAction(const ActionID &id,
                           const QString  &description,
                           const QString  &keys)
 {
+    // clazy:exclude-next-line=detaching-member (inserts item)
     ContextMap::iterator cit = m_contexts.find(id.GetContext());
     if (cit == m_contexts.end())
         cit = m_contexts.insert(id.GetContext(), ActionContext());
@@ -283,12 +279,12 @@ QStringList ActionSet::GetAllKeys(void) const
  */
 QString ActionSet::GetDescription(const ActionID &id) const
 {
-    ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
-    if (cit == m_contexts.end())
+    ContextMap::const_iterator cit = m_contexts.constFind(id.GetContext());
+    if (cit == m_contexts.constEnd())
         return {};
 
-    ActionContext::const_iterator it = (*cit).find(id.GetAction());
-    if (it != (*cit).end())
+    ActionContext::const_iterator it = (*cit).constFind(id.GetAction());
+    if (it != (*cit).constEnd())
         return (*it)->GetDescription();
 
     return {};
@@ -300,8 +296,8 @@ QString ActionSet::GetDescription(const ActionID &id) const
  */
 Action *ActionSet::GetAction(const ActionID &id)
 {
-    ContextMap::iterator cit = m_contexts.find(id.GetContext());
-    if (cit == m_contexts.end())
+    ContextMap::const_iterator cit = m_contexts.constFind(id.GetContext());
+    if (cit == m_contexts.constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find context '%1'")
@@ -310,9 +306,8 @@ Action *ActionSet::GetAction(const ActionID &id)
         return nullptr;
     }
 
-    ActionContext::iterator it = (*cit).find(id.GetAction());
-
-    if (it == (*cit).end())
+    ActionContext::const_iterator it = (*cit).constFind(id.GetAction());
+    if (it == (*cit).constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("GetAction: Did not find action '%1' in context '%1'")

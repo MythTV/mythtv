@@ -14,6 +14,15 @@ INSTHEADERS := $(INSTHEADERS) $(HEADERS:%=$(SUBDIR)%)
 all-$(CONFIG_STATIC): $(SUBDIR)$(LIBNAME)  $(SUBDIR)libmyth$(FULLNAME).pc
 all-$(CONFIG_SHARED): $(SUBDIR)$(SLIBNAME) $(SUBDIR)libmyth$(FULLNAME).pc
 
+# Make <4.0 does not support the built-in file function;
+# versions that do support it should use it, as it's
+# faster and isn't bound by command line length limits.
+ifeq (4.0,$(firstword $(sort 4.0 $(MAKE_VERSION))))
+HAVE_BUILTIN_FILE := yes
+else
+HAVE_BUILTIN_FILE := no
+endif
+
 LIBOBJS := $(OBJS) $(SHLIBOBJS) $(STLIBOBJS) $(SUBDIR)%.h.o $(TESTOBJS)
 $(LIBOBJS) $(LIBOBJS:.o=.s) $(LIBOBJS:.o=.i):   CPPFLAGS += -DHAVE_AV_CONFIG_H
 
@@ -36,7 +45,11 @@ endif
 $(SUBDIR)$(LIBNAME): $(OBJS) $(STLIBOBJS)
 	$(RM) $@
 ifeq ($(RESPONSE_FILES),yes)
+ifeq ($(HAVE_BUILTIN_FILE),yes)
+	$(file >$@.objs,$^)
+else
 	$(Q)echo $^ > $@.objs
+endif
 	$(AR) $(ARFLAGS) $(AR_O) @$@.objs
 else
 	$(AR) $(ARFLAGS) $(AR_O) $^
@@ -54,8 +67,6 @@ install-libs-$(CONFIG_SHARED): install-lib$(NAME)-shared
 define RULES
 $(TOOLS):     THISLIB = $(FULLNAME:%=$(LD_LIB))
 $(TESTPROGS): THISLIB = $(SUBDIR)$(LIBNAME)
-
-$(LIBOBJS): CPPFLAGS += -DBUILDING_$(NAME)
 
 $(NAME)LINK_EXE_ARGS = $(LDFLAGS) $(LDEXEFLAGS)
 $(NAME)LINK_SO_ARGS = $(SHFLAGS) $(LDFLAGS) $(LDSOFLAGS)
@@ -77,9 +88,15 @@ $(SUBDIR)$(SLIBNAME): $(SUBDIR)$(SLIBNAME_WITH_MAJOR)
 	$(Q)cd ./$(SUBDIR) && $(LN_S) $(SLIBNAME_WITH_MAJOR) $(SLIBNAME)
 
 $(SUBDIR)$(SLIBNAME_WITH_MAJOR): $(OBJS) $(SHLIBOBJS) $(SUBDIR)lib$(NAME).ver
+ifeq ($(RESPONSE_FILES),yes)
+ifeq ($(HAVE_BUILTIN_FILE),yes)
+	$$(file >$$@.objs,$$(filter %.o,$$^))
+else
+	$(Q)echo $$(filter %.o,$$^) > $$@.objs
+endif
+endif
 	$(SLIB_CREATE_DEF_CMD)
 ifeq ($(RESPONSE_FILES),yes)
-	$(Q)echo $$(filter %.o,$$^) > $$@.objs
 	$$(call LINK,$$(call $(NAME)LINK_SO_ARGS) $$(LD_O) @$$@.objs $$(call $(NAME)LINK_EXTRA))
 else
 	$$(call LINK,$$(call $(NAME)LINK_SO_ARGS) $$(LD_O) $$(filter %.o,$$^) $$(call $(NAME)LINK_EXTRA))

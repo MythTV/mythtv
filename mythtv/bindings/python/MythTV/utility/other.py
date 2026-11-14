@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides decorator classes for assorted functions"""
 
 from MythTV.logging import MythLog
@@ -7,17 +6,13 @@ from .dt import datetime
 from io import BytesIO
 from select import select
 from time import time
-from builtins import map
 import weakref
 import socket
-import re
-import sys
-from builtins import range
 
 def _donothing(*args, **kwargs):
     pass
 
-class SchemaUpdate( object ):
+class SchemaUpdate:
     # TODO: do locking and lock checking
     #       if interactive terminal, ask for update permission
     #       perform database backup (partial?)
@@ -49,7 +44,7 @@ class SchemaUpdate( object ):
                 schema = newschema
                 self.db.settings.NULL[self._schema_name] = schema
 
-        except AttributeError as e:
+        except AttributeError:
             self.log(MythLog.GENERAL, MythLog.CRIT,
                      'failed at %d' % schema, 'no handler method')
             raise MythDBError('Schema update failed, '
@@ -67,7 +62,7 @@ class SchemaUpdate( object ):
     def create(self):
         raise MythDBError('Schema creation failed, method not defined.')
 
-class databaseSearch( object ):
+class databaseSearch:
     # decorator class for database searches
     """
     Decorator class
@@ -113,7 +108,7 @@ class databaseSearch( object ):
                 4-field  -- Special response consisting of:
                     (see example in methodheap.py:MythDB.searchRecorded)
     """
-    class Join( object ):
+    class Join:
         def __init__(self, table=None, tableto=None, fields=None, \
                            fieldsto=None, fieldsfrom=None):
             if (table is None) or (tableto is None) or \
@@ -331,7 +326,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(bufsize-buff.tell(), flags))
-            except socket.error as e:
+            except OSError as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                # no data read from a 'ready' socket, connection terminated
@@ -363,7 +358,7 @@ class deadlinesocket( socket.socket ):
             p = buff.tell()
             try:
                 buff.write(self.recv(100, flags))
-            except socket.error as e:
+            except OSError as e:
                 raise MythError(MythError.SOCKET, e.args)
             if buff.tell() == p:
                 # no data read from a 'ready' socket, connection terminated
@@ -394,10 +389,10 @@ class deadlinesocket( socket.socket ):
             length = b'%-8d' % len(data)
             data = b"".join([length, data])
             self.send(data, flags)
-        except socket.error as e:
+        except OSError as e:
             raise MythError(MythError.SOCKET, e.args)
 
-class MARKUPLIST( object ):
+class MARKUPLIST:
     """
     Utility class for building seek/cutlists from video markup data.
     """
@@ -445,10 +440,10 @@ def levenshtein(s1, s2):
 
     return previous_row[-1]
 
-class ParseEnum( object ):
+class ParseEnum:
     _static = None
     def __str__(self):
-        return str([k for k,v in self.iteritems() if v==True])
+        return str(k for k,v in self.iteritems() if v)
     def __repr__(self): return str(self)
     def __init__(self, parent, field_name, enum, editable=True):
         self._parent = weakref.proxy(parent)
@@ -511,8 +506,8 @@ class ParseSet( ParseEnum ):
         if field[:4] != 'set(':
             raise MythDBError("ParseSet error. "+\
                         "Field '%s' not of type 'set()'" % self._field)
-        self._enum = dict([(t,2**i) for i,t in enumerate([type.strip("'")\
-                                for type in field[4:-1].split(',')])])
+        self._enum = {t: 2**i for i,t in enumerate(type.strip("'")
+                                for type in field[4:-1].split(','))}
         self._static = not editable
 
     def __getattr__(self, name):
@@ -569,7 +564,7 @@ def check_ipv6(n):
     try:
         socket.inet_pton(socket.AF_INET6, n)
         return True
-    except socket.error:
+    except OSError:
         return False
 
 def resolve_ip(host, port):
@@ -589,7 +584,7 @@ def py3_str(value, ignore_errors=False):
     except TypeError:  # Wasn't a bytes object, no need to decode
         return str(value)
 
-class QuickProperty( object ):
+class QuickProperty:
     def __init__(self, maskedvar, default=None, handler=None):
         self.varname = maskedvar
         self.default = default

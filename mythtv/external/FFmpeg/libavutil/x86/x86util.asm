@@ -27,6 +27,10 @@
 %define public_prefix  avpriv
 %define cpuflags_mmxext cpuflags_mmx2
 
+%if HAVE_X86_SSE2AVX
+%define FORCE_VEX_ENCODING 1
+%endif
+
 %include "libavutil/x86/x86inc.asm"
 
 ; expands to [base],...,[base+7*stride]
@@ -1022,3 +1026,15 @@
     pxor  %1, %2
 %endif
 %endmacro
+
+; NASM panics when emitting CodeView debug info for an empty translation unit.
+; GNU binutils `strip` and some other tools such as older MSVC linker also fail
+; on such files. Emit a dummy byte in a section with IMAGE_SCN_LNK_REMOVE flag
+; to work around these issues. Sections like that are dropped by the linker.
+%ifidn __OUTPUT_FORMAT__,win64
+    section .x86util info
+        db 0
+%elifidn __OUTPUT_FORMAT__,win32
+    section .x86util info
+        db 0
+%endif

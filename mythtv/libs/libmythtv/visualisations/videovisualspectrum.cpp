@@ -86,9 +86,9 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
         if (magL > m_range)
             magL = 1.0;
 
-        if (magL < m_magnitudes[l])
+        if (magL < m_magnitudes.at(l))
         {
-            tmp = m_magnitudes[l] - falloff;
+            tmp = m_magnitudes.at(l) - falloff;
             tmp = std::max(tmp, magL);
             magL = tmp;
         }
@@ -98,9 +98,9 @@ void VideoVisualSpectrum::Draw(const QRect Area, MythPainter* Painter, QPaintDev
         if (magR > m_range)
             magR = 1.0;
 
-        if (magR < m_magnitudes[r])
+        if (magR < m_magnitudes.at(r))
         {
-            tmp = m_magnitudes[r] - falloff;
+            tmp = m_magnitudes.at(r) - falloff;
             tmp = std::max(tmp, magR);
             magR = tmp;
         }
@@ -131,7 +131,7 @@ void VideoVisualSpectrum::DrawPriv(MythPainter* Painter, QPaintDevice* Device)
     {
         m_rects[i].setTop(static_cast<int>(range - static_cast<int>(m_magnitudes[i])));
         m_rects[i].setBottom(static_cast<int>(range + static_cast<int>(m_magnitudes[i + count])));
-        if (m_rects[i].height() > 4)
+        if (m_rects.at(i).height() > 4)
             Painter->DrawRect(m_rects[i], kBrush, kPen, 255);
     }
     Painter->End();

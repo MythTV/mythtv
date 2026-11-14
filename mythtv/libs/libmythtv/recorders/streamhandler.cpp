@@ -103,6 +103,8 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
     LOG(VB_RECORD, LOG_INFO, LOC + QString("RemoveListener(0x%1) -- locked")
                 .arg((uint64_t)data,0,16));
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     StreamDataList::iterator it = m_streamDataList.find(data);
 
     if (it != m_streamDataList.end())
@@ -111,6 +113,15 @@ void StreamHandler::RemoveListener(MPEGStreamData *data)
             RemoveNamedOutputFile(*it);
         m_streamDataList.erase(it);
     }
+#else
+    m_streamDataList.removeIf( [this,data](auto it) {
+        if (it.key() != data)
+            return false;
+        if (!(*it).isEmpty())
+            RemoveNamedOutputFile(*it);
+        return true;
+    } );
+#endif
 
     m_listenerLock.unlock();
 
@@ -221,6 +232,7 @@ bool StreamHandler::RemovePIDFilter(uint pid)
 
     QMutexLocker write_locker(&m_pidLock);
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     PIDInfoMap::iterator it = m_pidInfo.find(pid);
     if (it == m_pidInfo.end())
         return false;
@@ -253,8 +265,9 @@ bool StreamHandler::RemoveAllPIDFilters(void)
 #endif // DEBUG_PID_FILTERS
 
     std::vector<int> del_pids;
-    for (auto it = m_pidInfo.begin(); it != m_pidInfo.end(); ++it)
-        del_pids.push_back(it.key());
+    del_pids.reserve(m_pidInfo.size());
+    for (auto it = m_pidInfo.keyBegin(); it != m_pidInfo.keyEnd(); ++it)
+        del_pids.push_back(*it);
 
     bool ok = true;
     for (int & pid : del_pids)
@@ -415,10 +428,8 @@ void StreamHandler::RemoveNamedOutputFile([[maybe_unused]] const QString &file)
 #ifndef Q_OS_WINDOWS
     QMutexLocker lk(&m_mptsLock);
 
-    QSet<QString>::iterator it = m_mptsFiles.find(file);
-    if (it != m_mptsFiles.end())
+    if(m_mptsFiles.remove(file))
     {
-        m_mptsFiles.erase(it);
         if (m_mptsFiles.isEmpty())
         {
             delete m_mptsTfw;

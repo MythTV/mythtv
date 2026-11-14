@@ -387,6 +387,7 @@ void MHGroup::SetTimer(int nTimerId, bool fAbsolute, int nMilliSecs, MHEngine * 
 std::chrono::milliseconds MHGroup::CheckTimers(MHEngine *engine)
 {
     QTime currentTime = QTime::currentTime(); // Get current time
+    // clazy:exclude-next-line=detaching-member (erases item)
     QList<MHTimer *>::iterator it = m_timers.begin();
     std::chrono::milliseconds nMSecs = 0ms;
 

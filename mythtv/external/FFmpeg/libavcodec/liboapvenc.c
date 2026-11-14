@@ -29,10 +29,12 @@
 #include "libavutil/avassert.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/pixfmt.h"
+#include "libavutil/mastering_display_metadata.h"
 
 #include "avcodec.h"
 #include "apv.h"
@@ -44,6 +46,13 @@
 #define MAX_NUM_FRMS (1)           // supports only 1-frame in an access unit
 #define FRM_IDX      (0)           // supports only 1-frame in an access unit
 #define MAX_NUM_CC   (OAPV_MAX_CC) // Max number of color components (upto 4:4:4:4)
+
+#define MAX_METADATA_PAYLOADS (8)
+
+static inline int64_t rescale_rational(AVRational a, int b)
+{
+    return av_rescale(a.num, b, a.den);
+}
 
 /**
  * The structure stores all the states associated with the instance of APV encoder
@@ -59,11 +68,15 @@ typedef struct ApvEncContext {
 
     oapv_frms_t ifrms;      // frames for input
 
-    int num_frames;         // number of frames in an access unit
-
     int preset_id;          // preset of apv ( fastest, fast, medium, slow, placebo)
 
     int qp;                 // quantization parameter (QP) [0,63]
+
+    oapvm_payload_mdcv_t mdcv;
+    oapvm_payload_cll_t cll;
+
+    oapvm_payload_t *payloads;
+    unsigned nb_payloads;
 
     AVDictionary *oapv_params;
 } ApvEncContext;
@@ -98,35 +111,120 @@ static int apv_imgb_getref(oapv_imgb_t * imgb)
  */
 static inline int get_color_format(enum AVPixelFormat pix_fmt)
 {
-    int cf = OAPV_CF_UNKNOWN;
-
     switch (pix_fmt) {
-    case AV_PIX_FMT_GRAY10:
-        cf = OAPV_CF_YCBCR400;
-        break;
-    case AV_PIX_FMT_YUV422P10:
-        cf = OAPV_CF_YCBCR422;
-        break;
-    case AV_PIX_FMT_YUV422P12:
-        cf = OAPV_CF_YCBCR422;
-        break;
-    case AV_PIX_FMT_YUV444P10:
-        cf = OAPV_CF_YCBCR444;
-        break;
-    case AV_PIX_FMT_YUV444P12:
-        cf = OAPV_CF_YCBCR444;
-        break;
-    case AV_PIX_FMT_YUVA444P10:
-        cf = OAPV_CF_YCBCR4444;
-        break;
-    case AV_PIX_FMT_YUVA444P12:
-        cf = OAPV_CF_YCBCR4444;
-        break;
     default:
-        av_assert0(cf != OAPV_CF_UNKNOWN);
+        av_unreachable("Already checked via CODEC_PIXFMTS");
+    case AV_PIX_FMT_GRAY10:
+        return OAPV_CF_YCBCR400;
+    case AV_PIX_FMT_YUV422P10:
+        return OAPV_CF_YCBCR422;
+    case AV_PIX_FMT_YUV422P12:
+        return OAPV_CF_YCBCR422;
+    case AV_PIX_FMT_YUV444P10:
+        return OAPV_CF_YCBCR444;
+    case AV_PIX_FMT_YUV444P12:
+        return OAPV_CF_YCBCR444;
+    case AV_PIX_FMT_YUVA444P10:
+        return OAPV_CF_YCBCR4444;
+    case AV_PIX_FMT_YUVA444P12:
+        return OAPV_CF_YCBCR4444;
+    }
+}
+
+static inline int get_chroma_format_idc(enum AVPixelFormat pix_fmt)
+{
+    switch (pix_fmt) {
+    default:
+        av_unreachable("Already checked via CODEC_PIXFMTS");
+    case AV_PIX_FMT_GRAY10:
+        return APV_CHROMA_FORMAT_400;
+    case AV_PIX_FMT_YUV422P10:
+    case AV_PIX_FMT_YUV422P12:
+        return APV_CHROMA_FORMAT_422;
+    case AV_PIX_FMT_YUV444P10:
+    case AV_PIX_FMT_YUV444P12:
+        return APV_CHROMA_FORMAT_444;
+    case AV_PIX_FMT_YUVA444P10:
+    case AV_PIX_FMT_YUVA444P12:
+        return APV_CHROMA_FORMAT_4444;
+    }
+}
+
+static inline int get_min_profile(enum AVPixelFormat pix_fmt)
+{
+    switch (pix_fmt) {
+    default:
+        av_unreachable("Already checked via CODEC_PIXFMTS");
+    case AV_PIX_FMT_GRAY10:
+        return AV_PROFILE_APV_400_10;
+    case AV_PIX_FMT_YUV422P10:
+        return AV_PROFILE_APV_422_10;
+    case AV_PIX_FMT_YUV422P12:
+        return AV_PROFILE_APV_422_12;
+    case AV_PIX_FMT_YUV444P10:
+        return AV_PROFILE_APV_444_10;
+    case AV_PIX_FMT_YUV444P12:
+        return AV_PROFILE_APV_444_12;
+    case AV_PIX_FMT_YUVA444P10:
+        return AV_PROFILE_APV_4444_10;
+    case AV_PIX_FMT_YUVA444P12:
+        return AV_PROFILE_APV_4444_12;
+    }
+}
+
+static int profile_is_compatible(enum AVPixelFormat pix_fmt, int profile)
+{
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
+    const int chroma_format_idc = get_chroma_format_idc(pix_fmt);
+    const int bit_depth = desc->comp[0].depth;
+
+    av_assert0(desc);
+
+    switch (profile) {
+    case AV_PROFILE_APV_422_10:
+        return chroma_format_idc == APV_CHROMA_FORMAT_422 && bit_depth == 10;
+    case AV_PROFILE_APV_422_12:
+        return chroma_format_idc == APV_CHROMA_FORMAT_422 &&
+               bit_depth >= 10 && bit_depth <= 12;
+    case AV_PROFILE_APV_444_10:
+        return chroma_format_idc >= APV_CHROMA_FORMAT_422 &&
+               chroma_format_idc <= APV_CHROMA_FORMAT_444 &&
+               bit_depth == 10;
+    case AV_PROFILE_APV_444_12:
+        return chroma_format_idc >= APV_CHROMA_FORMAT_422 &&
+               chroma_format_idc <= APV_CHROMA_FORMAT_444 &&
+               bit_depth >= 10 && bit_depth <= 12;
+    case AV_PROFILE_APV_4444_10:
+        return chroma_format_idc >= APV_CHROMA_FORMAT_422 &&
+               chroma_format_idc <= APV_CHROMA_FORMAT_4444 &&
+               bit_depth == 10;
+    case AV_PROFILE_APV_4444_12:
+        return chroma_format_idc >= APV_CHROMA_FORMAT_422 &&
+               chroma_format_idc <= APV_CHROMA_FORMAT_4444 &&
+               bit_depth >= 10 && bit_depth <= 12;
+    case AV_PROFILE_APV_400_10:
+        return chroma_format_idc == APV_CHROMA_FORMAT_400 && bit_depth == 10;
+    default:
+        return 0;
+    }
+}
+
+static int validate_profile(AVCodecContext *avctx, int profile)
+{
+    const int minimum = get_min_profile(avctx->pix_fmt);
+    const char *profile_name = av_get_profile_name(avctx->codec, profile);
+    const char *minimum_name = av_get_profile_name(avctx->codec, minimum);
+
+    if (!profile_is_compatible(avctx->pix_fmt, profile)) {
+        av_log(avctx, AV_LOG_ERROR,
+               "Profile %s (%d) is incompatible with pixel format %s; minimum compatible profile is %s (%d)\n",
+               profile_name ? profile_name : "unknown", profile,
+               av_get_pix_fmt_name(avctx->pix_fmt),
+               minimum_name ? minimum_name : "unknown", minimum);
+        return AVERROR(EINVAL);
     }
 
-    return cf;
+    return 0;
 }
 
 static oapv_imgb_t *apv_imgb_create(AVCodecContext *avctx)
@@ -179,23 +277,44 @@ fail:
     return NULL;
 }
 
+static int apv_metadata_add_payload(const AVCodecContext *avctx, ApvEncContext *apv,
+                                    uint32_t group_id, uint32_t type, const void *data, uint32_t size)
+{
+    oapvm_payload_t *tmp;
+
+    if (apv->nb_payloads >= MAX_METADATA_PAYLOADS || !data || size == 0) {
+        return AVERROR_INVALIDDATA;
+    }
+
+    tmp = av_realloc_array(apv->payloads, apv->nb_payloads + 1, sizeof(oapvm_payload_t));
+    if (!tmp) {
+        return AVERROR(ENOMEM);
+    }
+    apv->payloads = tmp;
+
+    // Copying data into internal buffer
+    void *new_data = av_malloc(size);
+    if (!new_data) {
+        return AVERROR(ENOMEM);
+    }
+    memcpy(new_data, data, size);
+
+    apv->payloads[apv->nb_payloads].group_id = group_id;
+    apv->payloads[apv->nb_payloads].type = type;
+    apv->payloads[apv->nb_payloads].size = size;
+    apv->payloads[apv->nb_payloads].data = new_data;
+    apv->nb_payloads++;
+
+    return 0;
+}
+
 /**
- * The function returns a pointer to the object of the oapve_cdesc_t type.
- * oapve_cdesc_t contains all encoder parameters that should be initialized before the encoder is used.
+ * Populate the liboapv configuration from AVCodecContext and encoder options.
  *
- * The field values of the oapve_cdesc_t structure are populated based on:
- * - the corresponding field values of the AvCodecConetxt structure,
- * - the apv encoder specific option values,
- *
- * The order of processing input data and populating the apve_cdsc structure
- * 1) first, the fields of the AVCodecContext structure corresponding to the provided input options are processed,
- *    (i.e -pix_fmt yuv422p -s:v 1920x1080 -r 30 -profile:v 0)
- * 2) then apve-specific options added as AVOption to the apv AVCodec implementation
- *    (i.e -preset 0)
- *
- * Keep in mind that, there are options that can be set in different ways.
- * In this case, please follow the above-mentioned order of processing.
- * The most recent assignments overwrite the previous values.
+ * AVCodecContext fields are applied first, followed by liboapv private options
+ * and finally oapv-params. The APV profile defaults to the minimum profile
+ * implied by pix_fmt, and later overrides must remain compatible with that
+ * pixel format.
  *
  * @param[in] avctx codec context (AVCodecContext)
  * @param[out] cdsc contains all APV encoder encoder parameters that should be initialized before the encoder is use
@@ -214,11 +333,8 @@ static int get_conf(AVCodecContext *avctx, oapve_cdesc_t *cdsc)
     }
 
     /* read options from AVCodecContext */
-    if (avctx->width > 0)
-        cdsc->param[FRM_IDX].w = avctx->width;
-
-    if (avctx->height > 0)
-        cdsc->param[FRM_IDX].h = avctx->height;
+    cdsc->param[FRM_IDX].w = avctx->width;
+    cdsc->param[FRM_IDX].h = avctx->height;
 
     if (avctx->framerate.num > 0) {
         cdsc->param[FRM_IDX].fps_num = avctx->framerate.num;
@@ -228,6 +344,13 @@ static int get_conf(AVCodecContext *avctx, oapve_cdesc_t *cdsc)
         cdsc->param[FRM_IDX].fps_den = avctx->time_base.num;
     }
 
+    cdsc->param[FRM_IDX].profile_idc = get_min_profile(avctx->pix_fmt);
+    if (avctx->profile != AV_PROFILE_UNKNOWN) {
+        ret = validate_profile(avctx, avctx->profile);
+        if (ret < 0)
+            return ret;
+        cdsc->param[FRM_IDX].profile_idc = avctx->profile;
+    }
     cdsc->param[FRM_IDX].preset = apv->preset_id;
     cdsc->param[FRM_IDX].qp = apv->qp;
     if (avctx->bit_rate / 1000 > INT_MAX || avctx->rc_max_rate / 1000 > INT_MAX) {
@@ -269,10 +392,75 @@ static int get_conf(AVCodecContext *avctx, oapve_cdesc_t *cdsc)
     cdsc->max_num_frms = MAX_NUM_FRMS;
 
     const AVDictionaryEntry *en = NULL;
-    while (en = av_dict_iterate(apv->oapv_params, en)) {
+    while ((en = av_dict_iterate(apv->oapv_params, en))) {
         ret = oapve_param_parse(&cdsc->param[FRM_IDX], en->key, en->value);
-        if (ret < 0)
+        if (ret < 0) {
             av_log(avctx, AV_LOG_WARNING, "Error parsing option '%s = %s'.\n", en->key, en->value);
+        }
+    }
+
+    ret = validate_profile(avctx, cdsc->param[FRM_IDX].profile_idc);
+    if (ret < 0)
+        return ret;
+
+    avctx->profile = cdsc->param[FRM_IDX].profile_idc;
+
+
+    return 0;
+}
+
+static int handle_side_data(AVCodecContext *avctx, ApvEncContext *apv)
+{
+    int size = 0;
+    uint8_t payload[64];
+
+    const AVFrameSideData *cll_sd =
+        av_frame_side_data_get(avctx->decoded_side_data,
+            avctx->nb_decoded_side_data, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
+    const AVFrameSideData *mdcv_sd =
+        av_frame_side_data_get(avctx->decoded_side_data,
+            avctx->nb_decoded_side_data,
+            AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
+
+    if (cll_sd) {
+        const AVContentLightMetadata *cll = (AVContentLightMetadata *)cll_sd->data;
+
+        apv->cll.max_cll  = cll->MaxCLL;
+        apv->cll.max_fall = cll->MaxFALL;
+
+        oapvm_write_cll(&apv->cll, payload, &size);
+
+        int ret = apv_metadata_add_payload(avctx, apv, 1, OAPV_METADATA_CLL, payload, size);
+        if (ret < 0) {
+            av_log(avctx, AV_LOG_WARNING, "Error adding content light metadata\n");
+            return ret;
+        }
+    }
+
+    if (mdcv_sd) {
+        AVMasteringDisplayMetadata *mdcv = (AVMasteringDisplayMetadata *)mdcv_sd->data;
+
+        // According to APV specification, i = 0, 1, 2 specifies Red, Green, Blue respectively
+        apv->mdcv.primary_chromaticity_x[0] = rescale_rational(mdcv->display_primaries[0][0], 50000); // Red X
+        apv->mdcv.primary_chromaticity_y[0] = rescale_rational(mdcv->display_primaries[0][1], 50000); // Red Y
+        apv->mdcv.primary_chromaticity_x[1] = rescale_rational(mdcv->display_primaries[1][0], 50000); // Green X
+        apv->mdcv.primary_chromaticity_y[1] = rescale_rational(mdcv->display_primaries[1][1], 50000); // Green Y
+        apv->mdcv.primary_chromaticity_x[2] = rescale_rational(mdcv->display_primaries[2][0], 50000); // Blue X
+        apv->mdcv.primary_chromaticity_y[2] = rescale_rational(mdcv->display_primaries[2][1], 50000); // Blue Y
+
+        apv->mdcv.white_point_chromaticity_x = rescale_rational(mdcv->white_point[0], 50000);
+        apv->mdcv.white_point_chromaticity_y = rescale_rational(mdcv->white_point[1], 50000);
+
+        apv->mdcv.max_mastering_luminance = rescale_rational(mdcv->max_luminance, 10000);
+        apv->mdcv.min_mastering_luminance = rescale_rational(mdcv->min_luminance, 10000);
+
+        oapvm_write_mdcv(&apv->mdcv, payload, &size);
+
+        int ret = apv_metadata_add_payload(avctx, apv, 1, OAPV_METADATA_MDCV, payload, size);
+        if (ret < 0) {
+            av_log(avctx, AV_LOG_WARNING, "Error adding master display metadata\n");
+            return ret;
+        }
     }
 
     return 0;
@@ -291,6 +479,9 @@ static av_cold int liboapve_init(AVCodecContext *avctx)
     oapve_cdesc_t *cdsc = &apv->cdsc;
     unsigned char *bs_buf;
     int ret;
+
+    apv->nb_payloads = 0;
+    apv->payloads = NULL;
 
     /* allocate bitstream buffer */
     bs_buf = (unsigned char *)av_malloc(MAX_BS_BUF);
@@ -324,6 +515,21 @@ static av_cold int liboapve_init(AVCodecContext *avctx)
         return AVERROR_EXTERNAL;
     }
 
+    ret = handle_side_data(avctx, apv);
+    if (ret < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Failed handling side data! (%s)\n",
+               av_err2str(ret));
+        return ret;
+    }
+
+    if (apv->nb_payloads > 0) {
+        ret = oapvm_set_all(apv->mid, apv->payloads, apv->nb_payloads);
+        if (OAPV_FAILED(ret)) {
+            av_log(avctx, AV_LOG_ERROR, "cannot set metadata\n");
+            return AVERROR_EXTERNAL;
+        }
+    }
+
     int value = OAPV_CFG_VAL_AU_BS_FMT_NONE;
     int size = 4;
     ret = oapve_config(apv->id, OAPV_CFG_SET_AU_BS_FMT, &value, &size);
@@ -337,7 +543,7 @@ static av_cold int liboapve_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     apv->ifrms.num_frms++;
 
-     /* color description values */
+    /* color description values */
     if (cdsc->param[FRM_IDX].color_description_present_flag) {
         avctx->color_primaries = cdsc->param[FRM_IDX].color_primaries;
         avctx->color_trc = cdsc->param[FRM_IDX].transfer_characteristics;
@@ -368,13 +574,8 @@ static int liboapve_encode(AVCodecContext *avctx, AVPacket *avpkt,
     oapv_imgb_t *imgb = frm->imgb;
     int ret;
 
-    if (avctx->width != frame->width || avctx->height != frame->height || avctx->pix_fmt != frame->format) {
-        av_log(avctx, AV_LOG_ERROR, "Dimension changes are not supported\n");
-        return AVERROR(EINVAL);
-    }
-
-    av_image_copy((uint8_t **)imgb->a, imgb->s, (const uint8_t **)frame->data, frame->linesize,
-                  frame->format, frame->width, frame->height);
+    av_image_copy2((uint8_t **)imgb->a, imgb->s, frame->data, frame->linesize,
+                   frame->format, frame->width, frame->height);
 
     imgb->ts[0] = frame->pts;
 
@@ -426,7 +627,12 @@ static av_cold int liboapve_close(AVCodecContext *avctx)
 {
     ApvEncContext *apv = avctx->priv_data;
 
-    for (int i = 0; i < apv->num_frames; i++) {
+    for (unsigned int i = 0; i < apv->nb_payloads; i++) {
+        av_freep(&apv->payloads[i].data);
+    }
+    av_freep(&apv->payloads);
+
+    for (int i = 0; i < apv->ifrms.num_frms; i++) {
         if (apv->ifrms.frm[i].imgb != NULL)
             apv->ifrms.frm[i].imgb->release(apv->ifrms.frm[i].imgb);
         apv->ifrms.frm[i].imgb = NULL;
@@ -454,28 +660,18 @@ static av_cold int liboapve_close(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(ApvEncContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 
-static const enum AVPixelFormat supported_pixel_formats[] = {
-    AV_PIX_FMT_GRAY10,
-    AV_PIX_FMT_YUV422P10,
-    AV_PIX_FMT_YUV422P12,
-    AV_PIX_FMT_YUV444P10,
-    AV_PIX_FMT_YUV444P12,
-    AV_PIX_FMT_YUVA444P10,
-    AV_PIX_FMT_YUVA444P12,
-    AV_PIX_FMT_NONE
-};
-
 static const AVOption liboapv_options[] = {
     { "preset", "Encoding preset for setting encoding speed (optimization level control)", OFFSET(preset_id), AV_OPT_TYPE_INT, { .i64 = OAPV_PRESET_DEFAULT }, OAPV_PRESET_FASTEST, OAPV_PRESET_PLACEBO, VE, .unit = "preset" },
-    { "fastest", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_FASTEST }, INT_MIN, INT_MAX, VE, .unit = "preset" },
-    { "fast",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_FAST },    INT_MIN, INT_MAX, VE, .unit = "preset" },
-    { "medium",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_MEDIUM },  INT_MIN, INT_MAX, VE, .unit = "preset" },
-    { "slow",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_SLOW },    INT_MIN, INT_MAX, VE, .unit = "preset" },
-    { "placebo", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_PLACEBO }, INT_MIN, INT_MAX, VE, .unit = "preset" },
-    { "default", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_DEFAULT }, INT_MIN, INT_MAX, VE, .unit = "preset" },
+    { "fastest", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_FASTEST }, 0, 0, VE, .unit = "preset" },
+    { "fast",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_FAST },    0, 0, VE, .unit = "preset" },
+    { "medium",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_MEDIUM },  0, 0, VE, .unit = "preset" },
+    { "slow",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_SLOW },    0, 0, VE, .unit = "preset" },
+    { "placebo", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_PLACEBO }, 0, 0, VE, .unit = "preset" },
+    { "default", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = OAPV_PRESET_DEFAULT }, 0, 0, VE, .unit = "preset" },
 
-    { "qp", "Quantization parameter value for CQP rate control mode", OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 63, VE },
-    { "oapv-params",  "Override the apv configuration using a :-separated list of key=value parameters", OFFSET(oapv_params), AV_OPT_TYPE_DICT, { 0 }, 0, 0, VE },
+    { "qp", "Quantization parameter value for CQP rate control mode", OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 63, VE, .unit = NULL },
+    { "oapv-params",  "Override the apv configuration using a :-separated list of key=value parameters", OFFSET(oapv_params), AV_OPT_TYPE_DICT, { 0 }, 0, 0, VE, .unit = NULL },
+
     { NULL }
 };
 
@@ -504,7 +700,10 @@ const FFCodec ff_liboapv_encoder = {
     .defaults           = liboapve_defaults,
     .p.capabilities     = AV_CODEC_CAP_OTHER_THREADS | AV_CODEC_CAP_DR1,
     .p.wrapper_name     = "liboapv",
-    .p.pix_fmts         = supported_pixel_formats,
     .p.profiles         = NULL_IF_CONFIG_SMALL(ff_apv_profiles),
     .caps_internal      = FF_CODEC_CAP_INIT_CLEANUP | FF_CODEC_CAP_AUTO_THREADS | FF_CODEC_CAP_NOT_INIT_THREADSAFE,
+    CODEC_PIXFMTS(AV_PIX_FMT_GRAY10,
+                  AV_PIX_FMT_YUV422P10,  AV_PIX_FMT_YUV422P12,
+                  AV_PIX_FMT_YUV444P10,  AV_PIX_FMT_YUV444P12,
+                  AV_PIX_FMT_YUVA444P10, AV_PIX_FMT_YUVA444P12),
 };

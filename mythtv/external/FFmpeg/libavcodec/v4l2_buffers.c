@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include "libavcodec/avcodec.h"
+#include "libavutil/attributes.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/hwcontext.h"
 #include "libavutil/buffer.h"
@@ -232,7 +233,7 @@ static void v4l2_get_interlacing(AVFrame *frame, V4L2Buffer *buf)
     case V4L2_FIELD_INTERLACED:
     case V4L2_FIELD_INTERLACED_TB:
         frame->flags |=  AV_FRAME_FLAG_TOP_FIELD_FIRST;
-        /* fallthrough */
+        av_fallthrough;
     case V4L2_FIELD_INTERLACED_BT:
         frame->flags |=  AV_FRAME_FLAG_INTERLACED;
         break;

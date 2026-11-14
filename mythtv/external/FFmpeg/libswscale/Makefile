@@ -10,7 +10,9 @@ OBJS = alphablend.o                                     \
        csputils.o                                       \
        hscale.o                                         \
        hscale_fast_bilinear.o                           \
+       filters.o                                        \
        format.o                                         \
+       framepool.o                                      \
        gamma.o                                          \
        graph.o                                          \
        input.o                                          \
@@ -28,11 +30,13 @@ OBJS = alphablend.o                                     \
 
 OBJS-$(CONFIG_UNSTABLE) +=                              \
        ops.o                                            \
-       ops_backend.o                                    \
        ops_chain.o                                      \
        ops_dispatch.o                                   \
        ops_memcpy.o                                     \
        ops_optimizer.o                                  \
+       rational64.o                                     \
+       uops.o                                           \
+       uops_backend.o                                   \
 
 ifeq ($(CONFIG_UNSTABLE),yes)
 include $(SRC_PATH)/libswscale/vulkan/Makefile
@@ -49,3 +53,4 @@ TESTPROGS = colorspace                                                  \
             pixdesc_query                                               \
             swscale                                                     \
             sws_ops                                                     \
+            sws_ops_aarch64                                             \

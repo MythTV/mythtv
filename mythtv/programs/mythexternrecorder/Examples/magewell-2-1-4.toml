@@ -1,0 +1,20 @@
+[VARIABLES]
+BOARD=2
+INPUT=1
+SOURCE=4
+DEVICE="roku10"
+CORE1=4
+CORE2=5
+LINK="${SERIESID}${PROGRAMID}"
+TUNER="/usr/local/bin/stb-control --device ${DEVICE}"
+CODEC="hevc_qsv --p010 --settle 1000"
+LOG="-v 4"
+
+[TOUCH.verify]
+DELAY="05:00"
+COMMAND="/usr/local/bin/roku-control --device ${DEVICE} [{--verify ${CALLSIGN}}]"
+
+[INCLUDE]
+files = [
+    "magewell-${SOURCE}.toml",
+]

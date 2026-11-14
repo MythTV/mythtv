@@ -1,6 +1,9 @@
 clean::
 	$(RM) $(CLEANSUFFIXES:%=libavcodec/vulkan/%)
 
+OBJS-$(CONFIG_APV_VULKAN_HWACCEL) += vulkan/apv_decode.comp.spv.o \
+                                     vulkan/apv_idct.comp.spv.o
+
 OBJS-$(CONFIG_FFV1_VULKAN_ENCODER) += vulkan/ffv1_enc_setup.comp.spv.o \
                                       vulkan/ffv1_enc_reset.comp.spv.o \
                                       vulkan/ffv1_enc_reset_golomb.comp.spv.o \
@@ -8,7 +11,13 @@ OBJS-$(CONFIG_FFV1_VULKAN_ENCODER) += vulkan/ffv1_enc_setup.comp.spv.o \
                                       vulkan/ffv1_enc_golomb.comp.spv.o \
                                       vulkan/ffv1_enc_rgb.comp.spv.o \
                                       vulkan/ffv1_enc_rgb_golomb.comp.spv.o \
-                                      vulkan/ffv1_enc_rct_search.comp.spv.o
+                                      vulkan/ffv1_enc_rct_search.comp.spv.o \
+                                      vulkan/ffv1_enc_remap.comp.spv.o \
+                                      vulkan/ffv1_enc_rgb_float.comp.spv.o \
+                                      vulkan/ffv1_enc_rgb_float_golomb.comp.spv.o \
+                                      vulkan/ffv1_enc_sort32.comp.spv.o \
+                                      vulkan/ffv1_enc_bayer.comp.spv.o \
+                                      vulkan/ffv1_enc_bayer_golomb.comp.spv.o
 
 OBJS-$(CONFIG_FFV1_VULKAN_HWACCEL) += vulkan/ffv1_dec_setup.comp.spv.o \
                                       vulkan/ffv1_dec_reset.comp.spv.o \
@@ -16,7 +25,11 @@ OBJS-$(CONFIG_FFV1_VULKAN_HWACCEL) += vulkan/ffv1_dec_setup.comp.spv.o \
                                       vulkan/ffv1_dec.comp.spv.o \
                                       vulkan/ffv1_dec_golomb.comp.spv.o \
                                       vulkan/ffv1_dec_rgb.comp.spv.o \
-                                      vulkan/ffv1_dec_rgb_golomb.comp.spv.o
+                                      vulkan/ffv1_dec_rgb_golomb.comp.spv.o \
+                                      vulkan/ffv1_dec_rgb_float.comp.spv.o \
+                                      vulkan/ffv1_dec_rgb_float_golomb.comp.spv.o \
+                                      vulkan/ffv1_dec_bayer.comp.spv.o \
+                                      vulkan/ffv1_dec_bayer_golomb.comp.spv.o
 
 OBJS-$(CONFIG_PRORES_KS_VULKAN_ENCODER) += vulkan/prores_ks_alpha_data.comp.spv.o \
                                            vulkan/prores_ks_slice_data.comp.spv.o \

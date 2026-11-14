@@ -2116,7 +2116,7 @@ void VideoDialog::dismissFetchDialog(VideoMetadata *metadata, bool ok)
     if (!metadata || !m_d->m_notifications.contains(metadata->GetHash()))
         return;
 
-    int id = m_d->m_notifications[metadata->GetHash()];
+    int id = m_d->m_notifications.value(metadata->GetHash());
     m_d->m_notifications.remove(metadata->GetHash());
 
     QString msg;

@@ -368,7 +368,7 @@ void LyricsView::findLyrics(const QString &grabber)
     if (gPlayer->getPlayMode() == MusicPlayer::PLAYMODE_RADIO)
     {
         if (!gPlayer->getPlayedTracksList().isEmpty())
-            mdata = gPlayer->getPlayedTracksList().last();
+            mdata = gPlayer->getPlayedTracksList().constLast();
     }
     else
     {

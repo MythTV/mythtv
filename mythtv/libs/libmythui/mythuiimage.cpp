@@ -115,7 +115,7 @@ class ImageLoader
 
         // Check to see if the image is being loaded by us in another thread
         if ((m_loadingImages.contains(cacheKey)) &&
-            (m_loadingImages[cacheKey] == uitype))
+            (m_loadingImages.value(cacheKey) == uitype))
         {
             LOG(VB_GUI | VB_FILE, LOG_DEBUG,
                 QString("ImageLoader::PreLoad(%1), this "
@@ -247,15 +247,10 @@ class ImageLoader
 
         if (image)
         {
-            if (VERBOSE_LEVEL_CHECK(VB_GUI | VB_FILE, LOG_INFO))
-            {
-                image->IncrRef();
-                int cnt = image->DecrRef();
-                LOG(VB_GUI | VB_FILE, LOG_INFO,
-                    QString("ImageLoader::LoadImage(%1) Found in cache, "
-                            "RefCount = %2")
-                    .arg(cacheKey).arg(cnt));
-            }
+            LOG(VB_GUI | VB_FILE, LOG_INFO,
+                QString("ImageLoader::LoadImage(%1) Found in cache, "
+                        "RefCount = %2")
+                .arg(cacheKey).arg(image->GetRefCount()));
 
             if (imProps.m_isReflected)
                 image->setIsReflected(true);
@@ -616,13 +611,10 @@ void MythUIImage::Clear(void)
     QWriteLocker updateLocker(&d->m_updateLock);
     QMutexLocker locker(&m_imagesLock);
 
-    for (auto it = m_images.begin();
-         it != m_images.end();
-         it = m_images.erase(it))
-    {
-        if (*it)
-            (*it)->DecrRef();
-    }
+    for (auto* image : std::as_const(m_images))
+        if (image)
+            image->DecrRef();
+    m_images.clear();
 
     m_delays.clear();
 
@@ -788,6 +780,10 @@ void MythUIImage::SetImage(MythImage *img)
         SetSize(img->size());
 
     m_imagesLock.lock();
+    if (m_images.value(0))
+    {
+        m_images[0]->DecrRef(); // delete the original
+    }
     m_images[0] = img;
     m_delays.clear();
     m_imagesLock.unlock();
@@ -1106,6 +1102,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     SetMinArea(rect);
 
                     m_imagesLock.lock();
+                    if (m_images.value(j))
+                    {
+                        m_images[j]->DecrRef(); // delete the original
+                    }
                     m_images[j] = image;
                     m_imagesLock.unlock();
 
@@ -1119,7 +1119,10 @@ bool MythUIImage::Load(bool allowLoadInBackground, bool forceStat)
                     Reset();
 
                     m_imagesLock.lock();
-                    m_images[j] = nullptr;
+                    if (auto *val = m_images.take(j)) // remove from hash
+                    {
+                        val->DecrRef();
+                    }
                     m_imagesLock.unlock();
                 }
             }
@@ -1236,7 +1239,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         int alpha = CalcAlpha(alphaMod);
 
-        MythImage *currentImage = m_images[m_curPos];
+        MythImage *currentImage = m_images.value(m_curPos);
 
         if (currentImage)
             currentImage->IncrRef();
@@ -1615,12 +1618,12 @@ void MythUIImage::customEvent(QEvent *event)
 
             m_imagesLock.lock();
 
-            if (m_images[number])
+            if (m_images.value(number))
             {
                 // If we got to this point, it means this same MythUIImage
                 // was told to reload the same image, so we use the newest
                 // copy of the image.
-                m_images[number]->DecrRef(); // delete the original
+                m_images.value(number)->DecrRef(); // delete the original
             }
 
             m_images[number] = image;

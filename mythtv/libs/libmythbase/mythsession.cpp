@@ -184,7 +184,7 @@ bool MythSessionManager::IsValidUser(const QString& username)
 MythUserSession MythSessionManager::GetSession(const QString& sessionToken)
 {
     if (IsValidSession(sessionToken))
-        return m_sessionList[sessionToken];
+        return m_sessionList.value(sessionToken);
 
     return {};
 }
@@ -240,7 +240,7 @@ bool MythSessionManager::IsValidSession(const QString& sessionToken)
 {
     if (m_sessionList.contains(sessionToken))
     {
-        MythUserSession session = m_sessionList[sessionToken];
+        MythUserSession session = m_sessionList.value(sessionToken);
         if (session.IsValid())
         {
             // Accessing a session automatically extends it
@@ -261,7 +261,7 @@ void MythSessionManager::UpdateSession(const QString& sessionToken)
 {
     if (m_sessionList.contains(sessionToken))
     {
-        MythUserSession session = m_sessionList[sessionToken];
+        MythUserSession session = m_sessionList.value(sessionToken);
         session.Update(); // Update the database
         m_sessionList[sessionToken] = session; // Update the cache
     }

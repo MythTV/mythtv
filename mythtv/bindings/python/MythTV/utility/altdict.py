@@ -11,7 +11,6 @@
 #                 For the classes 'DictInvert' and 'DictInvertCI', please use the imports
 #                 'from MythTV.altdict import DictInvert, DictInvertCI'
 
-from builtins import map, zip
 from warnings import warn
 
 class OrdDict( dict ):

@@ -36,9 +36,7 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
 {
     QMutexLocker locker(&s_handlersLock);
 
-    QMap<int,HDHRStreamHandler*>::iterator it = s_handlers.find(majorid);
-
-    if (it == s_handlers.end())
+    if (!s_handlers.contains(majorid))
     {
         auto *newhandler = new HDHRStreamHandler(devname, inputid, majorid);
         newhandler->Open();
@@ -52,14 +50,14 @@ HDHRStreamHandler *HDHRStreamHandler::Get(const QString &devname,
     else
     {
         s_handlersRefCnt[majorid]++;
-        uint rcount = s_handlersRefCnt[majorid];
+        uint rcount = s_handlersRefCnt.value(majorid);
         LOG(VB_RECORD, LOG_INFO,
             QString("HDHRSH[%1]: Using existing stream handler %2 for %3")
             .arg(inputid).arg(majorid)
             .arg(devname) + QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_handlers[majorid];
+    return s_handlers.value(majorid);
 }
 
 void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
@@ -68,10 +66,12 @@ void HDHRStreamHandler::Return(HDHRStreamHandler * & ref, int inputid)
 
     int majorid = ref->m_majorId;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<int,uint>::iterator rit = s_handlersRefCnt.find(majorid);
     if (rit == s_handlersRefCnt.end())
         return;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<int,HDHRStreamHandler*>::iterator it = s_handlers.find(majorid);
     if (*rit > 1)
     {

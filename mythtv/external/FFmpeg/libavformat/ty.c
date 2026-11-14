@@ -23,6 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/attributes.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
 #include "avformat.h"
@@ -395,12 +396,16 @@ static int demux_video(AVFormatContext *s, TyRecHdr *rec_hdr, AVPacket *pkt)
     int got_packet = 0;
 
     if (subrec_type != 0x02 && subrec_type != 0x0c &&
-        subrec_type != 0x08 && rec_size > 4) {
+        subrec_type != 0x08 && rec_size > 7) {
+
         /* get the PTS from this packet if it has one.
          * on S1, only 0x06 has PES.  On S2, however, most all do.
          * Do NOT Pass the PES Header to the MPEG2 codec */
         es_offset1 = find_es_header(ty_VideoPacket, ty->chunk + ty->cur_chunk_pos, 5);
         if (es_offset1 != -1) {
+            if (rec_size < es_offset1 + VIDEO_PTS_OFFSET + 5)
+                return AVERROR_INVALIDDATA;
+
             ty->last_video_pts = ff_parse_pes_pts(
                     ty->chunk + ty->cur_chunk_pos + es_offset1 + VIDEO_PTS_OFFSET);
             if (subrec_type != 0x06) {
@@ -573,7 +578,7 @@ static int demux_audio(AVFormatContext *s, TyRecHdr *rec_hdr, AVPacket *pkt)
         if (ty->audio_type == TIVO_AUDIO_AC3 &&
                 ty->tivo_series == TIVO_SERIES2) {
             if (ty->ac3_pkt_size + pkt->size > AC3_PKT_LENGTH) {
-                pkt->size -= 2;
+                pkt->size -= FFMIN(pkt->size, 2);
                 ty->ac3_pkt_size = 0;
             } else {
                 ty->ac3_pkt_size += pkt->size;
@@ -691,6 +696,7 @@ static int ty_read_packet(AVFormatContext *s, AVPacket *pkt)
             break;
         default:
             ff_dlog(s, "Invalid record type 0x%02x\n", rec->rec_type);
+            av_fallthrough;
         case 0x01:
         case 0x02:
         case 0x03: /* TiVo data services */

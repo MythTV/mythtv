@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Provides data access classes for accessing and managing MythTV data
@@ -14,7 +13,6 @@ from MythTV.utility import CMPRecord, CMPVideo, MARKUPLIST, datetime, ParseSet
 
 import re
 import locale
-import xml.etree.ElementTree as etree
 from collections import UserString
 from datetime import date, time
 
@@ -67,7 +65,7 @@ class Artwork( UserString ):
             # return a dumb string
             return str.__new__(str, attr)
         else:
-            return super(Artwork, cls).__new__(cls)
+            return super().__new__(cls)
 
     def __init__(self, attr, parent=None, imagetype=None):
         self.attr = attr
@@ -128,7 +126,7 @@ class Record( CMPRecord, DBDataWrite, RECTYPE ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Record, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         defaults = cls._template('Default', db=db)
         for k,v in list(defaults.items()):
             cls._defaults[k] = v
@@ -594,7 +592,7 @@ class Recorded( CMPRecord, DBDataWrite ):
             name = pitem.name
             if pitem.roleid:
                 character = self._InverseRole(pitem.roleid, self._db).name
-            role = ' '.join([word.capitalize() for word in pitem.role.split('_')])
+            role = ' '.join(word.capitalize() for word in pitem.role.split('_'))
             if role == 'Writer': role = 'Author'
             if character:
                 metadata.people.append(OrdDict((('name', name), ('job', role),
@@ -962,7 +960,7 @@ class Video( CMPVideo, VideoSchema, DBDataWrite ):
     @classmethod
     def _setClassDefs(cls, db=None):
         db = DBCache(db)
-        super(Video, cls)._setClassDefs(db)
+        super()._setClassDefs(db)
         cls._fill_cm(db)
 
     @classmethod
@@ -1330,7 +1328,7 @@ class InetrefGrabber( Grabber ):
         self.grabber = inetref.split('_')[0]
         try:
             self.iref = inetref.split('_')[1]
-        except IndexError as e:
+        except IndexError:
             raise MythError("MythTV interef error: '%s' !" % inetref)
 
         self.season = season
@@ -1532,7 +1530,7 @@ class MusicPlaylist( MusicSchema, DBDataWrite ):
     def _pl_tostr(self):
         try:
             self.playlist_songs = \
-                    ','.join(['%d' % id for id in self.playlist_songs])
+                    ','.join('%d' % id for id in self.playlist_songs)
         except: pass
 
     def _pull(self):

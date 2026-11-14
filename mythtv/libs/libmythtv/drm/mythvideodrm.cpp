@@ -119,7 +119,7 @@ bool MythVideoDRM::RenderFrame(AVDRMFrameDescriptor* DRMDesc, MythVideoFrame* Fr
     }
 
     Frame->m_displayed = true;
-    auto handle = m_handles[DRMDesc];
+    auto handle = m_handles.value(DRMDesc);
     auto id = m_videoPlane->m_id;
 
     if (m_lastSrc != Frame->m_srcRect)

@@ -20,22 +20,17 @@
    compile-time flags.
   INSTRUCTIONS:
 
-  * Get the very fresh clang, e.g. see http://libfuzzer.info#versions
-  * Get and build libFuzzer:
-     svn co http://llvm.org/svn/llvm-project/llvm/trunk/lib/Fuzzer
-     ./Fuzzer/build.sh
-  * build ffmpeg for fuzzing:
-    FLAGS="-fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp -g" CC="clang $FLAGS" CXX="clang++ $FLAGS" ./configure  --disable-x86asm
+  * Get clang > 6.0 (https://llvm.org/docs/LibFuzzer.html)
+  * Build ffmpeg for fuzzing:
+    ./configure --enable-debug --toolchain=clang-asan-ubsan-fuzz --enable-ossfuzz
     make clean && make -j
   * build the fuzz target.
-    Choose the value of FFMPEG_CODEC (e.g. AV_CODEC_ID_DVD_SUBTITLE) and
-    choose one of FUZZ_FFMPEG_VIDEO, FUZZ_FFMPEG_AUDIO, FUZZ_FFMPEG_SUBTITLE.
-    clang -fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp tools/target_dec_fuzzer.c -o target_dec_fuzzer -I.   -DFFMPEG_CODEC=AV_CODEC_ID_MPEG1VIDEO -DFUZZ_FFMPEG_VIDEO ../../libfuzzer/libFuzzer.a   -Llibavcodec -Llibavdevice -Llibavfilter -Llibavformat -Llibavutil -Llibpostproc -Llibswscale -Llibswresample -Wl,--as-needed -Wl,-z,noexecstack -Wl,--warn-common -Wl,-rpath-link=:libpostproc:libswresample:libswscale:libavfilter:libavdevice:libavformat:libavcodec:libavutil -lavdevice -lavfilter -lavformat -lavcodec -lswresample -lswscale -lavutil -ldl -lxcb -lxcb-shm -lxcb -lxcb-xfixes  -lxcb -lxcb-shape -lxcb -lX11 -lasound -lm -lbz2 -lz -pthread
-  * create a corpus directory and put some samples there (empty dir is ok too):
-    mkdir CORPUS && cp some-files CORPUS
-
-  * Run fuzzing:
-    ./target_dec_fuzzer -max_len=100000 CORPUS
+    make tools/target_dec_<codec>_fuzzer # e.g. tools/target_dec_jpeg2000_fuzzer
+  * Run fuzzing with a corpus directory:
+    mkdir CORPUS && cp some-files CORPUS # (empty corpus dir is ok too)
+    ./tools/target_dec_<codec>_fuzzer -max_len=100000 CORPUS
+  * Run a test case:
+    ./tools/target_dec_<codec>_fuzzer <testcase>
 
    More info:
    http://libfuzzer.info
@@ -110,6 +105,9 @@ const uint32_t maxiteration = 8096;
 
 static const uint64_t FUZZ_TAG = 0x4741542D5A5A5546ULL;
 
+static uint64_t alloc_pixels;
+static uint64_t max_alloc_pixels;
+
 static int fuzz_video_get_buffer(AVCodecContext *ctx, AVFrame *frame)
 {
     ptrdiff_t linesize1[4];
@@ -118,6 +116,11 @@ static int fuzz_video_get_buffer(AVCodecContext *ctx, AVFrame *frame)
     int i, ret, w = frame->width, h = frame->height;
 
     avcodec_align_dimensions2(ctx, &w, &h, linesize_align);
+
+    alloc_pixels += (uint64_t)w * h;
+    if (alloc_pixels > max_alloc_pixels)
+        return AVERROR(ENOMEM);
+
     ret = av_image_fill_linesizes(frame->linesize, ctx->pix_fmt, w);
     if (ret < 0)
         return ret;
@@ -216,6 +219,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     maxpixels = maxpixels_per_frame * maxiteration;
     maxsamples = maxsamples_per_frame * maxiteration;
     switch (c->p.id) {
+    case AV_CODEC_ID_4XM:         maxpixels  /= 64;    break;
     case AV_CODEC_ID_AASC:        maxpixels  /= 1024;  break;
     case AV_CODEC_ID_AGM:         maxpixels  /= 1024;  break;
     case AV_CODEC_ID_ANM:         maxpixels  /= 1024;  break;
@@ -225,6 +229,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     case AV_CODEC_ID_BETHSOFTVID: maxpixels  /= 8192;  break;
     case AV_CODEC_ID_BFI:         maxpixels  /= 8192;  break;
     case AV_CODEC_ID_BINKVIDEO:   maxpixels  /= 32;    break;
+    case AV_CODEC_ID_BMP:         maxpixels  /= 16;    break;
     case AV_CODEC_ID_BONK:        maxsamples /= 1<<20; break;
     case AV_CODEC_ID_CAVS:        maxpixels  /= 1024;  break;
     case AV_CODEC_ID_CDTOONS:     maxpixels  /= 1024;  break;
@@ -358,6 +363,9 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
     maxsamples_per_frame = FFMIN(maxsamples_per_frame, maxsamples);
     maxpixels_per_frame  = FFMIN(maxpixels_per_frame , maxpixels);
+
+    alloc_pixels     = 0;
+    max_alloc_pixels = maxpixels;
 
     AVCodecContext* ctx = avcodec_alloc_context3(&c->p);
     AVCodecContext* parser_avctx = avcodec_alloc_context3(NULL);

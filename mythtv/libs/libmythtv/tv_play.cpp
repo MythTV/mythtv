@@ -1642,12 +1642,22 @@ void TV::AskAllowRecording(const QStringList &Msg, int Timeuntil, bool HasRec, b
         // remove program from list
         LOG(VB_GENERAL, LOG_INFO, LOC + "-- " +
             QString("removing '%1'").arg(info->GetTitle()));
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.find(key);
         if (it != m_askAllowPrograms.end())
         {
             delete (*it).m_info;
             m_askAllowPrograms.erase(it);
         }
+#else
+        m_askAllowPrograms.removeIf( [key](auto it){
+            if (key != it.key())
+                return false;
+            delete (*it).m_info;
+            return true;
+        } );
+#endif
         delete info;
     }
 
@@ -1674,28 +1684,42 @@ void TV::ShowOSDAskAllow()
 
     // eliminate timed out programs
     QDateTime timeNow = MythDate::current();
-    QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.begin();
-    while (it != m_askAllowPrograms.end())
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
+    QMap<QString,AskProgramInfo>::iterator it2 = m_askAllowPrograms.begin();
+    while (it2 != m_askAllowPrograms.end())
     {
-        if ((*it).m_expiry <= timeNow)
+        if ((*it2).m_expiry <= timeNow)
         {
 #if 0
             LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
-                QString("removing '%1'").arg((*it).m_info->m_title));
+                QString("removing '%1'").arg((*it2).m_info->m_title));
 #endif
-            delete (*it).m_info;
-            it = m_askAllowPrograms.erase(it);
+            delete (*it2).m_info;
+            it2 = m_askAllowPrograms.erase(it2);
         }
         else
         {
-            it++;
+            it2++;
         }
     }
+#else
+    m_askAllowPrograms.removeIf( [timeNow](auto it2) {
+        if ((*it2).m_expiry > timeNow)
+            return false;
+#if 0
+        LOG(VB_GENERAL, LOG_DEBUG, LOC + "-- " +
+            QString("removing '%1'").arg((*it2).m_info->m_title));
+#endif
+        delete (*it2).m_info;
+        return true;
+    } );
+#endif
     std::chrono::milliseconds timeuntil = 0ms;
     QString      message;
     uint conflict_count = static_cast<uint>(m_askAllowPrograms.size());
 
-    it = m_askAllowPrograms.begin();
+    QMap<QString,AskProgramInfo>::iterator it = m_askAllowPrograms.begin();
     if ((1 == m_askAllowPrograms.size()) && ((*it).m_info->GetInputID() == cardid))
     {
         (*it).m_isInSameInputGroup = (*it).m_isConflicting = true;
@@ -2676,9 +2700,10 @@ bool TV::HandleLCDTimerEvent()
         {
             osdInfo info;
             if (CalcPlayerSliderPosition(info)) {
-                progress = info.values["position"] * 0.001F;
+                progress = info.values.value("position") * 0.001F;
 
-                lcd_time_string = info.text["playedtime"] + " / " + info.text["totaltime"];
+                lcd_time_string = info.text.value("playedtime") +
+                    " / " + info.text.value("totaltime");
                 // if the string is longer than the LCD width, remove all spaces
                 if (lcd_time_string.length() > lcd->getLCDWidth())
                     lcd_time_string.remove(' ');
@@ -3297,8 +3322,8 @@ bool TV::TranslateGesture(const QString &Context, MythGestureEvent *Event,
             region += (pos.y() / h3) * widthDivider;
 
             if (IsLiveTV)
-                return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapLiveTV[region], Actions, true);
-            return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapPlayback[region], Actions, true);
+                return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapLiveTV.at(region), Actions, true);
+            return m_mainWindow->TranslateKeyPress(Context, m_screenPressKeyMapPlayback.at(region), Actions, true);
         }
         return false;
     }
@@ -4676,7 +4701,7 @@ void TV::ProcessNetworkControlCommand(const QString &Command)
             }
             else
             {
-                QString position = info.text["description"].section(" ",0,0);
+                QString position = info.text.value("description").section(" ",0,0);
                 infoStr += QString(" %1 %2 %3 %4 %5")
                     .arg(position,
                          speedStr,
@@ -5273,6 +5298,7 @@ void TV::ChangeFFRew(int Direction)
     }
     else if (!m_ffRewReverse && m_playerContext.m_ffRewState == -Direction)
     {
+        auto last_ffRewIndex = m_playerContext.m_ffRewIndex;
         while (--m_playerContext.m_ffRewIndex >= kInitFFRWSpeed)
             if (m_ffRewSpeeds[static_cast<size_t>(m_playerContext.m_ffRewIndex)])
                 break;
@@ -5282,6 +5308,7 @@ void TV::ChangeFFRew(int Direction)
         }
         else
         {
+            m_playerContext.m_ffRewIndex = last_ffRewIndex;
             float time = StopFFRew();
             DoPlayerSeek(time);
             UpdateOSDSeekMessage(m_playerContext.GetPlayMessage(), kOSDTimeout_Med);
@@ -8971,7 +8998,7 @@ bool TV::MenuItemDisplayPlayback(const MythTVMenuItemContext& Context,
             {
                 QString chapter1 = QString("%1").arg(i+1, size, 10, QChar{'0'});
                 QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar{'0'});
-                QString timestr = MythDate::formatTime(m_tvmChapterTimes[i], "HH:mm:ss");
+                QString timestr = MythDate::formatTime(m_tvmChapterTimes.at(i), "HH:mm:ss");
                 QString desc = chapter1 + QString(" (%1)").arg(timestr);
                 QString action = prefix + chapter2;
                 active = (m_tvmCurrentChapter == (i + 1));
@@ -9804,7 +9831,7 @@ void TV::FillOSDMenuActorShows(const QString & actor, int person_id,
 
     QString   show;
     int       idx = -1;
-    for (auto & pi : m_progLists[actor])
+    for (const auto* pi : std::as_const(m_progLists[actor]))
     {
         show = pi->GetTitle();
         if (show.isEmpty())
@@ -9911,8 +9938,8 @@ bool TV::HandleJumpToProgramAction(const QStringList &Actions)
         if (ok)
         {
             QMutexLocker locker(&m_progListsLock);
-            auto pit = m_progLists.find(key);
-            if (pit != m_progLists.end())
+            auto pit = m_progLists.constFind(key);
+            if (pit != m_progLists.constEnd())
             {
                 const ProgramInfo* tmp = (*pit)[index];
                 if (tmp)

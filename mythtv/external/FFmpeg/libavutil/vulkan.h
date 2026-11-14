@@ -24,45 +24,11 @@
 #include <stdatomic.h>
 
 #include "pixdesc.h"
-#include "bprint.h"
 #include "hwcontext.h"
 #include "vulkan_functions.h"
 #include "hwcontext_vulkan.h"
 #include "avassert.h"
 #include "intreadwrite.h"
-
-/* GLSL management macros */
-#define INDENT(N) INDENT_##N
-#define INDENT_0
-#define INDENT_1 INDENT_0 "    "
-#define INDENT_2 INDENT_1 INDENT_1
-#define INDENT_3 INDENT_2 INDENT_1
-#define INDENT_4 INDENT_3 INDENT_1
-#define INDENT_5 INDENT_4 INDENT_1
-#define INDENT_6 INDENT_5 INDENT_1
-#define C(N, S)          INDENT(N) #S "\n"
-
-#define GLSLC(N, S)                     \
-    do {                                \
-        av_bprintf(&shd->src, C(N, S)); \
-    } while (0)
-
-#define GLSLA(...)                          \
-    do {                                    \
-        av_bprintf(&shd->src, __VA_ARGS__); \
-    } while (0)
-
-#define GLSLF(N, S, ...)                             \
-    do {                                             \
-        av_bprintf(&shd->src, C(N, S), __VA_ARGS__); \
-    } while (0)
-
-#define GLSLD(D)                                        \
-    do {                                                \
-        av_bprintf(&shd->src, "\n");                    \
-        av_bprint_append_data(&shd->src, D, strlen(D)); \
-        av_bprintf(&shd->src, "\n");                    \
-    } while (0)
 
 /* Helper, pretty much every Vulkan return value needs to be checked */
 #define RET(x)                                                                 \
@@ -229,9 +195,6 @@ typedef struct FFVulkanShader {
     /* Whether shader is precompiled or not */
     int precompiled;
     VkSpecializationInfo *specialization_info;
-
-    /* Shader text */
-    AVBPrint src;
 
     /* Compute shader local group sizes */
     uint32_t lg_size[3];
@@ -637,16 +600,6 @@ int ff_vk_init_sampler(FFVulkanContext *s, VkSampler *sampler,
                        int unnorm_coords, VkFilter filt);
 
 /**
- * Initialize a shader object, with a specific set of extensions, type+bind,
- * local group size, and subgroup requirements.
- */
-int ff_vk_shader_init(FFVulkanContext *s, FFVulkanShader *shd, const char *name,
-                      VkPipelineStageFlags stage,
-                      const char *extensions[], int nb_extensions,
-                      int lg_x, int lg_y, int lg_z,
-                      uint32_t required_subgroup_size);
-
-/**
  * Initialize a shader object.
  * If spec is non-null, it must have been created with SPEC_LIST_CREATE().
  * The IDs for the workgroup size must be 253, 254, 255.
@@ -654,12 +607,6 @@ int ff_vk_shader_init(FFVulkanContext *s, FFVulkanShader *shd, const char *name,
 int ff_vk_shader_load(FFVulkanShader *shd,
                       VkPipelineStageFlags stage, VkSpecializationInfo *spec,
                       uint32_t wg_size[3], uint32_t required_subgroup_size);
-
-/**
- * Output the shader code as logging data, with a specific
- * priority.
- */
-void ff_vk_shader_print(void *ctx, FFVulkanShader *shd, int prio);
 
 /**
  * Link a shader into an executable.
@@ -677,9 +624,9 @@ int ff_vk_shader_add_push_const(FFVulkanShader *shd, int offset, int size,
 /**
  * Add descriptor to a shader. Must be called before shader init.
  */
-int ff_vk_shader_add_descriptor_set(FFVulkanContext *s, FFVulkanShader *shd,
-                                    const FFVulkanDescriptorSetBinding *desc, int nb,
-                                    int singular, int print_to_shader_only);
+void ff_vk_shader_add_descriptor_set(FFVulkanContext *s, FFVulkanShader *shd,
+                                     const FFVulkanDescriptorSetBinding *desc, int nb,
+                                     int singular);
 
 /**
  * Register a shader with an exec pool.

@@ -70,3 +70,4 @@ cppcheck.xml
 log
 log-*
 success-*
+.claude/settings.local.json

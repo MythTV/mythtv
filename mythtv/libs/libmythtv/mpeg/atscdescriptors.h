@@ -64,7 +64,7 @@ class MTV_PUBLIC MultipleStringStructure
     static QString Uncompressed(const unsigned char *buf, int len, int mode);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
     const unsigned char *Offset(int i, int j) const
-        { return m_ptrs[Index(i,j)]; }
+        { return m_ptrs.value(Index(i,j)); }
 
   private:
     const unsigned char *m_data;

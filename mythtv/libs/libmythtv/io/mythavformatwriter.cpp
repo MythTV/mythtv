@@ -200,7 +200,7 @@ bool MythAVFormatWriter::CloseFile(void)
 bool MythAVFormatWriter::NextFrameIsKeyFrame(void)
 {
     return (m_bufferedVideoFrameTypes.isEmpty()) ||
-           (m_bufferedVideoFrameTypes.first() == AV_PICTURE_TYPE_I);
+           (m_bufferedVideoFrameTypes.constFirst() == AV_PICTURE_TYPE_I);
 }
 
 int MythAVFormatWriter::WriteVideoFrame(MythVideoFrame *Frame)

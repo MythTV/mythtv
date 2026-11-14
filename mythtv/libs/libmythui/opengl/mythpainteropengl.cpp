@@ -82,7 +82,7 @@ void MythOpenGLPainter::ClearCache(void)
     for (auto it = m_imageToTextureMap.cbegin();
          it != m_imageToTextureMap.cend(); ++it)
     {
-        m_textureDeleteList.push_back(m_imageToTextureMap[it.key()]);
+        m_textureDeleteList.push_back(m_imageToTextureMap.value(it.key()));
         m_imageExpireList.remove(it.key());
     }
     m_imageToTextureMap.clear();
@@ -108,6 +108,8 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
     }
 
     QSize currentsize = m_parent->size();
+    m_pixelRatio = m_parent->devicePixelRatioF();
+    m_usingHighDPI = !qFuzzyCompare(m_pixelRatio, 1.0);
 
     // check if we need to adjust cache sizes
     // NOTE - don't use the scaled size if using high DPI. Our images are at the lower
@@ -182,7 +184,7 @@ MythGLTexture* MythOpenGLPainter::GetTextureFromCache(MythImage *Image)
         {
             m_imageExpireList.remove(Image);
             m_imageExpireList.push_back(Image);
-            return m_imageToTextureMap[Image];
+            return m_imageToTextureMap.value(Image);
         }
         DeleteFormatImagePriv(Image);
     }
@@ -288,7 +290,7 @@ QOpenGLShaderProgram* MythOpenGLPainter::GetProceduralShader(const ProcSource& V
     if (!m_render)
         return nullptr;
 
-    if (auto program = m_procedurals.find(SourceHash); program != m_procedurals.end())
+    if (auto program = m_procedurals.constFind(SourceHash); program != m_procedurals.constEnd())
         return *program;
 
     auto * result = m_render->CreateShaderProgram(QString(*VertexSource), QString(*FragmentSource));
@@ -337,7 +339,7 @@ void MythOpenGLPainter::DeleteFormatImagePriv(MythImage *Image)
     QMutexLocker locker(&m_imageAndTextureLock);
     if (m_imageToTextureMap.contains(Image))
     {
-        m_textureDeleteList.push_back(m_imageToTextureMap[Image]);
+        m_textureDeleteList.push_back(m_imageToTextureMap.value(Image));
         m_imageToTextureMap.remove(Image);
         m_imageExpireList.remove(Image);
     }

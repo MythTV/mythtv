@@ -120,6 +120,7 @@ void MythFontManager::ReleaseFonts(const QString &registeredFor)
         return;
 
     QMutexLocker locker(&m_lock);
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (FontPathToReference::iterator it = m_fontPathToReference.begin();
          it != m_fontPathToReference.end();)
     {

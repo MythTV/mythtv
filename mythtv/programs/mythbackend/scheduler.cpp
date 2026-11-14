@@ -1033,7 +1033,7 @@ void Scheduler::BuildListMaps(void)
             p->GetRecordingStatus() == RecStatus::Unknown)
         {
             RecList *conflictlist =
-                m_sinputInfoMap[p->GetInputID()].m_conflictList;
+                m_sinputInfoMap.value(p->GetInputID()).m_conflictList;
             if (!conflictlist)
             {
                 ++badinputs[p->GetInputID()];
@@ -1904,7 +1904,7 @@ void Scheduler::AddRecording(const RecordingInfo &pi)
 
     auto * new_pi = new RecordingInfo(pi);
     new_pi->m_mplexId = new_pi->QueryMplexID();
-    new_pi->m_sgroupId = m_sinputInfoMap[new_pi->GetInputID()].m_sgroupId;
+    new_pi->m_sgroupId = m_sinputInfoMap.value(new_pi->GetInputID()).m_sgroupId;
     m_recList.push_back(new_pi);
     m_recListChanged = true;
 
@@ -1949,7 +1949,9 @@ bool Scheduler::IsBusyRecording(const RecordingInfo *rcinfo)
 
     // now check other inputs in the same input group as the recording.
     uint inputid = rcinfo->GetInputID();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     const std::vector<unsigned int> &inputids = m_sinputInfoMap[inputid].m_conflictingInputs;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     std::vector<unsigned int> &group_inputs = m_sinputInfoMap[inputid].m_groupInputs;
     for (uint id : inputids)
     {
@@ -2613,6 +2615,8 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
             keys.insert("something");
         }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         QSet<QString>::iterator sit = m_sysEvents[i].begin();
         while (sit != m_sysEvents[i].end())
         {
@@ -2621,6 +2625,10 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
             else
                 ++sit;
         }
+#else
+        m_sysEvents[i].removeIf( [&keys](const auto& key)
+            { return !keys.contains(key); } );
+#endif
     }
 
     EncoderLink *nexttv = *tvit;
@@ -2934,9 +2942,9 @@ void Scheduler::HandleRecordingStatusChange(
     bool doSchedAfterStart =
         ((recStatus != RecStatus::Tuning &&
           recStatus != RecStatus::Recording) ||
-         m_schedAfterStartMap[ri.GetRecordingRuleID()] ||
+         m_schedAfterStartMap.value(ri.GetRecordingRuleID()) ||
          ((ri.GetParentRecordingRuleID() != 0U) &&
-          m_schedAfterStartMap[ri.GetParentRecordingRuleID()]));
+          m_schedAfterStartMap.value(ri.GetParentRecordingRuleID())));
     ri.AddHistory(doSchedAfterStart);
 
     QString msg;
@@ -2979,7 +2987,7 @@ bool Scheduler::AssignGroupInput(RecordingInfo &ri,
     QDateTime now = MythDate::current();
 
     // Check each child input to find the best one to use.
-    std::vector<unsigned int> inputs = m_sinputInfoMap[ri.GetInputID()].m_groupInputs;
+    std::vector<unsigned int> inputs = m_sinputInfoMap.value(ri.GetInputID()).m_groupInputs;
     for (uint i = 0; !bestid && i < inputs.size(); ++i)
     {
         uint inputid = inputs[i];
@@ -5286,7 +5294,7 @@ int Scheduler::FillRecordingDir(
     LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, LOC +
         "FillRecordingDir: Calculating initial FS Weights.");
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
+    // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
     for (auto fsit = m_fsInfoCache.begin(); fsit != m_fsInfoCache.end(); ++fsit)
     {
         FileSystemInfo *fs = &(*fsit);
@@ -5366,10 +5374,8 @@ int Scheduler::FillRecordingDir(
             if (recDir == "_UNKNOWN_")
                 continue;
 
-            for (fslistit = fsInfoList.begin();
-                 fslistit != fsInfoList.end(); ++fslistit)
+            for (const auto* fs : fsInfoList)
             {
-                FileSystemInfo *fs = *fslistit;
                 if ((recHost == fs->getHostname()) &&
                     (recDir == fs->getPath()))
                 {
@@ -5448,10 +5454,8 @@ int Scheduler::FillRecordingDir(
             (thispg->GetPathname().isEmpty()))
             continue;
 
-        for (fslistit = fsInfoList.begin();
-             fslistit != fsInfoList.end(); ++fslistit)
+        for (const auto* fs : fsInfoList)
         {
-            FileSystemInfo *fs = *fslistit;
             if ((fs->getHostname() == thispg->GetHostname()) &&
                 (fs->getPath() == thispg->GetPathname()))
             {
@@ -5463,7 +5467,7 @@ int Scheduler::FillRecordingDir(
                              fs->getHostname(), fs->getPath())
                         .arg(fs->getFSysID()).arg(weightPerRecording));
 
-                // NOLINTNEXTLINE(modernize-loop-convert)
+                // NOLINTNEXTLINE(modernize-loop-convert) clazy:exclude-next-line=detaching-member (modifies item)
                 for (auto fsit2 = m_fsInfoCache.begin();
                      fsit2 != m_fsInfoCache.end(); ++fsit2)
                 {
@@ -5501,10 +5505,8 @@ int Scheduler::FillRecordingDir(
     {
         LOG(VB_FILE | VB_SCHEDULE, LOG_INFO,
             "--- FillRecordingDir Sorted fsInfoList start ---");
-        for (fslistit = fsInfoList.begin();fslistit != fsInfoList.end();
-             ++fslistit)
+        for (const auto *fs : fsInfoList)
         {
-            FileSystemInfo *fs = *fslistit;
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("%1:%2")
                 .arg(fs->getHostname(), fs->getPath()));
             LOG(VB_FILE | VB_SCHEDULE, LOG_INFO, QString("    Location    : %1")
@@ -5552,12 +5554,8 @@ int Scheduler::FillRecordingDir(
         {
             // setup a container of remaining space for all the file systems
             QMap <int , long long> remainingSpaceKB;
-            for (fslistit = fsInfoList.begin();
-                fslistit != fsInfoList.end(); ++fslistit)
-            {
-                remainingSpaceKB[(*fslistit)->getFSysID()] =
-                    (*fslistit)->getFreeSpace();
-            }
+            for (const auto* fs : fsInfoList)
+                remainingSpaceKB[fs->getFSysID()] = fs->getFreeSpace();
 
             // get list of expirable programs
             pginfolist_t expiring;
@@ -5566,20 +5564,19 @@ int Scheduler::FillRecordingDir(
             for (auto & expire : expiring)
             {
                 // find the filesystem its on
-                FileSystemInfo *fs = nullptr;
-                for (fslistit = fsInfoList.begin();
-                    fslistit != fsInfoList.end(); ++fslistit)
+                const FileSystemInfo *found = nullptr;
+                for (const auto* fs : fsInfoList)
                 {
                     // recording is not on this filesystem's host
-                    if (expire->GetHostname() != (*fslistit)->getHostname())
+                    if (expire->GetHostname() != fs->getHostname())
                         continue;
 
                     // directory is not in the Storage Group dir list
-                    if (!dirlist.contains((*fslistit)->getPath()))
+                    if (!dirlist.contains(fs->getPath()))
                         continue;
 
                     QString filename =
-                        (*fslistit)->getPath() + "/" + expire->GetPathname();
+                        fs->getPath() + "/" + expire->GetPathname();
 
                     // recording is local
                     if (expire->GetHostname() == gCoreContext->GetHostName())
@@ -5588,7 +5585,7 @@ int Scheduler::FillRecordingDir(
 
                         if (checkFile.exists())
                         {
-                            fs = *fslistit;
+                            found = fs;
                             break;
                         }
                     }
@@ -5611,7 +5608,7 @@ int Scheduler::FillRecordingDir(
                         if (foundSlave &&
                             programinfo->GetPathname() == filename)
                         {
-                            fs = *fslistit;
+                            found = fs;
                             programinfo->SetPathname(backuppath);
                             break;
                         }
@@ -5619,7 +5616,7 @@ int Scheduler::FillRecordingDir(
                     }
                 }
 
-                if (!fs)
+                if (!found)
                 {
                     LOG(VB_GENERAL, LOG_ERR,
                         QString("Unable to match '%1' "
@@ -5629,18 +5626,18 @@ int Scheduler::FillRecordingDir(
                 }
 
                 // add this files size to the remaining free space
-                remainingSpaceKB[fs->getFSysID()] +=
+                remainingSpaceKB[found->getFSysID()] +=
                     expire->GetFilesize() / 1024;
 
                 // check if we have enough space for new file
                 long long desiredSpaceKB =
-                    m_expirer->GetDesiredSpace(fs->getFSysID());
+                    m_expirer->GetDesiredSpace(found->getFSysID());
 
-                if (remainingSpaceKB[fs->getFSysID()] >
+                if (remainingSpaceKB[found->getFSysID()] >
                         (desiredSpaceKB + maxSizeKB))
                 {
-                    recording_dir = fs->getPath();
-                    fsID = fs->getFSysID();
+                    recording_dir = found->getPath();
+                    fsID = found->getFSysID();
 
                     LOG(VB_FILE, LOG_INFO,
                         QString("pass 2: '%1' will record in '%2' "
@@ -5651,7 +5648,7 @@ int Scheduler::FillRecordingDir(
                                 "there are enough that the Expirer should "
                                 "be able to free up space for this recording.")
                             .arg(title, recording_dir)
-                            .arg(fs->getFreeSpace() / 1024)
+                            .arg(found->getFreeSpace() / 1024)
                             .arg(desiredSpaceKB / 1024));
 
                     foundDir = true;
@@ -5663,11 +5660,9 @@ int Scheduler::FillRecordingDir(
         }
         else // passes 1 & 3 (or 1 & 2 if !simulateAutoExpire)
         {
-            for (fslistit = fsInfoList.begin();
-                fslistit != fsInfoList.end(); ++fslistit)
+            for (const auto* fs : fsInfoList)
             {
                 long long desiredSpaceKB = 0;
-                FileSystemInfo *fs = *fslistit;
                 if (m_expirer)
                     desiredSpaceKB =
                         m_expirer->GetDesiredSpace(fs->getFSysID());
@@ -5773,7 +5768,7 @@ void Scheduler::SchedLiveTV(void)
             dummy->SetRecordingEndTime(m_schedTime.addSecs(1800));
         dummy->SetInputID(enc->GetInputID());
         dummy->m_mplexId = dummy->QueryMplexID();
-        dummy->m_sgroupId = m_sinputInfoMap[dummy->GetInputID()].m_sgroupId;
+        dummy->m_sgroupId = m_sinputInfoMap.value(dummy->GetInputID()).m_sgroupId;
         dummy->SetRecordingStatus(RecStatus::Unknown);
 
         m_livetvList.push_front(dummy);
@@ -5872,7 +5867,7 @@ bool Scheduler::CreateConflictLists(void)
     for (mit = inputSets.begin(); mit != inputSets.end(); ++mit)
     {
         uint inputid = mit.key();
-        if (m_sinputInfoMap[inputid].m_conflictList)
+        if (m_sinputInfoMap.value(inputid).m_conflictList)
             continue;
 
         // Find the union of all inputs grouped with those already in
@@ -5954,9 +5949,10 @@ bool Scheduler::InitInputInfoMap(void)
 
         // This code should stay substantially similar to that below
         // in AddChildInput().
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         SchedInputInfo &siinfo = m_sinputInfoMap[inputid];
         siinfo.m_inputId = inputid;
-        if (parentid && m_sinputInfoMap[parentid].m_schedGroup)
+        if (parentid && m_sinputInfoMap.value(parentid).m_schedGroup)
             siinfo.m_sgroupId = parentid;
         else
             siinfo.m_sgroupId = inputid;
@@ -5983,16 +5979,17 @@ void Scheduler::AddChildInput(uint parentid, uint childid)
 
     // This code should stay substantially similar to that above in
     // InitInputInfoMap().
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     SchedInputInfo &siinfo = m_sinputInfoMap[childid];
     siinfo.m_inputId = childid;
-    if (m_sinputInfoMap[parentid].m_schedGroup)
+    if (m_sinputInfoMap.value(parentid).m_schedGroup)
         siinfo.m_sgroupId = parentid;
     else
         siinfo.m_sgroupId = childid;
     siinfo.m_schedGroup = false;
     siinfo.m_conflictingInputs = CardUtil::GetConflictingInputs(childid);
 
-    siinfo.m_conflictList = m_sinputInfoMap[parentid].m_conflictList;
+    siinfo.m_conflictList = m_sinputInfoMap.value(parentid).m_conflictList;
 
     // Now, fixup the infos for the parent and conflicting inputs.
     m_sinputInfoMap[parentid].m_groupInputs.push_back(childid);

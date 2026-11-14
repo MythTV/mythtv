@@ -171,6 +171,8 @@ void MPEGStreamData::Reset(int desiredProgram)
 
 void MPEGStreamData::DeletePartialPSIP(uint pid)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
     if (it != m_partialPsipPacketCache.end())
     {
@@ -178,6 +180,14 @@ void MPEGStreamData::DeletePartialPSIP(uint pid)
         m_partialPsipPacketCache.erase(it);
         delete pkt;
     }
+#else
+    m_partialPsipPacketCache.removeIf( [pid] (auto it) {
+        if (pid != it.key())
+            return false;
+        delete it.value();
+        return true;
+    } );
+#endif
 }
 
 /**
@@ -1191,8 +1201,8 @@ PIDPriority MPEGStreamData::GetPIDPriority(uint pid) const
 
 void MPEGStreamData::SavePartialPSIP(uint pid, PSIPTable* packet)
 {
-    pid_psip_map_t::iterator it = m_partialPsipPacketCache.find(pid);
-    if (it == m_partialPsipPacketCache.end())
+    const auto it = m_partialPsipPacketCache.constFind(pid);
+    if (it == m_partialPsipPacketCache.constEnd())
     {
         m_partialPsipPacketCache[pid] = packet;
     }
@@ -1495,7 +1505,7 @@ void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    int val = m_cachedRefCnt[psip] - 1;
+    int val = m_cachedRefCnt.value(psip) - 1;
     m_cachedRefCnt[psip] = val;
 
     // if ref <= 0 and table was slated for deletion, delete it.
@@ -1556,7 +1566,7 @@ void MPEGStreamData::ReturnCachedPMTTables(pmt_map_t &pmts) const
 void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
 {
     QMutexLocker locker(&m_cacheLock);
-    m_cachedRefCnt[psip] = m_cachedRefCnt[psip] + 1;
+    m_cachedRefCnt[psip] = m_cachedRefCnt.value(psip) + 1;
 }
 
 bool MPEGStreamData::DeleteCachedTable(const PSIPTable *psip) const
@@ -1567,25 +1577,25 @@ bool MPEGStreamData::DeleteCachedTable(const PSIPTable *psip) const
     uint tid = psip->TableIDExtension();
 
     QMutexLocker locker(&m_cacheLock);
-    if (m_cachedRefCnt[psip] > 0)
+    if (m_cachedRefCnt.value(psip) > 0)
     {
         m_cachedSlatedForDeletion[psip] = 1;
         return false;
     }
     if (TableID::PAT == psip->TableID() &&
-             (m_cachedPats[(tid << 8) | psip->Section()] == psip))
+             (m_cachedPats.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedPats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if (TableID::CAT == psip->TableID() &&
-             (m_cachedCats[(tid << 8) | psip->Section()] == psip))
+             (m_cachedCats.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedCats[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
     }
     else if ((TableID::PMT == psip->TableID()) &&
-             (m_cachedPmts[(tid << 8) | psip->Section()] == psip))
+             (m_cachedPmts.value((tid << 8) | psip->Section()) == psip))
     {
         m_cachedPmts[(tid << 8) | psip->Section()] = nullptr;
         delete psip;
@@ -1610,8 +1620,8 @@ void MPEGStreamData::CachePAT(const ProgramAssociationTable *_pat)
 
     QMutexLocker locker(&m_cacheLock);
 
-    pat_cache_t::iterator it = m_cachedPats.find(key);
-    if (it != m_cachedPats.end())
+    const auto it = m_cachedPats.constFind(key);
+    if (it != m_cachedPats.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedPats[key] = pat;
@@ -1624,8 +1634,8 @@ void MPEGStreamData::CacheCAT(const ConditionalAccessTable *_cat)
 
     QMutexLocker locker(&m_cacheLock);
 
-    cat_cache_t::iterator it = m_cachedCats.find(key);
-    if (it != m_cachedCats.end())
+    const auto it = m_cachedCats.constFind(key);
+    if (it != m_cachedCats.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedCats[key] = cat;
@@ -1638,8 +1648,8 @@ void MPEGStreamData::CachePMT(const ProgramMapTable *_pmt)
 
     QMutexLocker locker(&m_cacheLock);
 
-    pmt_cache_t::iterator it = m_cachedPmts.find(key);
-    if (it != m_cachedPmts.end())
+    const auto it = m_cachedPmts.constFind(key);
+    if (it != m_cachedPmts.constEnd())
         DeleteCachedTable(*it);
 
     m_cachedPmts[key] = pmt;
@@ -1818,7 +1828,7 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
     QMap<uint, uint_vec_t>::iterator list;
     uint_vec_t::iterator it;
 
-    uint_vec_t pids = m_encryptionPnumToPids[pnum];
+    uint_vec_t pids = m_encryptionPnumToPids.value(pnum);
     for (uint pid : pids)
     {
 #if 0
@@ -1924,6 +1934,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
 
     std::map<uint,bool> pnumEncrypted;
     const uint pid = tspacket.PID();
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     CryptInfo &info = m_encryptionPidToInfo[pid];
 
     CryptStatus status = kEncUnknown;
@@ -1953,18 +1964,20 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
         QString("PID 0x%1 status: %2") .arg(pid,0,16).arg(toString(status)));
 
     uint_vec_t pnum_del_list;
+    // clazy:exclude-next-line=detaching-member (can't reference temporary)
     const uint_vec_t &pnums = m_encryptionPidToPnums[pid];
     for (uint pnum : pnums)
     {
-        status = m_encryptionPnumToStatus[pnum];
+        status = m_encryptionPnumToStatus.value(pnum);
 
+        // clazy:exclude-next-line=detaching-member (can't reference temporary)
         const uint_vec_t &pids = m_encryptionPnumToPids[pnum];
         if (!pids.empty())
         {
             std::array<uint,3> enc_cnt { 0, 0, 0 };
             for (uint pid2 : pids)
             {
-                CryptStatus stat = m_encryptionPidToInfo[pid2].m_status;
+                CryptStatus stat = m_encryptionPidToInfo.value(pid2).m_status;
                 enc_cnt[stat]++;
 
 #if 0
@@ -1981,7 +1994,7 @@ void MPEGStreamData::ProcessEncryptedPacket(const TSPacket& tspacket)
                 status = kEncDecrypted;
         }
 
-        if (status == m_encryptionPnumToStatus[pnum])
+        if (status == m_encryptionPnumToStatus.value(pnum))
             continue; // program encryption status unchanged
 
         LOG(VB_RECORD, LOG_DEBUG, LOC + QString("Program %1 status: %2")

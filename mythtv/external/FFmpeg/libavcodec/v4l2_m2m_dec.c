@@ -308,7 +308,7 @@ static const AVCodecHWConfigInternal *v4l2_m2m_hw_configs[] = {
         FF_CODEC_RECEIVE_FRAME_CB(v4l2_receive_frame), \
         .close          = v4l2_decode_close, \
         .flush          = v4l2_flush, \
-        .p.pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_DRM_PRIME, \
+        .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_DRM_PRIME, \
                                                          AV_PIX_FMT_NV12, \
                                                          AV_PIX_FMT_NONE}, \
         .bsfs           = bsf_name, \

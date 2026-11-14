@@ -107,9 +107,9 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
     pRequest->m_eResponseType = ResponseTypeFile;
 
     // Optional Parameters
-    int     nWidth    = pRequest->m_mapParams[ "width"     ].toInt();
-    int     nHeight   = pRequest->m_mapParams[ "height"    ].toInt();
-    QString sFormat   = pRequest->m_mapParams[ "format"    ];
+    int     nWidth    = pRequest->m_mapParams.value( "width"  ).toInt();
+    int     nHeight   = pRequest->m_mapParams.value( "height" ).toInt();
+    QString sFormat   = pRequest->m_mapParams.value( "format" );
 
     if (sFormat.isEmpty())
         sFormat = "png";

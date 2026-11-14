@@ -158,7 +158,7 @@ class Source : public MythUIComboBoxSetting
 
         if ((m_defaultSourceId != 0U) && (getValue().toUInt() == 0U))
         {
-            uint which = m_sourceIdToIndex[m_defaultSourceId];
+            uint which = m_sourceIdToIndex.value(m_defaultSourceId);
             if (which)
                 setValue(which);
         }

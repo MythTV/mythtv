@@ -225,7 +225,7 @@ void DeleteThread::ProcessOld(void)
     // delete that file completely before moving onto the next
     while (true)
     {
-        DeleteHandler *handler = m_files.first();
+        DeleteHandler *handler = m_files.constFirst();
 
         // first file in the list has been delayed for deletion
         if (handler->m_wait > ctime)

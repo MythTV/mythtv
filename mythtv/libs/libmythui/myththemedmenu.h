@@ -103,8 +103,6 @@ class MUI_PUBLIC MythThemedMenu : public MythThemedMenuState
 
     bool checkPinCode(const QString &password_setting);
 
-    MythThemedMenu *m_parent     {nullptr};
-
     MythThemedMenuState *m_state {nullptr};
     bool m_allocedstate          {false};
 

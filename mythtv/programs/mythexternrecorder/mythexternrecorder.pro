@@ -23,11 +23,25 @@ INSTALLS += config
 
 # Input
 HEADERS += mythexternrecorder_commandlineparser.h
-HEADERS += MythExternControl.h
-HEADERS += MythExternRecApp.h
+HEADERS += stdinnotifier.h
+HEADERS += config_base.h
+HEADERS += config_ini.h
+HEADERS += posixprocess.h
+HEADERS += process.h
+HEADERS += recorder.h
+HEADERS += touchmonitor.h
 
 SOURCES += mythexternrecorder_commandlineparser.cpp
-SOURCES += MythExternControl.cpp
-SOURCES += MythExternRecApp.cpp
-SOURCES += mythexternrecorder.cpp
+SOURCES += config_base.cpp
+SOURCES += config_ini.cpp
+SOURCES += main.cpp
+SOURCES += posixprocess.cpp
+SOURCES += process.cpp
+SOURCES += recorder.cpp
+SOURCES += stdinnotifier.cpp
+SOURCES += touchmonitor.cpp
 
+using_tomlplusplus {
+  HEADERS += config_toml.h
+  SOURCES += config_toml.cpp
+}

@@ -175,6 +175,7 @@ include $(SRC_PATH)/tests/fate/checkasm.mak
 # Must be included after lavf-container.mak
 include $(SRC_PATH)/tests/fate/concatdec.mak
 include $(SRC_PATH)/tests/fate/cover-art.mak
+include $(SRC_PATH)/tests/fate/dashenc.mak
 include $(SRC_PATH)/tests/fate/dca.mak
 include $(SRC_PATH)/tests/fate/demux.mak
 include $(SRC_PATH)/tests/fate/dfa.mak
@@ -195,6 +196,7 @@ include $(SRC_PATH)/tests/fate/fits.mak
 include $(SRC_PATH)/tests/fate/flac.mak
 include $(SRC_PATH)/tests/fate/flvenc.mak
 include $(SRC_PATH)/tests/fate/gapless.mak
+include $(SRC_PATH)/tests/fate/generic-tags.mak
 include $(SRC_PATH)/tests/fate/gif.mak
 include $(SRC_PATH)/tests/fate/h264.mak
 include $(SRC_PATH)/tests/fate/hap.mak
@@ -240,6 +242,7 @@ include $(SRC_PATH)/tests/fate/qoa.mak
 include $(SRC_PATH)/tests/fate/qt.mak
 include $(SRC_PATH)/tests/fate/qtrle.mak
 include $(SRC_PATH)/tests/fate/real.mak
+include $(SRC_PATH)/tests/fate/sbc.mak
 include $(SRC_PATH)/tests/fate/screen.mak
 include $(SRC_PATH)/tests/fate/segafilm.mak
 include $(SRC_PATH)/tests/fate/segment.mak
@@ -256,6 +259,7 @@ include $(SRC_PATH)/tests/fate/vorbis.mak
 include $(SRC_PATH)/tests/fate/vpx.mak
 include $(SRC_PATH)/tests/fate/vqf.mak
 include $(SRC_PATH)/tests/fate/vvc.mak
+include $(SRC_PATH)/tests/fate/wav.mak
 include $(SRC_PATH)/tests/fate/wavpack.mak
 include $(SRC_PATH)/tests/fate/webm-dash-manifest.mak
 include $(SRC_PATH)/tests/fate/wma.mak

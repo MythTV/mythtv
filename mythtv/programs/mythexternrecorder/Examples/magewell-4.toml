@@ -1,0 +1,19 @@
+[RECORDER]
+command = "[[taskset -c ${CORE1}]][[,${CORE2}]][[,${CORE3}]][[,${CORE4}]] /usr/local/bin/magewell2ts --realtime -b ${BOARD} -i ${INPUT} -m -c ${CODEC} -q 21 ${LOG}"
+command_lowquality  = "/usr/local/bin/magewell2ts -b ${BOARD} -i ${INPUT} -m -c ${CODEC} -q 25 ${LOG}"
+command_default     = "/usr/local/bin/magewell2ts -b ${BOARD} -i ${INPUT} -m -c ${CODEC} -q 21 -t 4 ${LOG}"
+command_highquality = "/usr/local/bin/magewell2ts -b ${BOARD} -i ${INPUT} -m -c ${CODEC} -q 16 -t 6 ${LOG}"
+desc = "${DEVICE}+${BOARD}-${INPUT}-${SOURCE}"
+
+[TUNER]
+channels = "OnDemand-channels.toml"
+command = """
+${TUNER} --link "${LINK}"
+"""
+timeout = 90000
+
+[SCANNER]
+command = """
+/home/mythtv/mythtvguide/scan.sh "${CHANCONF}"
+"""
+timeout = 60000

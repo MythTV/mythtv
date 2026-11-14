@@ -103,6 +103,8 @@ class ChannelBase
     // \brief Get major input ID
     int GetMajorID(void);
 
+    QString GetProfileName(void) const;
+
     static ChannelBase *CreateChannel(
         TVRec                    *tvrec,
         const GeneralDBOptions   &genOpt,

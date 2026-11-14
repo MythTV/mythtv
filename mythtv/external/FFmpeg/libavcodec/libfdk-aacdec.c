@@ -159,18 +159,18 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
            channel_counts[ACT_BACK_TOP]  + channel_counts[ACT_TOP]);
 
     switch (channel_counts[ACT_FRONT]) {
+    case 5:
     case 4:
-        ch_layout |= AV_CH_LAYOUT_STEREO | AV_CH_FRONT_LEFT_OF_CENTER |
+        ch_layout |= AV_CH_FRONT_LEFT_OF_CENTER |
                      AV_CH_FRONT_RIGHT_OF_CENTER;
-        break;
+        av_fallthrough;
     case 3:
-        ch_layout |= AV_CH_LAYOUT_STEREO | AV_CH_FRONT_CENTER;
-        break;
     case 2:
         ch_layout |= AV_CH_LAYOUT_STEREO;
-        break;
+        av_fallthrough;
     case 1:
-        ch_layout |= AV_CH_FRONT_CENTER;
+        if (channel_counts[ACT_FRONT] & 1)
+            ch_layout |= AV_CH_FRONT_CENTER;
         break;
     default:
         av_log(avctx, AV_LOG_WARNING,
@@ -179,6 +179,7 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
         ch_error = 1;
         break;
     }
+
     if (channel_counts[ACT_SIDE] > 0) {
         if (channel_counts[ACT_SIDE] == 2) {
             ch_layout |= AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT;
@@ -191,14 +192,16 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
     }
     if (channel_counts[ACT_BACK] > 0) {
         switch (channel_counts[ACT_BACK]) {
+        case 4:
+            ch_layout |= AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT;
+            av_fallthrough;
         case 3:
-            ch_layout |= AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT | AV_CH_BACK_CENTER;
-            break;
         case 2:
             ch_layout |= AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT;
-            break;
+            av_fallthrough;
         case 1:
-            ch_layout |= AV_CH_BACK_CENTER;
+            if (channel_counts[ACT_BACK] & 1)
+                ch_layout |= AV_CH_BACK_CENTER;
             break;
         default:
             av_log(avctx, AV_LOG_WARNING,
@@ -216,6 +219,24 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
                    "unsupported number of LFE channels: %d\n",
                    channel_counts[ACT_LFE]);
             ch_error = 1;
+        }
+    }
+    if (channel_counts[ACT_FRONT_TOP] > 0) {
+        switch (channel_counts[ACT_FRONT_TOP]) {
+        case 3:
+        case 2:
+            ch_layout |= AV_CH_TOP_FRONT_LEFT | AV_CH_TOP_FRONT_RIGHT;
+            av_fallthrough;
+        case 1:
+            if (channel_counts[ACT_FRONT_TOP] & 1)
+                ch_layout |= AV_CH_TOP_FRONT_CENTER;
+            break;
+        default:
+            av_log(avctx, AV_LOG_WARNING,
+                   "unsupported number of top front channels: %d\n",
+                   channel_counts[ACT_FRONT_TOP]);
+            ch_error = 1;
+            break;
         }
     }
 
@@ -269,7 +290,7 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
     }
 
     if (s->downmix_layout.nb_channels > 0 &&
-        s->downmix_layout.order != AV_CHANNEL_ORDER_NATIVE) {
+        s->downmix_layout.order == AV_CHANNEL_ORDER_NATIVE) {
         int downmix_channels = -1;
 
         switch (s->downmix_layout.u.mask) {
@@ -301,6 +322,12 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
                }
             }
         }
+#if FDKDEC_VER_AT_LEAST(2, 5)
+    } else {
+        // AAC_PCM_MAX_OUTPUT_CHANNELS == 0 means outputting all the coded channels
+        if (aacDecoder_SetParam(s->handle, AAC_PCM_MAX_OUTPUT_CHANNELS, 0) != AAC_DEC_OK)
+           av_log(avctx, AV_LOG_WARNING, "Unable to set output channels in the decoder\n");
+#endif
     }
 
     if (s->drc_boost != -1) {

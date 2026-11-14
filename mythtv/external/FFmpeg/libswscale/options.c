@@ -51,6 +51,20 @@ static const AVOption swscale_options[] = {
         { "bitexact",        "bit-exact mode",                0,  AV_OPT_TYPE_CONST, { .i64 = SWS_BITEXACT       }, .flags = VE, .unit = "sws_flags" },
         { "error_diffusion", "error diffusion dither",        0,  AV_OPT_TYPE_CONST, { .i64 = SWS_ERROR_DIFFUSION}, .flags = VE, .unit = "sws_flags" },
         { "unstable",        "allow experimental new code",   0,  AV_OPT_TYPE_CONST, { .i64 = SWS_UNSTABLE       }, .flags = VE, .unit = "sws_flags" },
+        { "strict",          "require all metadata to be set",0,  AV_OPT_TYPE_CONST, { .i64 = SWS_STRICT         }, .flags = VE, .unit = "sws_flags" },
+
+    { "scaler",          "set scaling algorithm",         OFFSET(scaler),       AV_OPT_TYPE_INT,    { .i64 = SWS_SCALE_AUTO     }, .flags = VE, .unit = "sws_scaler", .max = SWS_SCALE_NB - 1 },
+    { "scaler_sub",      "set subsampling algorithm",     OFFSET(scaler_sub),   AV_OPT_TYPE_INT,    { .i64 = SWS_SCALE_AUTO     }, .flags = VE, .unit = "sws_scaler", .max = SWS_SCALE_NB - 1 },
+        { "auto",        "automatic selection",           0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_AUTO     }, .flags = VE, .unit = "sws_scaler" },
+        { "bilinear",    "bilinear filtering",            0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_BILINEAR }, .flags = VE, .unit = "sws_scaler" },
+        { "bicubic",     "2-tap cubic B-spline",          0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_BICUBIC  }, .flags = VE, .unit = "sws_scaler" },
+        { "point",       "point sampling",                0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_POINT    }, .flags = VE, .unit = "sws_scaler" },
+        { "neighbor",    "nearest neighbor",              0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_POINT    }, .flags = VE, .unit = "sws_scaler" },
+        { "area",        "area averaging",                0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_AREA     }, .flags = VE, .unit = "sws_scaler" },
+        { "gaussian",    "2-tap gaussian approximation",  0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_GAUSSIAN }, .flags = VE, .unit = "sws_scaler" },
+        { "sinc",        "unwindowed sinc",               0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_SINC     }, .flags = VE, .unit = "sws_scaler" },
+        { "lanczos",     "3-tap sinc/sinc",               0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_LANCZOS  }, .flags = VE, .unit = "sws_scaler" },
+        { "spline",      "2-tap cubic BC spline",         0,                    AV_OPT_TYPE_CONST,  { .i64 = SWS_SCALE_SPLINE   }, .flags = VE, .unit = "sws_scaler" },
 
     { "param0",          "scaler param 0", OFFSET(scaler_params[0]), AV_OPT_TYPE_DOUBLE, { .dbl = SWS_PARAM_DEFAULT  }, INT_MIN, INT_MAX, VE },
     { "param1",          "scaler param 1", OFFSET(scaler_params[1]), AV_OPT_TYPE_DOUBLE, { .dbl = SWS_PARAM_DEFAULT  }, INT_MIN, INT_MAX, VE },
@@ -91,6 +105,18 @@ static const AVOption swscale_options[] = {
         { "relative_colorimetric", "relative colorimetric clipping", 0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_RELATIVE_COLORIMETRIC }, .flags = VE, .unit = "intent" },
         { "saturation",            "saturation mapping",             0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_SATURATION            }, .flags = VE, .unit = "intent" },
         { "absolute_colorimetric", "absolute colorimetric clipping", 0, AV_OPT_TYPE_CONST,  { .i64 = SWS_INTENT_ABSOLUTE_COLORIMETRIC }, .flags = VE, .unit = "intent" },
+
+    { "sws_backends",    "set allowed swscale backends",  OFFSET(backends),  AV_OPT_TYPE_FLAGS,  { .i64  = 0                    }, .flags = VE, .unit = "sws_backend", .max = UINT_MAX },
+        { "auto",        "automatic selection",           0,                 AV_OPT_TYPE_CONST,  { .i64  = 0                    }, .flags = VE, .unit = "sws_backend" },
+        { "stable",      "All stable backends",           0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_STABLE   }, .flags = VE, .unit = "sws_backend" },
+        { "unstable",    "All unstable backends",         0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_UNSTABLE }, .flags = VE, .unit = "sws_backend" },
+        { "all",         "All available backends",        0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_ALL      }, .flags = VE, .unit = "sws_backend" },
+        { "legacy",      "legacy swscale code",           0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_LEGACY   }, .flags = VE, .unit = "sws_backend" },
+        { "c",           "template-based reference code", 0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_C        }, .flags = VE, .unit = "sws_backend" },
+        { "memcpy",      "fast path using libc memcpy",   0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_MEMCPY   }, .flags = VE, .unit = "sws_backend" },
+        { "x86",         "x86 SIMD kernels",              0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_X86      }, .flags = VE, .unit = "sws_backend" },
+        { "aarch64",     "AArch64 NEON kernels",          0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_AARCH64  }, .flags = VE, .unit = "sws_backend" },
+        { "spirv",       "Vulkan SPIR-V backend",         0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_SPIRV    }, .flags = VE, .unit = "sws_backend" },
 
     { NULL }
 };

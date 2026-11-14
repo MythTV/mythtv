@@ -178,25 +178,58 @@ function ff_vector_fmul_reverse_neon, export=1
 endfunc
 
 function ff_butterflies_float_neon, export=1
-1:      ld1             {v0.4s}, [x0]
+        subs            w2,  w2,  #8
+        b.lt            2f
+1:      ldp             q0,  q1,  [x0]
+        ldp             q2,  q3,  [x1]
+        subs            w2,  w2,  #8
+        fadd            v4.4s,   v0.4s,  v2.4s
+        fadd            v5.4s,   v1.4s,  v3.4s
+        fsub            v0.4s,   v0.4s,  v2.4s
+        fsub            v1.4s,   v1.4s,  v3.4s
+        st1             {v4.4s,  v5.4s}, [x0], #32
+        st1             {v0.4s,  v1.4s}, [x1], #32
+        b.ge            1b
+2:      tbz             w2,  #2,  3f
+        ld1             {v0.4s}, [x0]
         ld1             {v1.4s}, [x1]
-        subs            w2,  w2,  #4
         fsub            v2.4s,   v0.4s,  v1.4s
         fadd            v3.4s,   v0.4s,  v1.4s
-        st1             {v2.4s}, [x1],   #16
-        st1             {v3.4s}, [x0],   #16
-        b.gt            1b
-        ret
+        st1             {v2.4s}, [x1]
+        st1             {v3.4s}, [x0]
+3:      ret
 endfunc
 
 function ff_scalarproduct_float_neon, export=1
-        movi            v2.4s,  #0
-1:      ld1             {v0.4s}, [x0],   #16
-        ld1             {v1.4s}, [x1],   #16
-        subs            w2,      w2,     #4
-        fmla            v2.4s,   v0.4s,  v1.4s
-        b.gt            1b
-        faddp           v0.4s,   v2.4s,  v2.4s
-        faddp           s0,      v0.2s
+        // 16 elements per iteration; w3 = len / 16.
+        lsr             w3, w2, #4
+        movi            v2.4s, #0
+        movi            v3.4s, #0
+        movi            v4.4s, #0
+        movi            v5.4s, #0
+        cbz             w3, 2f
+1:      ld1             {v16.4s, v17.4s}, [x0], #32
+        ld1             {v20.4s, v21.4s}, [x1], #32
+        ld1             {v18.4s, v19.4s}, [x0], #32
+        ld1             {v22.4s, v23.4s}, [x1], #32
+        subs            w3, w3, #1
+        fmla            v2.4s, v16.4s, v20.4s
+        fmla            v3.4s, v17.4s, v21.4s
+        fmla            v4.4s, v18.4s, v22.4s
+        fmla            v5.4s, v19.4s, v23.4s
+        b.ne            1b
+2:      // len is a multiple of 4
+        and             w2, w2, #12
+        cbz             w2, 4f
+3:      ld1             {v0.4s}, [x0], #16
+        ld1             {v1.4s}, [x1], #16
+        subs            w2, w2, #4
+        fmla            v2.4s, v0.4s, v1.4s
+        b.ne            3b
+4:      fadd            v2.4s, v2.4s, v3.4s
+        fadd            v4.4s, v4.4s, v5.4s
+        fadd            v2.4s, v2.4s, v4.4s
+        faddp           v0.4s, v2.4s, v2.4s
+        faddp           s0, v0.2s
         ret
 endfunc

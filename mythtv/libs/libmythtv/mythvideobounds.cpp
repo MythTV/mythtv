@@ -25,6 +25,7 @@
 
 // Qt
 #include <QApplication>
+#include <QWindow>
 
 // MythtTV
 #include "libmythbase/mythcorecontext.h"
@@ -86,10 +87,8 @@ void MythVideoBounds::SetDisplay(MythDisplay *mDisplay)
 void MythVideoBounds::DisplayChanged()
 {
     PopulateGeometry();
-#ifdef Q_OS_MACOS
     // PopulateGeometry will update m_devicePixelRatio
     m_windowRect = m_displayVisibleRect = SCALED_RECT(m_rawWindowRect, m_devicePixelRatio);
-#endif
     MoveResize();
 }
 
@@ -102,9 +101,8 @@ void MythVideoBounds::PopulateGeometry(void)
     if (!screen)
         return;
 
-#ifdef Q_OS_MACOS
-    m_devicePixelRatio = screen->devicePixelRatio();
-#endif
+    QWindow *window = m_display->GetCurrentWindow();
+    m_devicePixelRatio = window ? window->devicePixelRatio() : screen->devicePixelRatio();
 
     if (MythDisplay::SpanAllScreens() && MythDisplay::GetScreenCount() > 1)
     {

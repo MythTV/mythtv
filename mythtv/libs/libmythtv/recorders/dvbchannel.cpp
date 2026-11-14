@@ -89,7 +89,7 @@ DVBChannel::DVBChannel(QString aDevice, TVRec *parent)
             .arg(CardUtil::GetSourceID(m_pParent->GetInputId()));
 
     s_master_map[m_key].push_back(this); // == RegisterForMaster
-    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
     if (master == this)
     {
         m_dvbCam = new DVBCam(m_device);
@@ -110,13 +110,13 @@ DVBChannel::~DVBChannel()
     // Set a new master if there are other instances and we're the master
     // whether we are the master or not remove us from the map..
     s_master_map_lock.lockForWrite();
-    auto *master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+    auto *master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
     if (master == this)
     {
         s_master_map[m_key].pop_front();
         DVBChannel *new_master = nullptr;
-        if (!s_master_map[m_key].empty())
-            new_master = dynamic_cast<DVBChannel*>(s_master_map[m_key].front());
+        if (!s_master_map.value(m_key).empty())
+            new_master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
         if (new_master)
         {
             QMutexLocker master_locker(&(master->m_hwLock));
@@ -134,7 +134,7 @@ DVBChannel::~DVBChannel()
 
     // If we're the last one out delete dvbcam
     s_master_map_lock.lockForRead();
-    MasterMap::iterator mit = s_master_map.find(m_key);
+    auto mit = s_master_map.constFind(m_key);
     if ((*mit).empty())
         delete m_dvbCam;
     m_dvbCam = nullptr;
@@ -149,11 +149,8 @@ void DVBChannel::Close(DVBChannel *who)
 
     QMutexLocker locker(&m_hwLock);
 
-    IsOpenMap::iterator it = m_isOpen.find(who);
-    if (it == m_isOpen.end())
+    if (!m_isOpen.remove(who))
         return; // This caller didn't have it open in the first place..
-
-    m_isOpen.erase(it);
 
     DVBChannel *master = GetMasterLock();
     if (master != nullptr && master != this)

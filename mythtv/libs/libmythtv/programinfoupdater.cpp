@@ -14,6 +14,7 @@ void ProgramInfoUpdater::insert(
     QMutexLocker locker(&m_lock);
     if (kPIUpdate == action || kPIUpdateFileSize == action)
     {
+        // clazy:exclude-next-line=detaching-member (updates value)
         QHash<uint,PIKeyData>::iterator it = m_needsUpdate.find(recordedid);
         // If there is no action in the set we can insert
         // If it is the same type of action we can overwrite,
@@ -73,21 +74,27 @@ void ProgramInfoUpdater::run(void)
 
         // Send updates in any old order, we just need
         // one per updated ProgramInfo.
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
         // NOLINTNEXTLINE(modernize-loop-convert)
-        for (auto itu = m_needsUpdate.begin(); itu != m_needsUpdate.end(); ++itu)
+        for (auto itu = m_needsUpdate.constBegin();
+             itu != m_needsUpdate.constEnd(); ++itu)
         {
+            auto key = itu.key();
+            auto data = itu.value();
+#else
+        for (auto [key, data] : std::as_const(m_needsUpdate).asKeyValueRange())
+        {
+#endif
             QString msg;
 
-            if (kPIUpdateFileSize == (*itu).m_action)
+            if (kPIUpdateFileSize == data.m_action)
             {
-                msg = QString("UPDATE_FILE_SIZE %1 %2")
-                    .arg(itu.key())
-                    .arg((*itu).m_filesize);
+                msg = QString("UPDATE_FILE_SIZE %1 %2").arg(key)
+                    .arg(data.m_filesize);
             }
             else
             {
-                msg = QString("MASTER_UPDATE_REC_INFO %1")
-                    .arg(itu.key());
+                msg = QString("MASTER_UPDATE_REC_INFO %1").arg(key);
             }
 
             workDone = true;

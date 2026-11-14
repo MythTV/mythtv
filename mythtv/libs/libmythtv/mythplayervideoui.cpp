@@ -153,16 +153,15 @@ void MythPlayerVideoUI::HandleDecoderCallback(const QString& Debug, DecoderCallb
 void MythPlayerVideoUI::ProcessCallbacks()
 {
     m_decoderCallbackLock.lock();
-    // NOLINTNEXTLINE(readability-qualified-auto) for Qt6
-    for (auto it = m_decoderCallbacks.begin(); it != m_decoderCallbacks.end(); ++it)
+    for (const auto& callback : std::as_const(m_decoderCallbacks))
     {
-        if (it->m_function)
+        if (callback.m_function)
         {
-            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(it->m_debug));
-            it->m_function(it->m_opaque1, it->m_opaque2, it->m_opaque3);
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Executing %1").arg(callback.m_debug));
+            callback.m_function(callback.m_opaque1, callback.m_opaque2, callback.m_opaque3);
         }
-        if (it->m_ready)
-            it->m_ready->ref();
+        if (callback.m_ready)
+            callback.m_ready->ref();
     }
     m_decoderCallbacks.clear();
     m_decoderCallbackLock.unlock();

@@ -1,0 +1,116 @@
+
+#include "libmythbase/mythlogging.h"
+
+#include <QJsonDocument>
+#include <QJsonParseError>
+
+#include "stdinnotifier.h"
+#include <array>
+#include <cstdio>
+#include <unistd.h>
+#include <fcntl.h>
+
+StdinNotifier::StdinNotifier(QObject *parent)
+    : QObject(parent),
+      m_notifier(new QSocketNotifier(fileno(stdin),
+                                     QSocketNotifier::Read,
+                                     this))
+{
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+
+    connect(m_notifier,
+            &QSocketNotifier::activated,
+            this,
+            &StdinNotifier::handleReadyRead);
+}
+
+void StdinNotifier::handleReadyRead()
+{
+    m_notifier->setEnabled(false);
+
+    std::array<char, 4096> buffer {};
+    bool immediateEof = false;
+
+    for (;;)
+    {
+        ssize_t count = ::read(STDIN_FILENO, buffer.data(), buffer.size());
+
+        if (count > 0)
+        {
+            m_buffer.append(buffer.data(), count);
+            continue;
+        }
+
+        if (count == 0)
+        {
+            // Mark EOF state instead of returning instantly so
+            // m_buffer is drained first
+            immediateEof = true;
+            break;
+        }
+
+        if (errno == EINTR)
+            continue;
+
+        if (errno == EAGAIN)
+            break;
+
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("stdin read failed: %1")
+            .arg(QString::fromLocal8Bit(strerror(errno))));
+
+        emit finished();
+        return;
+    }
+
+    for (;;)
+    {
+        qsizetype newline = m_buffer.indexOf('\n');
+
+        if (newline < 0)
+            break;
+
+        QByteArray line = m_buffer.left(newline);
+        m_buffer.remove(0, newline + 1);
+
+        line = line.trimmed();
+
+        if (line.isEmpty())
+            continue;
+
+        LOG(VB_GENERAL, LOG_DEBUG,
+            QString("StdinNotifier received: [%1]")
+            .arg(QString::fromUtf8(line)));
+
+        if (line == "APIVersion?")
+        {
+            emit apiVersionRequested();
+            continue;
+        }
+
+        QJsonParseError jsonError {};
+        QJsonDocument jsonDoc =
+            QJsonDocument::fromJson(line, &jsonError);
+
+        if (jsonDoc.isNull() || !jsonDoc.isObject())
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Invalid JSON message received: %1. Details: %2")
+                .arg(QString::fromUtf8(line),
+                     jsonError.errorString()));
+            continue;
+        }
+
+        emit commandReceived(jsonDoc.object());
+    }
+
+    // exit only after lines are finished being processed
+    if (immediateEof)
+    {
+        emit finished();
+        return;
+    }
+
+    m_notifier->setEnabled(true);
+}

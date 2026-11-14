@@ -10,17 +10,10 @@ BackendContext *gBackendContext = nullptr;
 
 BackendContext::~BackendContext()
 {
-    QMap<QString, Frontend*>::iterator it = m_knownFrontends.begin();
-    while (it != m_knownFrontends.end())
-    {
-        Frontend *fe = (*it);
-        delete fe;
-        fe = nullptr;
-        ++it;
-    }
+    qDeleteAll(m_knownFrontends);
+    m_knownFrontends.clear();
 
     m_connectedFrontends.clear();
-    m_knownFrontends.clear();
 }
 
 void BackendContext::SetFrontendConnected(Frontend *frontend)

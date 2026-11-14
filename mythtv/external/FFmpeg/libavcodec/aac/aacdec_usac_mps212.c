@@ -240,7 +240,7 @@ static void huff_data_2d(GetBitContext *gb, int16_t *part0_data[2], int16_t (*da
                    0, 2*esc_cnt, 0, (2*lav + 1));
         for (i = 0; i < esc_cnt; i++) {
             data[esc_idx[i]][0] = esc_data[0][i] - lav;
-            data[esc_idx[i]][0] = esc_data[0][i] - lav;
+            data[esc_idx[i]][1] = esc_data[1][i] - lav;
         }
     }
 }
@@ -464,10 +464,10 @@ static int ec_pair_dec(GetBitContext *gb,
     }
 
     if (pair) {
-        p_data[0] = data_pair[0];
-        p_data[1] = data_pair[1];
+        p_data[0] = data_diff[0];
+        p_data[1] = data_diff[1];
     } else {
-        p_data[0] = data_pair[0];
+        p_data[0] = data_diff[0];
         p_data[1] = NULL;
     }
 
@@ -480,7 +480,7 @@ static int ec_pair_dec(GetBitContext *gb,
     if (pair && (diff_freq[0] || diff_time_back))
         diff_freq[1] = !get_bits1(gb);
 
-    int time_pair;
+    int time_pair = 0;
     huff_decode(gb, p_data, data_type, diff_freq,
                 nb_bands, &time_pair);
 
@@ -534,11 +534,11 @@ static int ec_pair_dec(GetBitContext *gb,
     }
 
     /* Decode LSBs */
-    attach_lsb(gb, p_data[0], quant_offset, attach_lsb_flag,
-               nb_bands, p_data[0]);
+    attach_lsb(gb, data_pair[0], quant_offset, attach_lsb_flag,
+               nb_bands, data_pair[0]);
     if (pair)
-        attach_lsb(gb, p_data[1], quant_offset, attach_lsb_flag,
-                   nb_bands, p_data[1]);
+        attach_lsb(gb, data_pair[1], quant_offset, attach_lsb_flag,
+                   nb_bands, data_pair[1]);
 
     memcpy(&set1[start_band], data_pair[0], 2*nb_bands);
     if (pair)
@@ -645,7 +645,7 @@ int ff_aac_ec_data_dec(GetBitContext *gb, AACMPSLosslessData *ld,
                                           stride_table[ld->freq_res[set_idx]],
                                           start_band, end_band);
 
-        if (set_idx + data_pair > MPS_MAX_PARAM_SETS)
+        if (set_idx + data_pair >= MPS_MAX_PARAM_SETS)
             return AVERROR(EINVAL);
 
         for (int j = 0; j < data_bands; j++)
@@ -858,7 +858,7 @@ int ff_aac_map_index_data(AACMPSLosslessData *ld,
     for (int i = 0; i < nb_param_sets; i++) {
         if (ld->coarse_quant_no[i] == 1) {
             coarse_to_fine(tmp_idx_data[i], data_type, start_band,
-                           stop_band - start_band);
+                           stop_band);
             ld->coarse_quant_no[i] = 0;
         }
     }

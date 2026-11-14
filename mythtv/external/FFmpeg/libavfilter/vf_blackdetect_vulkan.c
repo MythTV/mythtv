@@ -19,13 +19,14 @@
  */
 
 #include <float.h>
-#include "libavutil/vulkan_spirv.h"
 #include "libavutil/opt.h"
 #include "libavutil/timestamp.h"
 #include "vulkan_filter.h"
 
 #include "filters.h"
-#include "video.h"
+
+extern const unsigned char ff_blackdetect_comp_spv_data[];
+extern const unsigned int ff_blackdetect_comp_spv_len;
 
 typedef struct BlackDetectVulkanContext {
     FFVulkanContext vkctx;
@@ -36,12 +37,15 @@ typedef struct BlackDetectVulkanContext {
     FFVulkanShader shd;
     AVBufferPool *sum_buf_pool;
 
-    double black_min_duration_time;
     double picture_black_ratio_th;
     double pixel_black_th;
     int    alpha;
 
-    int64_t black_start;
+    int64_t black_start;             ///< pts start time of the first black picture
+    int64_t last_pts;                ///< pts of the last filtered frame
+    double  black_min_duration_time; ///< minimum duration of detected black, in seconds
+    int64_t black_min_duration;      ///< minimum duration of detected black, expressed in timebase units
+    AVRational time_base;
 } BlackDetectVulkanContext;
 
 typedef struct BlackDetectPushData {
@@ -56,26 +60,15 @@ typedef struct BlackDetectBuf {
 static av_cold int init_filter(AVFilterContext *ctx)
 {
     int err;
-    uint8_t *spv_data;
-    size_t spv_len;
-    void *spv_opaque = NULL;
     BlackDetectVulkanContext *s = ctx->priv;
     FFVulkanContext *vkctx = &s->vkctx;
-    FFVulkanShader *shd;
-    FFVkSPIRVCompiler *spv;
-    FFVulkanDescriptorSetBinding *desc;
+    const AVFilterLink *inlink = ctx->inputs[0];
     const int plane = s->alpha ? 3 : 0;
 
     const AVPixFmtDescriptor *pixdesc = av_pix_fmt_desc_get(s->vkctx.input_format);
     if (pixdesc->flags & AV_PIX_FMT_FLAG_RGB) {
         av_log(ctx, AV_LOG_ERROR, "RGB inputs are not supported\n");
         return AVERROR(ENOTSUP);
-    }
-
-    spv = ff_vk_spirv_init();
-    if (!spv) {
-        av_log(ctx, AV_LOG_ERROR, "Unable to initialize SPIR-V compiler!\n");
-        return AVERROR_EXTERNAL;
     }
 
     s->qf = ff_vk_qf_find(vkctx, VK_QUEUE_COMPUTE_BIT, 0);
@@ -86,89 +79,58 @@ static av_cold int init_filter(AVFilterContext *ctx)
     }
 
     RET(ff_vk_exec_pool_init(vkctx, s->qf, &s->e, s->qf->num*4, 0, 0, 0, NULL));
-    RET(ff_vk_shader_init(vkctx, &s->shd, "blackdetect",
-                          VK_SHADER_STAGE_COMPUTE_BIT,
-                          (const char *[]) { "GL_KHR_shader_subgroup_ballot" }, 1,
-                          32, 32, 1,
-                          0));
-    shd = &s->shd;
 
-    GLSLC(0, layout(push_constant, std430) uniform pushConstants {            );
-    GLSLC(1,     float threshold;                                             );
-    GLSLC(0, };                                                               );
+    SPEC_LIST_CREATE(sl, 2, 2*sizeof(uint32_t))
+    SPEC_LIST_ADD(sl, 0, 32, plane);
+    SPEC_LIST_ADD(sl, 1, 32, SLICES);
 
-    ff_vk_shader_add_push_const(shd, 0, sizeof(BlackDetectPushData),
+    ff_vk_shader_load(&s->shd, VK_SHADER_STAGE_COMPUTE_BIT, sl,
+                      (int []) { 32, 32, 1 }, 0);
+
+    ff_vk_shader_add_push_const(&s->shd, 0, sizeof(BlackDetectPushData),
                                 VK_SHADER_STAGE_COMPUTE_BIT);
 
-    desc = (FFVulkanDescriptorSetBinding []) {
-        {
-            .name       = "input_img",
+    const FFVulkanDescriptorSetBinding desc[] = {
+        { /* input_img */
             .type       = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-            .mem_layout = ff_vk_shader_rep_fmt(s->vkctx.input_format, FF_VK_REP_FLOAT),
-            .mem_quali  = "readonly",
-            .dimensions = 2,
-            .elems      = av_pix_fmt_count_planes(s->vkctx.input_format),
             .stages     = VK_SHADER_STAGE_COMPUTE_BIT,
-        }, {
-            .name        = "sum_buffer",
+            .elems      = av_pix_fmt_count_planes(s->vkctx.input_format),
+        },
+        { /* sum_buffer */
             .type        = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
             .stages      = VK_SHADER_STAGE_COMPUTE_BIT,
-            .buf_content = "uint slice_sum[];",
         }
     };
+    ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0);
 
-    RET(ff_vk_shader_add_descriptor_set(vkctx, &s->shd, desc, 2, 0, 0));
-
-    GLSLC(0, shared uint wg_sum;                                              );
-    GLSLC(0,                                                                  );
-    GLSLC(0, void main()                                                      );
-    GLSLC(0, {                                                                );
-    GLSLC(1,     wg_sum = 0u;                                                 );
-    GLSLC(1,     barrier();                                                   );
-    GLSLC(0,                                                                  );
-    GLSLC(1,     const ivec2 pos = ivec2(gl_GlobalInvocationID.xy);           );
-    GLSLF(1,     if (!IS_WITHIN(pos, imageSize(input_img[%d])))               ,plane);
-    GLSLC(2,         return;                                                  );
-    GLSLF(1,     float value = imageLoad(input_img[%d], pos).x;               ,plane);
-    GLSLC(1,     uvec4 isblack = subgroupBallot(value <= threshold);          );
-    GLSLC(1,     if (subgroupElect())                                         );
-    GLSLC(2,         atomicAdd(wg_sum, subgroupBallotBitCount(isblack));      );
-    GLSLC(1,     barrier();                                                   );
-    GLSLC(1,     if (gl_LocalInvocationIndex == 0u)                           );
-    GLSLF(2,         atomicAdd(slice_sum[gl_WorkGroupID.x %% %du], wg_sum);   ,SLICES);
-    GLSLC(0, }                                                                );
-
-    RET(spv->compile_shader(vkctx, spv, &s->shd, &spv_data, &spv_len, "main",
-                            &spv_opaque));
-    RET(ff_vk_shader_link(vkctx, &s->shd, spv_data, spv_len, "main"));
+    RET(ff_vk_shader_link(vkctx, &s->shd,
+                          ff_blackdetect_comp_spv_data,
+                          ff_blackdetect_comp_spv_len, "main"));
 
     RET(ff_vk_shader_register_exec(vkctx, &s->e, &s->shd));
 
+    s->time_base = inlink->time_base;
+    s->black_min_duration = s->black_min_duration_time / av_q2d(s->time_base);
     s->black_start = AV_NOPTS_VALUE;
     s->initialized = 1;
 
 fail:
-    if (spv_opaque)
-        spv->free_shader(spv, &spv_opaque);
-    if (spv)
-        spv->uninit(&spv);
-
     return err;
 }
 
 static void report_black_region(AVFilterContext *ctx, int64_t black_end)
 {
     BlackDetectVulkanContext *s = ctx->priv;
-    const AVFilterLink *inlink = ctx->inputs[0];
+
     if (s->black_start == AV_NOPTS_VALUE)
         return;
 
-    if ((black_end - s->black_start) >= s->black_min_duration_time / av_q2d(inlink->time_base)) {
+    if ((black_end - s->black_start) >= s->black_min_duration) {
         av_log(ctx, AV_LOG_INFO,
                "black_start:%s black_end:%s black_duration:%s\n",
-               av_ts2timestr(s->black_start, &inlink->time_base),
-               av_ts2timestr(black_end, &inlink->time_base),
-               av_ts2timestr(black_end - s->black_start, &inlink->time_base));
+               av_ts2timestr(s->black_start, &s->time_base),
+               av_ts2timestr(black_end, &s->time_base),
+               av_ts2timestr(black_end - s->black_start, &s->time_base));
     }
 }
 
@@ -344,6 +306,7 @@ static int blackdetect_vulkan_filter_frame(AVFilterLink *link, AVFrame *in)
     RET(ff_vk_exec_submit(vkctx, exec));
     ff_vk_exec_wait(vkctx, exec);
     evaluate(link, in, sum);
+    s->last_pts = in->pts;
 
     av_buffer_unref(&sum_buf);
     return ff_filter_frame(outlink, in);
@@ -359,11 +322,12 @@ fail:
 static void blackdetect_vulkan_uninit(AVFilterContext *avctx)
 {
     BlackDetectVulkanContext *s = avctx->priv;
-    AVFilterLink *inlink = avctx->inputs[0];
-    FilterLink *inl = ff_filter_link(inlink);
     FFVulkanContext *vkctx = &s->vkctx;
 
-    report_black_region(avctx, inl->current_pts);
+    /* the input link may be gone here: during graph teardown the upstream
+     * filter can be freed first. Use the cached pts of the last frame */
+    if (s->initialized)
+        report_black_region(avctx, s->last_pts);
 
     ff_vk_exec_pool_free(vkctx, &s->e);
     ff_vk_shader_free(vkctx, &s->shd);

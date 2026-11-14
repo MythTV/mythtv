@@ -6,7 +6,6 @@
 #include <cstring>
 
 #include "goom_core.h"
-#include "goom_tools.h"
 #include "filters.h"
 #include "lines.h"
 #include "ifs.h"

@@ -62,8 +62,8 @@ DeviceLocation *SSDPCacheEntries::Find(const QString &sUSN)
 {
     QMutexLocker locker(&m_mutex);
 
-    EntryMap::iterator it = m_mapEntries.find(GetNormalizedUSN(sUSN));
-    DeviceLocation *pEntry = (it != m_mapEntries.end()) ? *it : nullptr;
+    const auto it = m_mapEntries.constFind(GetNormalizedUSN(sUSN));
+    DeviceLocation *pEntry = (it != m_mapEntries.constEnd()) ? *it : nullptr;
     if (pEntry)
         pEntry->IncrRef();
 
@@ -108,8 +108,8 @@ void SSDPCacheEntries::Insert(const QString &sUSN, DeviceLocation *pEntry)
 
     QString usn = GetNormalizedUSN(sUSN);
 
-    EntryMap::iterator it = m_mapEntries.find(usn);
-    if ((it != m_mapEntries.end()) && (*it != nullptr))
+    auto it = m_mapEntries.constFind(usn);
+    if ((it != m_mapEntries.constEnd()) && (*it != nullptr))
         (*it)->DecrRef();
 
     m_mapEntries[usn] = pEntry;
@@ -124,6 +124,8 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
     QMutexLocker locker(&m_mutex);
 
     QString usn = GetNormalizedUSN(sUSN);
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     EntryMap::iterator it = m_mapEntries.find(usn);
     if (it != m_mapEntries.end())
     {
@@ -139,6 +141,24 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 
         m_mapEntries.erase(it);
     }
+#else
+    m_mapEntries.removeIf( [usn](auto it) {
+        if (it.key() != usn)
+            return false;
+
+        if (*it)
+        {
+            LOG(VB_UPNP, LOG_INFO,
+                QString("SSDP Cache removing USN: %1 Location %2")
+                    .arg((*it)->m_sUSN, (*it)->m_sLocation));
+            (*it)->DecrRef();
+        }
+
+        // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
+
+        return true;
+    });
+#endif
 }
 
 /// Removes expired cache entries, returning the number removed.
@@ -147,6 +167,8 @@ uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
     QMutexLocker locker(&m_mutex);
     uint nCount = 0;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     EntryMap::iterator it = m_mapEntries.begin();
     while (it != m_mapEntries.end())
     {
@@ -170,6 +192,21 @@ uint SSDPCacheEntries::RemoveStale(const std::chrono::microseconds ttNow)
             ++it;
         }
     }
+#else
+    nCount = m_mapEntries.removeIf( [ttNow](auto it) {
+        if (*it == nullptr)
+            return true;
+        if ((*it)->m_ttExpires >= ttNow)
+            return false;
+        // Note: locking is not required above since we hold
+        // one reference to each entry and are holding m_mutex.
+        (*it)->DecrRef();
+
+        // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
+
+        return true;
+    } );
+#endif
 
     return nCount;
 }
@@ -342,11 +379,11 @@ SSDPCacheEntries *SSDPCache::Find(const QString &sURI)
 {
     QMutexLocker locker(&m_mutex);
 
-    SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
-    if (it != m_cache.end() && (*it != nullptr))
+    auto it = m_cache.constFind(sURI);
+    if (it != m_cache.constEnd() && (*it != nullptr))
         (*it)->IncrRef();
 
-    return (it != m_cache.end()) ? *it : nullptr;
+    return (it != m_cache.constEnd()) ? *it : nullptr;
 }
 
 /// Finds the Device in the cache, returns nullptr when absent
@@ -387,6 +424,7 @@ void SSDPCache::Add( const QString &sURI,
     SSDPCacheEntries *pEntries = nullptr;
     {
         QMutexLocker locker(&m_mutex);
+        // clazy:exclude-next-line=detaching-member (adds item)
         SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
         if (it == m_cache.end() || (*it == nullptr))
         {
@@ -464,6 +502,7 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
     // Get a Pointer to a Entries QDict... (Create if not found)
     // --------------------------------------------------------------
 
+    // clazy:exclude-next-line=detaching-member (erases item)
     SSDPCacheEntriesMap::Iterator it = m_cache.find( sURI );
 
     if (it != m_cache.end())
@@ -511,9 +550,15 @@ int SSDPCache::RemoveStale()
     // Iterate through all Type URI's and build list of stale entries keys
     // ----------------------------------------------------------------------
 
-    for (auto it = m_cache.begin(); it != m_cache.end(); ++it )
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_cache.constBegin(); it != m_cache.constEnd(); ++it )
     {
+        const QString& key = it.key();
         SSDPCacheEntries *pEntries = *it;
+#else
+    for (auto [key, pEntries] : std::as_const(m_cache).asKeyValueRange())
+    {
+#endif
 
         if (pEntries != nullptr)
         {
@@ -522,7 +567,7 @@ int SSDPCache::RemoveStale()
             nCount += pEntries->RemoveStale( ttNow );
 
             if (pEntries->Count() == 0)
-                lstKeys.append( it.key() );
+                lstKeys.append( key );
 
             pEntries->DecrRef();
         }
@@ -537,6 +582,8 @@ int SSDPCache::RemoveStale()
 
     for (const auto & key : std::as_const(lstKeys))
     {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         SSDPCacheEntriesMap::iterator it = m_cache.find( key );
         if (it == m_cache.end())
             continue;
@@ -546,6 +593,16 @@ int SSDPCache::RemoveStale()
             (*it)->DecrRef();
             m_cache.erase(it);
         }
+#else
+        m_cache.removeIf( [key](auto it) {
+            if (it.key() != key)
+                return false;
+            if (!*it)
+                return false;
+            (*it)->DecrRef();
+            return true;
+        } );
+#endif
     }
 
     Unlock();

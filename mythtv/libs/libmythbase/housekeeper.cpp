@@ -617,8 +617,8 @@ HouseKeeper::~HouseKeeper(void)
     {
         QMutexLocker threadLock(&m_threadLock);
         // tell primary thread to self-terminate and wake it
-        m_threadList.first()->Discard();
-        m_threadList.first()->Wake();
+        m_threadList.constFirst()->Discard();
+        m_threadList.constFirst()->Wake();
         // wait for any remaining threads to self-terminate and close
         while (!m_threadList.isEmpty())
         {
@@ -631,12 +631,9 @@ HouseKeeper::~HouseKeeper(void)
     {
         // unload any registered tasks
         QMutexLocker mapLock(&m_mapLock);
-        QMap<QString,HouseKeeperTask*>::iterator it = m_taskMap.begin();
-        while (it != m_taskMap.end())
-        {
-            (*it)->DecrRef();
-            it = m_taskMap.erase(it);
-        }
+        for (auto* task : std::as_const(m_taskMap))
+            task->DecrRef();
+        m_taskMap.clear();
     }
 }
 
@@ -662,8 +659,8 @@ void HouseKeeper::RegisterTask(HouseKeeperTask *task)
 void HouseKeeper::UnregisterTask(const QString& tag)
 {
     QMutexLocker mapLock(&m_mapLock);
-    auto it = m_taskMap.find(tag);
-    if (it == m_taskMap.end())
+    auto it = m_taskMap.constFind(tag);
+    if (it == m_taskMap.constEnd())
     {
         LOG(VB_GENERAL, LOG_ERR,
                 QString("HouseKeeperTask '%1' doesn't exist.").arg(tag));
@@ -719,7 +716,7 @@ void HouseKeeper::Start(void)
             QDateTime lastrun = MythDate::as_utc(query.value(1).toDateTime());
 
             if (m_taskMap.contains(tag))
-                m_taskMap[tag]->SetLastRun(lastrun);
+                m_taskMap.value(tag)->SetLastRun(lastrun);
         }
     }
 
@@ -757,6 +754,8 @@ void HouseKeeper::Run(void)
 
     QMutexLocker mapLock(&m_mapLock);
     // Remove any tasks that have finished
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_taskMap.begin(); it != m_taskMap.end(); )
     {
         if ((*it)->IsFinished())
@@ -771,17 +770,35 @@ void HouseKeeper::Run(void)
             it++;
         }
     }
+#else
+    m_taskMap.removeIf( [](const auto it){
+        if (!(*it)->IsFinished())
+            return false;
+        LOG(VB_GENERAL, LOG_INFO,
+            QString("Removing finished  HouseKeeperTask '%1'.")
+            .arg(it.key()));
+        return true;
+    } );
+#endif
 
     // check if any tasks are ready to run, and add to queue
-    for (auto it = m_taskMap.begin(); it != m_taskMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_taskMap.constBegin();
+         it != m_taskMap.constEnd(); ++it)
     {
-        if ((*it)->CheckRun(now))
+        const auto& name = it.key();
+        auto* task = it.value();
+#else
+    for (auto [name, task] : std::as_const(m_taskMap).asKeyValueRange())
+    {
+#endif
+        if (task->CheckRun(now))
         {
             LOG(VB_GENERAL, LOG_INFO,
-                QString("Queueing HouseKeeperTask '%1'.").arg(it.key()));
+                QString("Queueing HouseKeeperTask '%1'.").arg(name));
             QMutexLocker queueLock(&m_queueLock);
-            (*it)->IncrRef();
-            m_taskQueue.enqueue(*it);
+            task->IncrRef();
+            m_taskQueue.enqueue(task);
         }
     }
 
@@ -795,6 +812,8 @@ void HouseKeeper::Run(void)
         QMutexLocker threadLock(&m_threadLock);
         int count1 = m_threadList.size();
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         auto it = m_threadList.begin();
         ++it; // skip the primary thread
         while (it != m_threadList.end())
@@ -809,6 +828,17 @@ void HouseKeeper::Run(void)
                 it = m_threadList.erase(it);
             }
         }
+#else
+        int index { 0 };
+        m_threadList.removeIf( [&index](auto thread){
+            if (index++ == 0) // skip the primary thread
+                return false;
+            if (thread->isRunning())
+                return false;
+            delete thread;
+            return true;
+        } );
+#endif
 
         int count2 = m_threadList.size();
         if (count1 > count2)
@@ -857,7 +887,7 @@ void HouseKeeper::StartThread(void)
             QString("Current HouseKeepingThread is delayed on task, "
                     "spawning replacement. Current count %1.")
                             .arg(m_threadList.size()));
-        m_threadList.first()->Discard();
+        m_threadList.constFirst()->Discard();
         auto *thread = new HouseKeepingThread(this);
         m_threadList.prepend(thread);
         thread->start();
@@ -867,7 +897,7 @@ void HouseKeeper::StartThread(void)
     {
         // the old thread is idle, so just wake it for processing
         LOG(VB_GENERAL, LOG_DEBUG, "Waking HouseKeepingThread.");
-        m_threadList.first()->Wake();
+        m_threadList.constFirst()->Wake();
     }
 }
 
@@ -894,14 +924,15 @@ void HouseKeeper::customEvent(QEvent *e)
             QMutexLocker mapLock(&m_mapLock);
             if (m_taskMap.contains(tag))
             {
-                if ((m_taskMap[tag]->GetScope() == kHKGlobal) ||
-                        ((m_taskMap[tag]->GetScope() == kHKLocal) &&
+                auto *task = m_taskMap.value(tag);
+                if ((task->GetScope() == kHKGlobal) ||
+                    ((task->GetScope() == kHKLocal) &&
                          (gCoreContext->GetHostName() == hostname)))
                 {
                     // task being run in the same scope as us.
                     // update the run time so we don't attempt to run
                     //      it ourselves
-                    m_taskMap[tag]->SetLastRun(last, successful);
+                    task->SetLastRun(last, successful);
                 }
             }
         }

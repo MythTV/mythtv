@@ -144,6 +144,8 @@ MythUIType *MythUIType::GetChild(const QString &name) const
  */
 void MythUIType::DeleteChild(const QString &name)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc*/)
     {
         MythUIType *type = *it;
@@ -155,6 +157,14 @@ void MythUIType::DeleteChild(const QString &name)
         }
         ++it;
     }
+#else
+    m_childrenList.removeIf( [name](auto* type){
+        if (type->objectName() != name)
+            return false;
+        delete type;
+        return true;
+    } );
+#endif
 }
 
 /**
@@ -168,6 +178,8 @@ void MythUIType::DeleteChild(MythUIType *child)
     if (!child)
         return;
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     for (auto it = m_childrenList.begin(); it != m_childrenList.end(); /* no inc */)
     {
         MythUIType *type = *it;
@@ -180,6 +192,15 @@ void MythUIType::DeleteChild(MythUIType *child)
         }
         ++it;
     }
+#else
+    m_childrenList.removeIf( [&child](auto* type){
+        if (type != child)
+            return false;
+        delete type;
+        child = nullptr;
+        return true;
+    } );
+#endif
 }
 
 /**
@@ -1051,12 +1072,12 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
 
     if (dependee)
     {
-        bool reverse = m_reverseDepend[dependee];
+        bool reverse = m_reverseDepend.value(dependee);
         visible = reverse ? !isDefault : isDefault;
         // NOLINTNEXTLINE(modernize-loop-convert)
         for (int i = 0; i < m_dependsValue.size(); i++)
         {
-            if (m_dependsValue[i].first != dependee)
+            if (m_dependsValue.at(i).first != dependee)
                 continue;
             m_dependsValue[i].second = visible;
             break;
@@ -1064,13 +1085,13 @@ void MythUIType::UpdateDependState(MythUIType *dependee, bool isDefault)
     }
 
     if (!m_dependsValue.empty())
-        visible = m_dependsValue[0].second;
+        visible = m_dependsValue.at(0).second;
     for (int i = 1; i <  m_dependsValue.size(); i++)
     {
-        bool v = m_dependsValue[i].second;
+        bool v = m_dependsValue.at(i).second;
 
         if (((i-1) < m_dependOperator.size()) &&
-            m_dependOperator[i-1] == 1)
+            m_dependOperator.at(i-1) == 1)
         {
             // OR operator
             visible = visible && v;
@@ -1433,12 +1454,19 @@ void MythUIType::ConnectDependants(bool recurse)
 {
     QStringList dependees;
     QList<int> operators;
-    for (auto it = m_dependsMap.begin(); it != m_dependsMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_dependsMap.constBegin();
+         it != m_dependsMap.constEnd(); ++it)
     {
+        const QString& key = it.key();
+        const QString& name = it.value();
+#else
+    for (const auto [key, name] : std::as_const(m_dependsMap).asKeyValueRange())
+    {
+#endif
         // build list of operators and dependeees.
         dependees.clear();
         operators.clear();
-        QString& name = it.value();
         QStringList tmp1 = name.split("&");
         for (const QString& t1 : std::as_const(tmp1))
         {
@@ -1453,7 +1481,7 @@ void MythUIType::ConnectDependants(bool recurse)
             operators.append(2);     // 2 is AND
         }
 
-        MythUIType *dependant = GetChild(it.key());
+        MythUIType *dependant = GetChild(key);
         if (dependant)
         {
             dependant->m_dependOperator = operators;

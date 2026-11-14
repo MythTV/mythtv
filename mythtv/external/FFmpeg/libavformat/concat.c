@@ -25,6 +25,7 @@
 
 #include "config_components.h"
 
+#include "libavutil/attributes.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 #include "libavutil/error.h"
@@ -44,7 +45,7 @@ struct concat_data {
     struct concat_nodes *nodes;    ///< list of nodes to concat
     size_t               length;   ///< number of cat'ed nodes
     size_t               current;  ///< index of currently read node
-    uint64_t total_size;
+    int64_t total_size;
 };
 
 static av_cold int concat_close(URLContext *h)
@@ -110,6 +111,12 @@ static av_cold int concat_open(URLContext *h, const char *uri, int flags)
         if ((size = ffurl_size(uc)) < 0) {
             ffurl_close(uc);
             err = AVERROR(ENOSYS);
+            break;
+        }
+
+        if (total_size > INT64_MAX - size) {
+            ffurl_close(uc);
+            err = AVERROR_INVALIDDATA;
             break;
         }
 
@@ -179,6 +186,7 @@ static int64_t concat_seek(URLContext *h, int64_t pos, int whence)
         pos += ffurl_seek(nodes[i].uc, 0, SEEK_CUR);
         whence = SEEK_SET;
         /* fall through with the absolute position */
+        av_fallthrough;
     case SEEK_SET:
         for (i = 0; i != data->length - 1 && pos >= nodes[i].size; i++)
             pos -= nodes[i].size;
@@ -279,6 +287,12 @@ static av_cold int concatf_open(URLContext *h, const char *uri, int flags)
         if ((size = ffurl_size(uc)) < 0) {
             ffurl_close(uc);
             err = AVERROR(ENOSYS);
+            break;
+        }
+
+        if (total_size > INT64_MAX - size) {
+            ffurl_close(uc);
+            err = AVERROR_INVALIDDATA;
             break;
         }
 

@@ -2,9 +2,9 @@
 
 # FFmpeg Update Instructions
 
-FFmpeg was last updated to FFmpeg 8.1 `9047fa1b084f76b1b4d065af2d743df1b40dfb56`
+FFmpeg was last updated to FFmpeg 9.0 `d32b387f2b0a484599d4587d651891f0c63c4238`
 on 2026-03-18, which branched from FFmpeg master at
-`67c886222f5fcb4c53d6f5a8b41faec8668b6229`.
+`47e9d68e203fc5e1ecec0607f39ecfcecce14296`.
 
 MythTV's changes are currently being maintained at
 [ulmus-scott/FFmpeg](https://github.com/ulmus-scott/FFmpeg), not
@@ -117,7 +117,27 @@ git cherry-pick ..ffmpeg/release/x.y
 git push
 ```
 
-### Step 3: Copying the updated FFmpeg to MythTV
+Merge commits may be problematic.  Fix any merge errors and ignore the cherry-pick failures.
+
+### Step 3: Rebasing FFmpeg modifications
+
+```sh
+cd $FFMPEG_GIT_DIR
+git checkout release/mythtv/x.y
+git checkout -b release/x.y
+git rebase -i ffmpeg/release/x.y
+# drop any commits that had merge conflicts during the cherry-pick
+git diff release/mythtv/x.y
+# redo the rebase until there is no difference in the final state
+
+# merge/reorder mythtv commits as desired to create commits for upstreaming
+git rebase -i ffmpeg/release/x.y
+git diff release/mythtv/x.y
+# release/x.y must still be identical to release/mythtv/x.y
+git push
+```
+
+### Step 4: Copying the updated FFmpeg to MythTV
 
 After final compile test of FFmpeg:
 
@@ -180,26 +200,7 @@ git commit
 This commit should be after the commit updating this document and before any
 commits modifying MythTV.
 
-### Step 4: Testing
+### Step 5: Testing
 
 Post on the mythtv-dev mailing list that the new version is available for testing
 after running whatever tests you can do yourself.
-
-### Step 5: Rebasing FFmpeg modifications
-
-This can be done simultaneously with testing:
-
-```sh
-cd $FFMPEG_GIT_DIR
-git checkout release/mythtv/x.y
-git checkout -b release/x.y
-git rebase -i ffmpeg/release/x.y
-# drop any commits that had merge conflicts during the cherry-pick
-git diff release/mythtv/x.y
-# redo the rebase until there is no difference in the final state
-
-# merge/reorder mythtv commits as desired to create commits for upstreaming
-git rebase -i ffmpeg/release/x.y
-git diff release/mythtv/x.y
-# release/x.y must still be identical to release/mythtv/x.y
-```

@@ -29,9 +29,7 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devkey);
-
-    if (it == s_hlshandlers.end())
+    if (!s_hlshandlers.contains(devkey))
     {
         auto* newhandler = new HLSStreamHandler(tuning, inputid);
         newhandler->Start();
@@ -45,14 +43,14 @@ HLSStreamHandler* HLSStreamHandler::Get(const IPTVTuningData& tuning, int inputi
     else
     {
         s_hlshandlers_refcnt[devkey]++;
-        uint rcount = s_hlshandlers_refcnt[devkey];
+        uint rcount = s_hlshandlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("HLSSH[%1]: Using existing stream handler %2 for %3")
             .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_hlshandlers[devkey];
+    return s_hlshandlers.value(devkey);
 }
 
 void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
@@ -61,6 +59,7 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_hlshandlers_refcnt.find(devname);
     if (rit == s_hlshandlers_refcnt.end())
         return;
@@ -75,6 +74,8 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<QString,HLSStreamHandler*>::iterator it = s_hlshandlers.find(devname);
     if ((it != s_hlshandlers.end()) && (*it == ref))
     {
@@ -92,6 +93,25 @@ void HLSStreamHandler::Return(HLSStreamHandler* & ref, int inputid)
             QString("HLSSH[%1] Error: Couldn't find handler for %2")
             .arg(inputid).arg(devname));
     }
+#else
+    int count = s_hlshandlers.removeIf( [devname,inputid,ref](auto it) {
+        if (*it != ref)
+            return false;
+        LOG(VB_RECORD, LOG_INFO, QString("HLSSH[%1]: Closing handler for %2")
+                           .arg(inputid).arg(devname));
+        ref->Stop();
+        LOG(VB_RECORD, LOG_DEBUG, QString("HLSSH[%1]: handler for %2 stopped")
+            .arg(inputid).arg(devname));
+        delete *it;
+        return true;
+    } );
+    if (count == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("HLSSH[%1] Error: Couldn't find handler for %2")
+            .arg(inputid).arg(devname));
+    }
+#endif
 
     s_hlshandlers_refcnt.erase(rit);
     ref = nullptr;

@@ -37,7 +37,8 @@ ExternalRecChannelFetcher::ExternalRecChannelFetcher(int cardid,
                                                      QString cmd)
     : m_cardid(cardid)
     , m_command(std::move(cmd))
-    , m_streamHandler(ExternalStreamHandler::Get(m_command , m_cardid, m_cardid))
+    , m_streamHandler(ExternalStreamHandler::Get(m_command, m_cardid,
+                                                 m_cardid, "fetcher"))
 {
     if (!m_streamHandler || m_streamHandler->HasError())
     {
@@ -54,7 +55,7 @@ ExternalRecChannelFetcher::~ExternalRecChannelFetcher(void)
 void ExternalRecChannelFetcher::Close(void)
 {
     if (m_streamHandler)
-        ExternalStreamHandler::Return(m_streamHandler, m_cardid);
+        ExternalStreamHandler::Return(m_streamHandler, m_cardid, "fetcher");
 }
 
 bool ExternalRecChannelFetcher::Valid(void) const

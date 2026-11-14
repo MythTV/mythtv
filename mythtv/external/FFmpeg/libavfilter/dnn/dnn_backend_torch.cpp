@@ -121,6 +121,7 @@ static void dnn_free_model_th(DNNModel **model)
     th_model = (THModel *)(*model);
 
     if (th_model->request_queue) {
+        ff_dnn_wait_requests(th_model->request_queue, th_model->ctx->nireq);
         while (ff_safe_queue_size(th_model->request_queue) != 0) {
             THRequestItem *item = (THRequestItem *)ff_safe_queue_pop_front(th_model->request_queue);
             destroy_request_item(&item);
@@ -439,6 +440,13 @@ static DNNModel *dnn_load_model_th(DnnContext *ctx, DNNFunctionType func_type, A
 #else
         at::detail::getXPUHooks().initXPU();
 #endif
+    } else if (device.is_cuda()) {
+        // CUDA device - works for both NVIDIA CUDA and AMD ROCm (which uses CUDA-compatible API)
+        if (!torch::cuda::is_available()) {
+            av_log(ctx, AV_LOG_ERROR, "CUDA/ROCm is not available\n");
+            goto fail;
+        }
+        av_log(ctx, AV_LOG_INFO, "Using CUDA/ROCm device: %s\n", device_name);
     } else if (!device.is_cpu()) {
         av_log(ctx, AV_LOG_ERROR, "Not supported device:\"%s\"\n", device_name);
         goto fail;

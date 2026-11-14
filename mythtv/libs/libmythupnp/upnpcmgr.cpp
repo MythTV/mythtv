@@ -187,7 +187,7 @@ void UPnpCMGR::HandleGetProtocolInfo( HTTPRequest *pRequest )
 
 void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 {
-    unsigned short nId = pRequest->m_mapParams[ "ConnectionID" ].toUShort();
+    unsigned short nId = pRequest->m_mapParams.value( "ConnectionID" ).toUShort();
 
     if ( nId != 0)
     {

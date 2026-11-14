@@ -434,7 +434,8 @@ static int libjxl_preprocess_stream(AVCodecContext *avctx, const AVFrame *frame,
         if (ret >= 0)
             ret = av_exif_get_entry(avctx, &ifd, tag, 0, &orient);
         if (ret >= 0 && orient) {
-            if (!have_matrix && orient->value.uint[0] >= 1 && orient->value.uint[0] <= 8) {
+            if (!have_matrix && orient->type == AV_TIFF_SHORT && orient->count
+                    && orient->value.uint[0] >= 1 && orient->value.uint[0] <= 8) {
                 av_exif_orientation_to_matrix(matrix, orient->value.uint[0]);
                 have_matrix = 1;
             }
@@ -455,7 +456,7 @@ static int libjxl_preprocess_stream(AVCodecContext *avctx, const AVFrame *frame,
 
     /* av_display_matrix_flip is a right-multipilcation */
     /* i.e. flip is applied before the previous matrix */
-    if (frame->linesize < 0)
+    if (frame->linesize[0] < 0)
         av_display_matrix_flip(matrix, 0, 1);
 
     orientation = av_exif_matrix_to_orientation(matrix);
@@ -468,7 +469,7 @@ static int libjxl_preprocess_stream(AVCodecContext *avctx, const AVFrame *frame,
     }
 
     /* restore the previous value */
-    if (frame->linesize < 0)
+    if (frame->linesize[0] < 0)
         av_display_matrix_flip(matrix, 0, 1);
 
     if (animated) {

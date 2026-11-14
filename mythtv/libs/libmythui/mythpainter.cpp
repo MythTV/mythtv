@@ -316,16 +316,17 @@ void MythPainter::DrawRectPriv(MythImage *im, const QRect area, int radius,
     radius = std::min(area.width() / 2, radius);
     radius = std::min(area.height() / 2, radius);
 
-    int lineWidth = linePen.width();
-    QRect r(lineWidth, lineWidth,
-            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+    qreal lineWidth = (linePen.style() == Qt::NoPen) ? 0.0 : linePen.widthF();
+    qreal halfLine  = lineWidth / 2.0;
+    QRectF r(halfLine, halfLine,
+             area.width() - lineWidth, area.height() - lineWidth);
 
     if (ellipse)
         painter.drawEllipse(r);
     else if (radius == 0)
         painter.drawRect(r);
     else
-        painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
+        painter.drawRoundedRect(r, static_cast<qreal>(radius), static_cast<qreal>(radius));
 
     painter.end();
     im->Assign(image);
@@ -345,7 +346,7 @@ MythImage *MythPainter::GetImageFromString(const QString &msg,
     {
         m_stringExpireList.remove(incoming);
         m_stringExpireList.push_back(incoming);
-        im = m_stringToImageMap[incoming];
+        im = m_stringToImageMap.value(incoming);
         if (im)
             im->IncrRef();
     }
@@ -385,7 +386,7 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
     {
         m_stringExpireList.remove(incoming);
         m_stringExpireList.push_back(incoming);
-        im = m_stringToImageMap[incoming];
+        im = m_stringToImageMap.value(incoming);
         if (im)
             im->IncrRef();
     }
@@ -430,14 +431,22 @@ MythImage *MythPainter::GetImageFromTextLayout(const LayoutVector &layouts,
 
             painter.setPen(shadowColor);
             for (auto *layout : std::as_const(layouts))
-                layout->draw(&painter, shadowRect.topLeft(), formats, clip);
+            {
+                QTextLayout::FormatRange shadowRange;
+                shadowRange.start = 0;
+                shadowRange.length = layout->text().length();
+                shadowRange.format.setForeground(shadowColor);
+                shadowRange.format.setTextOutline(Qt::NoPen);
+
+                layout->draw(&painter, shadowRect.topLeft(),
+                             {shadowRange}, clip);
+            }
         }
 
         painter.setPen(QPen(font.GetBrush(), 0));
         for (auto *layout : std::as_const(layouts))
         {
-            layout->draw(&painter, canvas.topLeft(),
-                           layout->formats(), clip);
+            layout->draw(&painter, canvas.topLeft(), formats, clip);
         }
         painter.end();
 
@@ -502,7 +511,7 @@ MythImage* MythPainter::GetImageFromRect(const QRect area, int radius,
     {
         m_stringExpireList.remove(incoming);
         m_stringExpireList.push_back(incoming);
-        im = m_stringToImageMap[incoming];
+        im = m_stringToImageMap.value(incoming);
         if (im)
             im->IncrRef();
     }
@@ -559,7 +568,7 @@ void MythPainter::ExpireImages(int64_t max)
         m_stringExpireList.pop_front();
 
         QMap<QString, MythImage*>::iterator it =
-            m_stringToImageMap.find(oldmsg);
+            m_stringToImageMap.find(oldmsg); // clazy:exclude=detaching-member (erases item)
         if (it == m_stringToImageMap.end())
         {
             recompute = true;

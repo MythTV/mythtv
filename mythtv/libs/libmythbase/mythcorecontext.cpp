@@ -911,7 +911,7 @@ QString MythCoreContext::GetSetting(const QString &key,
                                     const QString &defaultval)
 {
     if (!m_testOverrideStrings.empty())
-        return m_testOverrideStrings[key];
+        return m_testOverrideStrings.value(key);
     return d->m_database->GetSetting(key, defaultval);
 }
 
@@ -924,14 +924,14 @@ bool MythCoreContext::GetBoolSetting(const QString &key, bool defaultval)
 int MythCoreContext::GetNumSetting(const QString &key, int defaultval)
 {
     if (!m_testOverrideInts.empty())
-        return m_testOverrideInts[key];
+        return m_testOverrideInts.value(key);
     return d->m_database->GetNumSetting(key, defaultval);
 }
 
 double MythCoreContext::GetFloatSetting(const QString &key, double defaultval)
 {
     if (!m_testOverrideFloats.empty())
-        return m_testOverrideFloats[key];
+        return m_testOverrideFloats.value(key);
     return d->m_database->GetFloatSetting(key, defaultval);
 }
 
@@ -940,7 +940,7 @@ QString MythCoreContext::GetSettingOnHost(const QString &key,
                                           const QString &defaultval)
 {
     if (!m_testOverrideStrings.empty())
-        return m_testOverrideStrings[key];
+        return m_testOverrideStrings.value(key);
     return d->m_database->GetSettingOnHost(key, host, defaultval);
 }
 
@@ -957,7 +957,7 @@ int MythCoreContext::GetNumSettingOnHost(const QString &key,
                                          int defaultval)
 {
     if (!m_testOverrideInts.empty())
-        return m_testOverrideInts[key];
+        return m_testOverrideInts.value(key);
     return d->m_database->GetNumSettingOnHost(key, host, defaultval);
 }
 
@@ -966,7 +966,7 @@ double MythCoreContext::GetFloatSettingOnHost(const QString &key,
                                               double defaultval)
 {
     if (!m_testOverrideFloats.empty())
-        return m_testOverrideFloats[key];
+        return m_testOverrideFloats.value(key);
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 
@@ -2018,19 +2018,26 @@ void MythCoreContext::WantingPlayback(QObject *sender)
     // connections for any clients in the same thread as non-blocking connection
     QThread *currentThread = QThread::currentThread();
 
-    QMap<QObject *, PlaybackStartCb>::iterator it = d->m_playbackClients.begin();
-    for (; it != d->m_playbackClients.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = d->m_playbackClients.constBegin();
+         it != d->m_playbackClients.constEnd(); ++it)
     {
-        if (it.key() == sender)
+        auto* object = it.key();
+        auto callback = it.value();
+#else
+    for (auto [object, callback] : std::as_const(d->m_playbackClients).asKeyValueRange())
+    {
+#endif
+        if (object == sender)
             continue;   // will be done separately, no need to do it again
 
-        QThread *thread = it.key()->thread();
+        QThread *thread = object->thread();
 
         if (thread != currentThread)
             continue;
 
-        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
-        connect(this, &MythCoreContext::TVPlaybackAboutToStart, it.key(), it.value());
+        disconnect(this, &MythCoreContext::TVPlaybackAboutToStart, object, callback);
+        connect(this, &MythCoreContext::TVPlaybackAboutToStart, object, callback);
     }
 
     // disconnect sender so it won't receive the message
@@ -2051,21 +2058,28 @@ void MythCoreContext::WantingPlayback(QObject *sender)
                 Qt::BlockingQueuedConnection);
     }
     // Restore blocking connections
-    it = d->m_playbackClients.begin();
-    for (; it != d->m_playbackClients.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = d->m_playbackClients.constBegin();
+         it != d->m_playbackClients.constEnd(); ++it)
     {
-        if (it.key() == sender)
+        auto* object = it.key();
+        auto callback = it.value();
+#else
+    for (auto [object, callback] : std::as_const(d->m_playbackClients).asKeyValueRange())
+    {
+#endif
+        if (object == sender)
             continue;   // already done above, no need to do it again
 
-        QThread *thread = it.key()->thread();
+        QThread *thread = object->thread();
 
         if (thread != currentThread)
             continue;
 
         disconnect(this, &MythCoreContext::TVPlaybackAboutToStart,
-                   it.key(), it.value());
+                   object, callback);
         connect(this, &MythCoreContext::TVPlaybackAboutToStart,
-                it.key(), it.value(), Qt::BlockingQueuedConnection);
+                object, callback, Qt::BlockingQueuedConnection);
     }
     d->m_inwanting = false;
 }

@@ -287,6 +287,7 @@ void DeleteMap::ReverseAll(void)
 {
     EDIT_CHECK;
     Push(tr("Reverse Cuts"));
+    // clazy:exclude-next-line=detaching-member (data shared with Push)
     for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
         Add(it.key(), it.value() == MARK_CUT_END ? MARK_CUT_START :
                                                    MARK_CUT_END);
@@ -305,8 +306,8 @@ void DeleteMap::AddMark(uint64_t frame, MarkTypes type)
         (MARK_PLACEHOLDER != type))
         return;
 
-    frm_dir_map_t::Iterator find_temporary = m_deleteMap.find(frame);
-    if (find_temporary != m_deleteMap.end())
+    auto find_temporary = m_deleteMap.constFind(frame);
+    if (find_temporary != m_deleteMap.constEnd())
     {
         if (MARK_PLACEHOLDER == find_temporary.value())
         {
@@ -384,8 +385,8 @@ void DeleteMap::Delete(uint64_t frame, const QString& undoMessage)
 
     // If frame is a cut point, GetNearestMark() would return the previous/next
     // mark (not this frame), so check to see if we need to use frame, instead
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
-    if (it != m_deleteMap.end())
+    auto it = m_deleteMap.constFind(frame);
+    if (it != m_deleteMap.constEnd())
     {
         int type = it.value();
         if (MARK_PLACEHOLDER == type)
@@ -413,7 +414,8 @@ void DeleteMap::NewCut(uint64_t frame)
 
     // find any existing temporary marker to determine cut range
     int64_t existing = -1;
-    for (auto it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (auto it = m_deleteMap.constBegin() ; it != m_deleteMap.constEnd(); ++it)
     {
         if (MARK_PLACEHOLDER == it.value())
         {
@@ -421,6 +423,15 @@ void DeleteMap::NewCut(uint64_t frame)
             break;
         }
     }
+#else
+    for (auto [key, value] : std::as_const(m_deleteMap).asKeyValueRange())
+    {
+        if (MARK_PLACEHOLDER != value)
+            continue;
+        existing = key;
+        break;
+    }
+#endif
 
     if (existing > -1)
     {
@@ -441,8 +452,8 @@ void DeleteMap::NewCut(uint64_t frame)
                 MarkTypes type = MARK_UNSET;
                 cut_start = GetNearestMark(frame, false);
                 cut_end = GetNearestMark(frame, true);
-                frm_dir_map_t::Iterator it2 = m_deleteMap.find(frame);
-                if (it2 != m_deleteMap.end())
+                auto it2 = m_deleteMap.constFind(frame);
+                if (it2 != m_deleteMap.constEnd())
                     type = it2.value();
                 if (MARK_CUT_START == type)
                 {
@@ -486,19 +497,35 @@ void DeleteMap::NewCut(uint64_t frame)
             Add(startframe, MARK_CUT_START);
             Add(endframe, MARK_CUT_END);
             // Clear out any markers between the start and end frames
-            otherframe = 0;
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+            // clazy:exclude-next-line=detaching-member (erases item)
             frm_dir_map_t::Iterator it = m_deleteMap.find(startframe);
-            for ( ; it != m_deleteMap.end() && otherframe < endframe; ++it)
+            while (it != m_deleteMap.end())
             {
                 otherframe = it.key();
-                if ((startframe < otherframe) && (endframe > otherframe))
+                if (otherframe >= endframe)
+                    break;
+                if (startframe < otherframe)
                 {
                     LOG(VB_PLAYBACK, LOG_INFO, LOC +
                         QString("Deleting bounded marker: %1").arg(otherframe));
                     it = m_deleteMap.erase(it);
                     m_changed = true;
+                    continue;
                 }
+                ++it;
             }
+#else
+            m_deleteMap.removeIf( [this,startframe,endframe,&otherframe](auto it) {
+                otherframe = it.key();
+                if ((startframe >= otherframe) || (endframe <= otherframe))
+                    return false;
+                LOG(VB_PLAYBACK, LOG_INFO, LOC +
+                    QString("Deleting bounded marker: %1").arg(otherframe));
+                m_changed = true;
+                return true;
+            } );
+#endif
         }
     }
     else
@@ -513,8 +540,8 @@ void DeleteMap::NewCut(uint64_t frame)
 /// Move the previous (!right) or next (right) cut to frame.
 void DeleteMap::MoveRelative(uint64_t frame, bool right)
 {
-    frm_dir_map_t::Iterator it = m_deleteMap.find(frame);
-    if (it != m_deleteMap.end())
+    auto it = m_deleteMap.constFind(frame);
+    if (it != m_deleteMap.constEnd())
     {
         int type = it.value();
         if (((MARK_CUT_START == type) && !right) ||
@@ -594,13 +621,23 @@ bool DeleteMap::IsInDelete(uint64_t frame) const
 
     int      lasttype  = MARK_UNSET;
     uint64_t lastframe = UINT64_MAX;
-    for (it = m_deleteMap.begin() ; it != m_deleteMap.end(); ++it)
+#if QT_VERSION < QT_VERSION_CHECK(6,4,0)
+    for (it = m_deleteMap.constBegin() ; it != m_deleteMap.constEnd(); ++it)
     {
         if (it.key() > frame)
             return MARK_CUT_END == it.value();
         lasttype  = it.value();
         lastframe = it.key();
     }
+#else
+    for (auto [key, value] : std::as_const(m_deleteMap).asKeyValueRange())
+    {
+        if (key > frame)
+            return MARK_CUT_END == value;
+        lasttype  = value;
+        lastframe = key;
+    }
+#endif
 
     return lasttype == MARK_CUT_START && lastframe <= frame;
 }
@@ -689,7 +726,8 @@ void DeleteMap::CleanMap(void)
         int64_t lastframe = -1;
         int64_t tempframe = -1;
         QList<int64_t> deleteList;
-        for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); ++it)
+        for (auto it = m_deleteMap.constBegin();
+             it != m_deleteMap.constEnd(); ++it)
         {
             int      thistype  = it.value();
             uint64_t thisframe = it.key();
@@ -794,6 +832,8 @@ void DeleteMap::SaveMap(bool isAutoSave)
     if (!isAutoSave)
     {
         // Remove temporary placeholder marks
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+        // clazy:exclude-next-line=detaching-member (erases item)
         for (auto it = m_deleteMap.begin(); it != m_deleteMap.end(); /*no inc*/)
         {
             if (MARK_PLACEHOLDER == it.value())
@@ -806,6 +846,14 @@ void DeleteMap::SaveMap(bool isAutoSave)
                 ++it;
             }
         }
+#else
+        m_deleteMap.removeIf( [this] (const auto& it) {
+            if (MARK_PLACEHOLDER != it.value())
+                return false;
+            m_changed = true;
+            return true;
+        } );
+#endif
 
         CleanMap();
     }
@@ -828,8 +876,8 @@ void DeleteMap::TrackerReset(uint64_t frame)
     if (IsEmpty())
         return;
 
-    frm_dir_map_t::iterator cutpoint = m_deleteMap.find(frame);
-    if (cutpoint != m_deleteMap.end())
+    auto cutpoint = m_deleteMap.constFind(frame);
+    if (cutpoint != m_deleteMap.constEnd())
     {
         if (cutpoint.value() == MARK_CUT_START)
         {
@@ -839,7 +887,7 @@ void DeleteMap::TrackerReset(uint64_t frame)
         else
         {
             ++cutpoint;
-            m_nextCutStartIsValid = (cutpoint != m_deleteMap.end());
+            m_nextCutStartIsValid = (cutpoint != m_deleteMap.constEnd());
             m_nextCutStart = m_nextCutStartIsValid ? cutpoint.key() :
                 m_ctx->m_player->GetTotalFrameCount();
         }

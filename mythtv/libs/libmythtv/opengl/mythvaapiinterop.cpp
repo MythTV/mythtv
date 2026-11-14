@@ -175,19 +175,27 @@ void MythVAAPIInterop::DestroyDeinterlacer(void)
     m_deinterlacer = DEINT_NONE;
     m_deinterlacer2x = false;
     m_firstField = true;
-    m_lastFilteredFrame = 0;
+    m_lastFilteredFrame = VA_INVALID_SURFACE;
     m_lastFilteredFrameCount = 0;
     av_buffer_unref(&m_vppFramesContext);
 }
 
+/*! \brief Check that Frame holds a VAAPI surface we can use.
+ *
+ * \returns The frame's VASurfaceID, or VA_INVALID_SURFACE on failure.
+ *
+ * \note m_buffer holds the VASurfaceID cast to a pointer, and 0 is a valid
+ * surface ID (the Intel iHD driver issues it), so a null m_buffer must not be
+ * treated as an error.
+ */
 VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideoFrame *Frame)
 {
-    VASurfaceID result = 0;
+    VASurfaceID result = VA_INVALID_SURFACE;
     if (!Frame)
         return result;
 
     if ((Frame->m_pixFmt != AV_PIX_FMT_VAAPI) || (Frame->m_type != FMT_VAAPI) ||
-        !Frame->m_buffer || !Frame->m_priv[1])
+        !Frame->m_priv[1])
         return result;
 
     // Sanity check the context
@@ -207,10 +215,7 @@ VASurfaceID MythVAAPIInterop::VerifySurface(MythRenderOpenGL *Context, MythVideo
     }
 
     // Retrieve surface
-    auto id = static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->m_buffer));
-    if (id)
-        result = id;
-    return result;
+    return static_cast<VASurfaceID>(reinterpret_cast<uintptr_t>(Frame->m_buffer));
 }
 
 bool MythVAAPIInterop::SetupDeinterlacer(MythDeintType Deinterlacer, bool DoubleRate,
@@ -474,7 +479,7 @@ VASurfaceID MythVAAPIInterop::Deinterlace(MythVideoFrame *Frame, VASurfaceID Cur
         // buffering in the VAAPI frames context, causes the image to 'jiggle' when using
         // double rate deinterlacing. If we are confident this is a pause frame we have seen,
         // return the last deinterlaced frame.
-        if (Frame->m_pauseFrame && m_lastFilteredFrame && (m_lastFilteredFrameCount == Frame->m_frameCounter))
+        if (Frame->m_pauseFrame && (m_lastFilteredFrame != VA_INVALID_SURFACE) && (m_lastFilteredFrameCount == Frame->m_frameCounter))
             return m_lastFilteredFrame;
 
         Frame->m_deinterlaceInuse = m_deinterlacer | DEINT_DRIVER;

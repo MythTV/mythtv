@@ -31,6 +31,8 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
     Q_OBJECT
 
   public:
+    ~StandardSetting() override;
+
     virtual void setLabel(QString str) { m_label = std::move(str); }
     QString getLabel(void) const { return m_label; }
 
@@ -106,7 +108,6 @@ class MUI_PUBLIC StandardSetting : public QObject, public StorageUser
   protected:
     explicit StandardSetting(Storage *_storage = nullptr)
         : m_storage(_storage) {}
-    ~StandardSetting() override;
     void setParent(StandardSetting *parent);
     QString m_settingValue;
     bool    m_enabled         {true};

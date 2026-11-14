@@ -27,6 +27,7 @@
 
 #include <float.h>
 
+#include "libavutil/internal.h"
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 #include "libavutil/pixdesc.h"
@@ -215,8 +216,8 @@ static int vif_filter1d(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
     int dst_stride = td->dst_stride;
     int filt_w = td->filter_width;
     float *temp = td->temp[jobnr];
-    const int slice_start = (h * jobnr) / nb_jobs;
-    const int slice_end = (h * (jobnr+1)) / nb_jobs;
+    const int slice_start = ff_slice_pos(h, jobnr, nb_jobs);
+    const int slice_end = ff_slice_pos(h, jobnr + 1, nb_jobs);
 
     for (int i = slice_start; i < slice_end; i++) {
         /** Vertical pass. */
@@ -238,7 +239,7 @@ static int vif_filter1d(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
                     int ii = i - filt_w / 2 + filt_i;
                     float img_coeff;
 
-                    ii = ii < 0 ? -ii : (ii >= h ? 2 * h - ii - 1 : ii);
+                    ii = avpriv_mirror(ii, h - 1);
 
                     img_coeff = src[ii * src_stride + j];
                     sum += filt_coeff * img_coeff;
@@ -267,7 +268,7 @@ static int vif_filter1d(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
                     int jj = j - filt_w / 2 + filt_j;
                     float img_coeff;
 
-                    jj = jj < 0 ? -jj : (jj >= w ? 2 * w - jj - 1 : jj);
+                    jj = avpriv_mirror(jj, w - 1);
 
                     img_coeff = temp[jj];
                     sum += filt_coeff * img_coeff;

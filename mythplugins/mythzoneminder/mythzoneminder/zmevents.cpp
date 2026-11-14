@@ -369,7 +369,7 @@ void ZMEvents::getDateList(void)
 
         for (int x = 0; x < m_dateList.count(); x++)
         {
-            QDate date = QDate::fromString(m_dateList[x], Qt::ISODate);
+            QDate date = QDate::fromString(m_dateList.at(x), Qt::ISODate);
             new MythUIButtonListItem(m_dateSelector, date.toString(dateFormat));
         }
     }

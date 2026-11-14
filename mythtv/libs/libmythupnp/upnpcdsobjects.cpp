@@ -48,22 +48,15 @@ CDSObject::CDSObject( const QString &sId,
 
 CDSObject::~CDSObject()
 {
-    while (!m_resources.empty())
-    {
-        delete m_resources.takeLast();
-    }
+    qDeleteAll(m_resources);
+    m_resources.clear();
 
     while (!m_children.empty())
     {
         m_children.takeLast()->DecrRef();
     }
 
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (auto it = m_properties.begin(); it != m_properties.end(); ++it)
-    {
-        delete *it;
-        *it = nullptr;
-    }
+    qDeleteAll(m_properties);
     m_properties.clear();
 }
 
@@ -93,11 +86,11 @@ Property *CDSObject::AddProperty( Property *pProp )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QList<Property*> CDSObject::GetProperties( const QString &sName )
+QList<Property*> CDSObject::GetProperties( const QString &sName ) const
 {
     QList<Property*> props;
-    Properties::iterator it = m_properties.find(sName);
-    while (it != m_properties.end() && it.key() == sName)
+    auto it = m_properties.constFind(sName);
+    while (it != m_properties.constEnd() && it.key() == sName)
     {
         if (*it)
             props.append(*it);
@@ -114,7 +107,8 @@ QList<Property*> CDSObject::GetProperties( const QString &sName )
 void CDSObject::SetPropValue( const QString &sName, const QString &sValue,
                               const QString &sType )
 {
-    Properties::iterator it = m_properties.find(sName);
+    // clazy:exclude-next-line=detaching-member (modifies item)
+    auto it = m_properties.find(sName);
     if (it !=  m_properties.end() && *it)
     {
         if ((*it)->m_bMultiValue)

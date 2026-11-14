@@ -45,9 +45,7 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
 
     QString devkey = tuning.GetDeviceKey();
 
-    QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devkey);
-
-    if (it == s_iptvhandlers.end())
+    if (!s_iptvhandlers.contains(devkey))
     {
         auto *newhandler = new IPTVStreamHandler(tuning, inputid);
         newhandler->Start();
@@ -61,14 +59,14 @@ IPTVStreamHandler *IPTVStreamHandler::Get(const IPTVTuningData &tuning,
     else
     {
         s_iptvhandlers_refcnt[devkey]++;
-        uint rcount = s_iptvhandlers_refcnt[devkey];
+        uint rcount = s_iptvhandlers_refcnt.value(devkey);
         LOG(VB_RECORD, LOG_INFO,
             QString("IPTVSH[%1]: Using existing stream handler %2 for %3")
             .arg(QString::number(inputid), devkey, tuning.GetDeviceName()) +
             QString(" (%1 in use)").arg(rcount));
     }
 
-    return s_iptvhandlers[devkey];
+    return s_iptvhandlers.value(devkey);
 }
 
 void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
@@ -77,6 +75,7 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
 
     QString devname = ref->m_device;
 
+    // clazy:exclude-next-line=detaching-member (modifies item)
     QMap<QString,uint>::iterator rit = s_iptvhandlers_refcnt.find(devname);
     if (rit == s_iptvhandlers_refcnt.end())
         return;
@@ -91,6 +90,8 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
         return;
     }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,1,0)
+    // clazy:exclude-next-line=detaching-member (erases item)
     QMap<QString,IPTVStreamHandler*>::iterator it = s_iptvhandlers.find(devname);
     if ((it != s_iptvhandlers.end()) && (*it == ref))
     {
@@ -106,6 +107,23 @@ void IPTVStreamHandler::Return(IPTVStreamHandler * & ref, int inputid)
             QString("IPTVSH[%1] Error: Couldn't find handler for %2")
             .arg(QString::number(inputid), devname));
     }
+#else
+    int count = s_iptvhandlers.removeIf( [devname,inputid,ref](auto it){
+        if (*it != ref)
+            return false;
+        LOG(VB_RECORD, LOG_INFO, QString("IPTVSH[%1]: Closing handler for %2")
+            .arg(QString::number(inputid), devname));
+        ref->Stop();
+        delete *it;
+        return true;
+    } );
+    if (count == 0)
+    {
+        LOG(VB_GENERAL, LOG_ERR,
+            QString("IPTVSH[%1] Error: Couldn't find handler for %2")
+            .arg(QString::number(inputid), devname));
+    }
+#endif
 
     s_iptvhandlers_refcnt.erase(rit);
     ref = nullptr;

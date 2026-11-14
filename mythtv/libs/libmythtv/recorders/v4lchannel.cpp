@@ -639,7 +639,7 @@ bool V4LChannel::InitPictureAttribute(const QString &db_col_name)
         }
     }
 
-    int dfield = m_pictAttrDefault[db_col_name];
+    int dfield = m_pictAttrDefault.value(db_col_name);
     int field  = (cfield + sfield + dfield) & 0xFFFF;
     int value0 = (int) ((scl_range * field) + qctrl.minimum);
     int value1 = std::min(value0, qctrl.maximum);

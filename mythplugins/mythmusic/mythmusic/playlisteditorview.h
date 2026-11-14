@@ -113,7 +113,7 @@ class PlaylistEditorView : public MusicCommon
 
   private:
     QString                 m_layout;
-    bool                    m_restorePosition {false};
+    [[ maybe_unused]] bool  m_restorePosition {false};
     MusicGenericTree       *m_rootNode        {nullptr};
     QList<MetadataPtrList*> m_deleteList;
 

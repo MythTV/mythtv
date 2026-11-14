@@ -170,7 +170,7 @@ static void mpegts_write_section(MpegTSSection *s, uint8_t *buf, int len)
             b |= 0x40;
         *q++  = b;
         *q++  = s->pid;
-        s->cc = s->cc + 1 & 0xf;
+        s->cc = (s->cc + 1) & 0xf;
         *q++  = 0x10 | s->cc;
         if (s->discontinuity) {
             q[-1] |= 0x20;
@@ -1583,7 +1583,7 @@ static void mpegts_write_pes(AVFormatContext *s, AVStream *st,
             val |= 0x40;
         *q++      = val;
         *q++      = ts_st->pid;
-        ts_st->cc = ts_st->cc + 1 & 0xf;
+        ts_st->cc = (ts_st->cc + 1) & 0xf;
         *q++      = 0x10 | ts_st->cc; // payload indicator + CC
         if (ts_st->discontinuity) {
             set_af_flag(buf, 0x80);
@@ -1878,15 +1878,13 @@ static int mpegts_write_packet_internal(AVFormatContext *s, AVPacket *pkt)
     const int64_t max_audio_delay = av_rescale(s->max_delay, 90000, AV_TIME_BASE) / 2;
     int64_t dts = pkt->dts, pts = pkt->pts;
     int opus_samples = 0;
-    size_t side_data_size;
-    uint8_t *side_data = NULL;
     int stream_id = -1;
 
-    side_data = av_packet_get_side_data(pkt,
-                                        AV_PKT_DATA_MPEGTS_STREAM_ID,
-                                        &side_data_size);
-    if (side_data)
-        stream_id = side_data[0];
+    uint8_t *stream_id_p = av_packet_get_side_data(pkt,
+                                                   AV_PKT_DATA_MPEGTS_STREAM_ID,
+                                                   NULL);
+    if (stream_id_p)
+        stream_id = stream_id_p[0];
 
     if (!ts->first_dts_checked && dts != AV_NOPTS_VALUE) {
         ts->first_pcr += dts * SYSTEM_CLOCK_FREQUENCY_DIVISOR;

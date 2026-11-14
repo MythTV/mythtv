@@ -22,10 +22,11 @@
 #   translation-util.py --listkeys --language=de
 #
 #
-# Required modules: googletrans and flatten_dict
+# Required modules: googletrans==4.0.2 flatten-dict setuptools legacy-cgi
 
 import os, sys, re
 import json
+import asyncio
 from optparse import OptionParser
 from googletrans import Translator
 from flatten_dict import flatten
@@ -175,9 +176,7 @@ def translate(src_text, lang):
     # check for a template string which we don't want to translate
     srcMatches = re.findall(r"({.*?})", src_text)
 
-    translation = translator.translate(src_text, dest=lang, src='en')
-
-    result = translation.text
+    result = asyncio.run(translator(src_text, lang))
 
     destMatches = re.findall(r"({.*?})", result)
 
@@ -187,6 +186,12 @@ def translate(src_text, lang):
             result = result.replace(match, srcMatches[index], 1)
 
     return result
+
+async def translator(src_text, lang):
+    async with Translator() as translator:
+        translation = await translator.translate(src_text, dest=lang, src='en')
+        result = translation.text
+        return result
 
 def sortUSTrans():
     # open source file
@@ -410,9 +415,6 @@ def listLanguages():
         print("    {0:6}  {1}".format(code,name))
 
 if __name__ == '__main__':
-
-    global translator
-    translator = Translator()
 
     global translation_dir
     translation_dir = os.path.dirname(os.path.abspath(sys.argv[0])) + '/assets/i18n/'

@@ -20,18 +20,18 @@
 #include "libavutil/mem.h"
 #include "libavutil/opt.h"
 
-#include "bsf.h"
-#include "bsf_internal.h"
-#include "cbs.h"
-#include "cbs_bsf.h"
-#include "cbs_av1.h"
-#include "cbs_h265.h"
-#include "dovi_rpu.h"
-#include "h2645data.h"
-#include "h265_profile_level.h"
-#include "itut35.h"
+#include "libavcodec/bsf.h"
+#include "libavcodec/bsf_internal.h"
+#include "libavcodec/cbs.h"
+#include "libavcodec/cbs_bsf.h"
+#include "libavcodec/cbs_av1.h"
+#include "libavcodec/cbs_h265.h"
+#include "libavcodec/dovi_rpu.h"
+#include "libavcodec/h2645data.h"
+#include "libavcodec/h265_profile_level.h"
+#include "libavcodec/itut35.h"
 
-#include "hevc/hevc.h"
+#include "libavcodec/hevc/hevc.h"
 
 typedef struct DoviRpuContext {
     CBSBSFContext common;
@@ -99,6 +99,8 @@ static int dovi_rpu_update_fragment_hevc(AVBSFContext *bsf, AVPacket *pkt,
     ret = update_rpu(bsf, pkt, 0, nal->data + 2, nal->data_size - 2, &rpu, &rpu_size);
     if (ret < 0)
         return ret;
+    if (!rpu || rpu_size <= 0)
+        return 0;
 
     /* NAL unit header + NAL prefix */
     if (rpu_size + 3 <= nal->data_size && av_buffer_is_writable(nal->data_ref)) {
@@ -158,6 +160,10 @@ static int dovi_rpu_update_fragment_av1(AVBSFContext *bsf, AVPacket *pkt,
                          &rpu, &rpu_size);
         if (ret < 0)
             return ret;
+        if (!rpu || rpu_size <= 1) {
+            av_free(rpu);
+            continue;
+        }
 
         ref = av_buffer_create(rpu, rpu_size, av_buffer_default_free, NULL, 0);
         if (!ref) {

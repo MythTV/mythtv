@@ -223,6 +223,7 @@ bool CetonRTSP::ProcessRequest(
     if (contentLength > 0)
     {
         m_responseContent.resize(contentLength);
+        // clazy:exclude-next-line=detaching-member (modifies item)
         char* data = m_responseContent.data();
         int bytesRead = 0;
         while (bytesRead < contentLength)
@@ -297,12 +298,12 @@ QUrl CetonRTSP::GetBaseUrl(void)
 {
     if (m_responseHeaders.contains("Content-Base"))
     {
-        QUrl url { m_responseHeaders["Content-Base"] };
+        QUrl url { m_responseHeaders.value("Content-Base") };
         return url;
     }
     if (m_responseHeaders.contains("Content-Location"))
     {
-        QUrl url { m_responseHeaders["Content-Location"] };
+        QUrl url { m_responseHeaders.value("Content-Location") };
         return url;
     }
     return m_requestUrl;

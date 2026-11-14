@@ -817,39 +817,38 @@ void LCDProcClient::outputText(QList<LCDTextItem> *textItems)
     if (!m_lcdReady )
         return;
 
-    QList<LCDTextItem>::iterator it = textItems->begin();
     QString num;
     unsigned int counter = 1;
 
     // Do the definable scrolling in here.
     // Use asignScrollingWidgets(curItem->getText(), "textWidget" + num);
     // When scrolling is set, alignment has no effect
-    while (it != textItems->end() && counter < m_lcdHeight )
+    for (const auto& curItem : std::as_const(*textItems))
     {
-        LCDTextItem *curItem = &(*it);
-        ++it;
-        num.setNum(curItem->getRow());
+        if (counter >= m_lcdHeight)
+            break;
+        num.setNum(curItem.getRow());
 
-        if (curItem->getScroll())
+        if (curItem.getScroll())
         {
-            assignScrollingWidgets(curItem->getText(), curItem->getScreen(),
-                                "textWidget" + num, curItem->getRow());
+            assignScrollingWidgets(curItem.getText(), curItem.getScreen(),
+                                "textWidget" + num, curItem.getRow());
         }
         else
         {
-            switch (curItem->getAlignment())
+            switch (curItem.getAlignment())
             {
                 case ALIGN_LEFT:
-                    outputLeftText(curItem->getScreen(), curItem->getText(),
-                                   "textWidget" + num, curItem->getRow());
+                    outputLeftText(curItem.getScreen(), curItem.getText(),
+                                   "textWidget" + num, curItem.getRow());
                     break;
                 case ALIGN_RIGHT:
-                    outputRightText(curItem->getScreen(), curItem->getText(),
-                                    "textWidget" + num, curItem->getRow());
+                    outputRightText(curItem.getScreen(), curItem.getText(),
+                                    "textWidget" + num, curItem.getRow());
                     break;
                 case ALIGN_CENTERED:
-                    outputCenteredText(curItem->getScreen(), curItem->getText(),
-                                       "textWidget" + num, curItem->getRow());
+                    outputCenteredText(curItem.getScreen(), curItem.getText(),
+                                       "textWidget" + num, curItem.getRow());
                     break;
                 default: break;
             }
@@ -958,12 +957,11 @@ void LCDProcClient::formatScrollingWidgets()
     int max_len = std::accumulate(m_lcdTextItems->cbegin(), m_lcdTextItems->cend(),
                                   0, longest);
 
-    // Make all scrollable items the same lenght and do the initial output
-    auto it = m_lcdTextItems->begin();
-    while (it != m_lcdTextItems->end())
+    // Make all scrollable items the same length and do the initial output
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_lcdTextItems->begin(); it != m_lcdTextItems->end(); it++)
     {
         LCDTextItem *curItem = &(*it);
-        ++it;
         if (curItem->getText().length() > (int) m_lcdWidth )
         {
             QString temp;
@@ -1127,9 +1125,6 @@ void LCDProcClient::startChannel(const QString& channum, const QString& title, c
 
 void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
 {
-    QList<LCDTextItem>::iterator it = textItems->begin();
-    LCDTextItem *curItem = &(*it);
-
     if ( m_lcdShowGeneric )
         setPriority("Generic", TOP);
 
@@ -1142,6 +1137,7 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     // If nothing, return without setting up the timer, etc
     if (textItems->isEmpty())
         return;
+    LCDTextItem& curItem = textItems->first();
 
     m_activeScreen = "Generic";
 
@@ -1152,7 +1148,6 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     m_genericProgress = 0.0;
 
     // Todo, make scrolling definable in LCDTextItem
-    ++it;
 
 
     // Weird observations:
@@ -1163,8 +1158,8 @@ void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
     //    just handle the whole thing and the 'pop off' stuff can go.
     //
     m_lcdTextItems->clear();
-    assignScrollingWidgets(curItem->getText(), "Generic",
-                           "textWidget1", curItem->getRow());
+    assignScrollingWidgets(curItem.getText(), "Generic",
+                           "textWidget1", curItem.getRow());
 
     outputGeneric();
 
@@ -1195,19 +1190,15 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     if ( m_lcdHeight > 1)
         outputCenteredText("Menu", std::move(app_name), "topWidget", 1);
 
-    QList<LCDMenuItem>::iterator it = menuItems->begin();
-
     // First loop through and figure out where the selected item is in the
     // list so we know how many above and below to display
     unsigned int selectedItem = 0;
     unsigned int counter = 0;
     bool oneSelected = false;
 
-    while (it != menuItems->end())
+    for (const auto& curItem : std::as_const(*menuItems))
     {
-        LCDMenuItem *curItem = &(*it);
-        ++it;
-        if (curItem->isSelected() && !oneSelected)
+        if (curItem.isSelected() && !oneSelected)
         {
             selectedItem = counter + 1;
             oneSelected  = true;
@@ -1249,11 +1240,10 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
     //  item and leave
     if ( m_lcdHeight <= 2)
     {
-        it = menuItems->begin();
-        while (it != menuItems->end())
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = menuItems->begin(); it != menuItems->end(); it++)
         {
             LCDMenuItem *curItem = &(*it);
-            ++it;
             if (curItem->isSelected())
             {
                 // Set the scroll flag if necessary, otherwise set it to false
@@ -1300,7 +1290,7 @@ void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
 
     // Reset things
     counter = 1;
-    it = menuItems->begin();
+    auto it = menuItems->begin();
 
     // Move the iterator to selectedItem lcdHeight/2, if > 1, -1.
     unsigned int midPoint = ( m_lcdHeight/2) - 1;
@@ -1380,15 +1370,13 @@ void LCDProcClient::beginScrollingMenuText()
 
     m_menuScrollPosition = 1;
 
-    QList<LCDMenuItem>::iterator it = m_lcdMenuItems->begin();
-
     QString temp;
     // Loop through and prepend everything with enough spaces
     // for smooth scrolling, and update the position
-    while (it != m_lcdMenuItems->end())
+    // NOLINTNEXTLINE(modernize-loop-convert)
+    for (auto it = m_lcdMenuItems->begin(); it != m_lcdMenuItems->end(); it++)
     {
         LCDMenuItem *curItem = &(*it);
-        ++it;
         // Don't setup for smooth scrolling if the item isn't long enough
         // (It causes problems with items being scrolled when they shouldn't)
         if (curItem->ItemName().length()  > (int)( m_lcdWidth - lcdStartCol))
@@ -1417,7 +1405,6 @@ void LCDProcClient::scrollMenuText()
 
     QString aString;
     QString bString;
-    QList<LCDMenuItem>::iterator it = m_lcdMenuItems->begin();
 
     ++m_menuScrollPosition;
 
@@ -1426,11 +1413,9 @@ void LCDProcClient::scrollMenuText()
     unsigned int selectedItem = 0;
     unsigned int counter = 0;
 
-    while (it != m_lcdMenuItems->end())
+    for (const auto& curItem : std::as_const(*m_lcdMenuItems))
     {
-        LCDMenuItem *curItem = &(*it);
-        ++it;
-        if (curItem->isSelected())
+        if (curItem.isSelected())
         {
             selectedItem = counter + 1;
             break;
@@ -1440,13 +1425,12 @@ void LCDProcClient::scrollMenuText()
 
     // If there is only one or two lines on the display, then just write
     // the selected item and leave
-    it = m_lcdMenuItems->begin();
     if ( m_lcdHeight <= 2)
     {
-        while (it != m_lcdMenuItems->end())
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = m_lcdMenuItems->begin(); it != m_lcdMenuItems->end(); it++)
         {
             LCDMenuItem *curItem = &(*it);
-            ++it;
             if (curItem->isSelected())
             {
                 curItem->incrementScrollPos();
@@ -1515,24 +1499,20 @@ void LCDProcClient::scrollMenuText()
 
     // Find the longest line, if menuScrollPosition is longer then this, then
     // reset them all
-    it = m_lcdMenuItems->begin();
     int longest_line = 0;
     int max_scroll_pos = 0;
 
-    while (it != m_lcdMenuItems->end())
+    for (const auto& curItem : std::as_const(*m_lcdMenuItems))
     {
-        LCDMenuItem *curItem = &(*it);
-        ++it;
         longest_line = std::max(
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-            curItem->ItemName().length(),
+            curItem.ItemName().length(),
 #else
-            static_cast<int>(curItem->ItemName().length()),
+            static_cast<int>(curItem.ItemName().length()),
 #endif
             longest_line);
 
-        if ((int)curItem->getScrollPos() > max_scroll_pos)
-            max_scroll_pos = curItem->getScrollPos();
+        max_scroll_pos = std::max(max_scroll_pos, (int)curItem.getScrollPos());
     }
 
     // If max_scroll_pos > longest_line then reset
@@ -1543,18 +1523,17 @@ void LCDProcClient::scrollMenuText()
         m_menuScrollTimer->start(500ms);
         m_menuScrollPosition = 0;
 
-        it = m_lcdMenuItems->begin();
-        while (it != m_lcdMenuItems->end())
+        // NOLINTNEXTLINE(modernize-loop-convert)
+        for (auto it = m_lcdMenuItems->begin(); it != m_lcdMenuItems->end(); it++)
         {
             LCDMenuItem *curItem = &(*it);
-            ++it;
             curItem->setScrollPos(curItem->getIndent());
         }
     }
 
     // Reset things
     counter = 1;
-    it = m_lcdMenuItems->begin();
+    auto it = m_lcdMenuItems->begin();
 
     // Move the iterator to selectedItem -1
     if (selectedItem != 1 && m_lcdMenuItems->size() >= (int) m_lcdHeight )

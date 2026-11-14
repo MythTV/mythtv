@@ -39,10 +39,10 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <numbers>
 
 #include "ifs.h"
 #include "goom_core.h"
-#include "goom_tools.h"
 
 #include "libmythbase/mythrandom.h"
 
@@ -142,8 +142,8 @@ Random_Simis (FRACTAL * F, SimiData &simi_set, int offset, int count)
 		Cur->m_dCy = Gauss_Rand (0.0, .8, 4.0);
 		Cur->m_dR = Gauss_Rand (F->m_rMean, F->m_drMean, 3.0);
 		Cur->m_dR2 = Half_Gauss_Rand (0.0, F->m_dr2Mean, 2.0);
-		Cur->m_dA = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
-		Cur->m_dA2 = Gauss_Rand (0.0, 360.0, 4.0) * (M_PI / 180.0);
+		Cur->m_dA = Gauss_Rand (0.0, 360.0, 4.0) * (std::numbers::pi / 180.0);
+		Cur->m_dA2 = Gauss_Rand (0.0, 360.0, 4.0) * (std::numbers::pi / 180.0);
 		Cur++;
 	}
 }

@@ -36,7 +36,6 @@
 #include <string.h>
 
 #include "libavutil/attributes.h"
-#include "libavutil/emms.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
 #include "libavutil/mem_internal.h"
@@ -943,7 +942,8 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                         last_gold_motion_x = motion_x[0] = vp4_get_mv(gb, 0, last_gold_motion_x);
                         last_gold_motion_y = motion_y[0] = vp4_get_mv(gb, 1, last_gold_motion_y);
                         break;
-                    } /* otherwise fall through */
+                    }
+                    av_fallthrough;
                 case MODE_INTER_PLUS_MV:
                     /* all 6 fragments use the same motion vector */
                     if (coding_mode == 0) {
@@ -1923,7 +1923,6 @@ static void vp3_draw_horiz_band(Vp3DecodeContext *s, int y)
     for (int i = 3; i < AV_NUM_DATA_POINTERS; i++)
         offset[i] = 0;
 
-    emms_c();
     s->avctx->draw_horiz_band(s->avctx, s->current_frame.f, offset, y, 3, h);
 }
 

@@ -42,12 +42,15 @@ typedef struct FrameDecodeData {
      * stored in the post_process_opaque object.
      */
     int (*post_process)(void *logctx, AVFrame *frame);
-    void *post_process_opaque;
-    void (*post_process_opaque_free)(void *opaque);
+    void *post_process_opaque;                        ///< RefStruct reference
 
     /**
      * Per-frame private data for hwaccels.
+     *
+     * Same as @ref post_process, but used only by some hwaccels to retrieve or
+     * finalize frames, and executed first.
      */
+    int (*hwaccel_priv_post_process)(void *logctx, AVFrame *frame);
     void *hwaccel_priv;
     void (*hwaccel_priv_free)(void *priv);
 } FrameDecodeData;
@@ -82,7 +85,7 @@ int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame);
 int ff_decode_get_hw_frames_ctx(AVCodecContext *avctx,
                                 enum AVHWDeviceType dev_type);
 
-int ff_attach_decode_data(AVFrame *frame);
+int ff_attach_decode_data(AVCodecContext *avctx, AVFrame *frame);
 
 /**
  * Check whether the side-data of src contains a palette of
@@ -93,9 +96,13 @@ int ff_attach_decode_data(AVFrame *frame);
  */
 int ff_copy_palette(void *dst, const AVPacket *src, void *logctx);
 
-/**
- * Check that the provided frame dimensions are valid and set them on the codec
- * context.
+/*
+ * Validate and set video frame dimensions on AVCodecContext.
+ *
+ * Dimensions accepted here satisfy FFmpeg's generic image-size validation
+ * (see av_image_check_size2()). Decoder code normally should not duplicate
+ * generic width/height overflow checks before ff_get_buffer(); add local
+ * checks only for codec-specific derived sizes or complexity bounds.
  */
 int ff_set_dimensions(AVCodecContext *s, int width, int height);
 
@@ -111,8 +118,10 @@ int ff_set_sar(AVCodecContext *avctx, AVRational sar);
  * instead of calling get_format() directly.
  *
  * The list of pixel formats must contain at least one valid entry, and is
- * terminated with AV_PIX_FMT_NONE.  If it is possible to decode to software,
- * the last entry in the list must be the most accurate software format.
+ * terminated with AV_PIX_FMT_NONE. If it is possible to decode to software,
+ * the first entry after the last hwaccel one in the list must be the most
+ * accurate software format, followed by less accurate ones in order of
+ * preference.
  * If it is not possible to decode to software, AVCodecContext.sw_pix_fmt
  * must be set before calling this function.
  */
@@ -220,34 +229,5 @@ int ff_decode_content_light_new(const AVCodecContext *avctx, AVFrame *frame,
 int ff_decode_content_light_new_ext(const AVCodecContext *avctx,
                                     AVFrameSideData ***sd, int *nb_sd,
                                     struct AVContentLightMetadata **clm);
-
-enum AVExifHeaderMode;
-
-/**
- * Attach the data buffer to the frame. This is mostly a wrapper for
- * av_side_data_new_from_buffer, but it checks if the orientation tag is
- * present in the provided EXIF buffer. If it is, it zeroes it out and
- * attaches that information as an AV_FRAME_DATA_DISPLAYMATRIX instead
- * of including it in the AV_FRAME_DATA_EXIF side data buffer.
- *
- * *buf is ALWAYS consumed by this function and NULL written in its place, even
- * on failure.
- */
-int ff_decode_exif_attach_buffer(AVCodecContext *avctx, AVFrame *frame, AVBufferRef **buf,
-                                 enum AVExifHeaderMode header_mode);
-
-struct AVExifMetadata;
-
-/**
- * Attach an already-parsed EXIF metadata struct to the frame as a side data
- * buffer. It writes the EXIF IFD into the buffer and attaches the buffer to
- * the frame.
- *
- * If the metadata struct contains an orientation tag, it will be zeroed before
- * writing, and instead, an AV_FRAME_DATA_DISPLAYMATRIX will be attached in
- * addition to the AV_FRAME_DATA_EXIF side data.
- */
-int ff_decode_exif_attach_ifd(AVCodecContext *avctx, AVFrame *frame,
-                              const struct AVExifMetadata *ifd);
 
 #endif /* AVCODEC_DECODE_H */

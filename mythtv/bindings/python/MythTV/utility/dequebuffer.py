@@ -24,14 +24,13 @@ try:
                            args=(), kwargs={}):
             self.inputqueue = Queue()
             self.idletime = time()
-            super(_PollingThread, self).__init__(group,
+            super().__init__(group,
                         target, name, args, kwargs)
         def add_pipe(self, buff, pipe, mode):
             self.inputqueue.put((buff, pipe, mode))
         def run(self):
             poller = poll()
             fds = {}
-            events = []
             while True:
                 while not self.inputqueue.empty():
                     # loop though the queue and add new pipes to the
@@ -84,7 +83,7 @@ try:
                     self.idletime = time()
 except ImportError:
     from select import kqueue, kevent, KQ_FILTER_READ, KQ_FILTER_WRITE, \
-                         KQ_EV_ADD, KQ_EV_DELETE, KQ_EV_EOF
+                         KQ_EV_ADD, KQ_EV_EOF
     class _PollingThread( Thread ):
         """
         This polling thread listens on selected pipes, and automatically reads
@@ -96,7 +95,7 @@ except ImportError:
                            args=(), kwargs={}):
             self.inputqueue = Queue()
             self.idletime = time()
-            super(_PollingThread, self).__init__(group,
+            super().__init__(group,
                         target, name, args, kwargs)
         def add_pipe(self, buff, pipe, mode):
             self.inputqueue.put((buff, pipe, mode))
@@ -158,14 +157,14 @@ except ImportError:
                 else:
                     self.idletime = time()
 
-class DequeBuffer( object ):
+class DequeBuffer:
     """
     This is a chunked buffer, storing a sequence of buffer objects in a
     deque, allowing for FIFO operations outside the limited 64K system
     buffer, and the efficient freeing of memory without needing to rewrite
     a large contiguous buffer object.
     """
-    class _Buffer( object ):
+    class _Buffer:
         """
         This subclass contains a buffer object and a read/write lock, as
         well as independent read and write positions.

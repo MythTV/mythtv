@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Provides managed logging."""
 
 from MythTV.static import LOGLEVEL, LOGMASK, LOGFACILITY
@@ -13,7 +12,7 @@ try:
 except ImportError:
     # bail only when '--systemd-journal' is selected
     journal = None
-from sys import version_info, stdout, argv
+from sys import stdout, argv
 from datetime import datetime
 from _thread import allocate_lock
 from io import StringIO
@@ -250,7 +249,7 @@ class MythLog( LOGLEVEL, LOGMASK, LOGFACILITY ):
         # abuse the __new__ constructor to set some immutable class attributes
         # before the class is instantiated
         cls._initlogger()
-        return super(MythLog, cls).__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, module='pythonbindings', db=None):
         self.module = module

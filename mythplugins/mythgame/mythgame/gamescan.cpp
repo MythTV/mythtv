@@ -77,7 +77,7 @@ void GameScannerThread::verifyFiles()
         if (!romfile.isEmpty())
         {
             bool found = false;
-            // NOLINTNEXTLINE(modernize-loop-convert)
+            // NOLINTNEXTLINE(modernize-loop-convert), clazy:exclude-next-line=detaching-member (erases item)
             for (auto p2 = m_files.begin(); p2 != m_files.end(); ++p2)
             {
                 if ((*p2).romfile == romfile &&

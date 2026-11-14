@@ -288,12 +288,12 @@ class ScanTransponder: public TransMythUIComboBoxSetting
     QMap<QString, struct tuningdata> m_tdm;
 
   public:
-    QString getFrequency (const QString &satname) {return m_tdm[satname].frequency; }
-    QString getPolarity  (const QString &satname) {return m_tdm[satname].polarity;  }
-    QString getSymbolrate(const QString &satname) {return m_tdm[satname].symbolrate;}
-    QString getModulation(const QString &satname) {return m_tdm[satname].modulation;}
-    QString getModSys    (const QString &satname) {return m_tdm[satname].modSys;    }
-    QString getFec       (const QString &satname) {return m_tdm[satname].fec;       }
+    QString getFrequency (const QString &satname) {return m_tdm.value(satname).frequency; }
+    QString getPolarity  (const QString &satname) {return m_tdm.value(satname).polarity;  }
+    QString getSymbolrate(const QString &satname) {return m_tdm.value(satname).symbolrate;}
+    QString getModulation(const QString &satname) {return m_tdm.value(satname).modulation;}
+    QString getModSys    (const QString &satname) {return m_tdm.value(satname).modSys;    }
+    QString getFec       (const QString &satname) {return m_tdm.value(satname).fec;       }
 };
 
 class ScanFrequencykHz: public TransTextEditSetting

@@ -51,6 +51,12 @@ fate-filter-mcdeint-medium: CMD = framecrc -flags bitexact -idct simple -i $(TAR
 
 FATE_FILTER_SAMPLES-$(call FILTERDEMDEC, MCDEINT, MPEGTS, MPEG2VIDEO, SNOW_ENCODER) += $(FATE_MCDEINT)
 
+FATE_FILTER-$(call FILTERFRAMECRC, MCDEINT TESTSRC, SNOW_ENCODER SCALE_FILTER) += fate-filter-mcdeint-slow-edge
+fate-filter-mcdeint-slow-edge: CMD = framecrc -auto_conversion_filters -flags bitexact -lavfi testsrc=s=5x32:r=25:d=1,mcdeint=mode=slow -frames:v 3
+
+FATE_FILTER-$(call FILTERFRAMECRC, MCDEINT TESTSRC, SNOW_ENCODER SCALE_FILTER) += fate-filter-mcdeint-slow
+fate-filter-mcdeint-slow: CMD = framecrc -auto_conversion_filters -flags bitexact -lavfi testsrc=s=128x2:r=25:d=1,mcdeint=mode=slow -frames:v 3
+
 FATE_FILTER_SAMPLES-$(call FILTERDEMDEC, CODECVIEW, RM, RV40) += fate-filter-codecview-mvs
 fate-filter-codecview-mvs: CMD = framecrc -flags2 +export_mvs -i $(TARGET_SAMPLES)/real/spygames-2MB.rmvb -vf codecview=mv=pf+bf+bb -frames:v 60 -an
 
@@ -449,6 +455,18 @@ fate-filter-decimate: CMD = framecrc -lavfi testsrc2=r=24:d=10,fps=60,decimate=5
 FATE_FILTER-$(call FILTERFRAMECRC, TESTSRC2 FPS MPDECIMATE) += fate-filter-mpdecimate
 fate-filter-mpdecimate: CMD = framecrc -lavfi testsrc2=r=2:d=10,fps=3,mpdecimate -pix_fmt yuv420p
 
+FATE_FILTER-$(call FILTERFRAMECRC, TESTSRC2 FPS MPDECIMATE) += fate-filter-mpdecimate-keep
+fate-filter-mpdecimate-keep: CMD = framecrc -lavfi testsrc2=r=2:d=5,fps=4,mpdecimate=keep=3 -pix_fmt yuv420p
+
+FATE_FILTER-$(call FILTERFRAMECRC, TESTSRC2 FPS MPDECIMATE) += fate-filter-mpdecimate-keep1
+fate-filter-mpdecimate-keep1: CMD = framecrc -lavfi testsrc2=r=2:d=5,fps=8,mpdecimate=keep=1 -pix_fmt yuv420p
+
+FATE_FILTER-$(call FILTERFRAMECRC, TESTSRC2 FPS MPDECIMATE) += fate-filter-mpdecimate-maxdrop-pos
+fate-filter-mpdecimate-maxdrop-pos: CMD = framecrc -lavfi testsrc2=r=1:d=5,fps=10,mpdecimate=max=3 -pix_fmt yuv420p
+
+FATE_FILTER-$(call FILTERFRAMECRC, TESTSRC2 FPS MPDECIMATE) += fate-filter-mpdecimate-maxdrop-neg
+fate-filter-mpdecimate-maxdrop-neg: CMD = framecrc -lavfi testsrc2=r=1:d=5,fps=10,mpdecimate=max=-3 -pix_fmt yuv420p
+
 FATE_FILTER-$(call FILTERFRAMECRC, FPS TESTSRC2) += $(addprefix fate-filter-fps-, up up-round-down up-round-up down down-round-down down-round-up down-eof-pass start-drop start-fill)
 fate-filter-fps-up: CMD = framecrc -lavfi testsrc2=r=3:d=2,fps=7
 fate-filter-fps-up-round-down: CMD = framecrc -lavfi testsrc2=r=3:d=2,fps=7:round=down
@@ -503,13 +521,21 @@ fate-filter-scale200: CMD = video_filter "scale=w=200:h=200"
 FATE_FILTER_VSYNTH_VIDEO_FILTER-$(CONFIG_SCALE_FILTER) += fate-filter-scale500
 fate-filter-scale500: CMD = video_filter "scale=w=500:h=500"
 
-FATE_FILTER_VSYNTH-$(call ALLYES, TESTSRC_FILTER SCALE2REF_FILTER NULLSINK_FILTER FRAMEMD5_MUXER FILE_PROTOCOL PIPE_PROTOCOL) += fate-filter-scale2ref_keep_aspect
+FATE_FILTER_VSYNTH-$(call ALLYES, TESTSRC_FILTER SCALE_FILTER NULLSINK_FILTER FRAMEMD5_MUXER FILE_PROTOCOL PIPE_PROTOCOL) += fate-filter-scale2ref_keep_aspect
 fate-filter-scale2ref_keep_aspect: tests/data/filtergraphs/scale2ref_keep_aspect
 fate-filter-scale2ref_keep_aspect: CMD = framemd5 -frames:v 5 -/filter_complex $(TARGET_PATH)/tests/data/filtergraphs/scale2ref_keep_aspect -map "[main]"
 
 FATE_FILTER_VSYNTH-$(call FILTERDEMDEC, SCALE, RAWVIDEO, RAWVIDEO) += fate-filter-scalechroma
 fate-filter-scalechroma: tests/data/vsynth1.yuv
 fate-filter-scalechroma: CMD = framecrc -flags bitexact -s 352x288 -pix_fmt yuv444p -i $(TARGET_PATH)/tests/data/vsynth1.yuv -pix_fmt yuv420p -sws_flags +bitexact -vf scale=out_chroma_loc=bottomleft
+
+# Regression test: cascaded scale=...:-2 on extreme aspect ratios could
+# previously produce zero output dimensions, silently accepted by scale
+# filter and potentially hanging downstream encoders (issue #22817).
+# Verify that such invalid dimensions are now rejected explicitly.
+FATE_FILTER-$(call ALLYES, SCALE_FILTER COLOR_FILTER LAVFI_INDEV WRAPPED_AVFRAME_ENCODER NULL_MUXER) += fate-filter-scale-zero-dim
+fate-filter-scale-zero-dim: CMD = ! run $(FFMPEG) -nostdin -hide_banner -f lavfi -i "color=c=red:s=3000x2:d=1" -vf "scale=iw/2:-2,scale=iw/3:-2,scale=iw/2:-2" -f null none
+fate-filter-scale-zero-dim: CMP = null
 
 FATE_FILTER_VSYNTH_VIDEO_FILTER-$(CONFIG_VFLIP_FILTER) += fate-filter-vflip
 fate-filter-vflip: CMD = video_filter "vflip"
@@ -734,6 +760,9 @@ fate-filter-frei0r-filter: CMD = framecrc -lavfi "testsrc2=r=1:d=5,frei0r=enable
 fate-filter-frei0r-filter-unaligned: CMD = framecrc -lavfi "testsrc2=s=328x240:r=1:d=5,frei0r=filter_name=distort0r"
 FATE_FFMPEG += $(FATE_FILTER_FREI0R-yes)
 
+FATE_FILTER_FREI0R_SRC-$(call FILTERFRAMECRC, FREI0R_SRC) = fate-filter-frei0r-source
+fate-filter-frei0r-source: CMD = framecrc -lavfi "frei0r_src=200x200:5:onecol0r:1/2/3" -frames:v 5
+FATE_FFMPEG += $(FATE_FILTER_FREI0R_SRC-yes)
 #
 # Metadata tests
 #

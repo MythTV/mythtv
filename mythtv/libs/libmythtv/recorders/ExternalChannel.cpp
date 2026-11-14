@@ -8,6 +8,7 @@
 #include "ExternalChannel.h"
 #include "mpeg/mpegtables.h"
 #include "tv_rec.h"
+#include "cardutil.h"
 
 #define LOC  QString("ExternChan[%1](%2): ").arg(m_inputId).arg(m_loc)
 
@@ -42,10 +43,17 @@ bool ExternalChannel::Open(void)
         return false;
 
     m_streamHandler = ExternalStreamHandler::Get(m_device, GetInputID(),
-                                                  GetMajorID());
-    if (!m_streamHandler || m_streamHandler->HasError())
+                                                 GetMajorID(), "channel");
+    if (!m_streamHandler)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Open failed");
+        Close();
+        return false;
+    }
+    if (m_streamHandler->HasError())
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Open failed: %1").arg(m_streamHandler->ErrorString()));
         Close();
         return false;
     }
@@ -61,7 +69,7 @@ void ExternalChannel::Close()
 
     if (ExternalChannel::IsOpen())
     {
-        ExternalStreamHandler::Return(m_streamHandler, GetInputID());
+        ExternalStreamHandler::Return(m_streamHandler, GetInputID(), "channel");
         m_streamHandler = nullptr;
     }
 }
@@ -135,10 +143,13 @@ bool ExternalChannel::Tune(const QString &channum)
         QVariantMap vresult;
         QByteArray  response;
 
+        int id = GetInputID();
+
         cmd["command"] = "TuneChannel";
         cmd["channum"] = channum;
         cmd["value"]   = channum;
-        cmd["inputid"] = GetInputID();
+        cmd["inputid"] = id;
+        cmd["inputname"] = CardUtil::GetDisplayName(id);
         cmd["sourceid"] = m_sourceId;
 
         if (m_pParent)
