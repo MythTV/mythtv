@@ -141,15 +141,23 @@ static QSize get_video_dim(const AVCodecContext &ctx)
 {
     return {ctx.width >> ctx.lowres, ctx.height >> ctx.lowres};
 }
-static float get_aspect(const AVCodecContext &ctx)
+static float get_aspect(const AVCodecContext &ctx, const AVStream *stream)
 {
     float aspect_ratio = 0.0F;
 
-    if (ctx.sample_aspect_ratio.num && ctx.height)
+    if (ctx.height != 0)
     {
-        aspect_ratio = av_q2d(ctx.sample_aspect_ratio) *
-            static_cast<double>(ctx.width);
-        aspect_ratio /= (float) ctx.height;
+        if (stream->sample_aspect_ratio.num != 0)
+        {
+            aspect_ratio = av_q2d(stream->sample_aspect_ratio) *
+                static_cast<double>(ctx.width) / static_cast<double>(ctx.height);
+        }
+        else if (ctx.sample_aspect_ratio.num != 0)
+        {
+            aspect_ratio = av_q2d(ctx.sample_aspect_ratio) *
+                static_cast<double>(ctx.width);
+            aspect_ratio /= (float) ctx.height;
+        }
     }
 
     if (aspect_ratio <= 0.0F || aspect_ratio > 6.0F)
@@ -1495,7 +1503,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *codecCont
         QSize dim    = get_video_dim(*codecContext);
         int   width  = m_currentWidth  = dim.width();
         int   height = m_currentHeight = dim.height();
-        m_currentAspect = get_aspect(*codecContext);
+        m_currentAspect = get_aspect(*codecContext, stream);
 
         if (!width || !height)
         {
@@ -2157,7 +2165,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         QString codectype(AVMediaTypeToString(par->codec_type));
         if (par->codec_type == AVMEDIA_TYPE_VIDEO)
-            codectype += QString("(%1x%2)").arg(par->width).arg(par->height);
+        {
+            codectype += QString("(%1x%2 [SAR: %3:%4] [Stream SAR: %5:%6])").arg(
+                QString::number(par->width),
+                QString::number(par->height),
+                QString::number(par->sample_aspect_ratio.num),
+                QString::number(par->sample_aspect_ratio.den),
+                QString::number(m_ic->streams[strm]->sample_aspect_ratio.num),
+                QString::number(m_ic->streams[strm]->sample_aspect_ratio.den));
+        }
         QString program_id = "null";
         if (av_find_program_from_stream(m_ic, nullptr, strm) != nullptr)
         {
