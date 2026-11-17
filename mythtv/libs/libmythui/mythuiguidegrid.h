@@ -59,7 +59,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     void SetArrow(int direction, const QString &file);
     void LoadImage(int recType, const QString &file);
     void SetProgramInfo(int row, int col, QRect area,
-                        const QString &title, const QString &genre,
+                        const QString &title, uint year, const QString &genre,
                         int arrow, int recType, int recStat, bool selected);
     void ResetData();
     void ResetRow(int row);
@@ -85,9 +85,10 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
     {
       public:
         UIGTCon() = default;
-        UIGTCon(const QRect drawArea, QString title,
+        UIGTCon(const QRect drawArea, QString title, uint year,
                 const QString &category, int arrow, int recType, int recStat) :
                 m_drawArea(drawArea),               m_title(std::move(title)),
+                m_year(year),
                 m_category(category.trimmed()),     m_arrow(arrow),
                 m_recType(recType),                 m_recStat(recStat)
         {}
@@ -97,6 +98,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
         QRect m_drawArea;
         QString m_title;
+        uint m_year   { 0 };
         QString m_category;
         QColor m_categoryColor;
         int m_arrow   { GridTimeNormal };
@@ -154,6 +156,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     QMap<QString, QColor> m_categoryColors;
 
+    bool   m_drawYear           {true};
 };
 
 #endif

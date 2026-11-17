@@ -82,15 +82,17 @@ class JumpToChannel : public QObject
 class GuideUIElement {
 public:
     GuideUIElement(int row, int col, const QRect area,
-                   QString title, QString category,
+                   QString title, uint year, QString category,
                    int arrow, int recType, int recStat, bool selected)
         : m_row(row), m_col(col), m_area(area), m_title(std::move(title)),
-          m_category(std::move(category)), m_arrow(arrow), m_recType(recType),
+          m_year(year), m_category(std::move(category)),
+          m_arrow(arrow), m_recType(recType),
           m_recStat(recStat), m_selected(selected) {}
     const int m_row;
     const int m_col;
     const QRect m_area;
     const QString m_title;
+    const uint m_year;
     const QString m_category;
     const int m_arrow;
     const int m_recType;

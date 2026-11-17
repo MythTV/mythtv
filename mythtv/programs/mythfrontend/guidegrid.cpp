@@ -1659,6 +1659,8 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
                                                     const QDateTime& start,
                                                     ProgramList *proglist)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+
     if (row < 0 || row >= m_channelCount ||
         start != m_currentStartTime)
     {
@@ -1871,10 +1873,38 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             }
 
             int recStat = 0;
-            if (pginfo->GetRecordingStatus() == RecStatus::Conflict ||
-                pginfo->GetRecordingStatus() == RecStatus::Offline)
+            RecStatus::Type recstatus = pginfo->GetRecordingStatus();
+            if (recstatus == RecStatus::Unknown)
+            {
+                // Check for any previously recorded status.
+                query.prepare("SELECT recstatus "
+                              "FROM oldrecorded WHERE duplicate > 0 AND "
+                              "future = 0 AND "
+                              "((programid <> '' AND programid = :PROGRAMID) OR "
+                              " (title <> '' AND title = :TITLE AND "
+                              "  subtitle <> '' AND subtitle = :SUBTITLE AND "
+                              "  description <> '' AND description = :DECRIPTION));");
+
+                query.bindValue(":PROGRAMID",  pginfo->GetProgramID());
+                query.bindValue(":TITLE",      pginfo->GetTitle());
+                query.bindValue(":SUBTITLE",   pginfo->GetSubtitle());
+                query.bindValue(":DECRIPTION", pginfo->GetDescription());
+
+                if (!query.exec())
+                {
+                    MythDB::DBError("fillProgramRowInfosWith", query);
+                }
+                else if (query.next())
+                {
+                    recstatus = RecStatus::Type(query.value(0).toInt());
+                }
+            }
+
+            if (recstatus == RecStatus::Conflict ||
+                recstatus == RecStatus::Offline)
                 recStat = 2;
-            else if (pginfo->GetRecordingStatus() <= RecStatus::WillRecord)
+            else if (recstatus <= RecStatus::WillRecord ||
+                     recstatus == RecStatus::NeverRecord)
                 recStat = 1;
             else
                 recStat = 0;
@@ -1882,8 +1912,11 @@ void GuideUpdateProgramRow::fillProgramRowInfosWith(int row,
             QString title = (pginfo->GetTitle() == kUnknownTitle) ?
                 GuideGrid::tr("Unknown", "Unknown program title") :
                                 pginfo->GetTitle();
+            uint year = pginfo->GetYearOfInitialRelease();
+            bool addYear = pginfo->GetCategoryType() == ProgramInfo::kCategoryMovie;
             m_result.emplace_back(
                 row, cnt, tempRect, title,
+                addYear && year > 0 ? year : 0,
                 pginfo->GetCategory(), arrow, recFlag,
                 recStat, isCurrent);
 
@@ -2102,7 +2135,7 @@ void GuideGrid::updateProgramsUI(unsigned int firstRow, unsigned int numRows,
     m_guideGrid->SetProgPast(progPast);
     for (const auto & r : elements)
     {
-        m_guideGrid->SetProgramInfo(r.m_row, r.m_col, r.m_area, r.m_title,
+        m_guideGrid->SetProgramInfo(r.m_row, r.m_col, r.m_area, r.m_title, r.m_year,
                                     r.m_category, r.m_arrow, r.m_recType,
                                     r.m_recStat, r.m_selected);
     }

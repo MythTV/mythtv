@@ -134,6 +134,10 @@ bool MythUIGuideGrid::ParseElement(
     {
         m_drawCategoryColors = parseBool(element);
     }
+    else if (element.tagName() == "showyear")
+    {
+        m_drawYear = parseBool(element);
+    }
     else if (element.tagName() == "cutdown")
     {
         m_cutdown = parseBool(element);
@@ -243,6 +247,8 @@ void MythUIGuideGrid::CopyFrom(MythUIType *base)
     m_cutdown = gg->m_cutdown;
     m_drawCategoryColors = gg->m_drawCategoryColors;
     m_drawCategoryText = gg->m_drawCategoryText;
+
+    m_drawYear = gg->m_drawYear;
 
     MythUIType::CopyFrom(base);
 }
@@ -632,7 +638,17 @@ void MythUIGuideGrid::drawText(MythPainter *p, int xoffset, int yoffset, UIGTCon
     QString msg = data->m_title;
 
     if (m_drawCategoryText && !data->m_category.isEmpty())
-        msg += QString(" (%1)").arg(data->m_category);
+    {
+        if (m_drawYear && data->m_year > 0)
+            msg += QString(" (%1, %2)").arg(data->m_category).arg(data->m_year);
+        else
+            msg += QString(" (%1)").arg(data->m_category);
+
+    }
+    else if (m_drawYear && data->m_year > 0)
+    {
+        msg += QString(" (%1)").arg(data->m_year);
+    }
 
     QRect area = data->m_drawArea;
     area.translate(m_area.x(), m_area.y());	// Adjust within parent
@@ -684,11 +700,11 @@ QPoint MythUIGuideGrid::GetRowAndColumn(QPoint position)
 
 void MythUIGuideGrid::SetProgramInfo(int row,
                                      [[maybe_unused]] int col, const QRect area,
-                                     const QString &title, const QString &genre,
+                                     const QString &title, uint year, const QString &genre,
                                      int arrow, int recType, int recStat,
                                      bool selected)
 {
-    auto *data = new UIGTCon(area, title, genre, arrow, recType, recStat);
+    auto *data = new UIGTCon(area, title, year, genre, arrow, recType, recStat);
     m_allData[row].append(data);
 
     if (m_drawCategoryColors)
