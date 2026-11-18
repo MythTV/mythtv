@@ -146,15 +146,27 @@ print "copyright::National Digital Forecast Database\n";
 print "copyrightlogo::none\n";
 my $pop12;
 foreach my $time (sort keys %$result) {
-    if (defined $result->{$time}->{'probability-of-precipitation_12 hour'}) {
-        $pop12 = $result->{$time}->{'probability-of-precipitation_12 hour'};
+    if ($time eq "") {
+        next;
+    }
+    my $date;
+    if ($time =~ m/,/) {
+       ($date) = split /,/, $time;
+    } else {
+        $date = $time;
+    }
+    if (defined $result->{$date}->{'probability-of-precipitation_12 hour'}) {
+        $pop12 = $result->{$date}->{'probability-of-precipitation_12 hour'};
+        next;
+    }
+    if (! defined $result->{$date}->{'temperature_hourly'}) {
         next;
     }
 
-    print "time-${index}::" . UnixDate($time, "%i %p\n");
+    print "time-${index}::" . UnixDate($date, "%i %p\n");
     print "temp-${index}::$result->{$time}->{temperature_hourly}\n";
-    print "pop-${index}::$pop12 %\n";
-    $icon = $result->{$time}->{'conditions-icon_forecast-NWS'};
+    print "pop-${index}::$pop12\n";
+    $icon = $result->{$date}->{'conditions-icon_forecast-NWS'};
     $icon =~ s/.*\/([a-z0-9_]+[.][j][p][g])/$1/;
     local *FH;
     open(FH, $icon_file) or die "Cannot open icons";
