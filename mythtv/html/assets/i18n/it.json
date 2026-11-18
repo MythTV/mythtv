@@ -1446,7 +1446,7 @@
             "rtjpegquality_label": "Qualità RTjpeg",
             "samplerate_desc": "Imposta la frequenza di campionamento audio per il tuo DSP. Assicurati di scegliere una frequenza di campionamento appropriata per il tuo dispositivo. BTaudio consene solo 32000.",
             "samplerate_label": "Frequenza di campionamento",
-            "scalebitrate_desc": "",Se impostato, il bitrate specificato verrà utilizzato per la risoluzione 640x480. Qualora vengano impiegate altre risoluzioni, il bitrate verrà adattato di conseguenza.
+            "scalebitrate_desc": "Se impostato, il bitrate specificato verrà utilizzato per la risoluzione 640x480. Qualora vengano impiegate altre risoluzioni, il bitrate verrà adattato di conseguenza.",
             "scalebitrate_label": "Adatta il bitrate alle dimensioni del fotogramma",
             "title": "Profili di registrazione",
             "video_label": "Compressione video",
@@ -1538,7 +1538,7 @@
             "new_video_source": "Nuova sorgente video",
             "region_desc": "ID regione per Freesat o Sky sul satellite Astra-2 28.2E. Lasciare 0 se non si riceve questo satellite. Questo parametro è necessario per ottenere la numerazione dei canali Freesat e Sky. Il valore 1 seleziona la regione di Londra. Consultare la wiki di MythTV:",
             "region_label": "ID Regione",
-            "scanfreq_desc": "La frequenza con cui iniziare la scansione di questa sorgente video. Essa costituisce l'impostazione predefinita per la scansione dei canali di tipo "Scansione completa (sintonizzati)". Il valore della frequenza è espresso in Hz per DVB-T/T2/C e in kHz per DVB-S/S2. Lasciare impostato su 0 se non è nota.",
+            "scanfreq_desc": "La frequenza con cui iniziare la scansione di questa sorgente video. Essa costituisce l'impostazione predefinita per la scansione dei canali di tipo \"Scansione completa (sintonizzati)\". Il valore della frequenza è espresso in Hz per DVB-T/T2/C e in kHz per DVB-S/S2. Lasciare impostato su 0 se non è nota.",
             "scanfreq_label": "Frequenza di scansione",
             "source_desc": "Questo nome viene utilizzato per il file di configurazione xmltv (campo obbligatorio).",
             "source_label": "Nome sorgente video",
