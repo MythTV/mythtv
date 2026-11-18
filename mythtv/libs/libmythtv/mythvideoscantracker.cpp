@@ -188,15 +188,13 @@ void MythVideoScanTracker::AutoDeint(MythVideoFrame* Frame, MythVideoOutput* Vid
     }
 
     // This is currently only signalled for H264 content
-    if (Frame->m_newGOP)
-    {
-        if (m_scanOverride < kScan_Interlaced &&
+    if (Frame->m_newGOP &&
+        (m_scanOverride < kScan_Interlaced &&
             ((Frame->m_interlaced && !is_interlaced(m_scan)) ||
-            (!Frame->m_interlaced && is_interlaced(m_scan))))
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "Unlocking frame scan");
-            m_scanLocked = false;
-        }
+            (!Frame->m_interlaced && is_interlaced(m_scan)))))
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "Unlocking frame scan");
+        m_scanLocked = false;
     }
 
     if (m_scanLocked)

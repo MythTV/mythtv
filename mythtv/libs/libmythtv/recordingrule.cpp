@@ -253,7 +253,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, const QString& textname,
         searchType = SearchTypeToString(m_searchType);
 
         QString ltitle = QString("%1 (%2)").arg(textname, searchType);
-        m_title = ltitle;
+        m_title = std::move(ltitle);
         m_sortTitle = nullptr;
         m_subtitle = m_sortSubtitle = std::move(joininfo);
         m_description = forwhat;
@@ -338,7 +338,7 @@ bool RecordingRule::MakeTemplate(QString category)
     LoadTemplate(category);
     m_recordID = 0;
     m_type = kNotRecording;
-    m_category = category;
+    m_category = std::move(category);
     m_loaded = true;
     m_isTemplate = true;
 
@@ -356,7 +356,7 @@ bool RecordingRule::ModifyPowerSearchByID(int rid, const QString& textname,
         return false;
 
     QString ltitle = QString("%1 (%2)").arg(textname, tr("Power Search"));
-    m_title = ltitle;
+    m_title = std::move(ltitle);
     m_sortTitle = nullptr;
     m_subtitle = m_sortSubtitle = std::move(joininfo);
     m_description = std::move(forwhat);
@@ -627,7 +627,7 @@ void RecordingRule::ToMap(InfoMap &infoMap, uint date_format) const
     }
     else
     {
-        infoMap["lentime"] = minstring;
+        infoMap["lentime"] = std::move(minstring);
     }
 
 
@@ -970,13 +970,10 @@ bool RecordingRule::IsValid(QString &msg) const
             return false;
         }
     }
-    else if (isSearch)
+    else if (isSearch && m_description.isEmpty())
     {
-        if (m_description.isEmpty())
-        {
-            msg = QString("Invalid search value.");
-            return false;
-        }
+        msg = QString("Invalid search value.");
+        return false;
     }
 
     if (m_type != kTemplateRecord && !isSearch)

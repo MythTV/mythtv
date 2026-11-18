@@ -20,54 +20,54 @@ class VideoList;
 
 enum GenreFilter : std::int8_t {
     kGenreFilterAll = -1,
-    kGenreFilterUnknown = 0
+    kGenreFilterUnknown = 0,
 };
 
 enum CountryFilter : std::int8_t {
     kCountryFilterAll = -1,
-    kCountryFilterUnknown = 0
+    kCountryFilterUnknown = 0,
 };
 
 enum CastFilter : std::int8_t {
     kCastFilterAll = -1,
-    kCastFilterUnknown = 0
+    kCastFilterUnknown = 0,
 };
 
 enum CategoryFilter : std::int8_t {
     kCategoryFilterAll = -1,
-    kCategoryFilterUnknown = 0
+    kCategoryFilterUnknown = 0,
 };
 
 enum YearFilter : std::int8_t {
     kYearFilterAll = -1,
-    kYearFilterUnknown = 0
+    kYearFilterUnknown = 0,
 };
 
 enum RuntimeFilter : std::int8_t {
     kRuntimeFilterAll = -2,
-    kRuntimeFilterUnknown = -1
+    kRuntimeFilterUnknown = -1,
 };
 
 enum UserRatingFilter : std::int8_t {
-    kUserRatingFilterAll = -1
+    kUserRatingFilterAll = -1,
 };
 
 enum BrowseFilter : std::int8_t {
-    kBrowseFilterAll = -1
+    kBrowseFilterAll = -1,
 };
 
 enum WatchedFilter : std::int8_t {
-    kWatchedFilterAll = -1
+    kWatchedFilterAll = -1,
 };
 
 enum InetRefFilter : std::int8_t {
     kInetRefFilterAll = -1,
-    kInetRefFilterUnknown = 0
+    kInetRefFilterUnknown = 0,
 };
 
 enum CoverFileFilter : std::int8_t {
     kCoverFileFilterAll = -1,
-    kCoverFileFilterNone = 0
+    kCoverFileFilterNone = 0,
 };
 
 class VideoFilterSettings
@@ -89,7 +89,7 @@ class VideoFilterSettings
         kFilterParentalLevelChanged = (1 << 10),
         kFilterCastChanged = (1 << 11),
         kFilterWatchedChanged = (1 << 12),
-        kFilterTextFilterChanged = (1 << 13)
+        kFilterTextFilterChanged = (1 << 13),
     };
 
   public:
@@ -114,7 +114,7 @@ class VideoFilterSettings
         kOrderByFilename = 4,
         kOrderByID = 5,
         kOrderBySeasonEp = 6,
-        kOrderByDateAddedDescending = 7
+        kOrderByDateAddedDescending = 7,
     };
 
     int GetCategory() const { return m_category; }

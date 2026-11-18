@@ -130,13 +130,11 @@ static bool checkMusicAvailable(void)
 {
     MSqlQuery count_query(MSqlQuery::InitCon());
     bool foundMusic = false;
-    if (count_query.exec("SELECT COUNT(*) FROM music_songs;"))
+    if (count_query.exec("SELECT COUNT(*) FROM music_songs;") &&
+        count_query.next() &&
+        0 != count_query.value(0).toInt())
     {
-        if(count_query.next() &&
-            0 != count_query.value(0).toInt())
-        {
-            foundMusic = true;
-        }
+        foundMusic = true;
     }
 
     if (!foundMusic)

@@ -46,7 +46,7 @@ struct LogLine {
 void StatusBoxItem::Start(std::chrono::seconds Interval)
 {
     connect(this, &QTimer::timeout,
-            this, [this]() { emit UpdateRequired(this); });
+            this, [this] { emit UpdateRequired(this); });
     start(Interval);
 }
 
@@ -628,11 +628,8 @@ void StatusBox::doScheduleStatus()
     int hdflag = 0;
 
     query.prepare("SELECT MAX(sourceid) FROM videosource");
-    if (query.exec())
-    {
-        if (query.next())
-            maxSource = query.value(0).toInt();
-    }
+    if (query.exec() && query.next())
+        maxSource = query.value(0).toInt();
 
     query.prepare("SELECT sourceid,name FROM videosource");
     if (query.exec())
@@ -642,11 +639,8 @@ void StatusBox::doScheduleStatus()
     }
 
     query.prepare("SELECT MAX(cardid) FROM capturecard");
-    if (query.exec())
-    {
-        if (query.next())
-            maxCard = query.value(0).toInt();
-    }
+    if (query.exec() && query.next())
+        maxCard = query.value(0).toInt();
 
     query.prepare("SELECT cardid, inputname, displayname, parentid, "
                   "       schedgroup "
@@ -1140,7 +1134,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
         m_recordingProfilesBps[rateStr] =
-            (int)(query.value(0).toDouble());
+            (int)query.value(0).toDouble();
     }
 
     querystr =
@@ -1160,7 +1154,7 @@ void StatusBox::getActualRecordedBPS(const QString& hostnames)
         // Don't user a tr() directly here as the Qt tools will
         // not be able to extract the string for translation.
         m_recordingProfilesBps[rateStr] =
-            (int)(query.value(0).toDouble());
+            (int)query.value(0).toDouble();
     }
 }
 
@@ -1522,7 +1516,7 @@ void StatusBox::doRenderStatus()
 
         if (opengl && (opengl->GetExtraFeatures() & kGLNVMemory))
         {
-            auto GetGPUMem = []()
+            auto GetGPUMem = []
             {
                 auto * rend = GetMythMainWindow()->GetRenderDevice();
                 if (auto * gl = dynamic_cast<MythRenderOpenGL*>(rend); gl != nullptr)

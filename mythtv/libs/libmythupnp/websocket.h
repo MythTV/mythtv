@@ -107,7 +107,7 @@ class WebSocketFrame
         // Reserved
         kOpClose        = 0x8, // clazy:exclude=unexpected-flag-enumerator-value
         kOpPing         = 0x9,
-        kOpPong         = 0xA
+        kOpPong         = 0xA,
         // Reserved
     };
 
@@ -236,7 +236,7 @@ class WebSocketWorker : public QObject
         kCloseNoExtensions  = 1010, // CLIENT ONLY
         kCloseUnexpectedErr = 1011, // SERVER ONLY
         // Reserved - 1012-1014
-        kCloseNoTLS         = 1012  // Connection closed because it must use TLS
+        kCloseNoTLS         = 1012,  // Connection closed because it must use TLS
         // Reserved
     };
 

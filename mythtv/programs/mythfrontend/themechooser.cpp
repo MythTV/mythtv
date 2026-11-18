@@ -162,7 +162,7 @@ void ThemeChooser::Load(void)
     for (const auto &sharedTheme : std::as_const(sharedThemes))
     {
         if ((!themesSeen.contains(sharedTheme.fileName())) &&
-            (loadThemeInfo(sharedTheme)))
+            loadThemeInfo(sharedTheme))
         {
             m_infoList << sharedTheme;
             themesSeen << sharedTheme.fileName();
@@ -314,8 +314,8 @@ bool ThemeChooser::LoadVersion(const QString &version,
     themes.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
-    if ((QFile::exists(remoteThemesFile)) &&
-        (remoteThemesDir.exists()))
+    if (QFile::exists(remoteThemesFile) &&
+        remoteThemesDir.exists())
     {
         SetBusyPopupMessage(tr("Loading Downloadable Themes"));
 
@@ -609,7 +609,7 @@ bool ThemeChooser::keyPressEvent(QKeyEvent *event)
             removeTheme();
         }
         else if ((action == "ESCAPE") &&
-                 (m_fullPreviewShowing))
+                 m_fullPreviewShowing)
         {
             toggleFullscreenPreview();
         }
@@ -732,7 +732,7 @@ void ThemeChooser::saveAndReload(MythUIButtonListItem *item)
 #else
         QString localFile = GetConfDir() + "/tmp/" + baseName;
         GetMythDownloadManager()->queueDownload(downloadURL, localFile, this);
-        m_downloadFile = localFile;
+        m_downloadFile = std::move(localFile);
         m_downloadState = dsDownloadingOnFrontend;
 #endif
     }
@@ -849,7 +849,7 @@ void ThemeChooser::customEvent(QEvent *e)
 
                 QFileInfo file(m_downloadFile);
                 if ((m_downloadState == dsDownloadingOnBackend) &&
-                    (m_downloadFile.startsWith("myth://")))
+                    m_downloadFile.startsWith("myth://"))
                 {
                     // The backend download is finished so start the
                     // frontend download
@@ -873,7 +873,7 @@ void ThemeChooser::customEvent(QEvent *e)
                                 m_downloadFile, localFile, this);
                             OpenBusyPopup(tr("Copying %1 Theme Package")
                                               .arg(m_downloadTheme->GetName()));
-                            m_downloadFile = localFile;
+                            m_downloadFile = std::move(localFile);
                             return;
                         }
                     }
@@ -885,7 +885,7 @@ void ThemeChooser::customEvent(QEvent *e)
                 }
 
                 if ((m_downloadState == dsDownloadingOnFrontend) &&
-                    (file.exists()))
+                    file.exists())
                 {
                     // The frontend download is finished
                     LOG(VB_FILE, LOG_INFO, QString("Download done MFE %1 %2").arg(errorCode).arg(fileSize));
@@ -915,7 +915,7 @@ void ThemeChooser::customEvent(QEvent *e)
             }
         }
         else if ((me->Message() == "THEME_INSTALLED") &&
-                 (m_downloadTheme) &&
+                 m_downloadTheme &&
                  (m_downloadState == dsExtractingTheme))
         {
             m_downloadState = dsIdle;
@@ -994,10 +994,10 @@ bool ThemeChooser::removeThemeDir(const QString &dirname)
             if (!QFile::remove(fi.absoluteFilePath()))
                 return false;
         }
-        else if (fi.isDir() && !fi.isSymLink())
+        else if (fi.isDir() && !fi.isSymLink() &&
+                 !removeThemeDir(fi.absoluteFilePath()))
         {
-            if (!removeThemeDir(fi.absoluteFilePath()))
-                return false;
+            return false;
         }
     }
 

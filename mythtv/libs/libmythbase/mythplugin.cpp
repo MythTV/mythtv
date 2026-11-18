@@ -152,13 +152,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
     MythTranslation::load(plugname);
 
-    switch (m_dict.value(newname)->type())
-    {
-        case kPluginType_Module:
-        default:
-            m_moduleMap[newname] = m_dict.value(newname);
-            break;
-    }
+    m_moduleMap[newname] = m_dict.value(newname);
 
     return true;
 }

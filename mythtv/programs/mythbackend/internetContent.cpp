@@ -205,7 +205,7 @@ void InternetContent::GetInternetContent( HTTPRequest *pRequest )
     {
         pRequest->m_eResponseType   = ResponseTypeFile;
         pRequest->m_nResponseStatus = 200;
-        pRequest->m_sFileName       = htmlFile;
+        pRequest->m_sFileName       = std::move(htmlFile);
     }
     else
     {

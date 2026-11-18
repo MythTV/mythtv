@@ -412,7 +412,7 @@ bool CetonRTSP::Setup(ushort clientPort1, ushort clientPort2,
         LOG(VB_RECORD, LOG_WARNING, LOC +
             "invalid session id received");
     }
-    m_sessionId = session;
+    m_sessionId = std::move(session);
 
     if (params.contains("timeout"))
     {

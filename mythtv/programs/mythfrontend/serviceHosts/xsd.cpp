@@ -187,7 +187,7 @@ bool Xsd::GetEnumXSD( HTTPRequest *pRequest, const QString& sEnumName )
     // Return xsd doc to caller
     // ----------------------------------------------------------------------
 
-    QTextStream os( &(pRequest->m_response) );
+    QTextStream os( &pRequest->m_response );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
 
@@ -540,7 +540,7 @@ bool Xsd::RenderXSD( HTTPRequest *pRequest, QObject *pClass )
     // Return xsd doc to caller
     // ----------------------------------------------------------------------
 
-    QTextStream os( &(pRequest->m_response) );
+    QTextStream os( &pRequest->m_response );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
 
@@ -646,7 +646,7 @@ bool Xsd::RenderArrayXSD( HTTPRequest   *pRequest,
     // Return xsd doc to caller
     // ----------------------------------------------------------------------
 
-    QTextStream os( &(pRequest->m_response) );
+    QTextStream os( &pRequest->m_response );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
 
@@ -815,7 +815,7 @@ bool Xsd::RenderMapXSD( HTTPRequest   *pRequest,
     // Return xsd doc to caller
     // ----------------------------------------------------------------------
 
-    QTextStream os( &(pRequest->m_response) );
+    QTextStream os( &pRequest->m_response );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
 

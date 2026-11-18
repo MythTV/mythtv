@@ -638,7 +638,7 @@ bool ATSCStreamData::HasCachedMGT(bool current) const
         LOG(VB_GENERAL, LOG_WARNING, LOC +
             "Currently we ignore \'current\' param");
 
-    return (bool)(m_cachedMgt);
+    return (bool)m_cachedMgt;
 }
 
 bool ATSCStreamData::HasChannel(uint major, uint minor) const

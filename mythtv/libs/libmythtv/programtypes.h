@@ -108,7 +108,7 @@ static stringMarkMap MarkTypeStrings =
     { "DURATION_MS",      MARK_DURATION_MS },
     { "TOTAL_FRAMES",     MARK_TOTAL_FRAMES },
     { "UTIL_PROGSTART",   MARK_UTIL_PROGSTART },
-    { "UTIL_LASTPLAYPOS", MARK_UTIL_LASTPLAYPOS }
+    { "UTIL_LASTPLAYPOS", MARK_UTIL_LASTPLAYPOS },
 };
 
 MTV_PUBLIC MarkTypes markTypeFromString(const QString & str);
@@ -120,7 +120,7 @@ enum CommFlagStatus : std::uint8_t {
     COMM_FLAG_NOT_FLAGGED = 0,
     COMM_FLAG_DONE = 1,
     COMM_FLAG_PROCESSING = 2,
-    COMM_FLAG_COMMFREE = 3
+    COMM_FLAG_COMMFREE = 3,
 };
 
 /// This is used as a bitmask.
@@ -147,7 +147,7 @@ enum SkipType : std::int16_t {
     COMM_DETECT_PREPOSTROLL = 0x00000200,
     COMM_DETECT_PREPOSTROLL_ALL = (COMM_DETECT_PREPOSTROLL
                                    | COMM_DETECT_BLANKS
-                                   | COMM_DETECT_SCENE)
+                                   | COMM_DETECT_SCENE),
 };
 
 MTV_PUBLIC QString SkipTypeToString(int flags);
@@ -156,7 +156,7 @@ MTV_PUBLIC std::deque<int> GetPreferredSkipTypeCombinations(void);
 enum TranscodingStatus : std::uint8_t {
     TRANSCODING_NOT_TRANSCODED = 0,
     TRANSCODING_COMPLETE       = 1,
-    TRANSCODING_RUNNING        = 2
+    TRANSCODING_RUNNING        = 2,
 };
 
 #define DEFINE_FLAGS_ENUM
@@ -178,7 +178,7 @@ enum AvailableStatusType : std::uint8_t {
     asPendingDelete,
     asFileNotFound,
     asZeroByte,
-    asDeleted
+    asDeleted,
 }; // note stored in uint8_t in ProgramInfo
 MTV_PUBLIC QString toString(AvailableStatusType status);
 
@@ -186,14 +186,14 @@ enum WatchListStatus : std::int8_t {
     wlDeleted = -4,
     wlEarlier = -3,
     wlWatched = -2,
-    wlExpireOff = -1
+    wlExpireOff = -1,
 };
 
 enum AutoExpireType : std::uint16_t {
     kDisableAutoExpire = 0,
     kNormalAutoExpire  = 1,
     kDeletedAutoExpire = 9999,
-    kLiveTVAutoExpire = 10000
+    kLiveTVAutoExpire = 10000,
 };
 
 #endif // PROGRAM_TYPES_H

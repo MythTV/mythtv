@@ -12,20 +12,20 @@ static const MythBindingMap k450CircleBindings = {
                  .descriptorType=VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                  .descriptorCount=1,
                  .stageFlags=VK_SHADER_STAGE_VERTEX_BIT,
-                 .pImmutableSamplers=nullptr } } },
+                 .pImmutableSamplers=nullptr, }, }, },
         { },
         { },
         { .stageFlags=VK_SHADER_STAGE_VERTEX_BIT,
           .offset=0,
-          .size=sizeof(CirclesBuffer) } }
+          .size=sizeof(CirclesBuffer), }, },
     },
     { CircleFragment450,
         { VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
         { },
         { },
         { },
-        { } }
-    }
+        { }, },
+    },
 };
 
 static const MythShaderMap k450CircleShaders = {
@@ -170,8 +170,8 @@ CircleVertex450,
 0x0004003D, 0x00000006, 0x00000060, 0x0000005F, 0x00050081, 0x00000006,
 0x00000061, 0x0000005E, 0x00000060, 0x00050088, 0x00000006, 0x00000062,
 0x00000061, 0x00000059, 0x00050041, 0x0000005B, 0x00000063, 0x00000050,
-0x00000018, 0x0003003E, 0x00000063, 0x00000062, 0x000100FD, 0x00010038
-} } },
+0x00000018, 0x0003003E, 0x00000063, 0x00000062, 0x000100FD, 0x00010038,
+}, }, },
 {
 CircleFragment450,
 {
@@ -246,8 +246,8 @@ CircleFragment450,
 0x00000036, 0x00000020, 0x00050085, 0x00000006, 0x00000037, 0x00000035,
 0x00000036, 0x00070050, 0x00000009, 0x00000038, 0x00000034, 0x00000034,
 0x00000034, 0x00000037, 0x00050085, 0x00000009, 0x00000039, 0x00000033,
-0x00000038, 0x0003003E, 0x00000031, 0x00000039, 0x000100FD, 0x00010038
-} } }
+0x00000038, 0x0003003E, 0x00000031, 0x00000039, 0x000100FD, 0x00010038,
+}, }, },
 };
 
 MythVisualCirclesVulkan::MythVisualCirclesVulkan(AudioPlayer* Audio, MythRenderVulkan* Render)

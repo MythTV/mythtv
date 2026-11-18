@@ -18,7 +18,7 @@ class MythOpticalBuffer : public MythMediaBuffer
     {
         PROCESS_NORMAL,
         PROCESS_REPROCESS,
-        PROCESS_WAIT
+        PROCESS_WAIT,
     };
 
     MythOpticalState  m_processState { PROCESS_NORMAL };

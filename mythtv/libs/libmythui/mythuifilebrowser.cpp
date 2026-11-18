@@ -456,7 +456,7 @@ void MythUIFileBrowser::updateRemoteFileList()
     }
 
     if ((sgdirlist.size() == 1) &&
-        (sgdirlist[0].startsWith("sgdir::")))
+        sgdirlist[0].startsWith("sgdir::"))
     {
         QStringList tokens = sgdirlist[0].split("::");
 

@@ -217,15 +217,13 @@ bool AudioInputOSS::Stop(void)
 int AudioInputOSS::GetBlockSize(void)
 {
     int frag = 0;
-    if (IsOpen())
+    if (IsOpen() &&
+        (ioctl(m_dspFd, SNDCTL_DSP_GETBLKSIZE, &frag) < 0))
     {
-        if (ioctl(m_dspFd, SNDCTL_DSP_GETBLKSIZE, &frag) < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
-                QString("fragment size query failed, returned %1: ").arg(frag) +
-                ENO);
-            frag = 0;
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
+            QString("fragment size query failed, returned %1: ").arg(frag) +
+            ENO);
+        frag = 0;
     }
     LOG(VB_AUDIO, LOG_INFO, LOC_DEV + QString("block size %1").arg(frag));
     return frag;

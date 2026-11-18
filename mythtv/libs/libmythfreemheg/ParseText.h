@@ -53,7 +53,7 @@ class MHParseText: public MHParseBase
     enum ParseTextType : std::uint8_t
                        { PTTag, PTInt, PTString, PTEnum, PTStartSection,
                          PTEndSection, PTStartSeq, PTEndSeq, PTNull,
-                         PTEOF, PTBool };
+                         PTEOF, PTBool, };
     ParseTextType  m_nType         {PTNull};
 
     char           m_ch            {0};

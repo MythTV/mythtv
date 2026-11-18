@@ -15,7 +15,7 @@ enum VideoArtworkType : std::uint8_t {
     kArtworkPoster = 4,
     kArtworkBackCover = 5,
     kArtworkInsideCover = 6,
-    kArtworkCDImage = 7
+    kArtworkCDImage = 7,
 };
 
 struct ArtworkInfo

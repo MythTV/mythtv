@@ -850,7 +850,7 @@ void MusicMetadata::setArtistAndTrackFormats()
 
     tmp = gCoreContext->GetSetting("MusicFormatCompilationCDTrack");
     if (!tmp.isEmpty())
-        s_formatCompilationCdTrack = tmp;
+        s_formatCompilationCdTrack = std::move(tmp);
 }
 
 
@@ -1152,7 +1152,7 @@ void MusicMetadata::toMap(InfoMap &metadataMap, const QString &prefix)
     QLocale locale = gCoreContext->GetQLocale();
     QString tmpSize = locale.toString(m_fileSize *
                                       (1.0 / (1024.0 * 1024.0)), 'f', 2);
-    metadataMap[prefix + "filesize"] = tmpSize;
+    metadataMap[prefix + "filesize"] = std::move(tmpSize);
 
     metadataMap[prefix + "filename"] = m_filename;
 
@@ -1306,14 +1306,12 @@ QString MusicMetadata::getAlbumArtFile(void)
 
             albumart_image->m_filename = path + filename;
 
-            if (!QFile::exists(albumart_image->m_filename))
+            if (!QFile::exists(albumart_image->m_filename) &&
+                !GetMythDownloadManager()->download(res, albumart_image->m_filename))
             {
                 // file does not exist so try to download and cache it
-                if (!GetMythDownloadManager()->download(res, albumart_image->m_filename))
-                {
-                    m_albumArt->getImageList()->removeAll(albumart_image);
-                    return {""};
-                }
+                m_albumArt->getImageList()->removeAll(albumart_image);
+                return {""};
             }
 
             res = albumart_image->m_filename;
@@ -1333,33 +1331,30 @@ QString MusicMetadata::getAlbumArtFile(void)
                 return {""};
             }
 
-            if (!RemoteFile::Exists(res))
+            if (!RemoteFile::Exists(res) && albumart_image->m_embedded)
             {
-                if (albumart_image->m_embedded)
+                if (gCoreContext->IsMasterBackend() &&
+                    url.host() == gCoreContext->GetMasterHostName())
                 {
-                    if (gCoreContext->IsMasterBackend() &&
-                        url.host() == gCoreContext->GetMasterHostName())
-                    {
-                        QStringList paramList;
-                        paramList.append(QString("--songid='%1'").arg(ID()));
-                        paramList.append(QString("--imagetype='%1'").arg(albumart_image->m_imageType));
+                    QStringList paramList;
+                    paramList.append(QString("--songid='%1'").arg(ID()));
+                    paramList.append(QString("--imagetype='%1'").arg(albumart_image->m_imageType));
 
-                        QString command = "mythutil --extractimage " + paramList.join(" ");
+                    QString command = "mythutil --extractimage " + paramList.join(" ");
 
-                        QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
-                                                    kMSAutoCleanup | kMSRunBackground |
-                                                    kMSDontDisableDrawing | kMSProcessEvents |
-                                                    kMSDontBlockInputDevs));
-                    }
-                    else
-                    {
-                        QStringList slist;
-                        slist << "MUSIC_TAG_GETIMAGE"
-                            << Hostname()
-                            << QString::number(ID())
-                            << QString::number(albumart_image->m_imageType);
-                        gCoreContext->SendReceiveStringList(slist);
-                    }
+                    QScopedPointer<MythSystem> cmd(MythSystem::Create(command,
+                                                                      kMSAutoCleanup | kMSRunBackground |
+                                                                      kMSDontDisableDrawing | kMSProcessEvents |
+                                                                      kMSDontBlockInputDevs));
+                }
+                else
+                {
+                    QStringList slist;
+                    slist << "MUSIC_TAG_GETIMAGE"
+                          << Hostname()
+                          << QString::number(ID())
+                          << QString::number(albumart_image->m_imageType);
+                    gCoreContext->SendReceiveStringList(slist);
                 }
             }
         }
@@ -2181,7 +2176,7 @@ QString AlbumArtImages::getTypeFilename(ImageType type)
         QT_TR_NOOP("back"),         // IT_BACKCOVER
         QT_TR_NOOP("cd"),           // IT_CD
         QT_TR_NOOP("inlay"),        // IT_INLAY
-        QT_TR_NOOP("artist")        // IT_ARTIST
+        QT_TR_NOOP("artist"),        // IT_ARTIST
     };
 
     return QCoreApplication::translate("AlbumArtImages",

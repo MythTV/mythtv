@@ -129,7 +129,7 @@ bool AudioOutputOSS::OpenDevice()
                 return false;
             }
             QString message {LOC + QString("Error opening audio device (%1)")
-                .arg(m_mainDevice) + ": " + ENO};
+                .arg(m_mainDevice) + ": " + ENO,};
             dispatchError(message);
             LOG(VB_GENERAL, LOG_ERR, message);
             return false;
@@ -141,7 +141,7 @@ bool AudioOutputOSS::OpenDevice()
     if (m_audioFd == -1)
     {
         QString message {QCoreApplication::translate("AudioOutputOSS", "Error opening audio device (%1)")
-            .arg(m_mainDevice)};
+            .arg(m_mainDevice),};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
         message = LOC + QString("Error opening audio device (%1)").arg(m_mainDevice) + ": " + ENO;
@@ -153,7 +153,7 @@ bool AudioOutputOSS::OpenDevice()
     if (fcntl(m_audioFd, F_SETFL, fcntl(m_audioFd, F_GETFL) & ~O_NONBLOCK) == -1)
     {
         QString message {LOC + QString("Error removing the O_NONBLOCK flag from audio device FD (%1)")
-            .arg(m_mainDevice) + ": " + ENO};
+            .arg(m_mainDevice) + ": " + ENO,};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
     }
@@ -208,7 +208,7 @@ bool AudioOutputOSS::OpenDevice()
                 QString::number(AudioOutputSettings::FormatToBits(m_outputFormat)),
                 QString::number(m_channels)
                 )
-             + ": " + ENO};
+             + ": " + ENO,};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
 
@@ -283,7 +283,7 @@ void AudioOutputOSS::WriteAudio(uchar *aubuf, int size)
     if (lw < 0)
     {
         QString message {LOC + QString("Error writing to audio device (%1)")
-            .arg(m_mainDevice) + ": " + ENO};
+            .arg(m_mainDevice) + ": " + ENO,};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
         return;

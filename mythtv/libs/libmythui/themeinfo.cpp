@@ -53,10 +53,10 @@ bool ThemeInfo::parseThemeInfo()
 
     QDomDocument doc;
 
-    if ((m_themeurl.startsWith("http://")) ||
-        (m_themeurl.startsWith("https://")) ||
-        (m_themeurl.startsWith("ftp://")) ||
-        (m_themeurl.startsWith("myth://")))
+    if (m_themeurl.startsWith("http://") ||
+        m_themeurl.startsWith("https://") ||
+        m_themeurl.startsWith("ftp://") ||
+        m_themeurl.startsWith("myth://"))
     {
         QByteArray data;
         bool ok = GetMythDownloadManager()->download(m_themeurl +
@@ -128,30 +128,27 @@ bool ThemeInfo::parseThemeInfo()
                         child = child.nextSibling())
                 {
                     QDomElement ce = child.toElement();
-                    if (!ce.isNull())
+                    if (!ce.isNull() && (ce.tagName() == "type"))
                     {
-                        if (ce.tagName() == "type")
-                        {
-                            QString type = getFirstText(ce);
+                        QString type = getFirstText(ce);
 
-                            if (type == "UI")
-                            {
-                                m_type |= THEME_UI;
-                            }
-                            else if (type == "OSD")
-                            {
-                                m_type |= THEME_OSD;
-                            }
-                            else if (type == "Menu")
-                            {
-                                m_type |= THEME_MENU;
-                            }
-                            else
-                            {
-                                VERBOSE_XML(VB_GENERAL, LOG_ERR,
-                                            m_theme.fileName(), ce,
-                                            "Invalid theme type");
-                            }
+                        if (type == "UI")
+                        {
+                            m_type |= THEME_UI;
+                        }
+                        else if (type == "OSD")
+                        {
+                            m_type |= THEME_OSD;
+                        }
+                        else if (type == "Menu")
+                        {
+                            m_type |= THEME_MENU;
+                        }
+                        else
+                        {
+                            VERBOSE_XML(VB_GENERAL, LOG_ERR,
+                                        m_theme.fileName(), ce,
+                                        "Invalid theme type");
                         }
                     }
                 }
@@ -229,12 +226,9 @@ bool ThemeInfo::parseThemeInfo()
                         child = child.nextSibling())
                 {
                     QDomElement ce = child.toElement();
-                    if (!ce.isNull())
+                    if (!ce.isNull() && (ce.tagName() == "url"))
                     {
-                        if (ce.tagName() == "url")
-                        {
-                            m_downloadurl = getFirstText(ce);
-                        }
+                        m_downloadurl = getFirstText(ce);
                     }
                 }
             }

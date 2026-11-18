@@ -14,7 +14,7 @@ enum ThemeType : std::uint8_t {
     THEME_UNKN  = 0x00,
     THEME_UI    = 0x01,
     THEME_OSD   = 0x02,
-    THEME_MENU  = 0x04
+    THEME_MENU  = 0x04,
 };
 
 class MUI_PUBLIC ThemeInfo : public XMLParseBase

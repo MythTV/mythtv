@@ -130,7 +130,7 @@ void MythFEXML::GetScreenShot(HTTPRequest *pRequest)
     MythMainWindow *window = GetMythMainWindow();
     window->RemoteScreenShot(sFileName, nWidth, nHeight);
 
-    pRequest->m_sFileName = sFileName;
+    pRequest->m_sFileName = std::move(sFileName);
 }
 
 static const QString PROCESS_ACTION =

@@ -270,7 +270,7 @@ void NetBase::customEvent(QEvent *event)
                     m_progressDialog = nullptr;
                 }
 
-                if ((m_downloadFile.startsWith("myth://")))
+                if (m_downloadFile.startsWith("myth://"))
                 {
                     if ((errorCode == 0) &&
                         (fileSize > 0))

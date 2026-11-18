@@ -84,7 +84,7 @@ class Scheduler : public MThread, public MythScheduler
 
     enum SchedSortColumn : std::uint8_t
                          { kSortTitle, kSortLastRecorded, kSortNextRecording,
-                           kSortPriority, kSortType };
+                           kSortPriority, kSortType, };
     static void GetAllScheduled(QStringList &strList,
                                 SchedSortColumn sortBy = kSortTitle,
                                 bool ascending = true);
@@ -128,7 +128,7 @@ class Scheduler : public MThread, public MythScheduler
     enum OpenEndType : std::uint8_t {
         openEndNever = 0,
         openEndDiffChannel = 1,
-        openEndAlways = 2
+        openEndAlways = 2,
     };
 
     QString m_recordTable;

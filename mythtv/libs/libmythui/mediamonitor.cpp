@@ -651,7 +651,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
     if (!m_handlerMap.contains(destination))
     {
         MHData  mhd = { .callback=callback, .MythMediaType=mediaType,
-                        .destination=destination, .description=description };
+                        .destination=destination, .description=description, };
         QString msg = MythMediaDevice::MediaTypeString((MythMediaType)mediaType);
 
         if (!extensions.isEmpty())
@@ -661,7 +661,7 @@ void MediaMonitor::RegisterMediaHandler(const QString  &destination,
                  "Registering '" + destination + "' as a media handler for " +
                  msg);
 
-        m_handlerMap[destination] = mhd;
+        m_handlerMap[destination] = std::move(mhd);
 
         if (!extensions.isEmpty())
             MythMediaDevice::RegisterMediaExtensions(mediaType, extensions);

@@ -61,7 +61,7 @@ class Task : public ReferenceCounter
 
                explicit Task(const QString &debugName); 
 
-                long    Id() const { return( m_nTaskId ); }
+                long    Id() const { return m_nTaskId ; }
 
         virtual void    Execute( TaskQueue *pQueue ) = 0;
         virtual QString Name   () = 0;

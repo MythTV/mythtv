@@ -16,7 +16,7 @@ enum MythSchemaUpgrade : std::uint8_t
     MYTH_SCHEMA_EXIT         = 1,
     MYTH_SCHEMA_ERROR        = 2,
     MYTH_SCHEMA_UPGRADE      = 3,
-    MYTH_SCHEMA_USE_EXISTING = 4
+    MYTH_SCHEMA_USE_EXISTING = 4,
 };
 
 /** \brief Provides UI and helper functions for DB Schema updates.

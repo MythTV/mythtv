@@ -184,7 +184,7 @@ static const CHANLIST_vec ntsc_cable {
     { "T11",     31000 },
     { "T12",     37000 },
     { "T13",     43000 },
-    { "T14",     49000 }
+    { "T14",     49000 },
 };
 
 /* US HRC */
@@ -868,7 +868,7 @@ static const CHANLIST_vec europe_west {
     FREQ_CCIR_SL_SH,
     FREQ_CCIR_H,
     FREQ_CCIR_H2,
-    FREQ_UHF
+    FREQ_UHF,
 };
 
 static const CHANLIST_vec europe_east {
@@ -878,7 +878,7 @@ static const CHANLIST_vec europe_east {
     FREQ_CCIR_SL_SH,
     FREQ_CCIR_H,
     FREQ_CCIR_H2,
-    FREQ_UHF
+    FREQ_UHF,
 };
 
 static const CHANLIST_vec pal_italy {
@@ -892,7 +892,7 @@ static const CHANLIST_vec pal_italy {
     { "H",      210250 },
     { "H1",     217250 },
     { "H2",     224250 },
-    FREQ_UHF
+    FREQ_UHF,
 };
 
 static const CHANLIST_vec pal_ireland {
@@ -1116,7 +1116,7 @@ static const CHANLIST_vec pal_bcast_za {
     { "11", 231250 },
     { "12", 239250 },
     { "13", 247250 },
-    FREQ_UHF
+    FREQ_UHF,
 };
 
 /* --------------------------------------------------------------------- */
@@ -2153,7 +2153,7 @@ static const CHANLIST_vec try_all  {
         { "911" , 954000 } ,
         { "912" , 955000 } ,
         { "913" , 956000 } ,
-        { "914" , 957000 }
+        { "914" , 957000 },
 };
 
 /* --------------------------------------------------------------------- */
@@ -2233,5 +2233,5 @@ const CHANLISTS_vec gChanLists {
     { "singapore",        pal_bcast_sg        },
     { "malaysia",         pal_bcast_my        },
     { "israel-hot-matav", israel_hot_matav    },
-    { "try-all",          try_all             }
+    { "try-all",          try_all             },
 };

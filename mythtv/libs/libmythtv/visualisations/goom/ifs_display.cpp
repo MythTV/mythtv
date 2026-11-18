@@ -25,7 +25,7 @@ void ifs_update (uint32_t * data, const uint32_t * back, int width, int height,
         enum MODE : std::uint8_t {
             MOD_MER    = 0,
             MOD_FEU    = 1,
-            MOD_MERVER = 2
+            MOD_MERVER = 2,
         };
 	static MODE s_mode = MOD_MERVER;
 	static int s_justChanged = 0;

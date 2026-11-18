@@ -152,10 +152,10 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 
     // Default delay of 3 seconds before 'bouncing' the scrolling text
     enum Constants : std::uint8_t
-                   {ScrollBounceDelay = DEFAULT_REFRESH_RATE * 3};
+                   {ScrollBounceDelay = DEFAULT_REFRESH_RATE * 3,};
     enum ScrollDir : std::uint8_t
                    {ScrollNone, ScrollLeft, ScrollRight, ScrollUp, ScrollDown,
-                    ScrollHorizontal, ScrollVertical};
+                    ScrollHorizontal, ScrollVertical,};
 
     int       m_scrollStartDelay  {ScrollBounceDelay};
     int       m_scrollReturnDelay {ScrollBounceDelay};
@@ -172,7 +172,7 @@ class MUI_PUBLIC MythUIText : public MythUIType, public StorageUser
 
     enum TextCase : std::uint8_t
                   {CaseNormal, CaseUpper, CaseLower, CaseCapitaliseFirst,
-                   CaseCapitaliseAll};
+                   CaseCapitaliseAll,};
 
     TextCase  m_textCase          {CaseNormal};
 

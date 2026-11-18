@@ -1483,16 +1483,14 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
         ++it;
 
         // fill in miss stop times
-        if ((*cur)->m_endts.isEmpty() || (*cur)->m_startts > (*cur)->m_endts)
+        if (((*cur)->m_endts.isEmpty() || (*cur)->m_startts > (*cur)->m_endts) &&
+            (it != fixlist.end()))
         {
-            if (it != fixlist.end())
-            {
-                (*cur)->m_endts   = (*it)->m_startts;
-                (*cur)->m_endtime = (*it)->m_starttime;
-            }
             /* if its the last programme in the file then leave its
                endtime as 0000-00-00 00:00:00 so we can find it easily in
                fix_end_times() */
+            (*cur)->m_endts   = (*it)->m_startts;
+            (*cur)->m_endtime = (*it)->m_starttime;
         }
 
         if (it == fixlist.end())

@@ -49,7 +49,7 @@ static const std::array<const uint8_t,256> vbi_bit_reverse
     0x07, 0x87, 0x47, 0xc7, 0x27, 0xa7, 0x67, 0xe7,
     0x17, 0x97, 0x57, 0xd7, 0x37, 0xb7, 0x77, 0xf7,
     0x0f, 0x8f, 0x4f, 0xcf, 0x2f, 0xaf, 0x6f, 0xef,
-    0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff
+    0x1f, 0x9f, 0x5f, 0xdf, 0x3f, 0xbf, 0x7f, 0xff,
 };
 
 static const std::array<const std::string, 8> formats
@@ -61,7 +61,7 @@ static const std::array<const std::string, 8> formats
     "Letterbox 16:9 top, 430 lines",
     "Letterbox > 16:9 centre",
     "Full format 14:9 centre, 576 lines",
-    "Anamorphic 16:9, 576 lines"
+    "Anamorphic 16:9, 576 lines",
 };
 
 static const std::array<const std::string,4> subtitles
@@ -69,7 +69,7 @@ static const std::array<const std::string,4> subtitles
     "none",
     "in active image area",
     "out of active image area",
-    "?"
+    "?",
 };
 
 static void init_xds_program_type(CC608ProgramType& xds_program_type);
@@ -116,7 +116,7 @@ void CC608Decoder::GetServices(std::chrono::seconds seconds, CC608Seen& seen) co
 static const std::array<const int,16> rowdata =
 {
     11, -1, 1, 2, 3, 4, 12, 13,
-    14, 15, 5, 6, 7, 8,  9, 10
+    14, 15, 5, 6, 7, 8,  9, 10,
 };
 
 static const std::array<const QChar,16> specialchar =
@@ -124,7 +124,7 @@ static const std::array<const QChar,16> specialchar =
     QChar(0xAE),   QChar(0xB0),   QChar(0xBD),   QChar(0xBF),   // ®°½¿
     QChar(0x2122), QChar(0xA2),   QChar(0xA3),   QChar(0x266A), // ™¢£♪
     QChar(0xE0),   QChar(' '),    QChar(0xE8),   QChar(0xE2),   // à èâ
-    QChar(0xEA),   QChar(0xEE),   QChar(0xF4),   QChar(0xFB)    // êîôû
+    QChar(0xEA),   QChar(0xEE),   QChar(0xF4),   QChar(0xFB),    // êîôû
 };
 
 static const std::array<const QChar,32> extendedchar2 =
@@ -136,7 +136,7 @@ static const std::array<const QChar,32> extendedchar2 =
     QChar(0xC0),   QChar(0xC2),   QChar(0xC7),   QChar(0xC8),   // ÀÂÇÈ
     QChar(0xCA),   QChar(0xCB),   QChar(0xEB),   QChar(0xCE),   // ÊËëÎ
     QChar(0xCF),   QChar(0xEF),   QChar(0xD4),   QChar(0xD9),   // ÏïÔÙ
-    QChar(0xF9),   QChar(0xDB),   QChar(0xAB),   QChar(0xBB)    // ùÛ«»
+    QChar(0xF9),   QChar(0xDB),   QChar(0xAB),   QChar(0xBB),    // ùÛ«»
 };
 
 static const std::array<const QChar,32> extendedchar3 =
@@ -148,7 +148,7 @@ static const std::array<const QChar,32> extendedchar3 =
     QChar(0xC4),   QChar(0xE4),   QChar(0xD6),   QChar(0xF6),   // ÄäÖö
     QChar(0xDF),   QChar(0xA5),   QChar(0xA4),   QChar('|'),    // ß¥¤|
     QChar(0xC5),   QChar(0xE5),   QChar(0xD8),   QChar(0xF8),   // ÅåØø
-    QChar(0x250C), QChar(0x2510), QChar(0x2514), QChar(0x2518)  // ┌┐└┘
+    QChar(0x250C), QChar(0x2510), QChar(0x2514), QChar(0x2518),  // ┌┐└┘
 };
 
 void CC608Decoder::FormatTextCode(std::chrono::milliseconds tc, size_t field, size_t mode, size_t len, int b1, int b2)
@@ -656,11 +656,9 @@ bool CC608Decoder::FalseDup(std::chrono::milliseconds tc, size_t field, int data
             if (tc > (m_lastCodeTc[field] + 67ms + dup_ctrl_fudge))
                 return false;
         }
-        else if (b1)
+        else if (b1 && (tc > (m_lastCodeTc[field] + 33ms + dup_text_fudge)))
         {
-            // text, XDS
-            if (tc > (m_lastCodeTc[field] + 33ms + dup_text_fudge))
-                return false;
+            return false; // text, XDS
         }
 
         return true;
@@ -1093,7 +1091,7 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
         { "NR", "Y", "Y7",  "G",     "PG",  "14",    "MA",  "NR" },
         { "E",  "C", "C8+", "G",     "PG",  "14+",   "18+", "NR" },
         { "E",  "G", "8+",  "13+",   "16+", "18+",   "NR",  "NR" },
-    }};
+    },};
 
     QString main = prefix[i] + mainStr[i][GetRating(i, future)];
 
@@ -1504,7 +1502,7 @@ bool CC608Decoder::XDSPacketParseChannel(const std::vector<unsigned char> &xds_b
         if (is_better(tmp, m_xdsNetName))
         {
             LOG(VB_VBI, LOG_INFO, QString("XDS: Network Name '%1'").arg(tmp));
-            m_xdsNetName = tmp;
+            m_xdsNetName = std::move(tmp);
         }
     }
     else if ((b2 == 0x02) && (xds_buf.size() >= 6))
@@ -1513,7 +1511,7 @@ bool CC608Decoder::XDSPacketParseChannel(const std::vector<unsigned char> &xds_b
         if (is_better(tmp, m_xdsNetCall) && (tmp.indexOf(" ") < 0))
         {
             LOG(VB_VBI, LOG_INFO, QString("XDS: Network Call '%1'").arg(tmp));
-            m_xdsNetCall = tmp;
+            m_xdsNetCall = std::move(tmp);
         }
     }
     else if ((b2 == 0x04) && (xds_buf.size() >= 6))

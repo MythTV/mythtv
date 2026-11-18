@@ -63,7 +63,7 @@ class EncoderLink
     bool CanSleep(void) const { return (m_sleepStatus != sStatus_Undefined); }
 
     /// \brief Returns the current Sleep Status of the encoder.
-    SleepStatus GetSleepStatus(void) const { return (m_sleepStatus); }
+    SleepStatus GetSleepStatus(void) const { return m_sleepStatus; }
 
     /// \brief Returns the inputid used to refer to the recorder in the DB.
     int GetInputID(void) const { return m_inputid; }

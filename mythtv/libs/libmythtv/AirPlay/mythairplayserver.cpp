@@ -152,7 +152,7 @@ QString GenerateNonce(void)
         MythRandom(),
         MythRandom(),
         MythRandom(),
-        MythRandom()
+        MythRandom(),
     };
 
     QString nonce;
@@ -1230,7 +1230,7 @@ void MythAirplayServer::StartPlayback(const QString &pathname)
     // Wait until we receive that the play has started
     std::vector<CoreWaitInfo> sigs {
         { "TVPlaybackStarted", &MythCoreContext::TVPlaybackStarted },
-        { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
+        { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted }, };
     gCoreContext->WaitUntilSignals(sigs);
     LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
         QString("ACTION_HANDLEMEDIA completed"));
@@ -1250,7 +1250,7 @@ void MythAirplayServer::StopPlayback(void)
         // Wait until we receive that playback has stopped
         std::vector<CoreWaitInfo> sigs {
             { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
-            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted }, };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_STOP completed"));
@@ -1278,7 +1278,7 @@ void MythAirplayServer::SeekPosition(uint64_t position)
         std::vector<CoreWaitInfo> sigs {
             { "TVPlaybackSought", qOverload<>(&MythCoreContext::TVPlaybackSought) },
             { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
-            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted }, };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_SEEKABSOLUTE completed"));
@@ -1305,7 +1305,7 @@ void MythAirplayServer::PausePlayback(void)
         std::vector<CoreWaitInfo> sigs {
             { "TVPlaybackPaused", &MythCoreContext::TVPlaybackPaused },
             { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
-            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted }, };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PAUSE completed"));
@@ -1332,7 +1332,7 @@ void MythAirplayServer::UnpausePlayback(void)
         std::vector<CoreWaitInfo> sigs {
             { "TVPlaybackPlaying", &MythCoreContext::TVPlaybackPlaying },
             { "TVPlaybackStopped", &MythCoreContext::TVPlaybackStopped },
-            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted } };
+            { "TVPlaybackAborted", &MythCoreContext::TVPlaybackAborted }, };
         gCoreContext->WaitUntilSignals(sigs);
         LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
             QString("ACTION_PLAY completed"));

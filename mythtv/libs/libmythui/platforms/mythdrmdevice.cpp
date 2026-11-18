@@ -683,7 +683,7 @@ bool MythDRMDevice::SwitchMode(int ModeIndex)
         if (drmModeCreatePropertyBlob(m_fd, &m_connector->m_modes[index], sizeof(drmModeModeInfo), &blobid) == 0)
         {
             QueueAtomics( {{ m_connector->m_id, crtcid->m_id, m_crtc->m_id },
-                           { m_crtc->m_id, modeid->m_id, blobid }} );
+                           { m_crtc->m_id, modeid->m_id, blobid },} );
             m_adjustedRefreshRate = m_connector->m_modes[index]->m_rate;
             result = true;
         }
@@ -950,7 +950,7 @@ void MythDRMDevice::DisableVideoPlane()
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + "Disabling video plane");
         QueueAtomics( {{ m_videoPlane->m_id, m_videoPlane->m_fbIdProp->m_id,   0 },
-                       { m_videoPlane->m_id, m_videoPlane->m_crtcIdProp->m_id, 0 }} );
+                       { m_videoPlane->m_id, m_videoPlane->m_crtcIdProp->m_id, 0 },} );
     }
 }
 

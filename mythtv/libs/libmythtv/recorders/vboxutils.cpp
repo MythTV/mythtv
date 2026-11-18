@@ -21,7 +21,7 @@ static constexpr const char* QUERY_BOARDINFO
 { "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=QueryBoardInfo" };
 static constexpr const char* QUERY_CHANNELS
 { "http://{URL}/cgi-bin/HttpControl/HttpControlApp?OPTION=1&Method=GetXmltvChannelsList" \
-  "&FromChIndex=FirstChannel&ToChIndex=LastChannel&FilterBy=All" };
+  "&FromChIndex=FirstChannel&ToChIndex=LastChannel&FilterBy=All", };
 
 static constexpr std::chrono::milliseconds SEARCH_TIME { 3s };
 static constexpr const char* VBOX_URI { "urn:schemas-upnp-org:device:MediaServer:1" };

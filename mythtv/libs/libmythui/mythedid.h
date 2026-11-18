@@ -47,7 +47,7 @@ class MUI_PUBLIC MythEDID
         SDR     = 1 << 0,
         HDRTrad = 1 << 1,
         HDR10   = 1 << 2,
-        HLG     = 1 << 3
+        HLG     = 1 << 3,
     };
 
     void        Parse             ();

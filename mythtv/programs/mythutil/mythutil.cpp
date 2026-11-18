@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     {
         if (cmdline.toBool(i.key()))
         {
-            cmdResult = (i.value())(cmdline);
+            cmdResult = i.value()(cmdline);
             cmdFound = true;
             break;
         }

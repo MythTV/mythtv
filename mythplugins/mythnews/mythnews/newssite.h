@@ -57,7 +57,7 @@ class NewsSite : public QObject
         Retrieving = 0,
         RetrieveFailed,
         WriteFailed,
-        Success
+        Success,
     };
 
     class List : public std::vector<NewsSite*>

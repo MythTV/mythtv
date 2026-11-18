@@ -243,17 +243,15 @@ HistogramAnalyzer::MythPlayerInited(MythPlayer *player, long long nframes)
     unsigned int npixels = width * height;
     m_buf = new unsigned char[npixels];
 
-    if (m_debugHistVal)
+    if (m_debugHistVal &&
+        readData(m_debugdata, m_mean, m_median, m_stddev, m_fRow, m_fCol,
+                 m_fWidth, m_fHeight, m_histogram, m_monochromatic, nframes))
     {
-        if (readData(m_debugdata, m_mean, m_median, m_stddev, m_fRow, m_fCol,
-                    m_fWidth, m_fHeight, m_histogram, m_monochromatic, nframes))
-        {
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("HistogramAnalyzer::MythPlayerInited read %1")
-                    .arg(m_debugdata));
-            m_histValDone = true;
-            return FrameAnalyzer::ANALYZE_FINISHED;
-        }
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("HistogramAnalyzer::MythPlayerInited read %1")
+            .arg(m_debugdata));
+        m_histValDone = true;
+        return FrameAnalyzer::ANALYZE_FINISHED;
     }
 
     return FrameAnalyzer::ANALYZE_OK;
@@ -415,16 +413,14 @@ HistogramAnalyzer::analyzeFrame(const MythVideoFrame *frame, long long frameno)
 int
 HistogramAnalyzer::finished(long long nframes, bool final)
 {
-    if (!m_histValDone && m_debugHistVal)
+    if (!m_histValDone && m_debugHistVal &&
+        (final && writeData(m_debugdata, m_mean, m_median, m_stddev, m_fRow, m_fCol,
+                            m_fWidth, m_fHeight, m_histogram, m_monochromatic, nframes)))
     {
-        if (final && writeData(m_debugdata, m_mean, m_median, m_stddev, m_fRow, m_fCol,
-                    m_fWidth, m_fHeight, m_histogram, m_monochromatic, nframes))
-        {
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("HistogramAnalyzer::finished wrote %1")
-                    .arg(m_debugdata));
-            m_histValDone = true;
-        }
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("HistogramAnalyzer::finished wrote %1")
+            .arg(m_debugdata));
+        m_histValDone = true;
     }
 
     return 0;

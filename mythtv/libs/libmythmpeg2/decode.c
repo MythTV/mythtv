@@ -38,7 +38,7 @@ static size_t BUFFER_SIZE = (size_t)1194 * 1024;
 
 const mpeg2_info_t * mpeg2_info (mpeg2dec_t * mpeg2dec)
 {
-    return &(mpeg2dec->info);
+    return &mpeg2dec->info;
 }
 
 static inline int skip_chunk (mpeg2dec_t * mpeg2dec, int bytes)
@@ -166,7 +166,7 @@ mpeg2_state_t mpeg2_parse (mpeg2dec_t * mpeg2dec)
 	    }
 	    mpeg2dec->bytes_since_tag += copied;
 
-	    mpeg2_slice (&(mpeg2dec->decoder), mpeg2dec->code,
+	    mpeg2_slice (&mpeg2dec->decoder, mpeg2dec->code,
 			 mpeg2dec->chunk_start);
 	    mpeg2dec->code = mpeg2dec->buf_start[-1];
 	    mpeg2dec->chunk_ptr = mpeg2dec->chunk_start;
@@ -195,7 +195,7 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
 {
     static int (* s_processHeader[]) (mpeg2dec_t * mpeg2dec) = {
 	mpeg2_header_picture, mpeg2_header_extension, mpeg2_header_user_data,
-	mpeg2_header_sequence, NULL, NULL, NULL, NULL, mpeg2_header_gop
+	mpeg2_header_sequence, NULL, NULL, NULL, NULL, mpeg2_header_gop,
     };
 
     mpeg2dec->action = mpeg2_parse_header;
@@ -274,7 +274,7 @@ mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec)
 int mpeg2_convert (mpeg2dec_t * mpeg2dec, mpeg2_convert_t convert, void * arg)
 {
     mpeg2_convert_init_t convert_init;
-    int error = convert (MPEG2_CONVERT_SET, NULL, &(mpeg2dec->sequence), 0,
+    int error = convert (MPEG2_CONVERT_SET, NULL, &mpeg2dec->sequence, 0,
                          mpeg2_accels, arg, &convert_init);
     if (!error) {
 	mpeg2dec->convert = convert;
@@ -295,7 +295,7 @@ int mpeg2_stride (mpeg2dec_t * mpeg2dec, int stride)
 	mpeg2_convert_init_t convert_init;
 
 	stride = mpeg2dec->convert (MPEG2_CONVERT_STRIDE, NULL,
-				    &(mpeg2dec->sequence), stride,
+				    &mpeg2dec->sequence, stride,
 				    mpeg2_accels, mpeg2dec->convert_arg,
 				    &convert_init);
 	mpeg2dec->convert_id_size = convert_init.id_size;
@@ -317,7 +317,7 @@ void mpeg2_set_buf (mpeg2dec_t * mpeg2dec, uint8_t * buf[3], void * id)
 				   PIC_FLAG_CODING_TYPE_B));
 	fbuf = mpeg2dec->fbuf[0];
     } else {
-	fbuf = &(mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index].fbuf);
+	fbuf = &mpeg2dec->fbuf_alloc[mpeg2dec->alloc_index].fbuf;
 	mpeg2dec->alloc_index_user = ++mpeg2dec->alloc_index;
     }
     fbuf->buf[0] = buf[0];
@@ -376,7 +376,7 @@ void mpeg2_reset (mpeg2dec_t * mpeg2dec, int full_reset)
     mpeg2dec->state = STATE_INVALID;
     mpeg2dec->first = 1;
 
-    mpeg2_reset_info(&(mpeg2dec->info));
+    mpeg2_reset_info(&mpeg2dec->info);
     mpeg2dec->info.gop = NULL;
     mpeg2dec->info.user_data = NULL;
     mpeg2dec->info.user_data_len = 0;

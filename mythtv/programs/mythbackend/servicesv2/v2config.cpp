@@ -68,7 +68,7 @@ bool V2Config::SetDatabaseCredentials(const QString &Host, const QString &UserNa
         return false;
 
     DatabaseParams dbparms;
-    dbparms.m_dbName = db;
+    dbparms.m_dbName = std::move(db);
     dbparms.m_dbUserName = UserName;
     dbparms.m_dbPassword = Password;
     dbparms.m_dbHostName = Host;

@@ -64,7 +64,7 @@ V2VideoMetadataInfo* V2Video::GetVideo( int Id )
                           VideoMetadataListManager::loadOneFromDatabase(Id);
 
     if ( !metadata )
-        throw( QString( "No metadata found for selected ID!." ));
+        throw std::runtime_error("No metadata found for selected ID!.");
 
     auto *pVideoMetadataInfo = new V2VideoMetadataInfo();
 
@@ -82,7 +82,7 @@ V2VideoMetadataInfo* V2Video::GetVideoByFileName( const QString &FileName )
     VideoMetadataListManager::VideoMetadataPtr metadata = mlm->byFilename(FileName);
 
     if ( !metadata )
-        throw( QString( "No metadata found for selected filename!." ));
+        throw std::runtime_error("No metadata found for selected filename!.");
 
     auto *pVideoMetadataInfo = new V2VideoMetadataInfo();
 
@@ -589,14 +589,14 @@ bool V2Video::AddVideo( const QString &sFileName,
                       const QString &sHostName )
 {
     if ( sHostName.isEmpty() )
-        throw( QString( "Host not provided! Local storage is deprecated and "
-                        "is not supported by the API." ));
+        throw std::runtime_error("Host not provided! Local storage is "
+                                 "deprecated and is not supported by the API.");
 
     if ( sFileName.isEmpty() ||
-        (sFileName.contains("/../")) ||
-        (sFileName.startsWith("../")) )
+        sFileName.contains("/../") ||
+        sFileName.startsWith("../") )
     {
-        throw( QString( "Filename not provided, or fails sanity checks!" ));
+        throw std::runtime_error("Filename not provided, or fails sanity checks!");
     }
 
     StorageGroup sgroup("Videos", sHostName);
@@ -604,7 +604,7 @@ bool V2Video::AddVideo( const QString &sFileName,
     QString fullname = sgroup.FindFile(sFileName);
 
     if ( !QFile::exists(fullname) )
-        throw( QString( "Provided filename does not exist!" ));
+        throw std::runtime_error("Provided filename does not exist!");
 
     QString hash = FileHash(fullname);
 
@@ -1094,13 +1094,13 @@ V2BlurayInfo* V2Video::GetBluray( const QString &sPath )
     auto *bdmeta = new BlurayMetadata(path);
 
     if ( !bdmeta )
-        throw( QString( "Unable to open Blu-ray Metadata Parser!" ));
+        throw std::runtime_error("Unable to open Blu-ray Metadata Parser!");
 
     if ( !bdmeta->OpenDisc() )
-        throw( QString( "Unable to open Blu-ray Disc/Path!" ));
+        throw std::runtime_error("Unable to open Blu-ray Disc/Path!");
 
     if ( !bdmeta->ParseDisc() )
-        throw( QString( "Unable to parse metadata from Blu-ray Disc/Path!" ));
+        throw std::runtime_error("Unable to parse metadata from Blu-ray Disc/Path!");
 
     auto *pBlurayInfo = new V2BlurayInfo();
 
@@ -1202,7 +1202,7 @@ V2CutList* V2Video::GetVideoCutList ( int Id,
     if (!query.exec())
     {
         MythDB::DBError("V2Video::GetVideoCommBreak", query);
-        throw QString("Database Error.");
+        throw std::runtime_error("Database Error.");
     }
 
     QString fileName;
@@ -1214,7 +1214,7 @@ V2CutList* V2Video::GetVideoCutList ( int Id,
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));
-        throw QString("Video Not Found.");
+        throw std::runtime_error("Video Not Found.");
     }
 
     ProgramInfo pi(fileName,
@@ -1266,7 +1266,7 @@ V2CutList* V2Video::GetVideoCommBreak ( int Id,
     if (!query.exec())
     {
         MythDB::DBError("V2Video::GetVideoCommBreak", query);
-        throw QString("Database Error.");
+        throw std::runtime_error("Database Error.");
     }
 
     QString fileName;
@@ -1278,7 +1278,7 @@ V2CutList* V2Video::GetVideoCommBreak ( int Id,
     else
     {
         LOG(VB_GENERAL, LOG_ERR, QString("V2Video/GetVideoCommBreak Video id %1 Not found.").arg(Id));
-        throw QString("Video Not Found.");
+        throw std::runtime_error("Video Not Found.");
     }
 
     ProgramInfo pi(fileName,
@@ -1322,7 +1322,7 @@ V2VideoCategoryList*  V2Video::GetCategoryList (  )
     if (!query.exec())
     {
         MythDB::DBError("V2Video::GetCategoryList", query);
-        throw QString("Database Error.");
+        throw std::runtime_error("Database Error.");
     }
 
     while (query.next())

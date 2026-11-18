@@ -462,15 +462,8 @@ void ChannelRecPriority::customEvent(QEvent *event)
         QString resultid  = dce->GetId();
         int     buttonnum = dce->GetResult();
 
-        if (resultid == "options")
-        {
-            switch (buttonnum)
-            {
-                case 0:
-                    upcoming();
-                    break;
-            }
-        }
+        if ((resultid == "options") && (buttonnum == 0))
+            upcoming();
     }
 }
 

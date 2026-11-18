@@ -117,7 +117,7 @@ const DTVParamStringVec DTVInversion::kParseStrings
 {
     "0", ///< kInversionOff
     "1", ///< kInversionOn
-    "a"  ///< kInversionAuto
+    "a",  ///< kInversionAuto
 };
 
 //
@@ -209,7 +209,7 @@ const DTVParamHelperVec DTVCodeRate::kVdrTable
     { "0",     kFECNone  },
     { "35",    kFEC_3_5  },
     { "910",   kFEC_9_10 },
-    { nullptr, kFECAuto  }
+    { nullptr, kFECAuto  },
 };
 
 const DTVParamHelperVec DTVCodeRate::kParseTable
@@ -226,7 +226,7 @@ const DTVParamHelperVec DTVCodeRate::kParseTable
     { "none",  kFECNone  },
     { "3/5",   kFEC_3_5  },
     { "9/10",  kFEC_9_10 },
-    { nullptr, kFECAuto  }
+    { nullptr, kFECAuto  },
 };
 
 const DTVParamStringVec DTVCodeRate::kParseStrings
@@ -344,7 +344,7 @@ const DTVParamStringVec DTVModulation::kParseStrings
     "8psk",    ///< kModulation8PSK
     "16apsk",  ///< kModulation16APSK
     "32apsk",  ///< kModulation32APSK
-    "dqpsk"    ///< kModulationDQPSK
+    "dqpsk",    ///< kModulationDQPSK
 };
 
 //
@@ -397,7 +397,7 @@ const DTVParamStringVec DTVTransmitMode::kParseStrings
     "4",   ///< kTransmissionMode4K
     "1",   ///< kTransmissionMode1K
     "16",  ///< kTransmissionMode16K
-    "32"   ///< kTransmissionMode32K
+    "32",   ///< kTransmissionMode32K
 };
 
 //
@@ -495,7 +495,7 @@ const DTVParamStringVec DTVHierarchy::kParseStrings
     "1", ///< kHierarchy1
     "2", ///< kHierarchy2
     "4", ///< kHierarchy4
-    "a"  ///< kHierarchyAuto
+    "a",  ///< kHierarchyAuto
 };
 
 //
@@ -516,7 +516,7 @@ const DTVParamStringVec DTVPolarity::kParseStrings
    "v", ///< kPolarityVertical
    "h", ///< kPolarityHorizontal
    "r", ///< kPolarityRight
-   "l"  ///< kPolarityLeft
+   "l",  ///< kPolarityLeft
 };
 
 //

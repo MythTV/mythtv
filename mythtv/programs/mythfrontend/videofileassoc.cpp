@@ -40,7 +40,7 @@ namespace
         enum FA_State : std::uint8_t {
             efsNONE,
             efsDELETE,
-            efsSAVE
+            efsSAVE,
         };
 
       public:

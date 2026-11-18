@@ -93,7 +93,7 @@ class PlaybackBox : public ScheduleCommon
         VIEW_SEARCHES   =  0x0010,
         VIEW_LIVETVGRP  =  0x0020,
         // insert new entries above here
-        VIEW_WATCHED    =  0x8000
+        VIEW_WATCHED    =  0x8000,
     };
 
     enum DeletePopupType : std::uint8_t
@@ -116,7 +116,7 @@ class PlaybackBox : public ScheduleCommon
     {
         kNvpToPlay,
         kNvpToStop,
-        kDone
+        kDone,
     };
 
     static std::array<PlaybackBoxCb,kMaxJobs*2> kMySlots;

@@ -617,7 +617,7 @@ void LinuxFirewireDevice::run(void)
             // and we don't want to block other actions.
             m_priv->m_portHandlerWait.wait(&m_lock, kNoDataTimeout.count());
 
-            m_priv->m_noDataCnt += (m_priv->m_isStreaming) ? 1 : 0;
+            m_priv->m_noDataCnt += m_priv->m_isStreaming ? 1 : 0;
             continue;
         }
 

@@ -55,21 +55,17 @@ V4L2encRecorder::V4L2encRecorder(TVRec *rec, V4LChannel *channel) :
 void V4L2encRecorder::SetIntOption(RecordingProfile *profile, const QString &name)
 {
     const StandardSetting *setting = profile->byName(name);
-    if (setting)
-    {
-        if (!m_streamHandler->SetOption(name, setting->getValue().toInt()))
-            V4LRecorder::SetOption(name, setting->getValue().toInt());
-    }
+    if (setting &&
+        !m_streamHandler->SetOption(name, setting->getValue().toInt()))
+        V4LRecorder::SetOption(name, setting->getValue().toInt());
 }
 
 void V4L2encRecorder::SetStrOption(RecordingProfile *profile, const QString &name)
 {
     const StandardSetting *setting = profile->byName(name);
-    if (setting)
-    {
-        if (!m_streamHandler->SetOption(name, setting->getValue()))
-            V4LRecorder::SetOption(name, setting->getValue());
-    }
+    if (setting &&
+        !m_streamHandler->SetOption(name, setting->getValue()))
+        V4LRecorder::SetOption(name, setting->getValue());
 }
 
 void V4L2encRecorder::SetOptionsFromProfile(RecordingProfile *profile,

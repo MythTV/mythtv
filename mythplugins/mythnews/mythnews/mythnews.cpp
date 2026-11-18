@@ -326,37 +326,30 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_podcastImage && site->podcast())
                 m_podcastImage->Show();
 
-            if (!site->imageURL().isEmpty())
+            if (!site->imageURL().isEmpty() && m_thumbnailImage)
             {
-                if (m_thumbnailImage)
-                {
-                    m_thumbnailImage->SetFilename(site->imageURL());
-                    m_thumbnailImage->Load();
+                m_thumbnailImage->SetFilename(site->imageURL());
+                m_thumbnailImage->Load();
 
-                    if (!m_thumbnailImage->IsVisible())
-                        m_thumbnailImage->Show();
-                }
+                if (!m_thumbnailImage->IsVisible())
+                    m_thumbnailImage->Show();
             }
         }
     }
 
-    if (m_updatedText)
+    if (m_updatedText && site)
     {
-
-        if (site)
-        {
-            QString text(tr("Updated") + " - ");
-            QDateTime updated(site->lastUpdated());
-            if (updated.isValid()) {
-                text += MythDate::toString(site->lastUpdated(),
-                                           MythDate::kDateTimeFull | MythDate::kSimplify);
-            }
-            else
-            {
-                text += tr("Unknown");
-            }
-            m_updatedText->SetText(text);
+        QString text(tr("Updated") + " - ");
+        QDateTime updated(site->lastUpdated());
+        if (updated.isValid()) {
+            text += MythDate::toString(site->lastUpdated(),
+                                       MythDate::kDateTimeFull | MythDate::kSimplify);
         }
+        else
+        {
+            text += tr("Unknown");
+        }
+        m_updatedText->SetText(text);
     }
 }
 

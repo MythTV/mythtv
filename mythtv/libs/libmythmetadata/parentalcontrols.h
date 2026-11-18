@@ -11,7 +11,7 @@ class META_PUBLIC ParentalLevel
   public:
     enum Level : std::uint8_t
                { plNone = 0, plLowest = 1, plLow = 2, plMedium = 3,
-                 plHigh = 4 };
+                 plHigh = 4, };
 
   public:
     ParentalLevel(Level pl);

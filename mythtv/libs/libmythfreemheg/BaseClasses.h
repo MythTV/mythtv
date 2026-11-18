@@ -266,7 +266,7 @@ class MHParameter
         P_String,
         P_ObjRef,
         P_ContentRef,
-        P_Null
+        P_Null,
     } m_Type { P_Null }; // Null is used when this is optional
 
     MHGenericInteger        m_intVal;

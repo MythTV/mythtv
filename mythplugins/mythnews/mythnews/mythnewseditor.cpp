@@ -73,7 +73,7 @@ bool MythNewsEditor::Create(void)
     if (m_titleText)
     {
         m_titleText->SetText(
-            (m_editing) ? tr("Edit Site Details") : tr("Enter Site Details"));
+            m_editing ? tr("Edit Site Details") : tr("Enter Site Details"));
     }
 
     if (m_nameLabelText)

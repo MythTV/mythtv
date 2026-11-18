@@ -88,7 +88,7 @@ void HardwareProfile::GenerateUUIDs(void)
         LOG(VB_GENERAL, LOG_INFO,
                  QString("Profile UUID found in local file: %1")
                          .arg(fileUUID));
-        m_uuid = fileUUID;
+        m_uuid = std::move(fileUUID);
     }
 
     // Get the Public UUID from file

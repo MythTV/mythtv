@@ -56,14 +56,14 @@ const std::array<const QString,9> MythMediaDevice::kMediaStatusStrings
     "MEDIASTAT_UNFORMATTED",
     "MEDIASTAT_USEABLE",
     "MEDIASTAT_NOTMOUNTED",
-    "MEDIASTAT_MOUNTED"
+    "MEDIASTAT_MOUNTED",
 };
 
 const std::array<const QString,3> MythMediaDevice::kMediaErrorStrings
 {
     "MEDIAERR_OK",
     "MEDIAERR_FAILED",
-    "MEDIAERR_UNSUPPORTED"
+    "MEDIAERR_UNSUPPORTED",
 };
 
 const QEvent::Type MythMediaEvent::kEventType =
@@ -440,7 +440,7 @@ bool MythMediaDevice::findMountPath()
         if (deviceNames.contains(m_devicePath) ||
             deviceNames.contains(m_realDevice)  )
         {
-            m_mountPath = mountPoint;
+            m_mountPath = std::move(mountPoint);
             mountFile.close();
             return true;
         }

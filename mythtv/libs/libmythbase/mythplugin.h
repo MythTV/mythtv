@@ -16,7 +16,7 @@ class MythContext;
 class QPainter;
 
 enum MythPluginType : std::uint8_t {
-    kPluginType_Module = 0
+    kPluginType_Module = 0,
 };
 
 class MythPlugin : public QLibrary

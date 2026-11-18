@@ -45,7 +45,7 @@ class PaneDVBS : public GroupSetting
                                       m_ppolarity   = new ScanPolarity(),
                                       m_psymbolrate = new ScanDVBSSymbolRate(),
                                       m_pfec        = new ScanFec(),
-                                      m_pinversion  = new ScanInversion()});
+                                      m_pinversion  = new ScanInversion(),});
     }
 
     QString frequency(void)  const { return m_pfrequency->getValue();  }

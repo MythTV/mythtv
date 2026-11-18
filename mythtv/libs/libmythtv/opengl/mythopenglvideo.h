@@ -31,7 +31,7 @@ class MythOpenGLVideo : public MythVideoGPU
         InterlacedTop = 2, // Deinterlace with top field first
         InterlacedBot = 3, // Deinterlace with bottom field first
         BicubicUpsize = 4,
-        ShaderCount   = 5
+        ShaderCount   = 5,
     };
 
     static QString        TypeToProfile(VideoFrameType Type);

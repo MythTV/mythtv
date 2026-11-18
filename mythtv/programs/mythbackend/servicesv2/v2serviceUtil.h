@@ -35,7 +35,7 @@ ADD_SQLv2(QString& settings_var, MSqlBindings& bindvar,
 
 const QStringList KnownServicesV2 = { "Capture", "Channel", "Content", \
                                       "Dvr",     "Guide",   "Music",   \
-                                      "Myth",    "Video",   "Config" };
+                                      "Myth",    "Video",   "Config", };
 void V2FillVideoMetadataInfo (
                       V2VideoMetadataInfo *pVideoMetadataInfo,
                       const VideoMetadataListManager::VideoMetadataPtr& pMetadata,

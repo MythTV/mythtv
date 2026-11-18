@@ -69,7 +69,7 @@ MythRenderVulkan* MythVisualVulkan::InitialiseVulkan(const QRect /*Area*/)
     // Create descriptor pool
     const auto & sizes = m_vulkanShader->GetPoolSizes(0);
     VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
-                                      0, 1, static_cast<uint32_t>(sizes.size()), sizes.data() };
+                                      0, 1, static_cast<uint32_t>(sizes.size()), sizes.data(), };
     if (m_vulkanFuncs->vkCreateDescriptorPool(m_vulkanDevice, &pool, nullptr, &m_descriptorPool) != VK_SUCCESS)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create descriptor pool for projection");

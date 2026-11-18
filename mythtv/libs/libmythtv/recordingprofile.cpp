@@ -188,9 +188,9 @@ class MPEG2audType : public MythUIComboBoxSetting, public CodecParamStorage
             addSelection("Layer III");
 
         uint allowed_cnt = 0;
-        allowed_cnt += ((m_allowLayer1) ? 1 : 0);
-        allowed_cnt += ((m_allowLayer2) ? 1 : 0);
-        allowed_cnt += ((m_allowLayer3) ? 1 : 0);
+        allowed_cnt += (m_allowLayer1 ? 1 : 0);
+        allowed_cnt += (m_allowLayer2 ? 1 : 0);
+        allowed_cnt += (m_allowLayer3 ? 1 : 0);
 
         if (1 == allowed_cnt)
             setEnabled(false);
@@ -346,7 +346,7 @@ class MPEG2AudioBitrateSettings : public GroupSetting
                               bool layer1, bool layer2, bool layer3,
                               uint default_layer)
     {
-        const std::array<const QString,3> layers { "Layer I", "Layer II", "Layer III", };
+        const std::array<const QString,3> layers { "Layer I", "Layer II", "Layer III" };
 
         setLabel(QObject::tr("Bitrate Settings"));
 
@@ -821,7 +821,7 @@ class MPEG2streamType : public MythUIComboBoxSetting, public CodecParamStorage
         const std::array<const QString,9> options { "MPEG-2 PS", "MPEG-2 TS",
                                      "MPEG-1 VCD", "PES AV",
                                      "PES V", "PES A",
-                                     "DVD", "DVD-Special 1", "DVD-Special 2" };
+                                     "DVD", "DVD-Special 1", "DVD-Special 2", };
 
         for (uint idx = minopt; idx <= maxopt; ++idx)
             addSelection(options[idx]);
@@ -845,7 +845,7 @@ class MPEG2aspectRatio : public MythUIComboBoxSetting, public CodecParamStorage
         setLabel(QObject::tr("Aspect Ratio"));
 
         const std::array<const QString,4> options { QObject::tr("Square"), "4:3",
-                                     "16:9", "2.21:1" };
+                                     "16:9", "2.21:1", };
 
         for (uint idx = minopt; idx <= maxopt; ++idx)
             addSelection(options[idx]);

@@ -69,10 +69,12 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent) :
 
 ImportMusicDialog::~ImportMusicDialog()
 {
-    if (gPlayer->getCurrentMetadata() && m_playingMetaData)
+    if (gPlayer->getCurrentMetadata() &&
+        m_playingMetaData &&
+        gPlayer->isPlaying() &&
+        gPlayer->getCurrentMetadata()->Filename() == m_playingMetaData->Filename())
     {
-        if (gPlayer->isPlaying() && gPlayer->getCurrentMetadata()->Filename() == m_playingMetaData->Filename())
-            gPlayer->stop(true);
+        gPlayer->stop(true);
     }
 
     if (m_locationEdit)
@@ -878,13 +880,11 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
 void ImportMusicDialog::customEvent(QEvent *event)
 {
-    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
+    auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
+    if (dce && (dce->GetId() == "locationchange"))
     {
-        if (dce->GetId() == "locationchange")
-        {
-            m_locationEdit->SetText(dce->GetResultText());
-            startScan();
-        }
+        m_locationEdit->SetText(dce->GetResultText());
+        startScan();
     }
 }
 
@@ -1003,7 +1003,7 @@ void ImportCoverArtDialog::copyPressed()
         AlbumArtImage image;
         image.m_description = "";
         image.m_embedded = false;
-        image.m_filename = filename;
+        image.m_filename = std::move(filename);
         image.m_hostname = m_metadata->Hostname();
         image.m_imageType = (ImageType)m_typeList->GetItemCurrent()->GetData().toInt();
 

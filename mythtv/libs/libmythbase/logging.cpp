@@ -127,7 +127,7 @@ void resetLogging(void)
 LoggingItem::LoggingItem(const char *_file, const char *_function,
                          int _line, LogLevel_t _level, LoggingType _type) :
         ReferenceCounter("LoggingItem", false),
-        m_threadId((uint64_t)(QThread::currentThreadId())),
+        m_threadId((uint64_t)QThread::currentThreadId()),
         m_line(_line), m_type(_type), m_level(_level),
         m_function(_function)
 {
@@ -667,7 +667,7 @@ void logStart(const QString& logfile, bool progress, int quiet, int facility,
     {
         QFileInfo finfo(logfile);
         QString path = finfo.path();
-        logPropagateOpts.m_path = path;
+        logPropagateOpts.m_path = std::move(path);
     }
 
     logPropagateCalc();
@@ -755,7 +755,7 @@ int syslogGetFacility([[maybe_unused]] const QString& facility)
     for (name = &facilitynames[0];
          name->c_name && (strcmp(name->c_name, string) != 0); name++);
 
-    return( name->c_val );
+    return name->c_val ;
 #endif
 }
 
@@ -835,7 +835,7 @@ void loglevelAdd(int value, QString name, char shortname)
     // LOG_CRIT -> crit
     name.remove(0, 4);
     name = name.toLower();
-    item->name = name;
+    item->name = std::move(name);
     item->shortname = shortname;
 
     loglevelMap.insert(value, item);
@@ -986,7 +986,7 @@ int verboseArgParse(const QString& arg)
             {
                 if (reverseOption)
                 {
-                    verboseMask &= ~(item->mask);
+                    verboseMask &= ~item->mask;
                     verboseString = verboseString.remove(' ' + item->name);
                     verboseString += " no" + item->name;
                 }

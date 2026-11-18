@@ -536,7 +536,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                      /* 4*/"Sport", "Children", "Music", "Arts/Culture",
                      /* 8*/"Current Affairs", "Education", "Infotainment",
                      /*11*/"Special", "Comedy", "Drama", "Documentary",
-                     /*15*/"Unknown"};
+                     /*15*/"Unknown",};
                 ContentDescriptor content(content_data);
                 if (content.IsValid())
                 {
@@ -550,7 +550,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
                     {/* 0*/"Unknown",  "Ταινία", "Ενημερωτικό", "Unknown",
                      /* 4*/"Αθλητικό", "Παιδικό", "Unknown", "Unknown",
                      /* 8*/"Unknown", "Ντοκιμαντέρ", "Unknown", "Unknown",
-                     /*12*/"Unknown", "Unknown", "Unknown", "Unknown"};
+                     /*12*/"Unknown", "Unknown", "Unknown", "Unknown",};
                 ContentDescriptor content(content_data);
                 if (content.IsValid())
                 {

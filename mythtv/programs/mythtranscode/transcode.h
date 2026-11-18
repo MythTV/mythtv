@@ -40,7 +40,7 @@ class Transcode : public QObject
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
     void SetPlayerContext(PlayerContext* player_ctx);
     PlayerContext *GetPlayerContext(void) { return m_ctx; }
-    MythPlayer *GetPlayer(void) { return (m_ctx) ? m_ctx->m_player : nullptr; }
+    MythPlayer *GetPlayer(void) { return m_ctx ? m_ctx->m_player : nullptr; }
 
   private:
     ProgramInfo         *m_proginfo            { nullptr };

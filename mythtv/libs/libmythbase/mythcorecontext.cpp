@@ -1250,9 +1250,9 @@ QString MythCoreContext::resolveAddress(const QString &host, ResolveType type,
                 break;
             default:
                 if (!v6.isNull())
-                    addr = v6;
+                    addr = std::move(v6);
                 else if (!v4.isNull())
-                    addr = v4;
+                    addr = std::move(v4);
                 else
                     addr = QHostAddress::LocalHostIPv6;
                 break;

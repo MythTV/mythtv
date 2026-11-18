@@ -17,7 +17,7 @@ class MUI_PUBLIC MythPainterGPU : public MythPainter
     {
         None        = 0x00,
         Viewport    = 0x01,
-        Framebuffer = 0x02
+        Framebuffer = 0x02,
     };
     Q_DECLARE_FLAGS(ViewControls, ViewControl)
 

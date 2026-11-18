@@ -254,12 +254,9 @@ int main(int argc, char *argv[])
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
-        if (query.exec() && query.next())
-        {
-            if (!query.isNull(0))
-                GuideDataBefore =
+        if (query.exec() && query.next() && !query.isNull(0))
+            GuideDataBefore =
                     MythDate::fromString(query.value(0).toString());
-        }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
         {
@@ -274,12 +271,9 @@ int main(int argc, char *argv[])
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", fromfile_id);
 
-        if (query.exec() && query.next())
-        {
-            if (!query.isNull(0))
-                GuideDataAfter =
+        if (query.exec() && query.next() && !query.isNull(0))
+            GuideDataAfter =
                     MythDate::fromString(query.value(0).toString());
-        }
 
         if (GuideDataAfter == GuideDataBefore)
         {

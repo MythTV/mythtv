@@ -15,7 +15,7 @@ enum ImageCaptionType : std::uint8_t {
     kNoCaption   = 0, //!< None
     kNameCaption = 1, //!< Filenames
     kDateCaption = 2, //!< Dates
-    kUserCaption = 3  //!< Exif comments
+    kUserCaption = 3,  //!< Exif comments
 };
 
 

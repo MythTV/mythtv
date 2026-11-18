@@ -18,7 +18,7 @@ enum ARCHIVEDESTINATION : std::uint8_t
     AD_DVD_SL = 0,
     AD_DVD_DL = 1,
     AD_DVD_RW = 2,
-    AD_FILE   = 3
+    AD_FILE   = 3,
 };
 
 Q_DECLARE_METATYPE (ARCHIVEDESTINATION);

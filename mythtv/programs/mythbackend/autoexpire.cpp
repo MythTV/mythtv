@@ -567,7 +567,7 @@ fsit != fsInfos.end(); ++fsit)
 
                         if ((p->GetHostname() == el->GetHostName()) ||
                             ((p->GetHostname() == myHostName) &&
-                             (el->IsLocal())))
+                             el->IsLocal()))
                         {
                             if (el->IsConnected())
                                 foundFile = el->CheckFile(p);
@@ -1124,7 +1124,7 @@ bool AutoExpire::IsInDontExpireSet(
     QString key = QString("%1_%2")
         .arg(chanid).arg(recstartts.toString(Qt::ISODate));
 
-    return (m_dontExpireSet.contains(key));
+    return m_dontExpireSet.contains(key);
 }
 
 bool AutoExpire::IsInExpireList(

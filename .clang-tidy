@@ -60,13 +60,21 @@ Checks: '-*,
         # that all have the same set of function names. ,
        -bugprone-derived-method-shadowing-base-method,
 
-        # As of 2023-09-19, there are 140 unique warnings. ,
+        # As of 2026-11-12, there are 5276 unique warnings. ,
+       -bugprone-signed-bitwise
+
+        # As of 2023-11-12, there are 132 unique warnings. ,
        -bugprone-switch-missing-default-case,
 
         # Lots of complaints about constructors of static objects
         # possibly throwing exceptions that cant be caught. As of
         # 2023-05-22, there are 508 warnings. ,
        -bugprone-throwing-static-initialization,
+
+        # As of 2026-11-12 there are 85 unique warnings. There is some
+        # overlap between this and the switch-missing-default-case
+        # warnings. ,
+       -bugprone-unhandled-code-paths,
 
         # string-to-number conversion functions that do not verify the
         # validity of the conversion.  As of 2023-05-22, there are 43
@@ -167,13 +175,17 @@ Checks: '-*,
         # As of 2024-08-01, there are 207 unique warnings. ,
        -cppcoreguidelines-virtual-class-destructor,
 
-   -google-explicit-constructor,
    -google-runtime-int,
 
     misc-*,
 
         # As of 2024-08-02, there are 15970 unique warnings. ,
        -misc-const-correctness,
+
+        # These are all names for the same test. ,
+       -misc-explicit-constructor,
+       -google-explicit-constructor,
+       -cppcoreguidelines-explicit-constructor,
 
         # As of 2023-09-19, there are 115517 unique warnings. ,
        -misc-include-cleaner,
@@ -190,6 +202,9 @@ Checks: '-*,
         # related to the Q_DECLARE_METATYPE macro and the other 225
         # are in MythTV. ,
        -misc-no-recursion,
+
+        # New in clang23.  Most of the suggested changes are wrong. ,
+       -misc-static-assert,
 
         # New in clang16. As of 2023-05-03, there are 1445 unique
         # warnings. ,

@@ -67,13 +67,11 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT COUNT(*) FROM program WHERE stars > 0");
 
-        if (query.exec() && query.next())
+        if (query.exec() && query.next() && (query.value(0).toInt() == 0))
         {
-            if (query.value(0).toInt() == 0) // No ratings in database
-            {
-                m_curView = 0; // Show All
-                m_allowViewDialog = false;
-            }
+            // No ratings in database
+            m_curView = 0; // Show All
+            m_allowViewDialog = false;
         }
     }
 

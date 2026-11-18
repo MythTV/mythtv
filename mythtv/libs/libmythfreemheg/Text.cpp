@@ -59,7 +59,7 @@ MHText::MHText(const MHText &ref) // Copy constructor for cloning.
 
 MHText::~MHText()
 {
-    delete(m_pDisplay);
+    delete m_pDisplay;
 }
 
 
@@ -152,7 +152,7 @@ static const std::array<const QString,4> rchJustification
     "start", // 1
     "end",
     "centre",
-    "justified" // 4
+    "justified", // 4
 };
 
 // Look up the Justification. Returns zero if it doesn't match.  Used in the text parser only.
@@ -172,7 +172,7 @@ int MHText::GetJustification(const QString& str)
 static const std::array<const QString,2> rchlineOrientation
 {
     "vertical", // 1
-    "horizontal"
+    "horizontal",
 };
 
 int MHText::GetLineOrientation(const QString& str)
@@ -193,7 +193,7 @@ static const std::array<const QString,4> rchStartCorner
     "upper-left", // 1
     "upper-right",
     "lower-left",
-    "lower-right" // 4
+    "lower-right", // 4
 };
 
 int MHText::GetStartCorner(const QString& str)
@@ -518,7 +518,7 @@ MHTextLine::~MHTextLine()
 {
     for (int i = 0; i < m_items.Size(); i++)
     {
-        delete(m_items.GetAt(i));
+        delete m_items.GetAt(i);
     }
 }
 
@@ -848,7 +848,7 @@ void MHText::Redraw()
     // Clean up.
     for (int k = 0; k < theText.Size(); k++)
     {
-        delete(theText.GetAt(k));
+        delete theText.GetAt(k);
     }
 }
 
@@ -874,7 +874,7 @@ void MHText::Display(MHEngine *engine)
 // Return the area actually obscured.  This is empty unless the background is opaque.
 QRegion MHText::GetOpaqueArea()
 {
-    if (! m_fRunning || (GetColour(m_bgColour)).alpha() != 255)
+    if (! m_fRunning || GetColour(m_bgColour).alpha() != 255)
     {
         return {};
     }

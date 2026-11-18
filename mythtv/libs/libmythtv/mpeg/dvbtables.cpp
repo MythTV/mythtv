@@ -372,6 +372,6 @@ uint32_t dvbdate2key(const unsigned char *buf)
     uint dt = (((uint)buf[0]) << 24) | (((uint)buf[1]) << 16); // 16 bits
     uint tm = ((byteBCD2int(buf[2]) * 3600) +
                (byteBCD2int(buf[3]) * 60) +
-               (byteBCD2int(buf[4]))); // 17 bits
+               byteBCD2int(buf[4])); // 17 bits
     return (dt | (tm>>1)) ^ ((tm & 1)<<31);
 }

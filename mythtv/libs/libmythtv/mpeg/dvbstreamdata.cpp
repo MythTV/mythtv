@@ -212,21 +212,19 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
 
     // If the user specified a network ID and that network ID is a NITo then change that NITo into
     // the NIT and change the NIT into a NITo. See ticket #7486.
-    if (m_dvbRealNetworkId > 0)
+    if ((m_dvbRealNetworkId > 0) &&
+        ((psip.TableID() == TableID::NIT  && psip.TableIDExtension() != (uint)m_dvbRealNetworkId) ||
+         (psip.TableID() == TableID::NITo && psip.TableIDExtension() == (uint)m_dvbRealNetworkId)  ))
     {
-        if ((psip.TableID() == TableID::NIT  && psip.TableIDExtension() != (uint)m_dvbRealNetworkId) ||
-            (psip.TableID() == TableID::NITo && psip.TableIDExtension() == (uint)m_dvbRealNetworkId)  )
+        auto *nit = new NetworkInformationTable(psip);
+        if (!nit->Mutate())
         {
-            auto *nit = new NetworkInformationTable(psip);
-            if (!nit->Mutate())
-            {
-                delete nit;
-                return true;
-            }
-            bool retval = HandleTables(pid, *nit);
             delete nit;
-            return retval;
+            return true;
         }
+        bool retval = HandleTables(pid, *nit);
+        delete nit;
+        return retval;
     }
 
     if (IsRedundant(pid, psip))

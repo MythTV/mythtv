@@ -213,7 +213,7 @@ uint32_t CDSObject::GetChildCount(void) const
 {
     uint32_t nCount = m_children.count();
     if (nCount == 0)
-        return( m_nChildCount );
+        return m_nChildCount ;
 
     return nCount;
 }

@@ -55,7 +55,7 @@ class SignalMonitorValue
     ///        right side of the threshold (depends on IsHighThreashold()).
     bool IsGood() const
     {
-        return (m_highThreshold) ? m_value >= m_threshold : m_value <= m_threshold;
+        return m_highThreshold ? m_value >= m_threshold : m_value <= m_threshold;
     }
     /// \brief Returns the value normalized to the [newmin, newmax] range.
     /// \param newmin New minimum value.
@@ -122,7 +122,7 @@ class SignalMonitorValue
         QString str = m_noSpaceName.isNull() ? "(null)" : m_noSpaceName;
         return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) "
                        "timeout(%7 ms) %8 set. %9 good.")
-            .arg(str).arg(m_value).arg( (m_highThreshold) ? ">=" : "<=" )
+            .arg(str).arg(m_value).arg( m_highThreshold ? ">=" : "<=" )
             .arg(m_threshold).arg(m_minVal).arg(m_maxVal)
             .arg(m_timeout.count())
             .arg(m_set    ? "is" : "is NOT",

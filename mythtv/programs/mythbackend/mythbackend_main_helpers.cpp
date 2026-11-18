@@ -752,7 +752,7 @@ int run_backend(MythBackendCommandLineParser &cmdline)
         // { "/styles.css", styles_css },
         // { "/polyfills.js", polyfills_js },
         // { "/runtime.js", runtime_js },
-        { "/", root }
+        { "/", root },
     };
 
     MythHTTPScopedInstance webserver(be_handlers);
@@ -818,7 +818,7 @@ int run_setup_webserver()
         { "/styles.css", styles_css },
         { "/polyfills.js", polyfills_js },
         { "/runtime.js", runtime_js },
-        { "/", root }
+        { "/", root },
     };
 
     MythHTTPScopedInstance webserver(be_handlers);

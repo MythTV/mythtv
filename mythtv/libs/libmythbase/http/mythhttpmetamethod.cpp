@@ -30,7 +30,7 @@ MythHTTPMetaMethod::MythHTTPMetaMethod(int Index, QMetaMethod& Method, int Reque
         QMetaType::UnknownType, QMetaType::VoidStar, QMetaType::QObjectStar,
         QMetaType::QVariantHash, QMetaType::QRect, QMetaType::QRectF,
         QMetaType::QSize, QMetaType::QSizeF, QMetaType::QLine,
-        QMetaType::QLineF, QMetaType::QPoint, QMetaType::QPointF
+        QMetaType::QLineF, QMetaType::QPoint, QMetaType::QPointF,
     };
 
     // Static list of unsupported parameters (all invalid types plus extras)
@@ -40,7 +40,7 @@ MythHTTPMetaMethod::MythHTTPMetaMethod(int Index, QMetaMethod& Method, int Reque
         QMetaType::QVariantHash, QMetaType::QRect, QMetaType::QRectF,
         QMetaType::QSize, QMetaType::QSizeF, QMetaType::QLine,
         QMetaType::QLineF, QMetaType::QPoint, QMetaType::QPointF,
-        QMetaType::QVariantMap, QMetaType::QStringList, QMetaType::QVariantList
+        QMetaType::QVariantMap, QMetaType::QStringList, QMetaType::QVariantList,
     };
 
     int returntype = Method.returnType();
@@ -74,9 +74,9 @@ MythHTTPMetaMethod::MythHTTPMetaMethod(int Index, QMetaMethod& Method, int Reque
         {
             // If this is a user type, we assume its name should be used, otherwise
             // prefer deduction from methodname
-            if (returntype <= QMetaType::User)
-                if (QString(Method.name()).startsWith(QStringLiteral("Get"), Qt::CaseInsensitive))
-                    m_returnTypeName = Method.name().mid(3);
+            if ((returntype <= QMetaType::User) &&
+                QString(Method.name()).startsWith(QStringLiteral("Get"), Qt::CaseInsensitive))
+                m_returnTypeName = Method.name().mid(3);
             // Default to the type name
             if (m_returnTypeName.isEmpty())
                 m_returnTypeName = Method.typeName();
@@ -218,7 +218,7 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
 #else
             dt.setTimeZone(QTimeZone(QTimeZone::UTC));
 #endif
-            *(static_cast<QDateTime*>(Parameter)) = dt;
+            *(static_cast<QDateTime*>(Parameter)) = std::move(dt);
             break;
         }
         default:
@@ -230,7 +230,7 @@ void* MythHTTPMetaMethod::CreateParameter(void* Parameter, int Type, const QStri
 
 QVariant MythHTTPMetaMethod::CreateReturnValue(int Type, void* Value)
 {
-    if (!(ValidReturnType(Type)))
+    if (!ValidReturnType(Type))
         return {};
 
     // This assumes any user type will be derived from QObject...

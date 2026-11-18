@@ -1,5 +1,6 @@
 #include <sys/time.h>
 #include <algorithm>
+#include <stdexcept>
 
 extern "C" {
 #include "libavcodec/avcodec.h"        /* AVFrame */
@@ -181,7 +182,7 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             }
 
             if (!newwidth)
-                throw "monochromatic";
+                throw std::runtime_error("monochromatic");
 
             mincol = newcol;
 
@@ -230,7 +231,7 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             }
 
             if (!newwidth)
-                throw "monochromatic";
+                throw std::runtime_error("monochromatic");
 
             if (top || bottom)
                 break;  /* Do not repeat letterboxing check. */
@@ -282,7 +283,7 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             }
 
             if (!newheight)
-                throw "monochromatic";
+                throw std::runtime_error("monochromatic");
 
             minrow = newrow;
 
@@ -328,7 +329,7 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             }
 
             if (!newheight)
-                throw "monochromatic";
+                throw std::runtime_error("monochromatic");
 
             if (left || right)
                 break;  /* Do not repeat pillarboxing check. */
@@ -336,7 +337,7 @@ BorderDetector::getDimensionsReal(const AVFrame *pgm, int pgmheight,
             maxrow1 = minrow + newheight;
         }
     }
-    catch (char const* e)
+    catch (const std::runtime_error& e)
     {
         monochromatic = true;
     }

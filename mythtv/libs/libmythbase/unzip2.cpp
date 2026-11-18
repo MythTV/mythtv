@@ -306,15 +306,10 @@ bool UnZip::extractFile(const QString& outDirName)
             ok = zipCreateDirectory(entry);
         if (ok && (entry.m_stats.size > 0))
         {
-            switch (entry.m_attributes & ZIP_ATTR_FILE_TYPE_MASK)
-            {
-              case ZIP_ATTR_FILE_TYPE_SYMLINK:
-                  ok = zipCreateSymlink(entry);
-                break;
-              default:
-                  ok = zipWriteOneFile(entry);
-                break;
-            }
+            if ((entry.m_attributes & ZIP_ATTR_FILE_TYPE_MASK) == ZIP_ATTR_FILE_TYPE_SYMLINK)
+                ok = zipCreateSymlink(entry);
+            else
+                ok = zipWriteOneFile(entry);
         }
     }
 

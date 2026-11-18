@@ -29,7 +29,7 @@ enum MythSocketProtocol : std::uint8_t
     ProtJSONRPC,
     ProtXMLRPC,
     ProtPLISTRPC,
-    ProtCBORRPC
+    ProtCBORRPC,
 };
 
 class MythSharedData;

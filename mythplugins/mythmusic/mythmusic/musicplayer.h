@@ -169,7 +169,7 @@ class MusicPlayer : public QObject, public MythObservable
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
       REPEAT_ALL, 
-      MAX_REPEAT_MODES 
+      MAX_REPEAT_MODES,
     };
     enum ShuffleMode : std::uint8_t
     { SHUFFLE_OFF = 0, 
@@ -177,7 +177,7 @@ class MusicPlayer : public QObject, public MythObservable
       SHUFFLE_INTELLIGENT,
       SHUFFLE_ALBUM,
       SHUFFLE_ARTIST,
-      MAX_SHUFFLE_MODES 
+      MAX_SHUFFLE_MODES,
     };
 
     enum ResumeMode : std::uint8_t
@@ -185,7 +185,7 @@ class MusicPlayer : public QObject, public MythObservable
       RESUME_FIRST,
       RESUME_TRACK,
       RESUME_EXACT,
-      MAX_RESUME_MODES
+      MAX_RESUME_MODES,
     };
 
     RepeatMode getRepeatMode(void) { return m_repeatMode; }

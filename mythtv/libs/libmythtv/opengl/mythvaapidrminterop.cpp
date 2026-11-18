@@ -260,9 +260,8 @@ MythVAAPIInteropDRM::Acquire(MythRenderOpenGL* Context,
     m_discontinuityCounter = Frame->m_frameCounter;
 
 #if CONFIG_DRM_VIDEO
-    if (!m_drmTriedAndFailed)
-        if (HandleDRMVideo(ColourSpace, id, Frame))
-            return result;
+    if (!m_drmTriedAndFailed && HandleDRMVideo(ColourSpace, id, Frame))
+        return result;
 #endif
 
     // return cached texture if available
@@ -476,8 +475,8 @@ bool MythVAAPIInteropDRM::TestPrimeInterop()
             .type = VAGenericValueTypeInteger,
             .value = {
                 .i = VA_FOURCC_NV12,
-            }
-        }
+            },
+        },
     };
 
     if (vaCreateSurfaces(m_vaDisplay, VA_RT_FORMAT_YUV420, 1920, 1080,

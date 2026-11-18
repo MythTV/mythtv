@@ -12,11 +12,11 @@ struct DriverOption
                       VIDEO_BITRATE_MODE, VIDEO_BITRATE, VIDEO_BITRATE_PEAK,
                       AUDIO_ENCODING, AUDIO_BITRATE_MODE, AUDIO_SAMPLERATE,
                       AUDIO_BITRATE, AUDIO_LANGUAGE, VOLUME,
-                      BRIGHTNESS, CONTRAST, SATURATION, HUE, SHARPNESS
+                      BRIGHTNESS, CONTRAST, SATURATION, HUE, SHARPNESS,
     };
     enum type_t : std::uint8_t
                 { UNKNOWN_TYPE, INTEGER, BOOLEAN, STRING, MENU,
-                  BUTTON, BITMASK };
+                  BUTTON, BITMASK, };
 
     using menu_t = QMap<int, QString>;
     using Options = QMap<category_t, DriverOption>;

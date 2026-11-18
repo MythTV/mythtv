@@ -21,7 +21,7 @@ enum ArticleType : std::uint8_t {
     VIDEO_FILE = 0,
     VIDEO_PODCAST = 1,
     AUDIO_FILE = 2,
-    AUDIO_PODCAST = 3
+    AUDIO_PODCAST = 3,
 };
 
 /** Describes an enclosure associated with an item.

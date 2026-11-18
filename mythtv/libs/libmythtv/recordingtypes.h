@@ -29,7 +29,7 @@ enum RecordingType : std::uint8_t
     kDontRecord = 8,
     //kFindDailyRecord = 9, (Obsolete)
     //kFindWeeklyRecord = 10, (Obsolete)
-    kTemplateRecord = 11
+    kTemplateRecord = 11,
 }; // note stored in uint8_t in ProgramInfo
 MTV_PUBLIC QString toString(RecordingType rectype);
 MTV_PUBLIC QString toDescription(RecordingType rectype);
@@ -47,7 +47,7 @@ enum RecordingDupInType : std::uint8_t
     kDupsInRecorded     = 0x01,
     kDupsInOldRecorded  = 0x02,
     kDupsInAll          = 0x0F,
-    kDupsNewEpi         = 0x10
+    kDupsNewEpi         = 0x10,
 }; // note stored in uint8_t in ProgramInfo
 MTV_PUBLIC QString toString(RecordingDupInType rectype);
 MTV_PUBLIC QString toDescription(RecordingDupInType rectype);
@@ -65,7 +65,7 @@ enum RecordingDupMethodType : std::uint8_t
     kDupCheckSub      = 0x02,
     kDupCheckDesc     = 0x04,
     kDupCheckSubDesc  = 0x06, // clazy:exclude=unexpected-flag-enumerator-value
-    kDupCheckSubThenDesc = 0x08
+    kDupCheckSubThenDesc = 0x08,
 }; // note stored in uint8_t in ProgramInfo
 MTV_PUBLIC QString toString(RecordingDupMethodType rectype);
 MTV_PUBLIC QString toDescription(RecordingDupMethodType rectype);
@@ -81,7 +81,7 @@ enum RecSearchType : std::uint8_t
     kTitleSearch,
     kKeywordSearch,
     kPeopleSearch,
-    kManualSearch
+    kManualSearch,
 };
 MTV_PUBLIC QString toString(RecSearchType rectype);
 MTV_PUBLIC QString toRawString(RecSearchType rectype);
@@ -94,7 +94,7 @@ enum class AutoExtendType : uint8_t
     None = 0,
     ESPN,
     MLB,
-    Last
+    Last,
 };
 MTV_PUBLIC QString toString(AutoExtendType extType);
 MTV_PUBLIC QString toDescription(AutoExtendType extType);

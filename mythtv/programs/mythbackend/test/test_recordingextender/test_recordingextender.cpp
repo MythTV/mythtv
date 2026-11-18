@@ -221,7 +221,7 @@ void TestRecordingExtender::test_findKnownSport_data(void)
 
     QStringList fifaQualLeagues
         {"fifa.worldq.uefa", "fifa.worldq.concacaf", "fifa.worldq.conmebol",
-         "fifa.worldq.afc", "fifa.worldq.caf", "fifa.worldq.ofc"};
+         "fifa.worldq.afc", "fifa.worldq.caf", "fifa.worldq.ofc",};
 
     QTest::addColumn<QString>("title");
     QTest::addColumn<int>("autoExtendType");
@@ -465,7 +465,7 @@ void TestRecordingExtender::test_nameCleanup(void)
     SportInfo info {.showTitle=title,
                     .dataProvider=autoExtendTypeFromInt(autoExtendType),
                     .sport=sport,
-                    .league=dummy};
+                    .league=dummy,};
     nameCleanup(info, team, dummy);
     QCOMPARE(team, expectedTeam);
 }
@@ -590,7 +590,7 @@ void TestRecordingExtender::test_parseJson(void)
     SportInfo info {.showTitle="MLB Baseball",
                     .dataProvider=AutoExtendType::MLB,
                     .sport="",
-                    .league=""};
+                    .league="",};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                "/data/mlb_baseball_20210921_1720.json" };
@@ -718,7 +718,7 @@ void TestRecordingExtender::test_parseEspn(void)
     SportInfo info {.showTitle="MLB Baseball",
                     .dataProvider=AutoExtendType::ESPN,
                     .sport=sport,
-                    .league=league};
+                    .league=league,};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                "/data/" + infoFile };
@@ -818,7 +818,7 @@ void TestRecordingExtender::test_parseMlb(void)
     SportInfo info {.showTitle="MLB Baseball",
                     .dataProvider=AutoExtendType::MLB,
                     .sport="sport",
-                    .league="league"};
+                    .league="league",};
     ActiveGame game(0, "MLB Baseball", info);
     QUrl url1 { "file://" + QStringLiteral(TEST_SOURCE_DIR) +
                 "/data/" + infoFile };

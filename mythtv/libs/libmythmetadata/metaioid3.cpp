@@ -289,12 +289,9 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     }
 
     // Fallback to using any POPM tag we can find
-    if (!popm)
-    {
-        if (!tag->frameListMap()["POPM"].isEmpty())
-            popm = dynamic_cast<TagLib::ID3v2::PopularimeterFrame *>
+    if (!popm && !tag->frameListMap()["POPM"].isEmpty())
+        popm = dynamic_cast<TagLib::ID3v2::PopularimeterFrame *>
                                         (tag->frameListMap()["POPM"].front());
-    }
 
     if (popm)
     {
@@ -308,21 +305,18 @@ MusicMetadata *MetaIOID3::read(const QString &filename)
     TagLib::ID3v2::UserTextIdentificationFrame *musicbrainz = find(tag,
                                             "MusicBrainz Album Artist Id");
 
-    if (musicbrainz)
+    if (musicbrainz && !compilation && !musicbrainz->fieldList().isEmpty())
     {
         // If the MusicBrainz ID is the special "Various Artists" ID
         // then compilation is TRUE
-        if (!compilation && !musicbrainz->fieldList().isEmpty())
+        for (auto & field : musicbrainz->fieldList())
         {
-            for (auto & field : musicbrainz->fieldList())
-            {
-                QString ID = TStringToQString(field);
+            QString ID = TStringToQString(field);
 
-                if (ID == MYTH_MUSICBRAINZ_ALBUMARTIST_UUID)
-                {
-                    compilation = true;
-                    break;
-                }
+            if (ID == MYTH_MUSICBRAINZ_ALBUMARTIST_UUID)
+            {
+                compilation = true;
+                break;
             }
         }
     }

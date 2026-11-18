@@ -381,24 +381,21 @@ bool MythSocket::ConnectToHost(const QString &host, quint16 port)
     QHostAddress hadr;
 
     // attempt direct assignment
-    if (!hadr.setAddress(host))
+    if (!hadr.setAddress(host) &&
+        (!gCoreContext ||
+            !hadr.setAddress(gCoreContext->GetBackendServerIP(host))))
     {
-        // attempt internal lookup through MythCoreContext
-        if (!gCoreContext ||
-            !hadr.setAddress(gCoreContext->GetBackendServerIP(host)))
+        // attempt external lookup from hosts/DNS
+        QHostInfo info = QHostInfo::fromName(host);
+        if (!info.addresses().isEmpty())
         {
-            // attempt external lookup from hosts/DNS
-            QHostInfo info = QHostInfo::fromName(host);
-            if (!info.addresses().isEmpty())
-            {
-                hadr = info.addresses().constFirst();
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC() + QString("Unable to lookup: %1")
-                        .arg(host));
-                return false;
-            }
+            hadr = info.addresses().constFirst();
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC() + QString("Unable to lookup: %1")
+                .arg(host));
+            return false;
         }
     }
 
@@ -902,15 +899,12 @@ void MythSocket::ReadStringListReal(
         else
         {
             elapsed = timer.elapsed();
-            if (elapsed  > 10s)
+            if ((elapsed > 10s) && ((elapsed - errmsgtime) > 10s))
             {
-                if ((elapsed - errmsgtime) > 10s)
-                {
-                    errmsgtime = elapsed;
-                    LOG(VB_GENERAL, LOG_ERR, LOC() +
-                        QString("ReadStringList: Waiting for data: %1 %2")
-                            .arg(readoffset).arg(btr));
-                }
+                errmsgtime = elapsed;
+                LOG(VB_GENERAL, LOG_ERR, LOC() +
+                    QString("ReadStringList: Waiting for data: %1 %2")
+                    .arg(readoffset).arg(btr));
             }
 
             if (elapsed > 100s)

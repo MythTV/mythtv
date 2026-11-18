@@ -103,7 +103,7 @@ bool MythTranslation::LanguageChanged(void)
     bool ret = false;
     if (!currentLanguage.isEmpty() && currentLanguage.compare(d.m_language))
         ret = true;
-    d.m_language = currentLanguage;
+    d.m_language = std::move(currentLanguage);
     return ret;
 }
 

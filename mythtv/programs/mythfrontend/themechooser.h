@@ -65,7 +65,7 @@ class ThemeChooser : public MythScreenType
         dsIdle = 0,
         dsDownloadingOnBackend,
         dsDownloadingOnFrontend,
-        dsExtractingTheme
+        dsExtractingTheme,
     };
 
     ThemeInfo *loadThemeInfo(const QFileInfo &theme);

@@ -210,7 +210,7 @@ goom_lines_draw (GMLine * line, const GoomSingleData& data, unsigned int *p)
 		int y1 = (int) (pt->y + (sina * line->amplitude * data[0]));
 
 		for (int i = 1; i < LINENUMPOINTS; i++) {
-			pt = &(line->points[i]);
+			pt = &line->points[i];
 
 			cosa = cosf (pt->angle) / 1000.0F;
 			sina = sinf (pt->angle) / 1000.0F;

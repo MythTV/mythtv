@@ -70,7 +70,7 @@ class MythControls : public MythScreenType
     {
         kContextList,
         kKeyList,
-        kActionList
+        kActionList,
     };
 
     // Gets

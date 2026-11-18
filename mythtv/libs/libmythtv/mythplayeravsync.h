@@ -14,7 +14,7 @@ enum AVSyncAudioPausedType : std::uint8_t
 {
     kAVSyncAudioNotPaused    = 0,
     kAVSyncAudioPaused       = 1,
-    kAVSyncAudioPausedLiveTV = 2
+    kAVSyncAudioPausedLiveTV = 2,
 };
 
 class MythPlayerAVSync

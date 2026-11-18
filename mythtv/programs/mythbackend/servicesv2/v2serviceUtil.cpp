@@ -872,14 +872,11 @@ int FillUpcomingList(QVariantList &list, QObject* parent,
             continue;
         }
 
-        if (!RecGroup.isEmpty())
+        if (!RecGroup.isEmpty() && ( (*it)-> GetRecordingGroup() != RecGroup ))
         {
-            if ( (*it)-> GetRecordingGroup() != RecGroup )
-            {
-                delete *it;
-                *it = nullptr;
-                continue;
-            }
+            delete *it;
+            *it = nullptr;
+            continue;
         }
 
         if (!bShowAll && ((((*it)->GetRecordingStatus() >= RecStatus::Pending) &&

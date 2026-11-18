@@ -438,7 +438,7 @@ void PlaybackBoxHelper::CheckAvailability(
         QStringList list;
         pginfo.ToStringList(list);
         list += catstr;
-        m_eventHandler->m_checkAvailability[pginfo.GetRecordingID()] = list;
+        m_eventHandler->m_checkAvailability[pginfo.GetRecordingID()] = std::move(list);
     }
     else
     {

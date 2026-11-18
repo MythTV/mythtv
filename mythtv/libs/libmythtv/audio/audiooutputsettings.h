@@ -28,7 +28,7 @@ enum AudioFormat : std::uint8_t {
     FORMAT_S24LSB,
     FORMAT_S24,
     FORMAT_S32,
-    FORMAT_FLT
+    FORMAT_FLT,
 };
 
 enum DigitalFeature : std::uint8_t {

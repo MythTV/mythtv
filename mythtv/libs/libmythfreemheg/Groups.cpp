@@ -433,7 +433,7 @@ void MHGroup::MakeClone(MHRoot *pTarget, MHRoot *pRef, MHEngine *engine)
 
 MHApplication::~MHApplication()
 {
-    delete(m_pCurrentScene);
+    delete m_pCurrentScene;
 }
 
 void MHApplication::Initialise(MHParseNode *p, MHEngine *engine)

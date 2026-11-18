@@ -320,7 +320,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket, bool insert)
         if (!m_payloadBuffer.empty())
         {
             if (m_ringBuffer)
-                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
+                m_ringBuffer->Write(m_payloadBuffer.data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
     }
@@ -380,7 +380,7 @@ static const std::array<const MythAVRational,16> frameRateMap = {
     MythAVRational(50), MythAVRational(60000, 1001), MythAVRational(60),
     MythAVRational(0),  MythAVRational(0),           MythAVRational(0),
     MythAVRational(0),  MythAVRational(0),           MythAVRational(0),
-    MythAVRational(0)
+    MythAVRational(0),
 };
 
 /** \fn DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
@@ -480,90 +480,89 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
                 frameRate = frameRateMap[(bufptr[3] & 0x0000000f)];
             }
-            else if (PESStreamID::MPEG2ExtensionStartCode == stream_id)
+            else if ((PESStreamID::MPEG2ExtensionStartCode == stream_id) &&
+                     (bytes_left >= 1))
             {
-                if (bytes_left >= 1)
+                int ext_type = (bufptr[0] >> 4);
+                switch(ext_type)
                 {
-                    int ext_type = (bufptr[0] >> 4);
-                    switch(ext_type)
+                case 0x1: /* sequence extension */
+                    if (bytes_left >= 6)
                     {
-                    case 0x1: /* sequence extension */
-                        if (bytes_left >= 6)
-                        {
-                            m_progressiveSequence = bufptr[1] & (1 << 3);
-                        }
-                        break;
-                    case 0x8: /* picture coding extension */
-                        if (bytes_left >= 5)
-                        {
-                            int picture_structure  = bufptr[2] & 3;
-                            int top_field_first = bufptr[3] & (1 << 7);
-                            int repeat_first_field = bufptr[3] & (1 << 1);
-                            int progressive_frame = bufptr[4] & (1 << 7);
-#if 0
-                            LOG(VB_RECORD, LOG_DEBUG, LOC +
-                                QString("picture_coding_extension(): (m_progressiveSequence: %1) picture_structure: %2 top_field_first: %3 repeat_first_field: %4 progressive_frame: %5")
-                                    .arg(QString::number(m_progressiveSequence , 2),
-                                         QString::number(picture_structure , 2),
-                                         QString::number(top_field_first , 2),
-                                         QString::number(repeat_first_field , 2),
-                                         QString::number(progressive_frame , 2)
-                                        )
-                               );
-#endif
-                            if (!m_progressiveSequence)
-                            {
-                                if (picture_structure == 0b00)
-                                {
-                                    ; // reserved
-                                }
-                                else if (picture_structure == 0b11)
-                                {
-                                    // frame picture (either interleaved interlaced or progressive)
-                                    hasFrame = true;
-                                }
-                                else if (picture_structure < 0b11)
-                                {
-                                    // field picture
-                                    // Only add a frame for the first presented field.
-                                    // Do not add a frame for each field picture.
-                                    if (top_field_first != 0)
-                                    {
-                                        hasFrame = (picture_structure == 0b01); // Top Field
-                                    }
-                                    else // top_field_first == 0
-                                    {
-                                        hasFrame = (picture_structure == 0b10); // Bottom Field
-                                    }
-                                }
-                            }
-
-                            /* check if we must repeat the frame */
-                            m_repeatPict = 1;
-                            if (repeat_first_field)
-                            {
-                                if (m_progressiveSequence)
-                                {
-                                    if (top_field_first)
-                                        m_repeatPict = 5;
-                                    else
-                                        m_repeatPict = 3;
-                                }
-                                else if (progressive_frame)
-                                {
-                                    m_repeatPict = 2;
-                                }
-                            }
-                            // The m_repeatPict code above matches
-                            // mpegvideo_extract_headers(), but the
-                            // code in mpeg_field_start() computes a
-                            // value one less, which seems correct.
-                            --m_repeatPict;
-                        }
-                        break;
+                        m_progressiveSequence = bufptr[1] & (1 << 3);
                     }
+                    break;
+                case 0x8: /* picture coding extension */
+                    if (bytes_left >= 5)
+                    {
+                        int picture_structure  = bufptr[2] & 3;
+                        int top_field_first = bufptr[3] & (1 << 7);
+                        int repeat_first_field = bufptr[3] & (1 << 1);
+                        int progressive_frame = bufptr[4] & (1 << 7);
+#if 0
+                        LOG(VB_RECORD, LOG_DEBUG, LOC +
+                            QString("picture_coding_extension(): (m_progressiveSequence: %1) picture_structure: %2 top_field_first: %3 repeat_first_field: %4 progressive_frame: %5")
+                            .arg(QString::number(m_progressiveSequence , 2),
+                                 QString::number(picture_structure , 2),
+                                 QString::number(top_field_first , 2),
+                                 QString::number(repeat_first_field , 2),
+                                 QString::number(progressive_frame , 2)
+                                )
+                            );
+#endif
+                        if (!m_progressiveSequence)
+                        {
+                            if (picture_structure == 0b00)
+                            {
+                                ; // reserved
+                            }
+                            else if (picture_structure == 0b11)
+                            {
+                                // frame picture (either interleaved interlaced or progressive)
+                                hasFrame = true;
+                            }
+                            else if (picture_structure < 0b11)
+                            {
+                                // field picture
+                                // Only add a frame for the first presented field.
+                                // Do not add a frame for each field picture.
+                                if (top_field_first != 0)
+                                {
+                                    hasFrame = (picture_structure == 0b01); // Top Field
+                                }
+                                else // top_field_first == 0
+                                {
+                                    hasFrame = (picture_structure == 0b10); // Bottom Field
+                                }
+                            }
+                        }
+
+                        /* check if we must repeat the frame */
+                        m_repeatPict = 1;
+                        if (repeat_first_field)
+                        {
+                            if (m_progressiveSequence)
+                            {
+                                if (top_field_first)
+                                    m_repeatPict = 5;
+                                else
+                                    m_repeatPict = 3;
+                            }
+                            else if (progressive_frame)
+                            {
+                                m_repeatPict = 2;
+                            }
+                        }
+                        // The m_repeatPict code above matches
+                        // mpegvideo_extract_headers(), but the
+                        // code in mpeg_field_start() computes a
+                        // value one less, which seems correct.
+                        --m_repeatPict;
+                    }
+                    break;
                 }
             }
+
             if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
                 (stream_id <= PESStreamID::MPEGVideoStreamEnd))
             {
@@ -727,13 +726,10 @@ void DTVRecorder::HandleTimestamps(int stream_id, int64_t pts, int64_t dts)
 
     m_tsLast[stream_id] = ts;
 
-    if (m_tsCount[stream_id] < 30)
+    if ((m_tsCount[stream_id] < 30) && (!m_tsCount[stream_id] || (ts < m_tsFirst[stream_id])))
     {
-        if (!m_tsCount[stream_id] || (ts < m_tsFirst[stream_id]))
-        {
-            m_tsFirst[stream_id] = ts;
-            m_tsFirstDt[stream_id] = MythDate::current();
-        }
+        m_tsFirst[stream_id] = ts;
+        m_tsFirstDt[stream_id] = MythDate::current();
     }
 
     m_tsCount[stream_id]++;
@@ -992,21 +988,19 @@ bool DTVRecorder::FindH2645Keyframes(const TSPacket *tspacket)
                                m_ringBuffer->GetWritePosition());
         i += (bytes_used - 1);
 
-        if (m_h2645Parser->stateChanged())
+        if (m_h2645Parser->stateChanged() &&
+            m_h2645Parser->onFrameStart() &&
+            m_h2645Parser->getFieldType() != H2645Parser::FIELD_BOTTOM)
         {
-            if (m_h2645Parser->onFrameStart() &&
-                m_h2645Parser->getFieldType() != H2645Parser::FIELD_BOTTOM)
-            {
-                hasKeyFrame = m_h2645Parser->onKeyFrameStart();
-                hasFrame = true;
-                m_seenSps |= hasKeyFrame;
+            hasKeyFrame = m_h2645Parser->onKeyFrameStart();
+            hasFrame = true;
+            m_seenSps |= hasKeyFrame;
 
-                width = m_h2645Parser->pictureWidth();
-                height = m_h2645Parser->pictureHeight();
-                aspectRatio = m_h2645Parser->aspectRatio();
-                scantype = m_h2645Parser->GetScanType();
-                frameRate   = m_h2645Parser->getFrameRate();
-            }
+            width = m_h2645Parser->pictureWidth();
+            height = m_h2645Parser->pictureHeight();
+            aspectRatio = m_h2645Parser->aspectRatio();
+            scantype = m_h2645Parser->GetScanType();
+            frameRate   = m_h2645Parser->getFrameRate();
         }
     } // for (; i < TSPacket::kSize; ++i)
 
@@ -1281,7 +1275,7 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
                 if (m_ringBuffer)
                 {
                     m_ringBuffer->Write(
-                        (m_payloadBuffer).data(), m_payloadBuffer.size());
+                        m_payloadBuffer.data(), m_payloadBuffer.size());
                 }
                 m_payloadBuffer.clear();
             }
@@ -1331,18 +1325,15 @@ void DTVRecorder::HandlePAT(const ProgramAssociationTable *_pat)
 
     // If we have not found the desired program in the PAT and this happens to be
     // an SPTS then update the desired program to the one that is present in the PAT.
-    if (!pmtpid)
+    if (!pmtpid && (_pat->ProgramCount() == 1))
     {
-        if (_pat->ProgramCount() == 1)
-        {
-            int oldProgNum = progNum;
-            progNum = _pat->ProgramNumber(0);
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("Update desired program found in SPTS PAT from %1 to %2")
-                .arg(oldProgNum).arg(progNum));
-            GetStreamData()->SetDesiredProgram(progNum);
-            pmtpid = _pat->FindPID(progNum);
-        }
+        int oldProgNum = progNum;
+        progNum = _pat->ProgramNumber(0);
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("Update desired program found in SPTS PAT from %1 to %2")
+            .arg(oldProgNum).arg(progNum));
+        GetStreamData()->SetDesiredProgram(progNum);
+        pmtpid = _pat->FindPID(progNum);
     }
     if (!pmtpid)
     {
@@ -1630,7 +1621,7 @@ bool DTVRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
         {
             // Flush the buffer
             if (m_ringBuffer)
-                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
+                m_ringBuffer->Write(m_payloadBuffer.data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
 
@@ -1662,7 +1653,7 @@ bool DTVRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
         {
             // Flush the buffer
             if (m_ringBuffer)
-                m_ringBuffer->Write((m_payloadBuffer).data(), m_payloadBuffer.size());
+                m_ringBuffer->Write(m_payloadBuffer.data(), m_payloadBuffer.size());
             m_payloadBuffer.clear();
         }
 

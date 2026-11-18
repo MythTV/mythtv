@@ -228,10 +228,10 @@ void ScreenSetup::updateHelpText()
         {
             TypeListInfo ti = *si->m_types.begin();
             text += tr("Location: ");
-            text += (ti.m_location.isEmpty()) ? tr("Not Defined") : ti.m_location;
+            text += ti.m_location.isEmpty() ? tr("Not Defined") : ti.m_location;
             text += "\n";
             text += tr("Source: " );
-            text += (ti.m_src) ? ti.m_src->name : tr("Not Defined");
+            text += ti.m_src ? ti.m_src->name : tr("Not Defined");
             text += "\n";
         }
         text += "\n" + tr("Press SELECT to ");

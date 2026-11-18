@@ -41,7 +41,7 @@ class H2645Parser {
     enum field_type : std::uint8_t {
         FRAME = 'F',
         FIELD_TOP = 'T',
-        FIELD_BOTTOM = 'B'
+        FIELD_BOTTOM = 'B',
     };
 
     H2645Parser(void);
@@ -80,7 +80,7 @@ class H2645Parser {
     SCAN_t GetScanType(void) const { return m_scanType; }
 
     enum NAL_unit_type : std::int8_t {
-        UNKNOWN = -1
+        UNKNOWN = -1,
     };
 
     enum SLICE_type : std::uint8_t {
@@ -94,7 +94,7 @@ class H2645Parser {
         SLICE_I_a = 7,
         SLICE_SP_a = 8,
         SLICE_SI_a = 9,
-        SLICE_UNDEF = 10
+        SLICE_UNDEF = 10,
     };
 
   protected:

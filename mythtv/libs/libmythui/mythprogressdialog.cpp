@@ -187,7 +187,7 @@ void MythUIProgressDialog::customEvent(QEvent *event)
 
         QString message = pue->GetMessage();
         if (!message.isEmpty())
-            m_message = message;
+            m_message = std::move(message);
         uint total = pue->GetTotal();
         if (total > 0)
             m_total = total;

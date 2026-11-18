@@ -137,7 +137,7 @@ void RawSettingsEditor::Save(void)
     while (it != m_settingValues.constEnd())
     {
         if ((!it.value().isEmpty()) ||
-            ((m_origValues.contains(it.key())) &&
+            (m_origValues.contains(it.key()) &&
              (!m_origValues.value(it.key()).isEmpty())))
         {
             gCoreContext->SaveSetting(it.key(), it.value());

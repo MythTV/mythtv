@@ -41,7 +41,7 @@ class VideoMetadataListManagerImp
         string_to_meta::const_iterator p = m_fileMap.find(file_name);
         if (p != m_fileMap.end())
         {
-            return *(p->second);
+            return *p->second;
         }
         return {};
     }
@@ -52,7 +52,7 @@ class VideoMetadataListManagerImp
         int_to_meta::const_iterator p = m_idMap.find(db_id);
         if (p != m_idMap.end())
         {
-            return *(p->second);
+            return *p->second;
         }
         return {};
     }
@@ -215,7 +215,7 @@ const QString& meta_node::getFQPath()
     {
         QString p = getPath();
         if (p.startsWith("myth://"))
-            m_fqPath = p;
+            m_fqPath = std::move(p);
         else
             m_fqPath = ((!p.isEmpty() && p[0] != '/') ? "/" : "") + p;
     }

@@ -20,7 +20,7 @@ class MythVRR
         Unknown = 0,
         FreeSync,
         GSync,
-        GSyncCompat
+        GSyncCompat,
     };
 
     static MythVRRPtr Create(class MythDisplay* MDisplay);

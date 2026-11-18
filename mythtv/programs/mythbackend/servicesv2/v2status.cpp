@@ -995,120 +995,117 @@ int V2Status::PrintEncoderStatus( QTextStream &os, const QDomElement& encoders )
     {
         QDomElement e = node.toElement();
 
-        if (!e.isNull())
+        if (!e.isNull() && (e.tagName() == "Encoder"))
         {
-            if (e.tagName() == "Encoder")
+            QString sIsLocal  = (e.attribute( "local"    , "remote" )== "1")
+                ? "local" : "remote";
+            QString sCardId   =  e.attribute( "id"       , "0"      );
+            QString sHostName =  e.attribute( "hostname" , "Unknown");
+            bool    bConnected=  static_cast<bool>(e.attribute( "connected", "0" ).toInt());
+
+            bool bIsLowOnFreeSpace=static_cast<bool>(e.attribute( "lowOnFreeSpace", "0").toInt());
+
+            QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
+
+            os << "    Encoder " << sCardId << " " << sDevlabel
+               << " is " << sIsLocal << " on " << sHostName;
+
+            if ((sIsLocal == "remote") && !bConnected)
             {
-                QString sIsLocal  = (e.attribute( "local"    , "remote" )== "1")
-                                                           ? "local" : "remote";
-                QString sCardId   =  e.attribute( "id"       , "0"      );
-                QString sHostName =  e.attribute( "hostname" , "Unknown");
-                bool    bConnected=  static_cast<bool>(e.attribute( "connected", "0" ).toInt());
+                SleepStatus sleepStatus =
+                    (SleepStatus) e.attribute("sleepstatus",
+                                              QString::number(sStatus_Undefined)).toInt();
 
-                bool bIsLowOnFreeSpace=static_cast<bool>(e.attribute( "lowOnFreeSpace", "0").toInt());
+                if (sleepStatus == sStatus_Asleep)
+                    os << " (currently asleep).<br />";
+                else
+                    os << " (currently not connected).<br />";
 
-                QString sDevlabel = e.attribute( "devlabel", "[ UNKNOWN ]");
+                node = node.nextSibling();
+                continue;
+            }
 
-                os << "    Encoder " << sCardId << " " << sDevlabel
-                   << " is " << sIsLocal << " on " << sHostName;
+            nNumEncoders++;
 
-                if ((sIsLocal == "remote") && !bConnected)
+            TVState encState = (TVState) e.attribute( "state", "0").toInt();
+
+            switch( encState )
+            {
+            case kState_WatchingLiveTV:
+                os << " and is watching Live TV";
+                break;
+
+            case kState_RecordingOnly:
+            case kState_WatchingRecording:
+                os << " and is recording";
+                break;
+
+            default:
+                os << " and is not recording.";
+                break;
+            }
+
+            // Display first Program Element listed under the encoder
+
+            QDomNode tmpNode = e.namedItem( "Program" );
+
+            if (!tmpNode.isNull())
+            {
+                QDomElement program  = tmpNode.toElement();
+
+                if (!program.isNull())
                 {
-                    SleepStatus sleepStatus =
-                        (SleepStatus) e.attribute("sleepstatus",
-                            QString::number(sStatus_Undefined)).toInt();
+                    os << " '" << program.attribute( "title", "Unknown" ) << "'";
 
-                    if (sleepStatus == sStatus_Asleep)
-                        os << " (currently asleep).<br />";
-                    else
-                        os << " (currently not connected).<br />";
+                    // Get Channel information
 
-                    node = node.nextSibling();
-                    continue;
-                }
+                    tmpNode = program.namedItem( "Channel" );
 
-                nNumEncoders++;
-
-                TVState encState = (TVState) e.attribute( "state", "0").toInt();
-
-                switch( encState )
-                {
-                    case kState_WatchingLiveTV:
-                        os << " and is watching Live TV";
-                        break;
-
-                    case kState_RecordingOnly:
-                    case kState_WatchingRecording:
-                        os << " and is recording";
-                        break;
-
-                    default:
-                        os << " and is not recording.";
-                        break;
-                }
-
-                // Display first Program Element listed under the encoder
-
-                QDomNode tmpNode = e.namedItem( "Program" );
-
-                if (!tmpNode.isNull())
-                {
-                    QDomElement program  = tmpNode.toElement();
-
-                    if (!program.isNull())
+                    if (!tmpNode.isNull())
                     {
-                        os << " '" << program.attribute( "title", "Unknown" ) << "'";
+                        QDomElement channel = tmpNode.toElement();
 
-                        // Get Channel information
-
-                        tmpNode = program.namedItem( "Channel" );
-
-                        if (!tmpNode.isNull())
-                        {
-                            QDomElement channel = tmpNode.toElement();
-
-                            if (!channel.isNull())
-                                os <<  " on "
-                                   << channel.attribute( "callSign", "unknown" );
-                        }
-
-                        // Get Recording Information (if any)
-
-                        tmpNode = program.namedItem( "Recording" );
-
-                        if (!tmpNode.isNull())
-                        {
-                            QDomElement recording = tmpNode.toElement();
-
-                            if (!recording.isNull())
-                            {
-                                QDateTime endTs = MythDate::fromString(
-                                    recording.attribute( "recEndTs", "" ));
-
-                                os << ". This recording ";
-                                if (endTs < MythDate::current())
-                                    os << "was ";
-                                else
-                                    os << "is ";
-
-                                os << "scheduled to end at "
-                                   << MythDate::toString(endTs,
-                                                         MythDate::kTime);
-                            }
-                        }
+                        if (!channel.isNull())
+                            os <<  " on "
+                               << channel.attribute( "callSign", "unknown" );
                     }
 
-                    os << ".";
+                    // Get Recording Information (if any)
+
+                    tmpNode = program.namedItem( "Recording" );
+
+                    if (!tmpNode.isNull())
+                    {
+                        QDomElement recording = tmpNode.toElement();
+
+                        if (!recording.isNull())
+                        {
+                            QDateTime endTs = MythDate::fromString(
+                                recording.attribute( "recEndTs", "" ));
+
+                            os << ". This recording ";
+                            if (endTs < MythDate::current())
+                                os << "was ";
+                            else
+                                os << "is ";
+
+                            os << "scheduled to end at "
+                               << MythDate::toString(endTs,
+                                                     MythDate::kTime);
+                        }
+                    }
                 }
 
-                if (bIsLowOnFreeSpace)
-                {
-                    os << " <strong>WARNING</strong>:"
-                       << " This backend is low on free disk space!";
-                }
-
-                os << "<br />\r\n";
+                os << ".";
             }
+
+            if (bIsLowOnFreeSpace)
+            {
+                os << " <strong>WARNING</strong>:"
+                   << " This backend is low on free disk space!";
+            }
+
+            os << "<br />\r\n";
         }
 
         node = node.nextSibling();
@@ -1906,7 +1903,7 @@ void V2Status::FillChannelInfo( QDomElement &channel,
             channel.setAttribute( "sourceId"   , pInfo->GetSourceID()    );
             channel.setAttribute( "inputId"    , pInfo->GetInputID()     );
             channel.setAttribute( "commFree"   ,
-                                  (pInfo->IsCommercialFree()) ? 1 : 0 );
+                                  pInfo->IsCommercialFree() ? 1 : 0 );
         }
     }
 }

@@ -369,7 +369,7 @@ void SourceManager::recurseDirs( QDir dir )
             recurseDirs(recurseTo);
         }
 
-        if (file.isExecutable() && !(file.isDir()))
+        if (file.isExecutable() && !file.isDir())
         {
             ScriptInfo *info = WeatherSource::ProbeScript(file);
             if (info)

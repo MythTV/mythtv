@@ -145,7 +145,7 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
         static std::array<int,3> s_colors {
 		(0x18<<(ROUGE*8))|(0x4c<<(VERT*8))|(0x2f<<(BLEU*8)),
 		(0x48<<(ROUGE*8))|(0x2c<<(VERT*8))|(0x6f<<(BLEU*8)),
-		(0x58<<(ROUGE*8))|(0x3c<<(VERT*8))|(0x0f<<(BLEU*8))};
+		(0x58<<(ROUGE*8))|(0x3c<<(VERT*8))|(0x0f<<(BLEU*8)),};
 	
 	static float s_lig = 1.15F;
 	static float s_ligs = 0.1F;
@@ -188,7 +188,7 @@ void tentacle_update(int *buf, int *back, int W, int H, GoomDualData& data, floa
 
 		for (auto & tmp : grille) {
 			for (int tmp2=0;tmp2<definitionx;tmp2++) {
-				float val = (float)(ShiftRight(data[0][MythRandomInt(0, 510)],10)) * rapport;
+				float val = (float)ShiftRight(data[0][MythRandomInt(0, 510)],10) * rapport;
 				vals[tmp2] = val;
 			}
 			

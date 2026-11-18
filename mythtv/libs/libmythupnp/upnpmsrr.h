@@ -14,7 +14,7 @@ enum UPnpMSRRMethod : std::uint8_t
     MSRR_GetServiceDescription  = 1,
     MSRR_IsAuthorized           = 2,
     MSRR_RegisterDevice         = 3,
-    MSRR_IsValidated            = 4
+    MSRR_IsValidated            = 4,
 };
 
 //////////////////////////////////////////////////////////////////////////////

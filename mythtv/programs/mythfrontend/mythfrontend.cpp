@@ -1349,14 +1349,12 @@ static void TVMenuCallback(void * /* data */, QString &selection)
         LOG(VB_GENERAL, LOG_ERR, "Unknown menu action: " + selection);
     }
 
-    if (sel.startsWith("settings ") || sel == "video_settings_general")
+    if ((sel.startsWith("settings ") || sel == "video_settings_general") &&
+        g_settingsHelper)
     {
-        if (g_settingsHelper)
-        {
-            QObject::connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
-                             &MythScreenType::Exiting,
-                             g_settingsHelper, &SettingsHelper::RunEpilog);
-        }
+        QObject::connect(GetMythMainWindow()->GetMainStack()->GetTopScreen(),
+                         &MythScreenType::Exiting,
+                         g_settingsHelper, &SettingsHelper::RunEpilog);
     }
 }
 
@@ -1456,7 +1454,7 @@ static int internal_play_media(const QString &mrl, const QString &plot,
     auto *pginfo = new ProgramInfo(
         mrl, plot, title, QString(), subtitle, QString(),
         director, season, episode, inetref, lenMins,
-        (year.toUInt()) ? year.toUInt() : 1900, id);
+        year.toUInt() ? year.toUInt() : 1900, id);
 
     pginfo->SetProgramInfoType(pginfo->DiscoverProgramInfoType());
 
@@ -2089,11 +2087,8 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 
     cmdline.ApplySettingsOverride();
 
-    if (!GetMythDB()->HaveSchema())
-    {
-        if (!InitializeMythSchema())
-            return GENERIC_EXIT_DB_ERROR;
-    }
+    if (!GetMythDB()->HaveSchema() && !InitializeMythSchema())
+        return GENERIC_EXIT_DB_ERROR;
 
     if (cmdline.toBool("reset"))
         ResetSettings = true;
@@ -2208,7 +2203,7 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     // when we may have a new render device). This also ensures the support checks
     // are done immediately and are not reliant on semi-random settings initialisation.
     QObject::connect(mainWindow, &MythMainWindow::SignalWindowReady,
-                     mainWindow, []() { MythVideoProfile::InitStatics(true); } );
+                     mainWindow, [] { MythVideoProfile::InitStatics(true); } );
 
     mainWindow->Init(false);
     mainWindow->setWindowTitle(QCoreApplication::translate("(MythFrontendMain)",
@@ -2230,11 +2225,8 @@ Q_DECL_EXPORT int main(int argc, char **argv)
     // We must reload the translation after a language change and this
     // also means clearing the cached/loaded theme strings, so reload the
     // theme which also triggers a translation reload
-    if (LanguageSelection::prompt())
-    {
-        if (!reloadTheme())
-            return GENERIC_EXIT_NO_THEME;
-    }
+    if (LanguageSelection::prompt() && !reloadTheme())
+        return GENERIC_EXIT_NO_THEME;
 
     if (!UpgradeTVDatabaseSchema(false, false, true))
     {

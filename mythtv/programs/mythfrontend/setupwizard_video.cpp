@@ -273,7 +273,7 @@ void VideoSetupWizard::customEvent(QEvent *e)
                 if (m_progressDialog)
                     m_progressDialog->Close();
 
-                if ((m_downloadFile.startsWith("myth://")))
+                if (m_downloadFile.startsWith("myth://"))
                 {
                     if ((errorCode == 0) &&
                         (fileSize > 0))

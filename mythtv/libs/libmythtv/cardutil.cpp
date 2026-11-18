@@ -496,7 +496,7 @@ QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
         // Find devices
         uint32_t type  { HDHOMERUN_DEVICE_TYPE_TUNER };
         uint32_t flags { HDHOMERUN_DISCOVER_FLAGS_IPV4_GENERAL |
-                         HDHOMERUN_DISCOVER_FLAGS_IPV6_GENERAL };
+                         HDHOMERUN_DISCOVER_FLAGS_IPV6_GENERAL, };
         int result =
             hdhomerun_discover2_find_devices_broadcast(ds, flags, &type, 1);
 
@@ -2061,7 +2061,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
         return 0;
     }
 
-    uint inputgroupid = (query.next()) ? query.value(0).toUInt() + 1 : 1;
+    uint inputgroupid = query.next() ? query.value(0).toUInt() + 1 : 1;
 
     query.prepare(
         "INSERT INTO inputgroup "
@@ -2532,7 +2532,7 @@ QStringList CardUtil::CapabilitiesToString([[maybe_unused]] uint64_t capabilitie
         { .idx=FE_HAS_EXTENDED_CAPS,          .name="HAS_EXTENDED_CAPS" },
         { .idx=FE_IS_STUPID,                  .name="IS_STUPID" },
         { .idx=FE_NEEDS_BENDING,              .name="NEEDS_BENDING" },
-    }};
+    },};
 
     for (const auto & cap : fe_caps_name)
     {

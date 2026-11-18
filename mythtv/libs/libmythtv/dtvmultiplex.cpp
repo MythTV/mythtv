@@ -302,15 +302,12 @@ bool DTVMultiplex::ParseDVB_S_and_C(
         }
     }
 
-    if (ok)
+    if (ok && !_polarity.isEmpty())
     {
-        if (!_polarity.isEmpty())
+        ok = m_polarity.Parse(_polarity.toLower());
+        if (!ok)
         {
-            ok = m_polarity.Parse(_polarity.toLower());
-            if (!ok)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid polarity parameter " + _polarity);
-            }
+            LOG(VB_GENERAL, LOG_ERR, LOC + "Invalid polarity parameter " + _polarity);
         }
     }
 

@@ -65,7 +65,7 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest ) const
             .arg(pRequest->GetHostAddress()) .arg(m_nServicePort)
             .arg(sUserAgent));
 
-    QTextStream stream( &(pRequest->m_response) );
+    QTextStream stream( &pRequest->m_response );
 
     UPnp::g_UPnpDeviceDesc.GetValidXML( pRequest->GetHostAddress(),
                                         m_nServicePort,

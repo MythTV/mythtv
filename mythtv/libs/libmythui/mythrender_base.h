@@ -17,7 +17,7 @@ enum RenderType : uint8_t
     kRenderUnknown = 0,
     kRenderDirect3D9,
     kRenderOpenGL,
-    kRenderVulkan
+    kRenderVulkan,
 };
 
 class MUI_PUBLIC MythRender : public ReferenceCounter

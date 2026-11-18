@@ -350,8 +350,8 @@ void TeletextReader::AddPageHeader(int page, int subpage, const uint8_t *buf,
             TeletextSubPage *ttpage = FindSubPage(lastPage, lastSubPage);
             if (!ttpage)
             {
-                ttpage = &(m_magazines[m - 1]
-                           .pages[lastPage].subpages[lastSubPage]);
+                ttpage = &m_magazines[m - 1]
+                           .pages[lastPage].subpages[lastSubPage];
                 m_magazines[m - 1].pages[lastPage].pagenum = lastPage;
                 ttpage->subpagenum = lastSubPage;
             }
@@ -598,7 +598,7 @@ const TeletextSubPage *TeletextReader::FindSubPageInternal(
     if (pageIter == m_magazines[mag - 1].pages.end())
         return nullptr;
 
-    const TeletextPage *ttpage = &(pageIter->second);
+    const TeletextPage *ttpage = &pageIter->second;
     auto subpageIter = ttpage->subpages.cbegin();
 
     // try to find the subpage given, or first if subpage == -1
@@ -609,20 +609,20 @@ const TeletextSubPage *TeletextReader::FindSubPageInternal(
         return nullptr;
 
     if (subpage == -1)
-        return &(subpageIter->second);
+        return &subpageIter->second;
 
-    const TeletextSubPage *res = &(subpageIter->second);
+    const TeletextSubPage *res = &subpageIter->second;
     if (direction == -1)
     {
         --subpageIter;
         if (subpageIter == ttpage->subpages.cend())
         {
             auto iter = ttpage->subpages.crbegin();
-            res = &(iter->second);
+            res = &iter->second;
         }
         else
         {
-            res = &(subpageIter->second);
+            res = &subpageIter->second;
         }
     }
 
@@ -632,7 +632,7 @@ const TeletextSubPage *TeletextReader::FindSubPageInternal(
         if (subpageIter == ttpage->subpages.cend())
             subpageIter = ttpage->subpages.cbegin();
 
-        res = &(subpageIter->second);
+        res = &subpageIter->second;
     }
 
     return res;

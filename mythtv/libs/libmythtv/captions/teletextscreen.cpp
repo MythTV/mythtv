@@ -70,7 +70,7 @@ static constexpr std::array<const std::array<const uint8_t,16>,1+8+8> lang_chars
     { 0, 0x23,0xf9,0xe8,0xbb,0xbe,0xfd,0xed,0xf8,0xe9,0xe1,0xec,0xfa,0xb9 }, // #ùè»¾ýíøéáìú¹
     // Rumanian (95%)
     { 0, 0x23,0xa2,0xde,0xc2,0xaa,0xc3,0xce,0x69,0xfe,0xe2,0xba,0xe3,0xee }, // #¢ÞÂªÃÎiþâºãî
-}};
+},};
 
 static QChar cvt_char(char ch, int lang)
 {
@@ -204,7 +204,7 @@ void TeletextScreen::Pulse()
             while (!ok && m_fontStretch > 50)
             {
                 gTTFont->GetFace()->setStretch(m_fontStretch);
-                QFontMetrics font(*(gTTFont->GetFace()));
+                QFontMetrics font(*gTTFont->GetFace());
                 if (font.averageCharWidth() <= max_width || m_fontStretch < 50)
                     ok = true;
                 else
@@ -236,7 +236,7 @@ void TeletextScreen::Pulse()
     m_teletextReader->SetSubPage(ttpage->subpagenum);
 
     int a = 0;
-    if ((ttpage->subtitle) ||
+    if (ttpage->subtitle ||
         (ttpage->flags & (TP_SUPPRESS_HEADER | TP_NEWSFLASH | TP_SUBTITLE)))
     {
         a = 1; // when showing subtitles we don't want to see the teletext

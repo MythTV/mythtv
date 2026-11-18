@@ -253,8 +253,8 @@ int Transcode::TranscodeFile(const QString &inputname,
         LOG(VB_GENERAL, LOG_INFO, QString("New Length     : %1 frames")
                 .arg((long)new_frame_count));
 
-        if ((m_proginfo->QueryIsEditing()) ||
-            (JobQueue::IsJobRunning(JOB_COMMFLAG, *m_proginfo)))
+        if (m_proginfo->QueryIsEditing() ||
+            JobQueue::IsJobRunning(JOB_COMMFLAG, *m_proginfo))
         {
             LOG(VB_GENERAL, LOG_INFO, "Transcoding aborted, cutlist changed");
             SetPlayerContext(nullptr);
@@ -578,9 +578,11 @@ int Transcode::TranscodeFile(const QString &inputname,
     bool stopSignalled = false;
     MythVideoFrame *lastDecode = nullptr;
 
-    while ((!stopSignalled) &&
-           (lastDecode = videoBuffer->GetFrame(did_ff, is_key)))
+    while (!stopSignalled)
     {
+        lastDecode = videoBuffer->GetFrame(did_ff, is_key);
+        if (lastDecode == nullptr)
+            break;
         float new_aspect = lastDecode->m_aspect;
 
         if (cutter)
@@ -760,15 +762,12 @@ int Transcode::TranscodeFile(const QString &inputname,
             while ((ab = arb->GetData(lastWrittenTime)) != nullptr)
             {
                 auto *buf = (unsigned char *)ab->data();
-                if (m_avfMode)
+                if (m_avfMode && (did_ff != 1))
                 {
-                    if (did_ff != 1)
-                    {
-                        std::chrono::milliseconds tc = ab->m_time - timecodeOffset;
-                        avfw->WriteAudioFrame(buf, audioFrame, tc);
+                    std::chrono::milliseconds tc = ab->m_time - timecodeOffset;
+                    avfw->WriteAudioFrame(buf, audioFrame, tc);
 
-                        ++audioFrame;
-                    }
+                    ++audioFrame;
                 }
                 delete ab;
             }
@@ -827,7 +826,7 @@ int Transcode::TranscodeFile(const QString &inputname,
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_INFO)))
+            if ((jobID >= 0) || VERBOSE_LEVEL_CHECK(VB_GENERAL, LOG_INFO))
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {

@@ -181,7 +181,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting y to both maxes */
     *yo = HEIGHT/2;
-    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
+    *angle = (int)(asinf((y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
     *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*k_degrees_to_radians));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -191,7 +191,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *yo = -*yo;
-    *angle = (int)(asinf((float)(y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
+    *angle = (int)(asinf((y-(HEIGHT/2.0F))/(float)*yo)/k_degrees_to_radians);
     *xo = (int)((x-(WIDTH/2.0F))/cosf(*angle*k_degrees_to_radians));
 
     if (*xo >= -wd2 && *xo <= wd2) {
@@ -202,7 +202,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
 
     /* try setting x to both maxes */
     *xo = WIDTH/2;
-    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
+    *angle = (int)(acosf((x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
     *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*k_degrees_to_radians));
 
     if (*yo >= -hd2 && *yo <= hd2) {
@@ -212,7 +212,7 @@ void BumpScope::translate(int x, int y, int *xo, int *yo, int *xd, int *yd,
     }
 
     *xo = -*xo;
-    *angle = (int)(acosf((float)(x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
+    *angle = (int)(acosf((x-(WIDTH/2.0F))/(float)*xo)/k_degrees_to_radians);
     *yo = (int)((y-(HEIGHT/2.0F))/sinf(*angle*k_degrees_to_radians));
 
     /* if this isn't right, it's out of our range and we don't care */

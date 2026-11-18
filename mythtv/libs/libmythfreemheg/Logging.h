@@ -43,7 +43,7 @@ do { \
 do { \
     if (MHLogError & gMHLogoptions) \
         mhlog_fn(__text); \
-    throw "Failed"; \
+    throw std::runtime_error("Failed"); \
 } while (false)
 
 #endif

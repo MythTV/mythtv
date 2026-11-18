@@ -193,7 +193,7 @@ void ASIStreamHandler::run(void)
         ssize_t len = 0;
 
         len = drb->Read(
-            &(buffer[remainder]), buffer_size - remainder);
+            &buffer[remainder], buffer_size - remainder);
 
         if (!m_runningDesired)
             break;
@@ -240,7 +240,7 @@ void ASIStreamHandler::run(void)
         m_listenerLock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
-            memmove(buffer, &(buffer[len - remainder]), remainder);
+            memmove(buffer, &buffer[len - remainder], remainder);
     }
     LOG(VB_RECORD, LOG_INFO, LOC + "run(): " + "shutdown");
 

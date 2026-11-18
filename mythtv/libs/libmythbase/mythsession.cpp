@@ -263,7 +263,7 @@ void MythSessionManager::UpdateSession(const QString& sessionToken)
     {
         MythUserSession session = m_sessionList.value(sessionToken);
         session.Update(); // Update the database
-        m_sessionList[sessionToken] = session; // Update the cache
+        m_sessionList[sessionToken] = std::move(session); // Update the cache
     }
 }
 
@@ -353,7 +353,7 @@ MythUserSession MythSessionManager::CreateUserSession(uint userId,
             QString("%1_%2").arg(type, gCoreContext->GetHostName());
     }
 
-    session.m_sessionClient = clientIdentifier;
+    session.m_sessionClient = std::move(clientIdentifier);
 
     session.m_sessionCreated = MythDate::current();
     session.m_sessionLastActive = MythDate::current();

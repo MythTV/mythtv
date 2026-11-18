@@ -48,7 +48,7 @@ static QSet<QString> kBasicInfoSet {
         "FFmpeg.stream0:.sample_rate",
         "FFmpeg.stream1:.sample_rate",
         "FFmpeg.stream0:.rotate",
-        "FFmpeg.stream1:.rotate" };
+        "FFmpeg.stream1:.rotate", };
 
 //! Constructor
 InfoList::InfoList(MythScreenType &screen)

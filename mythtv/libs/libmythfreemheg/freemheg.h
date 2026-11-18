@@ -80,7 +80,7 @@ enum MHLog : std::uint8_t {
     MHLogScenes = 8,        // Print each application and scene
     MHLogActions = 16,      // Print each action before it is run.
     MHLogLinks = 32,        // Print each link when it is fired and each event as it is queued
-    MHLogDetail = 64        // Detailed evaluation of each action.
+    MHLogDetail = 64,        // Detailed evaluation of each action.
 };
 
 #define MHLogAll (MHLogError|MHLogWarning|MHLogNotifications|MHLogScenes|MHLogActions|MHLogLinks|MHLogDetail)

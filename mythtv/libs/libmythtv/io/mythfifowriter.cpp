@@ -126,7 +126,7 @@ bool MythFIFOWriter::FIFOInit(uint Id, const QString& Desc, const QString& Name,
     m_filename[Id]   = Name;
     m_fbDesc[Id]     = Desc;
     m_killWr[Id]     = 0;
-    m_fbCount[Id]    = (m_useSync) ? 2 : NumBufs;
+    m_fbCount[Id]    = m_useSync ? 2 : NumBufs;
     m_fbMaxCount[Id] = 512;
     m_fifoBuf[Id]    = new MythFifoBuffer;
     struct MythFifoBuffer *fifoptr = m_fifoBuf[Id];

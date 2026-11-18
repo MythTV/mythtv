@@ -53,7 +53,7 @@ enum MythBufferType : std::uint8_t
     kMythBufferBD,
     kMythBufferHTTP,
     kMythBufferHLS,
-    kMythBufferMHEG
+    kMythBufferMHEG,
 };
 
 class MTV_PUBLIC MythMediaBuffer : protected MThread

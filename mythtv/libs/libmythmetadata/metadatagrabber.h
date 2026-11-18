@@ -23,7 +23,7 @@ enum GrabberType : std::uint8_t {
     kGrabberTelevision,
     kGrabberMusic,
     kGrabberGame,
-    kGrabberInvalid
+    kGrabberInvalid,
 };
 
 class META_PUBLIC MetaGrabberScript

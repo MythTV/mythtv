@@ -233,7 +233,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 			fvitesse >>= 10;
 			break;
 		case SPEEDWAY_MODE:
-			fvitesse -= (ShiftRight(vy,10-EFFECT_DISTORS_SL));
+			fvitesse -= ShiftRight(vy,10-EFFECT_DISTORS_SL);
 			break;
 		}
 

@@ -20,7 +20,7 @@ enum ImageTransitionType : std::uint8_t {
     kSlideTransition   = 4,
     kZoomTransition    = 5,
     kSpinTransition    = 6,
-    kLastTransSentinel = 7  // Must be last
+    kLastTransSentinel = 7,  // Must be last
 };
 
 

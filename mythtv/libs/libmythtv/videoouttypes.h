@@ -20,7 +20,7 @@ enum : std::uint16_t
     kDisplayRawTextSubtitle     = 0x080,
     kDisplayAllCaptions         = 0x0FF,
     kDisplayTeletextMenu        = 0x100,
-    kDisplayAllTextCaptions     = ~kDisplayDVDButton & kDisplayAllCaptions
+    kDisplayAllTextCaptions     = ~kDisplayDVDButton & kDisplayAllCaptions,
 };
 
 /*! \brief Return whether any *optional* captions are enabled
@@ -54,7 +54,7 @@ enum ZoomDirection : std::uint8_t
     kZoomRight,
     kZoomAspectUp,
     kZoomAspectDown,
-    kZoom_END
+    kZoom_END,
 };
 
 enum AspectOverrideMode : std::int8_t
@@ -65,7 +65,7 @@ enum AspectOverrideMode : std::int8_t
     kAspect_16_9   = 2,
     kAspect_14_9   = 3, // added after 16:9 so as not to upset existing setups.
     kAspect_2_35_1 = 4,
-    kAspect_END    = 5
+    kAspect_END    = 5,
 };
 
 enum AdjustFillMode : std::int8_t
@@ -88,7 +88,7 @@ enum LetterBoxColour : std::int8_t
     kLetterBoxColour_Toggle = -1,
     kLetterBoxColour_Black = 0,
     kLetterBoxColour_Gray25 = 1,
-    kLetterBoxColour_END = 2
+    kLetterBoxColour_END = 2,
 };
 
 enum FrameScanType : std::int8_t
@@ -110,7 +110,7 @@ enum PictureAttribute : std::uint8_t
     kPictureAttribute_Hue = 4,
     kPictureAttribute_Range = 5,
     kPictureAttribute_Volume = 6,
-    kPictureAttribute_MAX = 7
+    kPictureAttribute_MAX = 7,
 };
 
 enum PictureAttributeSupported : std::uint8_t
@@ -136,14 +136,14 @@ enum StereoscopicMode : std::uint8_t
     kStereoscopicModeAuto,
     kStereoscopicModeIgnore3D,
     kStereoscopicModeSideBySideDiscard,
-    kStereoscopicModeTopAndBottomDiscard
+    kStereoscopicModeTopAndBottomDiscard,
 };
 
 enum PrimariesMode : std::uint8_t
 {
     PrimariesDisabled = 0,
     PrimariesRelaxed,
-    PrimariesExact
+    PrimariesExact,
 };
 
 inline QString toUserString(PrimariesMode Mode)
@@ -349,7 +349,7 @@ inline PictureAttributeSupported toMask(PictureAttribute PictureAttribute)
 
 inline PictureAttribute next_picattr(PictureAttributeSupported Supported, PictureAttribute Attribute)
 {
-    int i = static_cast<int>(Attribute + 1) % static_cast<int>(kPictureAttribute_MAX);
+    int i = (Attribute + 1) % kPictureAttribute_MAX;
     for (int j = 0; j < kPictureAttribute_MAX; (i = (i +1 ) % kPictureAttribute_MAX), j++)
         if (toMask(static_cast<PictureAttribute>(i)) & Supported)
             return static_cast<PictureAttribute>(i);

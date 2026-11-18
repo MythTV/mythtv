@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 #else
     QObject::connect(&stdinNotifier,
                      &StdinNotifier::apiVersionRequested,
-                     [&stderrStream]()
+                     [&stderrStream]
                      {
                          stderrStream << "OK:3\n";
                          stderrStream.flush();

@@ -78,11 +78,11 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
     QString sSecurityPin = gCoreContext->GetSetting( "SecurityPin", "");
 
     if ( sSecurityPin.isEmpty() )
-        throw( QString( "No Security Pin assigned. Run mythtv-setup to set one." ));
+        throw std::runtime_error("No Security Pin assigned. Run mythtv-setup to set one.");
         //SB: UPnPResult_HumanInterventionRequired,
 
     if ((sSecurityPin != "0000" ) && ( sPin != sSecurityPin ))
-        throw( QString( "Not Authorized" ));
+        throw std::runtime_error("Not Authorized");
         //SB: UPnPResult_ActionNotAuthorized );
 
     DatabaseParams params = GetMythDB()->GetDatabaseParams();
@@ -100,7 +100,7 @@ V2ConnectionInfo* V2Myth::GetConnectionInfo( const QString  &sPin )
       && !sServerIP.isEmpty())  // &&
         //(sServerIP         != sPeerIP    ))
     {
-        params.m_dbHostName = sServerIP;
+        params.m_dbHostName = std::move(sServerIP);
     }
 
     // If dbHostName is an IPV6 address with scope,
@@ -167,10 +167,10 @@ bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, con
         port = Port;
 
     if (DoTest && !TestDatabase(Host, UserName, Password, db, port))
-        throw( QString( "Database test failed. Not saving database connection information." ));
+        throw std::runtime_error("Database test failed. Not saving database connection information.");
 
     DatabaseParams dbparms;
-    dbparms.m_dbName = db;
+    dbparms.m_dbName = std::move(db);
     dbparms.m_dbUserName = UserName;
     dbparms.m_dbPassword = Password;
     dbparms.m_dbHostName = Host;
@@ -194,7 +194,7 @@ bool V2Myth::SetConnectionInfo(const QString &Host, const QString &UserName, con
 QString V2Myth::GetHostName( )
 {
     if (!gCoreContext)
-        throw( QString( "No MythCoreContext in GetHostName." ));
+        throw std::runtime_error("No MythCoreContext in GetHostName.");
 
     return gCoreContext->GetHostName();
 }
@@ -208,7 +208,7 @@ QStringList V2Myth::GetHosts( )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString( "Database not open while trying to load list of hosts" ));
+        throw std::runtime_error( "Database not open while trying to load list of hosts");
 
     query.prepare(
         "SELECT DISTINCTROW hostname "
@@ -219,7 +219,7 @@ QStringList V2Myth::GetHosts( )
     {
         MythDB::DBError("MythAPI::GetHosts()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -243,7 +243,7 @@ QStringList V2Myth::GetKeys()
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to load settings"));
+        throw std::runtime_error("Database not open while trying to load settings");
 
     query.prepare("SELECT DISTINCTROW value FROM settings;" );
 
@@ -251,7 +251,7 @@ QStringList V2Myth::GetKeys()
     {
         MythDB::DBError("MythAPI::GetKeys()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -293,8 +293,8 @@ V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Storage Group Dirs"));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Storage Group Dirs");
 
     if (!sGroupName.isEmpty() && !sHostName.isEmpty())
     {
@@ -332,7 +332,7 @@ V2StorageGroupDirList* V2Myth::GetStorageGroupDirs( const QString &sGroupName,
     {
         MythDB::DBError("MythAPI::GetStorageGroupDirs()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -370,17 +370,17 @@ bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to add Storage Group "
-                       "dir"));
+        throw std::runtime_error("Database not open while trying to add "
+                       "Storage Group dir");
 
     if (sGroupName.isEmpty())
-        throw ( QString( "Storage Group Required" ));
+        throw  std::runtime_error("Storage Group Required");
 
     if (sDirName.isEmpty())
-        throw ( QString( "Directory Name Required" ));
+        throw std::runtime_error("Directory Name Required");
 
     if (sHostName.isEmpty())
-        throw ( QString( "HostName Required" ));
+        throw std::runtime_error("HostName Required");
 
     query.prepare("SELECT COUNT(*) "
                   "FROM storagegroup "
@@ -394,14 +394,11 @@ bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
     {
         MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
-    if (query.next())
-    {
-        if (query.value(0).toInt() > 0)
-            return false;
-    }
+    if (query.next() && (query.value(0).toInt() > 0))
+        return false;
 
     query.prepare("INSERT storagegroup "
                   "( groupname, dirname, hostname ) "
@@ -415,7 +412,7 @@ bool V2Myth::AddStorageGroupDir( const QString &sGroupName,
     {
         MythDB::DBError("MythAPI::AddStorageGroupDir()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     return true;
@@ -432,17 +429,17 @@ bool V2Myth::RemoveStorageGroupDir( const QString &sGroupName,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to remove Storage "
-                       "Group dir"));
+        throw std::runtime_error("Database not open while trying to remove "
+                                 "Storage Group dir");
 
     if (sGroupName.isEmpty())
-        throw ( QString( "Storage Group Required" ));
+        throw std::runtime_error("Storage Group Required");
 
     if (sDirName.isEmpty())
-        throw ( QString( "Directory Name Required" ));
+        throw std::runtime_error("Directory Name Required");
 
     if (sHostName.isEmpty())
-        throw ( QString( "HostName Required" ));
+        throw std::runtime_error("HostName Required");
 
     query.prepare("DELETE "
                   "FROM storagegroup "
@@ -456,7 +453,7 @@ bool V2Myth::RemoveStorageGroupDir( const QString &sGroupName,
     {
         MythDB::DBError("MythAPI::RemoveStorageGroupDir()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     return true;
@@ -521,7 +518,7 @@ QDateTime V2Myth::ParseISODateString(const QString& DateTime)
     auto dateTime = QDateTime::fromString(DateTime, Qt::ISODate);
 
     if (!dateTime.isValid())
-        throw QString( "Unable to parse DateTime" );
+        throw std::runtime_error("Unable to parse DateTime");
 
     return dateTime;
 }
@@ -553,7 +550,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
     {
         MythDB::DBError("Retrieving log host names", query);
         delete pList;
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     while (query.next())
     {
@@ -569,7 +566,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
     {
         MythDB::DBError("Retrieving log applications", query);
         delete pList;
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     while (query.next())
     {
@@ -611,18 +608,18 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
 #endif
         query.prepare(sql);
 
-        query.bindValue(":HOSTNAME", (HostName.isEmpty()) ? QString() : HostName);
-        query.bindValue(":APPLICATION", (Application.isEmpty()) ? QString() :
+        query.bindValue(":HOSTNAME", HostName.isEmpty() ? QString() : HostName);
+        query.bindValue(":APPLICATION", Application.isEmpty() ? QString() :
                                                                   Application);
         query.bindValue(":PID", ( PID == 0 ) ? ullNull : (qint64)PID);
         query.bindValue(":TID", ( TID == 0 ) ? ullNull : (qint64)TID);
-        query.bindValue(":THREAD", (Thread.isEmpty()) ? QString() : Thread);
-        query.bindValue(":FILENAME", (Filename.isEmpty()) ? QString() : Filename);
+        query.bindValue(":THREAD", Thread.isEmpty() ? QString() : Thread);
+        query.bindValue(":FILENAME", Filename.isEmpty() ? QString() : Filename);
         query.bindValue(":LINE", ( Line == 0 ) ? ullNull : (qint64)Line);
-        query.bindValue(":FUNCTION", (Function.isEmpty()) ? QString() : Function);
-        query.bindValue(":FROMTIME", (FromTime.isValid()) ? FromTime : QDateTime());
-        query.bindValue(":TOTIME", (ToTime.isValid()) ? ToTime : QDateTime());
-        query.bindValue(":LEVEL", (Level.isEmpty()) ? ullNull :
+        query.bindValue(":FUNCTION", Function.isEmpty() ? QString() : Function);
+        query.bindValue(":FROMTIME", FromTime.isValid() ? FromTime : QDateTime());
+        query.bindValue(":TOTIME", ToTime.isValid() ? ToTime : QDateTime());
+        query.bindValue(":LEVEL", Level.isEmpty() ? ullNull :
                                         (qint64)logLevelGet(Level));
 
         if (!MsgContains.isEmpty())
@@ -634,7 +631,7 @@ V2LogMessageList* V2Myth::GetLogs( const QString   &HostName,
         {
             MythDB::DBError("Retrieving log messages", query);
             delete pList;
-            throw( QString( "Database Error executing query." ));
+            throw std::runtime_error("Database Error executing query.");
         }
 
         while (query.next())
@@ -681,7 +678,7 @@ QString V2Myth::GetSetting( const QString &sHostName,
                             const QString &sDefault )
 {
     if (sKey.isEmpty())
-        throw( QString("Missing or empty Key (settings.value)") );
+        throw std::runtime_error("Missing or empty Key (settings.value)");
 
     if (sHostName == "_GLOBAL_")
     {
@@ -696,7 +693,7 @@ QString V2Myth::GetSetting( const QString &sHostName,
         if (!query.exec())
         {
             MythDB::DBError("API Myth/GetSetting ", query);
-            throw( QString( "Database Error executing query." ));
+            throw std::runtime_error("Database Error executing query.");
         }
 
         return query.next() ? query.value(0).toString() : sDefault;
@@ -721,8 +718,8 @@ V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
 
     if (!query.isConnected())
     {
-        throw( QString("Database not open while trying to load settings for host: %1")
-                  .arg( sHostName ));
+        throw std::runtime_error(QString("Database not open while trying to load settings for host: %1")
+                                 .arg(sHostName).toStdString());
     }
 
     auto *pList = new V2SettingList();
@@ -753,7 +750,7 @@ V2SettingList* V2Myth::GetSettingList(const QString &sHostName)
         delete pList;
 
         MythDB::DBError("MythAPI::GetSetting() w/o key ", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     while (query.next())
@@ -780,7 +777,7 @@ bool V2Myth::PutSetting( const QString &sHostName,
             authorization = m_request->m_queries.value("authorization",{});
         MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
         if (sessionManager->GetSession(authorization).GetUserName() != "admin")
-            throw  QString ("Forbidden: PutSetting " + sKey);
+            throw  std::runtime_error(QString("Forbidden: PutSetting " + sKey).toStdString());
     }
 
     if (hostName == "_GLOBAL_")
@@ -791,7 +788,7 @@ bool V2Myth::PutSetting( const QString &sHostName,
         return gCoreContext->SaveSettingOnHost( sKey, sValue, hostName );
     }
 
-    throw ( QString( "Key Required" ));
+    throw std::runtime_error("Key Required");
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -811,7 +808,7 @@ bool V2Myth::DeleteSetting( const QString &sHostName,
         return gCoreContext->GetDB()->ClearSettingOnHost( sKey, hostName );
     }
 
-    throw ( QString( "Key Required" ));
+    throw std::runtime_error("Key Required");
 }
 
 
@@ -1211,8 +1208,9 @@ bool V2Myth::ManageDigestUser( const QString &sAction,
         sessionAction = DIGEST_USER_CHANGE_PW;
         if (sPassword.isEmpty() && loggedInUser != "admin" && !loggedInUser.isEmpty())
         {
-            throw  QString ("Forbidden: ManageDigestUser "
-                + loggedInUser + " Old Password required");
+            throw  std::runtime_error(QString("Forbidden: ManageDigestUser "
+                                               + loggedInUser + " Old Password required")
+                                      .toStdString());
         }
     }
     else
@@ -1226,7 +1224,9 @@ bool V2Myth::ManageDigestUser( const QString &sAction,
     if (!loggedInUser.isEmpty()
         && loggedInUser != "admin" && loggedInUser != sUserName)
     {
-        throw  QString ("Forbidden: ManageDigestUser " + sessionManager->GetSession(authorization).GetUserName());
+        throw  std::runtime_error(QString("Forbidden: ManageDigestUser " +
+                                          sessionManager->GetSession(authorization).GetUserName())
+                                  .toStdString());
     }
 
     return sessionManager->ManageDigestUser(sessionAction, sUserName,
@@ -1264,7 +1264,7 @@ QStringList V2Myth::GetUsers()
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString( "Database not open while trying to load list of users" ));
+        throw std::runtime_error("Database not open while trying to load list of users");
 
     query.prepare(
         "SELECT username "
@@ -1274,7 +1274,7 @@ QStringList V2Myth::GetUsers()
     {
         MythDB::DBError("V2Myth::GetUsers()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -1355,7 +1355,7 @@ bool V2Myth::ManageScheduler ( bool Enable, bool Disable )
 {
     auto *scheduler = dynamic_cast<Scheduler*>(gCoreContext->GetScheduler());
     if (scheduler == nullptr)
-        throw QString("Scheduler is null");
+        throw std::runtime_error("Scheduler is null");
     // One and only one of enable and disable must be supplied
     if (Enable == Disable)
         return false;

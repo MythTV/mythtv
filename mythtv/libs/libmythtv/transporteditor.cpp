@@ -311,9 +311,9 @@ void TransportListEditor::Load()
             auto *transport = new TransportSetting(txt, query.value(0).toUInt(),
                                                    m_sourceid, m_cardtype);
             connect(transport, &TransportSetting::deletePressed,
-                    this, [transport, this] () { Delete(transport); });
+                    this, [transport, this] { Delete(transport); });
             connect(transport, &TransportSetting::openMenu,
-                    this, [transport, this] () { Menu(transport); });
+                    this, [transport, this] { Menu(transport); });
             addChild(transport);
             m_list.push_back(transport);
         }
@@ -374,7 +374,7 @@ void TransportListEditor::Menu(TransportSetting *transport)
         return;
 
     auto *menu = new MythMenu(tr("Transport Menu"), this, "transportmenu");
-    menu->AddItem(tr("Delete..."), [transport, this] () { Delete(transport); });
+    menu->AddItem(tr("Delete..."), [transport, this] { Delete(transport); });
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 

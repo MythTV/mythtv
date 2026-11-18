@@ -39,15 +39,15 @@ std::array<unsigned int,4> slotsPerLayer {12, 144, 0, 0};
 std::array<std::array<unsigned int,16>,3> bitrates {{
  {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,0},
  {0,32,48,56,64,80,96,112,128,160,192,224,256,320,384,0},
- {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0}
-}};
+ {0,32,40,48,56,64,80,96,112,128,160,192,224,256,320,0},
+},};
 
 static const std::array<const uint32_t,4> freq    {441, 480, 320, 0};
 static const std::array<const uint64_t,4> samples {384, 1152, 1152, 1536};
 
 static const std::array<const uint16_t,32> ac3_bitrates
     {32,40,48,56,64,80,96,112,128,160,192,224,256,320,384,448,512,576,640,
-     0,0,0,0,0,0,0,0,0,0,0,0,0};
+     0,0,0,0,0,0,0,0,0,0,0,0,0,};
 static const std::array<const uint8_t,12> ac3half  {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3};
 static const std::array<const uint32_t,4> ac3_freq {480, 441, 320, 0};
 
@@ -211,7 +211,7 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
 	if (ring_peek(rbuf, buf, off) < 0) return -2;
 	
 	s->h_size	= ((headr[1] &0xF0) >> 4) | (headr[0] << 4);
-	s->v_size	= ((headr[1] &0x0F) << 8) | (headr[2]);
+	s->v_size	= ((headr[1] &0x0F) << 8) | headr[2];
     
         int sw = ((headr[3]&0xF0) >> 4) ;
 
@@ -251,7 +251,7 @@ int get_video_info(ringbuffer *rbuf, sequence_t *s, int off, int le)
             LOG(VB_GENERAL, LOG_DEBUG,
                 QString("  size = %1x%2").arg(s->h_size).arg(s->v_size));
 
-        sw = (int)(headr[3]&0x0F);
+        sw = (headr[3]&0x0F);
 
         switch ( sw ) {
 	case 1:
@@ -368,7 +368,8 @@ int find_audio_sync(ringbuffer *rbuf, audio_sync_buf &buf, int off, int type, in
 				if (mring_peek(rbuf, buf.data(), l, c-1) < -1)
 					return -2;
 				return c-1-off;	
-			} else if ( b != b1) {
+			}
+			if ( b != b1) {
 				found = 0;
 			}
 		}
@@ -412,7 +413,8 @@ int find_audio_s(const uint8_t *rbuf, int off, int type, int le)
 		case 1:
 			if ( (b&m2) == b2){
 				return c-1;	
-			} else if ( b != b1) {
+			}
+			if ( b != b1) {
 				found = 0;
 			}
 		}

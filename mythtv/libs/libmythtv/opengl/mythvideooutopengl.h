@@ -17,7 +17,7 @@ class MythVideoOutputOpenGL : public MythVideoOutputGPU
     enum TextureFormats : std::uint8_t
     {
         AllFormats    = 0,
-        LegacyFormats = 1
+        LegacyFormats = 1,
     };
 
     MythVideoOutputOpenGL(MythMainWindow* MainWindow, MythRenderOpenGL* Render,

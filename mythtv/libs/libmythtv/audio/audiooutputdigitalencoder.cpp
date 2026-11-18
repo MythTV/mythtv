@@ -128,7 +128,7 @@ bool AudioOutputDigitalEncoder::Init(
 
     m_avContext->bit_rate       = bitrate;
     m_avContext->sample_rate    = samplerate;
-    av_channel_layout_default(&(m_avContext->ch_layout), channels);
+    av_channel_layout_default(&m_avContext->ch_layout, channels);
     m_avContext->sample_fmt     = FFMPEG_SAMPLE_FORMAT;
 
     // open it
@@ -241,7 +241,7 @@ int AudioOutputDigitalEncoder::Encode(void *input, int len, AudioFormat format)
     m_frame->nb_samples = m_avContext->frame_size;
     m_frame->pts        = AV_NOPTS_VALUE;
     m_frame->format         = m_avContext->sample_fmt;
-    av_channel_layout_copy(&(m_frame->ch_layout), &(m_avContext->ch_layout));
+    av_channel_layout_copy(&m_frame->ch_layout, &m_avContext->ch_layout);
     m_frame->sample_rate = m_avContext->sample_rate;
 
     if (frames > 0)

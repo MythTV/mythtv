@@ -101,20 +101,20 @@ static const std::array<two_speaker_set,8> stereo_matrix
 //1F      L                R
     {{
         { 1,               1 },                 // M
-    }},
+    },},
 
 //2F      L                R
     {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
-    }},
+    },},
 
 //3F      L                R
     {{
         { 1,               0 },                 // L
         { 0,               1 },                 // R
         { 1,               1 },                 // C
-    }},
+    },},
 
 //3F1R    L                R
     {{
@@ -122,7 +122,7 @@ static const std::array<two_speaker_set,8> stereo_matrix
         { 0,               1 },                 // R
         { m3db,            m3db },              // C
         { mm3db,           m3db },              // S
-    }},
+    },},
 
 //3F2R    L                R
     {{
@@ -131,7 +131,7 @@ static const std::array<two_speaker_set,8> stereo_matrix
         { m3db,            m3db },              // C
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    }},
+    },},
 
 //3F2R.1  L                R
     {{
@@ -141,7 +141,7 @@ static const std::array<two_speaker_set,8> stereo_matrix
         { 0,               0 },                 // LFE
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    }},
+    },},
 
 // 3F3R.1 L                R
     {{
@@ -152,7 +152,7 @@ static const std::array<two_speaker_set,8> stereo_matrix
         { m6db,            m6db },              // Cs
         { sqrt_2_3,        msqrt_1_3 },         // LS
         { msqrt_1_3,       sqrt_2_3 },          // RS
-    }},
+    },},
 
 // 3F4R.1 L                R
     {{
@@ -164,8 +164,8 @@ static const std::array<two_speaker_set,8> stereo_matrix
         { msqrt_1_3bym3db, sqrt_2_3by3db },     // Rrs
         { sqrt_2_3by3db,   msqrt_1_3bym3db },   // LS
         { msqrt_1_3bym3db, sqrt_2_3by3db },     // RS
-    }}
-}};
+    },},
+},};
 
 using six_speaker_ratio = std::array<float,6>;
 using six_speaker_set   = std::array<six_speaker_ratio,8>;
@@ -180,7 +180,7 @@ static const std::array<six_speaker_set,3> s51_matrix
         { 0, 0, 0, 1,       0,       0 },     // LFE
         { 0, 0, 0, 0,       1,       0 },     // LS
         { 0, 0, 0, 0,       0,       1 },     // RS
-    }},
+    },},
     // 3F3R.1 in -> 3F2R.1 out
     // Used coefficient found at http://www.yamahaproaudio.com/training/self_training/data/smqr_en.pdf
     // L  R  C  LFE         LS       RS
@@ -192,7 +192,7 @@ static const std::array<six_speaker_set,3> s51_matrix
         { 0, 0, 0, 0,       m3db,    m3db },  // Cs
         { 0, 0, 0, 0,       1,       0 },     // LS
         { 0, 0, 0, 0,       0,       1 },     // RS
-    }},
+    },},
     // 3F4R.1 -> 3F2R.1 out
     // L  R  C  LFE         LS       RS
     {{
@@ -204,8 +204,8 @@ static const std::array<six_speaker_set,3> s51_matrix
         { 0, 0, 0, 0,       0,       m3db },  // Rrs
         { 0, 0, 0, 0,       m3db,    0 },     // LS
         { 0, 0, 0, 0,       0,       m3db },  // RS
-    }}
-}};
+    },},
+},};
 
 static int DownmixFrames(int channels_in, int  channels_out,
                                       float *dst, const float *src, int frames)
@@ -955,7 +955,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (m_needsDownmix && m_sourceChannels > 8)
     {
         QString message {QCoreApplication::translate("AudioOutputBase",
-            "Aborting Audio Reconfigure. Can't handle audio with more than 8 channels.")};
+            "Aborting Audio Reconfigure. Can't handle audio with more than 8 channels."),};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
         return;
@@ -1013,7 +1013,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (error)
         {
             QString message {QCoreApplication::translate("AudioOutputBase", "Error creating resampler: %1")
-                .arg(src_strerror(error))};
+                .arg(src_strerror(error)),};
             dispatchError(message);
             LOG(VB_GENERAL, LOG_ERR, message);
             m_srcCtx = nullptr;

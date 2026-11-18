@@ -218,7 +218,7 @@ class MHDivide: public MHIntegerAction {
     MHDivide(): MHIntegerAction(":Divide") {}
   protected:
     int DoOp(int arg1, int arg2) override { // MHIntegerAction
-        if (arg2 == 0) throw "Divide by 0";
+        if (arg2 == 0) throw std::runtime_error("Divide by 0");
         return arg1/arg2;
     }
 };

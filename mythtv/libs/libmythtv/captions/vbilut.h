@@ -7,7 +7,7 @@ enum vbimode : std::uint8_t
 {
     VBI_IVTV,        /// < IVTV packet
     VBI_DVB,         /// < DVB packet
-    VBI_DVB_SUBTITLE /// < DVB subtitle packet
+    VBI_DVB_SUBTITLE, /// < DVB subtitle packet
 };
 
 int hamm8(const uint8_t *p, int *err);

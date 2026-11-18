@@ -672,7 +672,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
         filter = conj + filter;
         conj = " and ";
     }
-    if ((childLevel == "gamename") && (m_gameShowFileName))
+    if ((childLevel == "gamename") && m_gameShowFileName)
     {
         columns = childIsLeaf
                     ? "romname,`system`,year,genre,gamename"
@@ -744,7 +744,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
 
     QString sql;
 
-    if ((childLevel == "gamename") && (m_gameShowFileName))
+    if ((childLevel == "gamename") && m_gameShowFileName)
     {
         sql = "select distinct "
                 + columns

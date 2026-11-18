@@ -42,7 +42,7 @@ class VBox
         REQUEST_REJECTED = 5,
         MISSING_METHOD = 6,
         REQUEST_TIMEOUT = 7,
-        REQUEST_ABOTRED = 8
+        REQUEST_ABOTRED = 8,
     };
 
     static bool sendQuery(const QString &query, QDomDocument *xmlDoc);

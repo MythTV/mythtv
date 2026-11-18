@@ -27,7 +27,7 @@ enum frameMaskValues : std::uint8_t {
     COMM_FRAME_SCENE_CHANGE  = 0x0004,
     COMM_FRAME_LOGO_PRESENT  = 0x0008,
     COMM_FRAME_ASPECT_CHANGE = 0x0010,
-    COMM_FRAME_RATING_SYMBOL = 0x0020
+    COMM_FRAME_RATING_SYMBOL = 0x0020,
 };
 
 class FrameInfoEntry

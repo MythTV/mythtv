@@ -125,7 +125,7 @@ class MTV_PUBLIC RecordingProfile : public GroupSetting
         CRCIGroup            = 14,
         ASIGroup             = 15,
         OCURGroup            = 16,
-        CetonGroup           = 17
+        CetonGroup           = 17,
     };
 
     static QMap<int, QString> GetProfiles(RecProfileGroup group = AllGroups);

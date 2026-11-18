@@ -149,6 +149,6 @@ const genre_table_array genre_table
        "Thrash Metal",
        "Anime",
        "JPop",
-       "Synthpop"
+       "Synthpop",
 };
 

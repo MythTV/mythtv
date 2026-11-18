@@ -175,14 +175,12 @@ bool AudioInputALSA::PrepHwParams(void)
         uint rate_num = 0;
         uint rate_den = 0;
         if (!AlsaBad(snd_pcm_hw_params_get_rate_numden(hwparams, &rate_num,
-                     &rate_den), "snd_pcm_hw_params_get_rate_numden failed"))
+                     &rate_den), "snd_pcm_hw_params_get_rate_numden failed") &&
+            (m_audioSampleRate != (int)(rate_num / rate_den)))
         {
-            if (m_audioSampleRate != (int)(rate_num / rate_den))
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
-                    QString("device reports sample rate as %1")
-                        .arg(rate_num / rate_den));
-            }
+            LOG(VB_GENERAL, LOG_ERR, LOC_DEV +
+                QString("device reports sample rate as %1")
+                .arg(rate_num / rate_den));
         }
         return false;
     }
@@ -249,13 +247,10 @@ int AudioInputALSA::PcmRead(void* buf, uint nbytes)
     while (nframes > 0 && retries < 3)
     {
         avail = snd_pcm_avail_update(m_pcmHandle);
-        if (AlsaBad(avail, "available update failed"))
+        if (AlsaBad(avail, "available update failed") && !Recovery(avail))
         {
-            if (!Recovery(avail))
-            {
-                ++retries;
-                continue;
-            }
+            ++retries;
+            continue;
         }
         nread = snd_pcm_readi(m_pcmHandle, bufptr, nframes);
         if (nread < 0)

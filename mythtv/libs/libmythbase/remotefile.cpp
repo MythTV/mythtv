@@ -493,13 +493,11 @@ bool RemoteFile::Exists(const QString &url, struct stat *fileinfo)
             fullFilePath = url;
         }
 
-        if (fileExists)
+        if (fileExists &&
+            (stat(fullFilePath.toLocal8Bit().constData(), fileinfo) == -1))
         {
-            if (stat(fullFilePath.toLocal8Bit().constData(), fileinfo) == -1)
-            {
-                LOG(VB_FILE, LOG_ERR,
-                    QString("RemoteFile::Exists(): failed to stat file: %1").arg(fullFilePath) + ENO);
-            }
+            LOG(VB_FILE, LOG_ERR,
+                QString("RemoteFile::Exists(): failed to stat file: %1").arg(fullFilePath) + ENO);
         }
 
         return fileExists;
@@ -1378,12 +1376,10 @@ QStringList RemoteFile::FindFileList(const QString& filename, const QString& hos
                 << (useRegex ? "1" : "0")
                 << "1";
 
-        if (gCoreContext->SendReceiveStringList(strList))
-        {
-            if (!strList.empty() && !strList[0].isEmpty() &&
-                strList[0] != "NOT FOUND" && !strList[0].startsWith("ERROR: "))
-                return strList;
-        }
+        if (gCoreContext->SendReceiveStringList(strList) &&
+            !strList.empty() && !strList[0].isEmpty() &&
+            strList[0] != "NOT FOUND" && !strList[0].startsWith("ERROR: "))
+            return strList;
     }
 
     return {};

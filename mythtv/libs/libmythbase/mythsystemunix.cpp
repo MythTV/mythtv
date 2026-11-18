@@ -763,12 +763,9 @@ void MythSystemLegacyUnix::Term(bool force)
     }
 
     Signal(SIGTERM);
-    if( force )
-    {
+    if( force && ( m_parent->Wait(1s) == GENERIC_EXIT_RUNNING ))
         // send KILL if it does not exit within one second
-        if( m_parent->Wait(1s) == GENERIC_EXIT_RUNNING )
-            Signal(SIGKILL);
-    }
+        Signal(SIGKILL);
 }
 
 void MythSystemLegacyUnix::Signal( int sig )
@@ -1000,14 +997,11 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
                                  "\n\t\t\tfailed to duplicate file descriptor: "
                               << strerror(errno) << '\n';
                 }
-                if (fd != 0)    // if fd was zero, do not close
+                if ((fd != 0) && (close(fd) < 0))    // if fd was zero, do not close
                 {
-                    if (close(fd) < 0)
-                    {
-                        std::cerr << locerr
-                                  << "Unable to close stdin redirect /dev/null: "
-                                  << strerror(errno) << '\n';
-                    }
+                    std::cerr << locerr
+                              << "Unable to close stdin redirect /dev/null: "
+                              << strerror(errno) << '\n';
                 }
             }
             else
@@ -1044,14 +1038,11 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
                                  "\n\t\t\tfailed to duplicate file descriptor: "
                               << strerror(errno) << '\n';
                 }
-                if (fd != 1)    // if fd was one, do not close
+                if ((fd != 1) && (close(fd) < 0))    // if fd was one, do not close
                 {
-                   if (close(fd) < 0)
-                   {
-                       std::cerr << locerr
-                                 << "Unable to close stdout redirect /dev/null: "
-                                 << strerror(errno) << '\n';
-                   }
+                    std::cerr << locerr
+                              << "Unable to close stdout redirect /dev/null: "
+                              << strerror(errno) << '\n';
                 }
             }
             else
@@ -1088,14 +1079,11 @@ void MythSystemLegacyUnix::Fork(std::chrono::seconds timeout)
                                  "\n\t\t\tfailed to duplicate file descriptor: "
                               << strerror(errno) << '\n';
                 }
-                if (fd != 2)    // if fd was two, do not close
+                if ((fd != 2) && (close(fd) < 0))    // if fd was two, do not close
                 {
-                   if (close(fd) < 0)
-                   {
-                       std::cerr << locerr
-                                 << "Unable to close stderr redirect /dev/null: "
-                                 << strerror(errno) << '\n';
-                   }
+                    std::cerr << locerr
+                              << "Unable to close stderr redirect /dev/null: "
+                              << strerror(errno) << '\n';
                 }
             }
             else

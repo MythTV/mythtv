@@ -51,7 +51,7 @@ bool MythPlayerVideoUI::InitVideo()
     }
 
     // Toggle detect letter box
-    auto toggleDetectLetterbox = [&]()
+    auto toggleDetectLetterbox = [&]
     {
         if (m_videoOutput)
         {

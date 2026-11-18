@@ -163,7 +163,7 @@ struct metadata_sort
 
     bool operator()(const smart_meta_node &lhs, const smart_meta_node &rhs)
     {
-        return m_vfs.meta_less_than(*(lhs->getData()), *(rhs->getData()));
+        return m_vfs.meta_less_than(*lhs->getData(), *rhs->getData());
     }
 
   private:
@@ -222,14 +222,11 @@ static meta_dir_node *AddMetadataToDir(VideoMetadata *metadata,
     QString host = metadata->GetHost();
     QString prefix = metadata->GetPrefix();
 
-    if (hint)
+    if (hint && metadata->GetFilename().startsWith(hint->getFQPath() + "/"))
     {
-        if (metadata->GetFilename().startsWith(hint->getFQPath() + "/"))
-        {
-            start = hint;
-            insert_chunk =
-                metadata->GetFilename().mid(hint->getFQPath().length());
-        }
+        start = hint;
+        insert_chunk =
+            metadata->GetFilename().mid(hint->getFQPath().length());
     }
 
     if (insert_chunk.startsWith(dir->getFQPath() + "/"))
@@ -335,7 +332,7 @@ class VideoListImp
                               ltDBYearGroup, ltDBDirectorGroup,
                               ltDBStudioGroup, ltDBCastGroup,
                               ltDBUserRatingGroup, ltDBInsertDateGroup,
-                              ltTVMetadata};
+                              ltTVMetadata,};
     using metadata_list = VideoMetadataListManager::metadata_list;
     using MetadataPtr = VideoMetadataListManager::VideoMetadataPtr;
 
@@ -1053,7 +1050,7 @@ static void copy_entries(meta_dir_node &dst, meta_dir_node &src,
 {
     for (auto e = src.entries_begin(); e != src.entries_end(); ++e)
     {
-        if (filter.matches_filter(*((*e)->getData())))
+        if (filter.matches_filter(*(*e)->getData()))
         {
             dst.addEntry(
                 smart_meta_node(new meta_data_node((*e)->getData())));
@@ -1088,7 +1085,7 @@ struct call_tree_flat
 
     void operator()(smart_dir_node &sdn)
     {
-        tree_view_to_flat(*(sdn.get()), m_list);
+        tree_view_to_flat(*sdn.get(), m_list);
     }
 
     VideoListImp::metadata_view_list &m_list;
@@ -1187,7 +1184,7 @@ class dirhandler : public DirectoryHandler
         {
             QString tmptitle(VideoMetadata::FilenameToMeta(file_string, 1));
             if (!tmptitle.isEmpty())
-                title = tmptitle;
+                title = std::move(tmptitle);
         }
         myData->SetTitle(title);
         myData->SetPrefix(m_prefix);

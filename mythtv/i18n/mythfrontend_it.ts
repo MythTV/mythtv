@@ -2390,17 +2390,17 @@ Controlla se il video esiste</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3234"/>
         <source>Menu Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu lingue</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3261"/>
         <source>Audio Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua Audio</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3282"/>
         <source>Preferred language for the audio track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lingua preferita per la traccia audio.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4727"/>
@@ -3109,7 +3109,7 @@ Dispositivo supporta fino a %1</translation>
         <location filename="../libs/libmythtv/audioplayer.cpp" line="136"/>
         <location filename="../libs/libmythtv/audioplayer.cpp" line="148"/>
         <source>AudioOutput has not been successfully configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>UscitaAudio non è stata propriamente configurata.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/audioplayer.cpp" line="157"/>
@@ -6928,7 +6928,7 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4614"/>
         <source>General</source>
-        <translation type="unfinished">Generale</translation>
+        <translation>Generale</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4616"/>
@@ -6943,7 +6943,7 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4643"/>
         <source>General (Jobs)</source>
-        <translation>Generale (processi)</translation>
+        <translation>Generale (Processi)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4654"/>
@@ -8635,7 +8635,7 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="410"/>
         <source>Downloading %1 (%2 of %3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Scaricamento %1 (%2 of %3)</translation>
     </message>
     <message>
         <source>Downloading %1 of %2</source>
@@ -9527,12 +9527,12 @@ Attendere...</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2125"/>
         <source>CEC Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo CEC</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2129"/>
         <source>CEC Device. Default is /dev/cec0 if you have only 1 HDMI output port.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo CEC. Di solito è /dev/cec0 se si ha una sola una porta HDMI.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2143"/>
@@ -10705,7 +10705,7 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="855"/>
         <source>Display list of cast members</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra la lista dei membri del cast</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="930"/>
@@ -11370,12 +11370,12 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="910"/>
         <source>Reload the current webpage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricarica la pagina corrente</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="912"/>
         <source>Reload the current webpage bypassing the cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricarica la pagina corrente tralasciando la cache</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="915"/>
@@ -13077,50 +13077,50 @@ Attendere...</translation>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="204"/>
         <source>Sending key presses to MythTV</source>
-        <translation type="unfinished">Invio del tasto premuto a Mythtv</translation>
+        <translation>Invio tasti premuti a Mythtv</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="209"/>
         <source>Sending key presses to web page</source>
-        <translation type="unfinished">Invio del tasto premuto alla pagina web</translation>
+        <translation>Invio tasti premuti alla pagina web</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="256"/>
         <source>Downloading...</source>
-        <translation type="unfinished">Scaricamento...</translation>
+        <translation>Scaricamento...</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="295"/>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="397"/>
         <source>Play the file</source>
-        <translation type="unfinished">Riproduci il file</translation>
+        <translation>Riproduci il file</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="321"/>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="402"/>
         <source>Download the file</source>
-        <translation type="unfinished">Scarica il file</translation>
+        <translation>Scarica il file</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="325"/>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="400"/>
         <source>Download and play the file</source>
-        <translation type="unfinished">Scarica e riproduci il file</translation>
+        <translation>Scarica e riproduci il file</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="359"/>
         <source>ERROR downloading file.</source>
-        <translation type="unfinished">ERRORE scaricamento file.</translation>
+        <translation>ERRORE scaricamento file.</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="382"/>
         <source>What do you want to do with this file?</source>
-        <translation type="unfinished">Che cosa vuoi fare con questo file?</translation>
+        <translation>Che cosa vuoi fare con questo file?</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythuiwebbrowser.cpp" line="403"/>
         <source>Cancel</source>
-        <translation type="unfinished">Annulla</translation>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
@@ -15758,18 +15758,18 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="233"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opzioni Ordinamento/Raggruppamento</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="236"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordinam./Raggrup.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="237"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="308"/>
         <source>Toggle Record</source>
-        <translation>Commuta Registra</translation>
+        <translation>Att./Disat. Registrazione</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="238"/>
@@ -15781,7 +15781,7 @@ non può essere vuoto.</translation>
         <location filename="../programs/mythfrontend/progfind.cpp" line="239"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="316"/>
         <source>Upcoming</source>
-        <translation>Imminenti</translation>
+        <translation>In programma</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="240"/>
@@ -15848,27 +15848,27 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../libs/libmythtv/programinfo.cpp" line="6682"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessuna</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/programinfo.cpp" line="6684"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Numero canale</translation>
+        <translation>Numero canale</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/programinfo.cpp" line="6686"/>
         <source>CallSign</source>
-        <translation type="unfinished"></translation>
+        <translation>Nome emittente</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/programinfo.cpp" line="6688"/>
         <source>ProgramId</source>
-        <translation type="unfinished"></translation>
+        <translation>IDprogramma</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/programinfo.cpp" line="6690"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Sconosciuto</translation>
     </message>
 </context>
 <context>
@@ -15942,12 +15942,12 @@ non può essere vuoto.</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="338"/>
         <source>Sort/Group Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opzioni Ordinamento/Raggruppamento</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="358"/>
         <source>Sort/Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordinam./Raggrup.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="365"/>
@@ -22389,25 +22389,25 @@ Collega la sorgente video &apos;%1&apos; a una scheda di acquisizione nel menu &
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="572"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="605"/>
         <source>Group By Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per Numero Canale</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="574"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="606"/>
         <source>Group By Call Sign</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per Nome Emittente</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="576"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="607"/>
         <source>Group By Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per ID Programma</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="578"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="608"/>
         <source>Group By None</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per Nessuno</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="460"/>
@@ -22977,7 +22977,7 @@ Nome Database: %2</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="878"/>
         <source>Input %1: %2</source>
-        <translation type="unfinished">Ingresso %1 %2: %2 {1:?}</translation>
+        <translation>Ingresso %1: %2</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="893"/>
@@ -22989,7 +22989,7 @@ Nome Database: %2</translation>
         <source>On %1 from %2.%3
 %4
 </source>
-        <translation>Su %1  da %2.%3
+        <translation>Su %1 da %2.%3
 %4
 </translation>
     </message>
@@ -24051,7 +24051,7 @@ dal gruppo di archiviazione?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9437"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9660"/>
         <source>Cast</source>
-        <translation type="unfinished">Cast</translation>
+        <translation>Cast</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9408"/>
@@ -24164,7 +24164,7 @@ dal gruppo di archiviazione?</translation>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="2508"/>
         <source>Last Program: &quot;%1&quot; Doesn&apos;t Exist</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;ultimo Programma: &quot;%1&quot; Non esiste</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="3640"/>
@@ -24755,12 +24755,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9438"/>
         <source>Recorded</source>
-        <translation type="unfinished">Registrato</translation>
+        <translation>Registrato</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9439"/>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>Prossimo</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9443"/>
@@ -25890,7 +25890,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="213"/>
         <source>%seasonepisode%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%seasonepisode%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="214"/>
@@ -27667,12 +27667,12 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../themes/themestrings.h" line="974"/>
         <source>Group By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="975"/>
         <source>Group by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggruppa per: %1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="976"/>
@@ -32011,7 +32011,7 @@ Regista: |DIRECTOR%</translation>
     <message>
         <location filename="../themes/themestrings.h" line="778"/>
         <source>Display :</source>
-        <translation type="unfinished"></translation>
+        <translation>Display :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1021"/>
@@ -33480,7 +33480,7 @@ dd MMM yyyy</translation>
     <message>
         <location filename="../themes/themestrings.h" line="92"/>
         <source>%SEASONEPISODE%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SEASONEPISODE%   %STARTDATE%   %STARTTIME%% - |ENDTIME%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="1951"/>
@@ -34917,7 +34917,7 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
     <message>
         <location filename="../themes/themestrings.h" line="2177"/>
         <source>[font]myverysmalllabel[/font]%(|SEASONEPISODE|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>[font]myverysmalllabel[/font]%(|SEASONEPISODE|) %%|RATING| %%|(STARS|) %[font]mydesc[/font]%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2178"/>
@@ -34926,7 +34926,11 @@ Se si seleziona &quot;Usa riproduttore predefinito&quot; il riproduttore del let
 [font]myverysmallsub[/font]Part |PARTNUMBER| of %%PARTTOTAL%%
 [font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
 [font]myverysmalllabel[/font]Director: |DIRECTOR| %</source>
-        <translation type="unfinished"></translation>
+        <translation>[font]myverysmalllabel[/font]%(|SEASONEPISODE|) %%|RATING| %%|(STARS|) %[font]myverysmall[/font]%DESCRIPTION%%
+
+[font]myverysmallsub[/font]Parte |PARTNUMBER| of %%PARTTOTAL%%
+[font]myverysmallsub[/font]|CAST| %%[font]myverysmallsub[/font]  
+[font]myverysmalllabel[/font]Regista: |DIRECTOR| %</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="2190"/>

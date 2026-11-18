@@ -117,7 +117,7 @@ QString RecStatus::toString(RecStatus::Type recstatus, const QString &name)
             break;
     }
 
-    return (ret.isEmpty()) ? QString("-") : ret;
+    return ret.isEmpty() ? QString("-") : ret;
 }
 
 /// \brief Converts "recstatus" into a human readable string

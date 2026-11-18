@@ -143,11 +143,10 @@ bool MythVideoProfileItem::CheckRange(const QString& Key,
                         }
                     }
                 }
-                if (isOK)
+                if (isOK && (value1 == 0 && value2 == 0 && oper.isEmpty()))
                 {
                     // Invalid string
-                    if (value1 == 0 && value2 == 0 && oper.isEmpty())
-                        isOK=false;
+                    isOK=false;
                 }
                 if (isOK)
                 {
@@ -735,7 +734,7 @@ std::vector<std::pair<QString, QString> > MythVideoProfile::GetUpscalers()
     static std::vector<std::pair<QString,QString>> s_upscalers =
     {
         { tr("Default (Bilinear)"), UPSCALE_DEFAULT },
-        { tr("Bicubic"), UPSCALE_HQ1 }
+        { tr("Bicubic"), UPSCALE_HQ1 },
     };
     return s_upscalers;
 }
@@ -898,14 +897,14 @@ QString MythVideoProfile::GetDefaultProfileName(const QString &HostName)
 {
     auto tmp = gCoreContext->GetSettingOnHost("DefaultVideoPlaybackProfile", HostName);
     QStringList profiles = GetProfiles(HostName);
-    tmp = (profiles.contains(tmp)) ? tmp : QString();
+    tmp = profiles.contains(tmp) ? tmp : QString();
 
     if (tmp.isEmpty())
     {
         if (!profiles.empty())
             tmp = profiles[0];
 
-        tmp = (profiles.contains("Normal")) ? "Normal" : tmp;
+        tmp = profiles.contains("Normal") ? "Normal" : tmp;
         if (!tmp.isEmpty())
             gCoreContext->SaveSettingOnHost("DefaultVideoPlaybackProfile", tmp, HostName);
     }
@@ -1316,7 +1315,7 @@ const QList<QPair<QString, QString> >& MythVideoProfile::GetDeinterlacers()
         { DEINT_QUALITY_NONE,   tr("None") },
         { DEINT_QUALITY_LOW,    tr("Low quality") },
         { DEINT_QUALITY_MEDIUM, tr("Medium quality") },
-        { DEINT_QUALITY_HIGH,   tr("High quality") }
+        { DEINT_QUALITY_HIGH,   tr("High quality") },
     };
 
     return s_deinterlacerOptions;

@@ -71,7 +71,7 @@ static const std::array<const QString,4> eld_connection_type_names {
     "HDMI",
     "DisplayPort",
     "2-reserved",
-    "3-reserved"
+    "3-reserved",
 };
 
 enum cea_audio_coding_xtypes : std::uint8_t
@@ -305,7 +305,7 @@ QString eld::print_pcm_rates(int pcm)
 {
     static const std::array<const uint32_t,12> rates {
         5512, 8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200,
-        96000, 176400, 192000 };
+        96000, 176400, 192000, };
     QString result = QString();
 
     for (size_t i = 0; i < rates.size(); i++)

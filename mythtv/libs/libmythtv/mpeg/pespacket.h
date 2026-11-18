@@ -194,7 +194,7 @@ class MTV_PUBLIC PESPacket
         return ((m_pesData[offset+0]<<24) |
                 (m_pesData[offset+1]<<16) |
                 (m_pesData[offset+2]<<8) |
-                (m_pesData[offset+3]));
+                m_pesData[offset+3]);
     }
 
     void SetCRC(uint crc)

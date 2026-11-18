@@ -18,7 +18,7 @@ bool MythWebSocketEvent::HandleRawTextMessage(const DataPayloads& Payloads)
     // TODO: Payloads potentially has multiple messages to process
     // We only handle the first one here.
     StringPayload p_message = MythSharedString::CreateString();
-    (*p_message).append(*(Payloads.front()));
+    (*p_message).append(*Payloads.front());
     return HandleTextMessage(p_message);
 }
 

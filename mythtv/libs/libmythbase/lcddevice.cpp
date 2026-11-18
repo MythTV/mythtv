@@ -334,7 +334,7 @@ void LCD::handleKeyPress(const QString &keyPressed)
         key = Qt::Key_Escape;
 
     QCoreApplication::postEvent(
-        (QObject *)(QApplication::activeWindow()),
+        (QObject *)QApplication::activeWindow(),
         new ExternalKeycodeEvent(key));
 }
 

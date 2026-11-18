@@ -585,7 +585,7 @@ void GuideGrid::Load(void)
     LoadFromScheduler(m_recList);
     fillChannelInfos();
 
-    setStartChannel((int)(m_currentStartChannel) - (m_channelCount / 2));
+    setStartChannel((int)m_currentStartChannel - (m_channelCount / 2));
     int maxchannel = GetChannelCount();
     m_channelCount = std::min(m_channelCount, maxchannel);
 
@@ -1186,7 +1186,7 @@ ChannelInfo *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
     if (sel >= (int) m_channelInfos[chan_idx].size())
         return nullptr;
 
-    return &(m_channelInfos[chan_idx][sel]);
+    return &m_channelInfos[chan_idx][sel];
 }
 
 const ChannelInfo *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
@@ -1488,7 +1488,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     }
 
     // then check channum, first only
-    i = (channum.isEmpty()) ? GetChannelCount() : 0;
+    i = channum.isEmpty() ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); ++i)
     {
          if (m_channelInfos[i][0].m_chanNum == channum)
@@ -1496,7 +1496,7 @@ int GuideGrid::FindChannel(uint chanid, const QString &channum,
     }
 
     // then check channum duplicates
-    i = (channum.isEmpty()) ? GetChannelCount() : 0;
+    i = channum.isEmpty() ? GetChannelCount() : 0;
     for (; i < GetChannelCount(); ++i)
     {
         for (size_t j = 1; j < m_channelInfos[i].size(); ++j)
@@ -1556,7 +1556,7 @@ void GuideGrid::fillTimeInfos()
 
         starttime = starttime.addSecs(kFiveMinutes);
     }
-    m_currentEndTime = starttime;
+    m_currentEndTime = std::move(starttime);
 }
 
 void GuideGrid::fillProgramInfos(bool useExistingData)
@@ -2524,13 +2524,13 @@ void GuideGrid::moveUpDown(MoveVector movement)
             setStartChannel(m_currentStartChannel + 1);
             break;
         case kScrollUp :
-            setStartChannel((int)(m_currentStartChannel) - 1);
+            setStartChannel((int)m_currentStartChannel - 1);
             break;
         case kPageDown :
             setStartChannel(m_currentStartChannel + m_channelCount);
             break;
         case kPageUp :
-            setStartChannel((int)(m_currentStartChannel) - m_channelCount);
+            setStartChannel((int)m_currentStartChannel - m_channelCount);
             break;
         default :
             break;

@@ -531,7 +531,7 @@ namespace
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["studiostate"] = metadata->GetStudio();
             tmp["userratingstate"] =
-                    QString::number((int)(metadata->GetUserRating()));
+                    QString::number((int)metadata->GetUserRating());
             tmp["watchedstate"] = WatchedToState(metadata->GetWatched());
 
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
@@ -1215,46 +1215,38 @@ void VideoDialog::loadData()
 
         // restore the last saved position in the video tree if this is the first
         // time this method is called and the option is set in the database
-        if (m_d->m_firstLoadPass)
+        if (m_d->m_firstLoadPass && m_d->m_rememberPosition)
         {
-            if (m_d->m_rememberPosition)
-            {
-                QStringList lastTreeNodePath = gCoreContext->GetSetting("mythvideo.VideoTreeLastActive", "").split("\n");
+            QStringList lastTreeNodePath = gCoreContext->GetSetting("mythvideo.VideoTreeLastActive", "").split("\n");
 
-                if (m_d->m_type == DLG_GALLERY || m_d->m_type == DLG_BROWSER)
+            if ((m_d->m_type == DLG_GALLERY || m_d->m_type == DLG_BROWSER) &&
+                !lastTreeNodePath.isEmpty())
+            {
+                // go through the path list and set the current node
+                for (int i = 0; i < lastTreeNodePath.size(); i++)
                 {
-                    if (!lastTreeNodePath.isEmpty())
+                    MythGenericTree *node =
+                        m_d->m_currentNode->getChildByName(lastTreeNodePath.at(i));
+                    // check if the node name is the same as the currently selected
+                    // one in the saved tree list. if yes then we are on the right
+                    // way down the video tree to find the last saved position
+                    if ((node != nullptr) && (node->GetText().compare(lastTreeNodePath.at(i)) == 0))
                     {
-                        // go through the path list and set the current node
-                        for (int i = 0; i < lastTreeNodePath.size(); i++)
+                        // set the folder as the new node so we can travel further down
+                        // dont do this if its the last part of the saved video path tree
+                        if (node->getInt() == kSubFolder &&
+                            node->childCount() > 1 &&
+                            i < lastTreeNodePath.size()-1)
                         {
-                            MythGenericTree *node =
-                                m_d->m_currentNode->getChildByName(lastTreeNodePath.at(i));
-                            if (node != nullptr)
-                            {
-                                // check if the node name is the same as the currently selected
-                                // one in the saved tree list. if yes then we are on the right
-                                // way down the video tree to find the last saved position
-                                if (node->GetText().compare(lastTreeNodePath.at(i)) == 0)
-                                {
-                                    // set the folder as the new node so we can travel further down
-                                    // dont do this if its the last part of the saved video path tree
-                                    if (node->getInt() == kSubFolder &&
-                                        node->childCount() > 1 &&
-                                        i < lastTreeNodePath.size()-1)
-                                    {
-                                        SetCurrentNode(node);
-                                    }
-                                    // in the last run the selectedNode will be the last
-                                    // entry of the saved tree node.
-                                    if (lastTreeNodePath.at(i) == lastTreeNodePath.last())
-                                        selectedNode = node;
-                                }
-                            }
+                            SetCurrentNode(node);
                         }
-                        m_d->m_firstLoadPass = false;
+                        // in the last run the selectedNode will be the last
+                        // entry of the saved tree node.
+                        if (lastTreeNodePath.at(i) == lastTreeNodePath.last())
+                            selectedNode = node;
                     }
                 }
+                m_d->m_firstLoadPass = false;
             }
         }
 
@@ -1836,7 +1828,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, const QString& type,
                                      node->GetText(), levels + 1);
                     if (!test_file.isEmpty())
                     {
-                        icon_file = test_file;
+                        icon_file = std::move(test_file);
                         break;
                     }
                 }
@@ -2553,11 +2545,8 @@ void VideoDialog::popupClosed(const QString& which, int result)
 {
     m_menuPopup = nullptr;
 
-    if (result == -2)
-    {
-        if (which == "display")
-            VideoMenu();
-    }
+    if ((result == -2) && (which == "display"))
+        VideoMenu();
 }
 
 /** \fn VideoDialog::CreateViewMenu()
@@ -3667,16 +3656,14 @@ void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
     QString host = metadata->GetHost();
     int episode = metadata->GetEpisode();
 
-    if (metadata->GetCoverFile().isEmpty() ||
-        IsDefaultCoverFile(metadata->GetCoverFile()))
+    if ((metadata->GetCoverFile().isEmpty() ||
+         IsDefaultCoverFile(metadata->GetCoverFile())) &&
+        GetLocalVideoImage(inetref, filename,
+                           cover_dirs, cover_file, title,
+                           season, host, "Coverart", episode))
     {
-        if (GetLocalVideoImage(inetref, filename,
-                                cover_dirs, cover_file, title,
-                                season, host, "Coverart", episode))
-        {
-            metadata->SetCoverFile(cover_file);
-            OnVideoImageSetDone(metadata);
-        }
+        metadata->SetCoverFile(cover_file);
+        OnVideoImageSetDone(metadata);
     }
 
     QStringList fanart_dirs;
@@ -3684,15 +3671,13 @@ void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
 
     QString fanart_file;
 
-    if (metadata->GetFanart().isEmpty())
+    if (metadata->GetFanart().isEmpty() &&
+        GetLocalVideoImage(inetref, filename,
+                            fanart_dirs, fanart_file, title,
+                            season, host, "Fanart", episode))
     {
-        if (GetLocalVideoImage(inetref, filename,
-                                fanart_dirs, fanart_file, title,
-                                season, host, "Fanart", episode))
-        {
-            metadata->SetFanart(fanart_file);
-            OnVideoImageSetDone(metadata);
-        }
+        metadata->SetFanart(fanart_file);
+        OnVideoImageSetDone(metadata);
     }
 
     QStringList banner_dirs;
@@ -3700,15 +3685,13 @@ void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
 
     QString banner_file;
 
-    if (metadata->GetBanner().isEmpty())
+    if (metadata->GetBanner().isEmpty() &&
+        GetLocalVideoImage(inetref, filename,
+                            banner_dirs, banner_file, title,
+                            season, host, "Banners", episode))
     {
-        if (GetLocalVideoImage(inetref, filename,
-                                banner_dirs, banner_file, title,
-                                season, host, "Banners", episode))
-        {
-            metadata->SetBanner(banner_file);
-            OnVideoImageSetDone(metadata);
-        }
+        metadata->SetBanner(banner_file);
+        OnVideoImageSetDone(metadata);
     }
 
     QStringList screenshot_dirs;
@@ -3716,16 +3699,14 @@ void VideoDialog::StartVideoImageSet(VideoMetadata *metadata)
 
     QString screenshot_file;
 
-    if (metadata->GetScreenshot().isEmpty())
+    if (metadata->GetScreenshot().isEmpty() &&
+        GetLocalVideoImage(inetref, filename,
+                            screenshot_dirs, screenshot_file, title,
+                            season, host, "Screenshots", episode,
+                            true))
     {
-        if (GetLocalVideoImage(inetref, filename,
-                                screenshot_dirs, screenshot_file, title,
-                                season, host, "Screenshots", episode,
-                                true))
-        {
-            metadata->SetScreenshot(screenshot_file);
-            OnVideoImageSetDone(metadata);
-        }
+        metadata->SetScreenshot(screenshot_file);
+        OnVideoImageSetDone(metadata);
     }
 }
 

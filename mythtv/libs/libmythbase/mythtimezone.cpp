@@ -50,7 +50,7 @@ QString getTimeZoneID(void)
 
     if (!tz.isEmpty())
     {
-        zone_id = tz;
+        zone_id = std::move(tz);
         if (zone_id.startsWith("\"") || zone_id.startsWith("'"))
                 zone_id.remove(0, 1);
         if (zone_id.endsWith("\"") || zone_id.endsWith("'"))

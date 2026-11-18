@@ -56,7 +56,7 @@ class MythWebSocket : public QObject
         Read16BitLength,
         Read64BitLength,
         ReadMask,
-        ReadPayload
+        ReadPayload,
     };
 
     QTcpSocket* m_socket            { nullptr };

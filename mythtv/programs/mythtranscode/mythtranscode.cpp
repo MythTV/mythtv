@@ -967,13 +967,13 @@ static void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist,
             // required.  This prevents the user from being stuck with a preview
             // from a cut area and ensures that the "dimensioned" previews
             // correspond to the new timeline
-            if (useCutlist)
+            if (useCutlist &&
+                (transUnlink(oldFileName.toLocal8Bit().constData(), pginfo) != -1))
             {
                 // If unlink fails, keeping the old preview is not a problem.
                 // The RENAME_TO_NUV check below will attempt to rename the
                 // file, if required.
-                if (transUnlink(oldFileName.toLocal8Bit().constData(), pginfo) != -1)
-                    continue;
+                continue;
             }
 
             if (jobArgs == "RENAME_TO_NUV" || jobArgs == "RENAME_TO_MPG")

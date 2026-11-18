@@ -406,19 +406,12 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 bool MythDialogBox::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
-    if (event->GetGesture() == MythGestureEvent::Click)
+    if ((event->GetGesture() == MythGestureEvent::Click) &&
+        (event->GetButton() == Qt::RightButton))
     {
-        switch (event->GetButton())
-        {
-            case Qt::RightButton:
-                SendEvent(-2);
-                Close();
-                handled = true;
-                break;
-            default :
-                break;
-        }
-
+        SendEvent(-2);
+        Close();
+        handled = true;
     }
 
     if (!handled && MythScreenType::gestureEvent(event))

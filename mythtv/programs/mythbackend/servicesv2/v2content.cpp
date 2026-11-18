@@ -93,11 +93,11 @@ QFileInfo V2Content::GetFile( const QString &sStorageGroup,
 
     if (sFileName.isEmpty())
     {
-        QString sMsg ( "GetFile - FileName missing." );
+        const char* sMsg ( "GetFile - FileName missing." );
 
         //LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw QString(sMsg);
+        throw std::runtime_error(sMsg);
     }
 
     // ------------------------------------------------------------------
@@ -150,11 +150,11 @@ QFileInfo V2Content::GetImageFile( const QString &sStorageGroup,
 
     if (sFileName.isEmpty())
     {
-        QString sMsg ( "GetImageFile - FileName missing." );
+        const char* sMsg ( "GetImageFile - FileName missing." );
 
         //LOG(VB_UPNP, LOG_WARNING, sMsg);
 
-        throw QString(sMsg);
+        throw std::runtime_error(sMsg);
     }
 
     // ------------------------------------------------------------------
@@ -213,7 +213,7 @@ QFileInfo V2Content::GetImageFile( const QString &sStorageGroup,
     if (!pImage || pImage->isNull())
         return {};
 
-    float fAspect = (float)(pImage->width()) / pImage->height();
+    float fAspect = (float)pImage->width() / pImage->height();
 
     if ( nWidth == 0 )
         nWidth = (int)std::rint(nHeight * fAspect);
@@ -241,10 +241,10 @@ QStringList V2Content::GetDirList( const QString &sStorageGroup )
 
     if (sStorageGroup.isEmpty())
     {
-        QString sMsg( "GetDirList - StorageGroup missing.");
+        const char* sMsg( "GetDirList - StorageGroup missing.");
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw QString(sMsg);
+        throw std::runtime_error(sMsg);
     }
 
     StorageGroup sgroup(sStorageGroup);
@@ -261,10 +261,10 @@ QStringList V2Content::GetFileList( const QString &sStorageGroup )
 
     if (sStorageGroup.isEmpty())
     {
-        QString sMsg( "GetFileList - StorageGroup missing.");
+        const char* sMsg( "GetFileList - StorageGroup missing.");
         LOG(VB_UPNP, LOG_ERR, sMsg);
 
-        throw QString(sMsg);
+        throw std::runtime_error(sMsg);
     }
 
     StorageGroup sgroup(sStorageGroup);
@@ -328,7 +328,7 @@ V2ArtworkInfoList* V2Content::GetRecordingArtworkList( int        RecordedId,
 {
     if ((RecordedId <= 0) &&
         (chanid <= 0 || !StartTime.isValid()))
-        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+        throw std::runtime_error("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // TODO Should use RecordingInfo
     ProgramInfo pginfo;
@@ -487,7 +487,7 @@ QFileInfo V2Content::GetAlbumArt( int nTrackId, int nWidth, int nHeight )
     }
     else
     {
-        float fAspect = (float)(img.width()) / img.height();
+        float fAspect = (float)img.width() / img.height();
 
         if ( nWidth == 0 || nWidth > img.width() )
             nWidth = (int)std::rint(nHeight * fAspect);
@@ -522,12 +522,12 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
 {
     if ((nRecordedId <= 0) &&
         (nChanId <= 0 || !StartTime.isValid()))
-        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+        throw std::runtime_error("Recorded ID or Channel ID and StartTime appears invalid.");
 
     if (!sFormat.isEmpty()
         && !QImageWriter::supportedImageFormats().contains(sFormat.toLower().toLocal8Bit()))
     {
-        throw QString("GetPreviewImage: Specified 'Format' is not supported.");
+        throw std::runtime_error("GetPreviewImage: Specified 'Format' is not supported.");
     }
 
     // ----------------------------------------------------------------------
@@ -615,7 +615,7 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
 
     if (bDefaultPixmap)
     {
-        sNewFileName = sPreviewFileName;
+        sNewFileName = std::move(sPreviewFileName);
     }
     else
     {
@@ -630,11 +630,11 @@ QFileInfo V2Content::GetPreviewImage(        int        nRecordedId,
         // check to see if scaled preview image is already created and isn't
         // out of date
         // ----------------------------------------------------------------------
-        if (QFile::exists( sNewFileName ))
+        if (QFile::exists(sNewFileName) &&
+            (QFileInfo(sPreviewFileName).lastModified() <=
+             QFileInfo(sNewFileName).lastModified()))
         {
-            if (QFileInfo(sPreviewFileName).lastModified() <=
-                QFileInfo(sNewFileName).lastModified())
-                return QFileInfo( sNewFileName );
+            return QFileInfo( sNewFileName );
         }
 
         QImage image = QImage(sPreviewFileName);
@@ -695,7 +695,7 @@ QFileInfo V2Content::GetRecording( int              nRecordedId,
 {
     if ((nRecordedId <= 0) &&
         (nChanId <= 0 || !StartTime.isValid()))
-        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+        throw std::runtime_error("Recorded ID or Channel ID and StartTime appears invalid.");
 
     // ------------------------------------------------------------------
     // Read Recording From Database
@@ -834,9 +834,9 @@ QFileInfo V2Content::GetVideo( int nId )
 QString V2Content::GetHash( const QString &sStorageGroup,
                           const QString &sFileName )
 {
-    if ((sFileName.isEmpty()) ||
-        (sFileName.contains("/../")) ||
-        (sFileName.startsWith("../")))
+    if (sFileName.isEmpty() ||
+        sFileName.contains("/../") ||
+        sFileName.startsWith("../"))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("ERROR checking for file, filename '%1' "
@@ -880,8 +880,8 @@ bool V2Content::DownloadFile( const QString &sURL, const QString &sStorageGroup 
         return false;
     }
 
-    if ((filename.contains("/../")) ||
-        (filename.startsWith("../")))
+    if (filename.contains("/../") ||
+        filename.startsWith("../"))
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("ERROR: %1 write filename '%2' does not "

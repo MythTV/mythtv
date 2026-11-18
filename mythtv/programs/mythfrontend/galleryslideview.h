@@ -15,7 +15,7 @@ class FlatView;
 enum ImageSlideShowType : std::uint8_t {
     kBrowseSlides       = 0,
     kNormalSlideShow    = 1,
-    kRecursiveSlideShow = 2
+    kRecursiveSlideShow = 2,
 };
 
 

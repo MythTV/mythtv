@@ -122,7 +122,7 @@ bool AudioOutputJACK::OpenDevice()
     if (m_channels > JACK_CHANNELS_MAX)
     {
         QString message {LOC + tr("Requested more channels: (%1), than the maximum: %2")
-                   .arg(m_channels).arg(JACK_CHANNELS_MAX)};
+                   .arg(m_channels).arg(JACK_CHANNELS_MAX),};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
         return false;
@@ -643,7 +643,7 @@ void AudioOutputJACK::JackClientClose(jack_client_t **client)
         if (err != 0)
         {
             QString message {LOC + tr("Error closing Jack output device. Error: %1")
-                       .arg(err)};
+                       .arg(err),};
             dispatchError(message);
             LOG(VB_GENERAL, LOG_ERR, message);
         }

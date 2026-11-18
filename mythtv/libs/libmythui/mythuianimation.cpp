@@ -120,15 +120,12 @@ void MythUIAnimation::IncrementCurrentTime(void)
                 m_active = false;
         }
     }
-    else if (startValue() == currentValue())
+    else if ((startValue() == currentValue()) && (direction() == Backward))
     {
-        if (direction() == Backward)
-        {
-            if (m_reversible)
-                setDirection(Forward);
-            else if (!m_looped)
-                m_active = false;
-        }
+        if (m_reversible)
+            setDirection(Forward);
+        else if (!m_looped)
+            m_active = false;
     }
 }
 

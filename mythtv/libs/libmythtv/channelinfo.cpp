@@ -485,24 +485,20 @@ bool ChannelInsertInfo::IsSameChannel(
         return true;
     }
 
-    if (relaxed > 0)
+    if ((relaxed > 0) &&
+        (m_origNetId == other.m_origNetId) &&
+        (m_serviceId == other.m_serviceId))
     {
-        if ((m_origNetId == other.m_origNetId) &&
-            (m_serviceId == other.m_serviceId))
-        {
-            return true;
-        }
+        return true;
     }
 
-    if (relaxed > 1)
+    if ((relaxed > 1) &&
+        (("mpeg" == m_siStandard || "mpeg" == other.m_siStandard ||
+          "dvb"  == m_siStandard || "dvb"  == other.m_siStandard ||
+          m_siStandard.isEmpty() || other.m_siStandard.isEmpty()) &&
+         (m_serviceId == other.m_serviceId)))
     {
-        if (("mpeg" == m_siStandard || "mpeg" == other.m_siStandard ||
-             "dvb"  == m_siStandard || "dvb"  == other.m_siStandard ||
-             m_siStandard.isEmpty() || other.m_siStandard.isEmpty()) &&
-            (m_serviceId == other.m_serviceId))
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;

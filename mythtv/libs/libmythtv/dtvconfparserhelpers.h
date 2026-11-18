@@ -617,7 +617,7 @@ class DTVPolarity : public DTVParamHelper
         kPolarityVertical,
         kPolarityHorizontal,
         kPolarityRight,
-        kPolarityLeft
+        kPolarityLeft,
     };
 
     explicit DTVPolarity(PolarityValues _default = kPolarityVertical)
@@ -674,7 +674,7 @@ class DTVModulationSystem : public DTVParamHelper
         kModulationSystem_DAB,
         kModulationSystem_DVBT2,
         kModulationSystem_TURBO,
-        kModulationSystem_DVBC_ANNEX_C
+        kModulationSystem_DVBC_ANNEX_C,
     };
 #if CONFIG_DVB
     static_assert((kModulationSystem_UNDEFINED    == (Types)SYS_UNDEFINED   ) &&

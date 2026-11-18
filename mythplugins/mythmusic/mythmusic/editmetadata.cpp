@@ -792,72 +792,69 @@ void EditMetadataDialog::customEvent(QEvent *event)
             return;
         QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
 
-        if (!tokens.isEmpty())
+        if (!tokens.isEmpty() && (tokens[0] == "BROWSER_DOWNLOAD_FINISHED"))
         {
-            if (tokens[0] == "BROWSER_DOWNLOAD_FINISHED")
+            QStringList args = me->ExtraDataList();
+            const QString& oldFilename = args[1];
+            int fileSize  = args[2].toInt();
+            int errorCode = args[4].toInt();
+
+            if ((errorCode != 0) || (fileSize == 0))
+                return;
+
+            QString newFilename;
+
+            if (m_searchType == "artist")
             {
-                QStringList args = me->ExtraDataList();
-                const QString& oldFilename = args[1];
-                int fileSize  = args[2].toInt();
-                int errorCode = args[4].toInt();
+                QString cleanName = fixFilename(s_metadata->Artist().toLower());
+                QString file = QString("Icons/%1/%2.jpg").arg("artist", cleanName);
+                newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                          0, file, "MusicArt");
+            }
+            else if (m_searchType == "genre")
+            {
+                QString cleanName = fixFilename(s_metadata->Genre().toLower());
+                QString file = QString("Icons/%1/%2.jpg").arg("genre", cleanName);
+                newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
+                                                          0, file, "MusicArt");
+            }
+            else if (m_searchType == "album")
+            {
+                // move the image from the MythMusic config dir to the tracks
+                // dir in the 'Music' storage group
+                newFilename = s_metadata->Filename();
+                newFilename = newFilename.section( '/', 0, -2);
+                newFilename = newFilename + '/' +  oldFilename.section( '/', -1, -1);
+            }
+            else
+            {
+                LOG(VB_GENERAL, LOG_ERR, QString("Got unknown search type '%1' "
+                                                 "in BROWSER_DOWNLOAD_FINISHED event")
+                    .arg(m_searchType));
+                return;
+            }
 
-                if ((errorCode != 0) || (fileSize == 0))
-                    return;
+            RemoteFile::CopyFile(oldFilename, newFilename, true);
+            QFile::remove(oldFilename);
 
-                QString newFilename;
+            if (m_searchType == "album")
+                scanForImages();
 
-                if (m_searchType == "artist")
+            // force the icons to update
+            updateAlbumImage();
+            updateArtistImage();
+            updateGenreImage();
+
+            s_metadata->getAlbumArtImages()->dumpToDatabase();
+            // force a reload of the images for any tracks affected
+            MetadataPtrList *allMusic =  gMusicData->m_all_music->getAllMetadata();
+            for (int x = 0; x < allMusic->count(); x++)
+            {
+                if ((allMusic->at(x)->ID() == s_sourceMetadata->ID()) ||
+                    (allMusic->at(x)->getDirectoryId() == s_sourceMetadata->getDirectoryId()))
                 {
-                    QString cleanName = fixFilename(s_metadata->Artist().toLower());
-                    QString file = QString("Icons/%1/%2.jpg").arg("artist", cleanName);
-                    newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
-                                                              0, file, "MusicArt");
-                }
-                else if (m_searchType == "genre")
-                {
-                    QString cleanName = fixFilename(s_metadata->Genre().toLower());
-                    QString file = QString("Icons/%1/%2.jpg").arg("genre", cleanName);
-                    newFilename = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
-                                                              0, file, "MusicArt");
-                }
-                else if (m_searchType == "album")
-                {
-                    // move the image from the MythMusic config dir to the tracks
-                    // dir in the 'Music' storage group
-                    newFilename = s_metadata->Filename();
-                    newFilename = newFilename.section( '/', 0, -2);
-                    newFilename = newFilename + '/' +  oldFilename.section( '/', -1, -1);
-                }
-                else
-                {
-                    LOG(VB_GENERAL, LOG_ERR, QString("Got unknown search type '%1' "
-                                                     "in BROWSER_DOWNLOAD_FINISHED event")
-                                                     .arg(m_searchType));
-                    return;
-                }
-
-                RemoteFile::CopyFile(oldFilename, newFilename, true);
-                QFile::remove(oldFilename);
-
-                if (m_searchType == "album")
-                    scanForImages();
-
-                // force the icons to update
-                updateAlbumImage();
-                updateArtistImage();
-                updateGenreImage();
-
-                s_metadata->getAlbumArtImages()->dumpToDatabase();
-                // force a reload of the images for any tracks affected
-                MetadataPtrList *allMusic =  gMusicData->m_all_music->getAllMetadata();
-                for (int x = 0; x < allMusic->count(); x++)
-                {
-                    if ((allMusic->at(x)->ID() == s_sourceMetadata->ID()) ||
-                        (allMusic->at(x)->getDirectoryId() == s_sourceMetadata->getDirectoryId()))
-                    {
-                        allMusic->at(x)->reloadAlbumArtImages();
-                        gPlayer->sendAlbumArtChangedEvent(allMusic->at(x)->ID());
-                    }
+                    allMusic->at(x)->reloadAlbumArtImages();
+                    gPlayer->sendAlbumArtChangedEvent(allMusic->at(x)->ID());
                 }
             }
         }
@@ -1088,10 +1085,10 @@ void EditAlbumartDialog::showMenu(void )
         }
     }
 
-    if (GetMythDB()->GetBoolSetting("AllowTagWriting", false))
+    if (GetMythDB()->GetBoolSetting("AllowTagWriting", false) &&
+        tagger && tagger->supportsEmbeddedImages())
     {
-        if (tagger && tagger->supportsEmbeddedImages())
-            menu->AddButton(tr("Copy Image To Tag"));
+        menu->AddButton(tr("Copy Image To Tag"));
     }
 
     delete tagger;
@@ -1166,7 +1163,7 @@ void EditAlbumartDialog::customEvent(QEvent *event)
         }
         else if (resultid == "imagelocation")
         {
-            m_imageFilename = resulttext;
+            m_imageFilename = std::move(resulttext);
 
             // save directory location for next time
             QFileInfo fi(m_imageFilename);
@@ -1188,20 +1185,17 @@ void EditAlbumartDialog::customEvent(QEvent *event)
             {
                 rescanForImages();
             }
-            else if (tokens[0] == "MUSIC_ALBUMART_CHANGED")
+            else if ((tokens[0] == "MUSIC_ALBUMART_CHANGED") && (tokens.size() >= 2))
             {
-                if (tokens.size() >= 2)
+                auto songID = (MusicMetadata::IdType)tokens[1].toInt();
+
+                if (s_metadata->ID() == songID)
                 {
-                    auto songID = (MusicMetadata::IdType)tokens[1].toInt();
+                    // force all the image to reload
+                    for (uint x = 0; x < s_metadata->getAlbumArtImages()->getImageCount(); x++)
+                        removeCachedImage(s_metadata->getAlbumArtImages()->getImageAt(x));
 
-                    if (s_metadata->ID() == songID)
-                    {
-                        // force all the image to reload
-                        for (uint x = 0; x < s_metadata->getAlbumArtImages()->getImageCount(); x++)
-                            removeCachedImage(s_metadata->getAlbumArtImages()->getImageAt(x));
-
-                        updateImageGrid();
-                    }
+                    updateImageGrid();
                 }
             }
         }

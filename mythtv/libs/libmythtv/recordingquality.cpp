@@ -70,12 +70,12 @@ RecordingQuality::RecordingQuality(
     }
 
     // account for late start
-    int start_gap = (first.isValid()) ? start.secsTo(first) : 0;
+    int start_gap = first.isValid() ? start.secsTo(first) : 0;
     if (start_gap >  max_start)
         m_recordingGaps.push_front(RecordingGap(start, first));
 
     // account for missing end
-    int end_gap = (latest.isValid()) ? latest.secsTo(end) : 0;
+    int end_gap = latest.isValid() ? latest.secsTo(end) : 0;
     if (end_gap > max_end)
         m_recordingGaps.push_back(RecordingGap(latest, end));
 

@@ -238,7 +238,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
     {
         const VideoMetadata::cast_list &cl = mdata.GetCast();
 
-        if ((m_cast == kCastFilterUnknown) && (cl.empty()))
+        if ((m_cast == kCastFilterUnknown) && cl.empty())
         {
             matches = true;
         }
@@ -301,7 +301,7 @@ bool VideoFilterSettings::matches_filter(const VideoMetadata &mdata) const
 
     if (matches && m_coverFile != kCoverFileFilterAll)
     {
-        matches = (IsDefaultCoverFile(mdata.GetCoverFile()));
+        matches = IsDefaultCoverFile(mdata.GetCoverFile());
     }
 
     if (matches && m_parentalLevel)

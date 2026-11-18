@@ -34,7 +34,7 @@ public:
         SurroundModePassive,
         SurroundModeActiveSimple,
         SurroundModeActiveLinear,
-        SurroundModePassiveHall
+        SurroundModePassiveHall,
     };
 public:
     FreeSurround(uint srate, bool moviemode, SurroundMode mode);
@@ -67,7 +67,7 @@ private:
         int32_t center_width { 100 };   // presence of the center channel
         int32_t dimension {      0 };   // dimension
         float   coeff_a   { std::numbers::sqrt2 /
-                            std::numbers::sqrt3 };     // surround mixing coefficients
+                            std::numbers::sqrt3, };     // surround mixing coefficients
         float   coeff_b   { std::numbers::inv_sqrt3 }; // surround mixing coefficients
         int32_t phasemode {      0 };   // phase shifting mode
         int32_t steering  {      1 };   // steering mode (0=simple, 1=linear)

@@ -410,7 +410,7 @@ QStringList StorageGroup::GetFileInfo(const QString &lfilename)
     }
 
     if ((searched && !filename.isEmpty()) ||
-        (FileExists(filename)))
+        FileExists(filename))
     {
         QFileInfo fInfo(filename);
 
@@ -656,21 +656,21 @@ QString StorageGroup::FindFileDir(const QString &filename)
             gCoreContext->GetSetting("RecordFilePrefix") + "/" + filename;
         checkFile.setFile(tmpFile);
         if (checkFile.exists() || checkFile.isSymLink())
-            result = tmpFile;
+            result = std::move(tmpFile);
     }
     else if (m_groupname != "Default")
     {
         // Not found in current group so try Default
         StorageGroup sgroup("Default");
         QString tmpFile = sgroup.FindFileDir(filename);
-        result = (tmpFile.isEmpty()) ? result : tmpFile;
+        result = tmpFile.isEmpty() ? result : tmpFile;
     }
     else
     {
         // Not found in Default so try any dir
         StorageGroup sgroup;
         QString tmpFile = sgroup.FindFileDir(filename);
-        result = (tmpFile.isEmpty()) ? result : tmpFile;
+        result = tmpFile.isEmpty() ? result : tmpFile;
     }
 
     return result;

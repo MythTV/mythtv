@@ -83,7 +83,7 @@ class DecoderHandler : public QObject, public MythObservable
     {
         ACTIVE,
         LOADING,
-        STOPPED
+        STOPPED,
     };
 
     DecoderHandler(void) = default;

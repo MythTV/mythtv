@@ -160,7 +160,7 @@ bool MythUIGuideGrid::ParseElement(
             MythMainWindow* window = GetMythMainWindow();
             fontcopy.Rescale(window->GetUIScreenRect().height());
             fontcopy.AdjustStretch(window->GetFontStretch());
-            *m_font = fontcopy;
+            *m_font = std::move(fontcopy);
         }
         else
         {

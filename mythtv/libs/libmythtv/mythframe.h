@@ -60,7 +60,7 @@ enum VideoFrameType : std::int8_t
     FMT_MEDIACODEC = 31,
     FMT_VTB      = 32,
     FMT_NVDEC    = 33,
-    FMT_DRMPRIME = 34
+    FMT_DRMPRIME = 34,
 };
 
 enum MythDeintType : std::uint8_t
@@ -72,7 +72,7 @@ enum MythDeintType : std::uint8_t
     DEINT_CPU    = 0x0010,
     DEINT_SHADER = 0x0020,
     DEINT_DRIVER = 0x0040,
-    DEINT_ALL    = 0x0077  // clazy:exclude=unexpected-flag-enumerator-value
+    DEINT_ALL    = 0x0077,  // clazy:exclude=unexpected-flag-enumerator-value
 };
 
 inline MythDeintType operator| (MythDeintType a, MythDeintType b) { return static_cast<MythDeintType>(static_cast<int>(a) | static_cast<int>(b)); }

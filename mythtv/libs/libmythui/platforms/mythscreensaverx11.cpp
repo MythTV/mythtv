@@ -190,7 +190,7 @@ class ScreenSaverX11Private
                 myth_system("xscreensaver-command -deactivate >&- 2>&- &",
                             kMSDontBlockInputDevs | kMSDontDisableDrawing | kMSRunBackground);
             }
-            m_lastDeactivated = current_time;
+            m_lastDeactivated = std::move(current_time);
         }
     }
 

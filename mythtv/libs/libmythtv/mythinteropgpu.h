@@ -37,7 +37,7 @@ class MythInteropGPU : public QObject, public ReferenceCounter
         GL_DRMPRIME,
         DRM_DRMPRIME,
         // used for default free/user_opaque storage
-        DUMMY
+        DUMMY,
     };
 
     using InteropTypes = std::vector<InteropType>;

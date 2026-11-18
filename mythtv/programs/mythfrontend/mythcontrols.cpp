@@ -749,13 +749,10 @@ void MythControls::customEvent(QEvent *event)
             if (GetFocusWidget() != m_leftList)
                 SetFocusWidget(m_leftList);
         }
-        else if (resultid == "conflict")
+        else if ((resultid == "conflict") && (buttonnum == 1))
         {
-            if (buttonnum == 1)
-            {
-                QString key = dce->GetData().toString();
-                AddKeyToAction(key, true);
-            }
+            QString key = dce->GetData().toString();
+            AddKeyToAction(key, true);
         }
 
         if (m_menuPopup)

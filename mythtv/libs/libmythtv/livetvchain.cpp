@@ -822,7 +822,7 @@ bool LiveTVChain::entriesFromStringList(const QStringList &items)
     {
         QMutexLocker lock(&m_lock);
         m_maxPos = maxpos;
-        m_chain = chain;
+        m_chain = std::move(chain);
     }
     else
     {

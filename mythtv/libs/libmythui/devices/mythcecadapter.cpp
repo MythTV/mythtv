@@ -296,19 +296,15 @@ int MythCECAdapter::HandleCommand(const cec_command &Command)
         .arg(Command.opcode).arg(Command.initiator).arg(Command.initiator)
         .arg(Command.destination).arg(Command.destination));
 
-    switch (Command.opcode)
+    if (Command.opcode == CEC_OPCODE_MENU_REQUEST)
     {
-        case CEC_OPCODE_MENU_REQUEST:
-            cec_keypress key;
-            key.keycode = CEC_USER_CONTROL_CODE_ROOT_MENU;
-            key.duration = 5;
-            HandleKeyPress(key);
-            // SetMenuState could be used to disable the TV menu here
-            // That may be a user-unfriendly thing to do
-            // So they have to see both the TV menu and the MythTV menu
-            break;
-        default:
-            break;
+        cec_keypress key;
+        key.keycode = CEC_USER_CONTROL_CODE_ROOT_MENU;
+        key.duration = 5;
+        HandleKeyPress(key);
+        // SetMenuState could be used to disable the TV menu here
+        // That may be a user-unfriendly thing to do
+        // So they have to see both the TV menu and the MythTV menu
     }
     gCoreContext->SendSystemEvent(QString("CEC_COMMAND_RECEIVED COMMAND %1").arg(Command.opcode));
     return 1;

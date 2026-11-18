@@ -198,7 +198,7 @@ bool MythFileBuffer::OpenFile(const QString &Filename, std::chrono::milliseconds
     }
 
     bool islocal = (!m_filename.startsWith("/dev")) &&
-                   ((m_filename.startsWith("/")) || QFile::exists(m_filename));
+                   (m_filename.startsWith("/") || QFile::exists(m_filename));
 
     if (islocal)
     {

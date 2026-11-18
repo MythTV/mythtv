@@ -436,7 +436,7 @@ QString RemoteEncoder::SetInput(const QString& input)
         return strlist[0];
     }
 
-    return (m_lastinput.isEmpty()) ? "Error" : m_lastinput;
+    return m_lastinput.isEmpty() ? "Error" : m_lastinput;
 }
 
 void RemoteEncoder::ToggleChannelFavorite(const QString& changroupname)

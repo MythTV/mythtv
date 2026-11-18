@@ -821,13 +821,8 @@ int ServerPool::tryListeningPort(QTcpServer *server, int baseport,
                 ipv6 = false;
             }
         }
-        if (!ipv6)
-        {
-            if (server->listen(QHostAddress::Any, port))
-            {
-                break;
-            }
-        }
+        if (!ipv6 && server->listen(QHostAddress::Any, port))
+            break;
         port++;
     }
 
@@ -885,13 +880,8 @@ int ServerPool::tryBindingPort(QUdpSocket *socket, int baseport,
                 ipv6 = false;
             }
         }
-        if (!ipv6)
-        {
-            if (socket->bind(QHostAddress::Any, port))
-            {
-                break;
-            }
-        }
+        if (!ipv6 && socket->bind(QHostAddress::Any, port))
+            break;
         port++;
     }
 

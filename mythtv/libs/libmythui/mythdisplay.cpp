@@ -760,7 +760,7 @@ bool MythDisplay::SwitchToVideo(QSize Size, double Rate)
     }
 
     // No need for change
-    if ((next == current) && (MythDisplayMode::CompareRates(current.RefreshRate(), targetrate)))
+    if ((next == current) && MythDisplayMode::CompareRates(current.RefreshRate(), targetrate))
     {
         LOG(VB_GENERAL, LOG_INFO, LOC + QString("Using current mode %1x%2@%3Hz")
             .arg(m_resolution.width()).arg(m_resolution.height()).arg(m_refreshRate));
@@ -931,13 +931,10 @@ double MythDisplay::GetAspectRatio(QString &Source, bool IgnoreModeOverride)
                         static_cast<double>(m_physicalSize.width()) / m_physicalSize.height();
 
     // Assume pixel aspect ratio is 1 (square pixels)
-    if (valid(calculated))
+    if (valid(calculated) && ((override < 0.0) || !valid(detected)))
     {
-        if ((override < 0.0) || !valid(detected))
-        {
-            Source = tr("Square pixels");
-            return calculated;
-        }
+        Source = tr("Square pixels");
+        return calculated;
     }
 
     // Based on actual physical size if available
@@ -1109,7 +1106,7 @@ void MythDisplay::WaitForScreenChange()
     QTimer timer;
     timer.setSingleShot(true);
     connect(&timer, &QTimer::timeout,
-            &timer, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for screen change"); });
+            &timer, []{ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for screen change"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_screen, &QScreen::geometryChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait
@@ -1130,7 +1127,7 @@ void MythDisplay::WaitForNewScreen()
     QTimer timer;
     timer.setSingleShot(true);
     connect(&timer, &QTimer::timeout,
-            &timer, [](){ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for new screen"); });
+            &timer, []{ LOG(VB_GENERAL, LOG_WARNING, LOC + "Timed out waiting for new screen"); });
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     QObject::connect(m_widget->windowHandle(), &QWindow::screenChanged, &loop, &QEventLoop::quit);
     // 500ms maximum wait

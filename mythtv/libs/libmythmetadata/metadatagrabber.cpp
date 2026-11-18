@@ -37,23 +37,23 @@ struct GrabberOpts {
 static const QMap<GrabberType, GrabberOpts> grabberTypes {
     { kGrabberMovie,      { .m_path="%1metadata/Movie/",
                             .m_setting="MovieGrabber",
-                            .m_def="metadata/Movie/tmdb3.py" } },
+                            .m_def="metadata/Movie/tmdb3.py", }, },
     { kGrabberTelevision, { .m_path="%1metadata/Television/",
                             .m_setting="TelevisionGrabber",
-                            .m_def="metadata/Television/ttvdb4.py" } },
+                            .m_def="metadata/Television/ttvdb4.py", }, },
     { kGrabberGame,       { .m_path="%1metadata/Game/",
                             .m_setting="mythgame.MetadataGrabber",
-                            .m_def="metadata/Game/giantbomb.py" } },
+                            .m_def="metadata/Game/giantbomb.py", }, },
     { kGrabberMusic,      { .m_path="%1metadata/Music",
                             .m_setting="",
-                            .m_def="" } }
+                            .m_def="", }, },
 };
 
 static QMap<QString, GrabberType> grabberTypeStrings {
     { "movie",      kGrabberMovie },
     { "television", kGrabberTelevision },
     { "game",       kGrabberGame },
-    { "music",      kGrabberMusic }
+    { "music",      kGrabberMusic },
 };
 
 GrabberList MetaGrabberScript::GetList(bool refresh)
@@ -93,7 +93,7 @@ GrabberList MetaGrabberScript::GetList(GrabberType type,
             // directories they are stored in
             for (const auto& grabberType : std::as_const(grabberTypes))
             {
-                QString path = (grabberType.m_path).arg(GetShareDir());
+                QString path = grabberType.m_path.arg(GetShareDir());
                 QDir dir = QDir(path);
                 if (!dir.exists())
                 {

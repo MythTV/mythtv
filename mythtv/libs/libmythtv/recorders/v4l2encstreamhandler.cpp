@@ -28,22 +28,22 @@ const std::array<const std::string,15> V4L2encStreamHandler::kStreamTypes
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2"
+    "SVCD",      "DVD-Special 1", "DVD-Special 2",
 };
 
 const std::array<const int,14> V4L2encStreamHandler::kAudioRateL1
 {
-    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
+    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448,
 };
 
 const std::array<const int,14> V4L2encStreamHandler::kAudioRateL2
 {
-    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384
+    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384,
 };
 
 const std::array<const int,14> V4L2encStreamHandler::kAudioRateL3
 {
-    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320,
 };
 
 #define LOC      QString("V4L2SH[%1](%2): ").arg(m_inputId).arg(m_device)

@@ -28,7 +28,7 @@ class MythCECAdapter
         None        = 0x00,
         PowerOffTV  = 0x01,
         PowerOnTV   = 0x02,
-        SwitchInput = 0x04
+        SwitchInput = 0x04,
     };
 
     Q_DECLARE_FLAGS(MythCECActions, MythCECAction)

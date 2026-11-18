@@ -645,7 +645,7 @@ void MythCCExtractorPlayer::IngestDVBSubtitles(void)
 
         AVSubtitles *avsubtitles = (*subit).m_reader->GetAVSubtitles();
 
-        QMutexLocker locker(&(avsubtitles->m_lock));
+        QMutexLocker locker(&avsubtitles->m_lock);
 
         while (!avsubtitles->m_buffers.empty())
         {

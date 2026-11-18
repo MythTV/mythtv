@@ -45,6 +45,7 @@ class RecordingInfo;
 
 #define JOBSTATUS_ENUM(A,B,C)   A = (B) ,
 enum JobStatus : std::uint16_t {
+    // NOLINTNEXTLINE(readability-trailing-comma) - messes up the macros
     JOBSTATUS_MAP(JOBSTATUS_ENUM)
 };
 
@@ -55,7 +56,7 @@ enum JobCmds : std::uint8_t {
     JOB_PAUSE        = 0x0001,
     JOB_RESUME       = 0x0002,
     JOB_STOP         = 0x0004,
-    JOB_RESTART      = 0x0008
+    JOB_RESTART      = 0x0008,
 };
 
 enum JobFlags : std::uint8_t {
@@ -63,7 +64,7 @@ enum JobFlags : std::uint8_t {
     JOB_USE_CUTLIST  = 0x0001,
     JOB_LIVE_REC     = 0x0002,
     JOB_EXTERNAL     = 0x0004,
-    JOB_REBUILD      = 0x0008
+    JOB_REBUILD      = 0x0008,
 };
 
 enum JobLists : std::uint8_t {
@@ -71,7 +72,7 @@ enum JobLists : std::uint8_t {
     JOB_LIST_DONE     = 0x0002,
     JOB_LIST_NOT_DONE = 0x0004,
     JOB_LIST_ERROR    = 0x0008,
-    JOB_LIST_RECENT   = 0x0010
+    JOB_LIST_RECENT   = 0x0010,
 };
 
 enum JobTypes : std::uint16_t {
@@ -87,7 +88,7 @@ enum JobTypes : std::uint16_t {
     JOB_USERJOB1     = 0x0100,
     JOB_USERJOB2     = 0x0200,
     JOB_USERJOB3     = 0x0400,
-    JOB_USERJOB4     = 0x0800
+    JOB_USERJOB4     = 0x0800,
 };
 
 static QMap< QString, int > JobNameToType {
@@ -97,7 +98,7 @@ static QMap< QString, int > JobNameToType {
     { "UserJob1",  JOB_USERJOB1 },
     { "UserJob2",  JOB_USERJOB2 },
     { "UserJob3",  JOB_USERJOB3 },
-    { "UserJob4",  JOB_USERJOB4 }
+    { "UserJob4",  JOB_USERJOB4 },
 };
 
 struct JobQueueEntry {

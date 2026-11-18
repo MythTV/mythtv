@@ -24,7 +24,7 @@ class PremiereContentInformationTable : public PSIPTable
     uint DurationInSeconds() const
         { return ((byteBCD2int(psipdata()[4]) * 3600) +
                   (byteBCD2int(psipdata()[5]) * 60) +
-                  (byteBCD2int(psipdata()[6]))); }
+                  byteBCD2int(psipdata()[6])); }
     // descriptor length        8   8.0
     uint DescriptorsLength() const
         { return ((psipdata()[7] & 0x0F) << 8) | psipdata()[8]; }

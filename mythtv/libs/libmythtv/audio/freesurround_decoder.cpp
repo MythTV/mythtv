@@ -176,8 +176,8 @@ public:
             {0,0},
             {0,std::numbers::pi_v<float>},
             {std::numbers::pi_v<float>,0},
-            {-std::numbers::pi_v<float>/2,std::numbers::pi_v<float>/2}
-        }};
+            {-std::numbers::pi_v<float>/2,std::numbers::pi_v<float>/2},
+        },};
         m_phaseOffsetL = modes[mode][0];
         m_phaseOffsetR = modes[mode][1];
     }
@@ -272,7 +272,7 @@ private:
                     front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),      // center
                     front * ((right * center_width) + (std::max(0.0F,  m_xFs[f]) * (1.0F - center_width)) ), // right
                     back * m_surroundLevel * left,                                        // left surround
-                    back * m_surroundLevel * right                                        // right surround
+                    back * m_surroundLevel * right,                                        // right surround
                 };
 
                 // adapt the prior filter
@@ -313,7 +313,7 @@ private:
                     front * center_level * ( (1.0F - std::abs(m_xFs[f])) * (1.0F - center_width) ),   // center
                     front * ((right * center_width) + (std::max(0.0F,  m_xFs[f]) * (1.0F-center_width))), // right
                     back * m_surroundLevel * std::clamp( (1.0F - (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F),// left surround
-                    back * m_surroundLevel * std::clamp( (1.0F + (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F) // right surround
+                    back * m_surroundLevel * std::clamp( (1.0F + (m_xFs[f] / m_surroundBalance) ) / 2.0F, 0.0F, 1.0F), // right surround
                 };
 
                 // adapt the prior filter
@@ -331,12 +331,12 @@ private:
         }
 
         // 4. distribute the unfiltered reference signals over the channels
-        apply_filter((m_frontL).data(), m_filter[0].data(),&output[0][0]);  // front left
-        apply_filter((m_avg).data(),    m_filter[1].data(),&output[1][0]);  // front center
-        apply_filter((m_frontR).data(), m_filter[2].data(),&output[2][0]);  // front right
-        apply_filter((m_surL).data(),   m_filter[3].data(),&output[3][0]);  // surround left
-        apply_filter((m_surR).data(),   m_filter[4].data(),&output[4][0]);  // surround right
-        apply_filter((m_trueavg).data(),m_filter[5].data(),&output[5][0]);  // lfe
+        apply_filter(m_frontL.data(), m_filter[0].data(),&output[0][0]);  // front left
+        apply_filter(m_avg.data(),    m_filter[1].data(),&output[1][0]);  // front center
+        apply_filter(m_frontR.data(), m_filter[2].data(),&output[2][0]);  // front right
+        apply_filter(m_surL.data(),   m_filter[3].data(),&output[3][0]);  // surround left
+        apply_filter(m_surR.data(),   m_filter[4].data(),&output[4][0]);  // surround right
+        apply_filter(m_trueavg.data(),m_filter[5].data(),&output[5][0]);  // lfe
     }
 
 #define FASTER_CALC

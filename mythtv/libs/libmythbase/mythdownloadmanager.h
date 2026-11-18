@@ -45,7 +45,7 @@ class MBASE_PUBLIC MythCookieJar : public QNetworkCookieJar
 enum MRequestType : std::uint8_t {
     kRequestGet,
     kRequestHead,
-    kRequestPost
+    kRequestPost,
 };
 
 using AuthCallback = void (*)(QNetworkReply*, QAuthenticator*, void*);

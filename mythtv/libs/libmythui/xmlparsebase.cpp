@@ -684,14 +684,11 @@ bool XMLParseBase::WindowExists(const QString &xmlfile,
         while (!n.isNull())
         {
             QDomElement e = n.toElement();
-            if (!e.isNull())
+            if (!e.isNull() && (e.tagName() == "window"))
             {
-                if (e.tagName() == "window")
-                {
-                    QString name = e.attribute("name", "");
-                    if (name == windowname)
-                        return true;
-                }
+                QString name = e.attribute("name", "");
+                if (name == windowname)
+                    return true;
             }
             n = n.nextSibling();
         }

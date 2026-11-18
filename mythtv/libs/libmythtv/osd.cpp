@@ -95,11 +95,9 @@ void OSD::IsOSDVisible(bool& Visible)
 
 void OSD::HideAll(bool KeepSubs, MythScreenType* Except, bool DropNotification)
 {
-    if (DropNotification)
-    {
-        if (m_mainWindow->GetCurrentNotificationCenter()->RemoveFirst())
-            return; // we've removed the top window, don't process any further
-    }
+    if (DropNotification &&
+        m_mainWindow->GetCurrentNotificationCenter()->RemoveFirst())
+        return; // we've removed the top window, don't process any further
 
     for (auto it = m_children.cbegin(); it != m_children.cend(); ++it)
     {
@@ -121,7 +119,7 @@ void OSD::LoadWindows()
 {
     static const std::array<const QString,7> s_defaultWindows {
         OSD_WIN_MESSAGE, OSD_WIN_INPUT, OSD_WIN_PROGINFO, OSD_WIN_BROWSE,
-        OSD_WIN_STATUS, OSD_WIN_PROGEDIT, OSD_WIN_DEBUG };
+        OSD_WIN_STATUS, OSD_WIN_PROGEDIT, OSD_WIN_DEBUG, };
 
     for (const auto & window : s_defaultWindows)
     {
@@ -611,10 +609,9 @@ void OSD::SetExpiryPriv(const QString &Window, enum OSDTimeout Timeout,
         QDateTime expires = MythDate::current().addMSecs(time.count());
             m_expireTimes.insert(win, expires);
     }
-    else if ((time < 0ms) && win)
+    else if ((time < 0ms) && win && m_expireTimes.contains(win))
     {
-        if (m_expireTimes.contains(win))
-            m_expireTimes.remove(win);
+        m_expireTimes.remove(win);
     }
 }
 

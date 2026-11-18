@@ -768,7 +768,7 @@ void GalleryThumbView::UpdateImageItem(MythUIButtonListItem *item)
     }
 
     // Allow theme to distinguish visible/hidden nodes
-    QString hideState = (im->m_isHidden) ? "hidden" : "visible";
+    QString hideState = im->m_isHidden ? "hidden" : "visible";
     item->DisplayState(hideState, "buttonstate");
 
     // Caption
@@ -1691,7 +1691,7 @@ void GalleryThumbView::ShowSettings()
             this,   &GalleryThumbView::ClearSgDb);
 
     connect(config, &GallerySettings::OrderChanged,
-            this,   [this]()
+            this,   [this]
     {
         // Update db view, reset cover cache & reload
         int sortIm  = gCoreContext->GetNumSetting("GalleryImageOrder");
@@ -1702,7 +1702,7 @@ void GalleryThumbView::ShowSettings()
     });
 
     connect(config, &GallerySettings::DateChanged,
-            this,   [this]()
+            this,   [this]
     {
         QString date = gCoreContext->GetSetting("GalleryDateFormat");
         m_mgr.SetDateFormat(date);
@@ -1710,7 +1710,7 @@ void GalleryThumbView::ShowSettings()
     });
 
     connect(config, &GallerySettings::ExclusionsChanged,
-            this,   [this]()
+            this,   [this]
     {
         // Request rescan
         QString exclusions = gCoreContext->GetSetting("GalleryIgnoreFilter");

@@ -37,17 +37,18 @@ class MBASE_PUBLIC MythHTTPService : public QObject
         { return m_request->m_queries.contains(p.toLower()); }
 };
 
-class MBASE_PUBLIC V2HttpRedirectException
+class MBASE_PUBLIC V2HttpRedirectException: public std::runtime_error
 {
     public:
 
         QString m_hostName;
 
         explicit V2HttpRedirectException( QString sHostName = "")
-               : m_hostName(std::move( sHostName ))
+               : runtime_error("http redirect"),
+                 m_hostName(std::move( sHostName ))
         {}
 
-        ~V2HttpRedirectException() = default;
+        ~V2HttpRedirectException() override = default;
 };
 
 //NOLINTBEGIN(cppcoreguidelines-macro-usage)

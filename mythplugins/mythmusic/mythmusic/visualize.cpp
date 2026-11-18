@@ -1162,7 +1162,7 @@ bool Spectrogram::processUndisplayed(VisualNode *node)
     if (node)     // shift previous samples left, then append new node
     {
         // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(node->m_length));
-        int i = std::min((int)(node->m_length), m_fftlen);
+        int i = std::min((int)node->m_length, m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
@@ -1484,7 +1484,7 @@ bool Spectrum::processUndisplayed(VisualNode *node)
     if (node)     // shift previous samples left, then append new node
     {
         // LOG(VB_PLAYBACK, LOG_DEBUG, QString("SG got %1 samples").arg(node->m_length));
-        int i = std::min((int)(node->m_length), m_fftlen);
+        int i = std::min((int)node->m_length, m_fftlen);
         int start = m_fftlen - i;
         float mult = 0.8F;      // decay older sound by this much
         for (int k = 0; k < start; k++)
@@ -1572,7 +1572,8 @@ bool Spectrum::processUndisplayed(VisualNode *node)
 
         prev = index;           // next pixel is FFT bins from here
         index = m_scale[i];     // to the next bin by LOG scale
-        (prev < index) || (prev = index -1);
+        if (prev >= index)
+            prev = index - 1;
     }
 
     return false;
@@ -1718,10 +1719,10 @@ bool Squares::draw(QPainter *p, const QColor &back)
 
     const QRect *rectsp = m_rectsL.constData();
     for (uint i = 0; i < (uint)m_rectsL.size() * 2; i += 2)
-        drawRect(p, &(rectsp[i]), i, center, w, h);
+        drawRect(p, &rectsp[i], i, center, w, h);
     rectsp = m_rectsR.constData();
     for (uint i = 1; i < ((uint)m_rectsR.size() * 2) + 1; i += 2)
-        drawRect(p, &(rectsp[i]), i, center, w, h);
+        drawRect(p, &rectsp[i], i, center, w, h);
 
     return true;
 }
@@ -2049,8 +2050,8 @@ bool Piano::draw(QPainter *p, const QColor &back)
     // just uses some Qt methods to draw on a pixmap.
     // MainVisual then bitblts that onto the screen.
 
-    QRect *rectsp = (m_rects).data();
-    double *magnitudep = (m_magnitude).data();
+    QRect *rectsp = m_rects.data();
+    double *magnitudep = m_magnitude.data();
 
     unsigned int n = kPianoNumKeys;
 
@@ -2241,31 +2242,28 @@ bool AlbumArt::process(VisualNode */*node*/)
 
 void AlbumArt::handleKeyPress(const QString &action)
 {
-    if (action == "SELECT")
+    if ((action == "SELECT") && gPlayer->getCurrentMetadata())
     {
-        if (gPlayer->getCurrentMetadata())
-        {
-            AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
-            int newType = m_currImageType;
+        AlbumArtImages albumArt(gPlayer->getCurrentMetadata());
+        int newType = m_currImageType;
 
-            if (albumArt.getImageCount() > 0)
+        if (albumArt.getImageCount() > 0)
+        {
+            newType++;
+
+            while (!albumArt.getImage((ImageType) newType))
             {
                 newType++;
-
-                while (!albumArt.getImage((ImageType) newType))
-                {
-                    newType++;
-                    if (newType == IT_LAST)
-                        newType = IT_UNKNOWN;
-                }
+                if (newType == IT_LAST)
+                    newType = IT_UNKNOWN;
             }
+        }
 
-            if (newType != m_currImageType)
-            {
-                m_currImageType = (ImageType) newType;
-                // force an update
-                m_cursize = QSize(0, 0);
-            }
+        if (newType != m_currImageType)
+        {
+            m_currImageType = (ImageType) newType;
+            // force an update
+            m_cursize = QSize(0, 0);
         }
     }
 }
@@ -2284,11 +2282,9 @@ bool AlbumArt::needsUpdate()
     }
 
     // if it's time to cycle to the next image we need to update the image
-    if (m_lastCycle.addSecs(ALBUMARTCYCLETIME) < QDateTime::currentDateTime())
-    {
-        if (cycleImage())
-            return true;
-    }
+    if ((m_lastCycle.addSecs(ALBUMARTCYCLETIME) < QDateTime::currentDateTime()) &&
+        cycleImage())
+        return true;
 
     return false;
 }

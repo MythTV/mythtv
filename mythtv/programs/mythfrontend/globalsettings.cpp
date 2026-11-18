@@ -120,7 +120,7 @@ static HostTextEditSetting *VAAPIDevice()
 
     // update VideoDisplayProfile statics if this changes
     QObject::connect(ge, &HostTextEditSetting::ChangeSaved, ge,
-        []()
+        []
         {
             QString device = gCoreContext->GetSetting("VAAPIDevice");
             LOG(VB_GENERAL, LOG_INFO, QString("New VAAPI device (%1) - resetting profiles").arg(device));
@@ -977,7 +977,7 @@ void PlaybackProfileItemConfig::Save(void)
     m_item.Set(COND_RATE,    m_framerate->getValue());
     m_item.Set(PREF_DEC,     m_decoder->getValue());
     m_item.Set(PREF_CPUS,    m_maxCpus->getValue());
-    m_item.Set(PREF_LOOP,   (m_skipLoop->boolValue()) ? "1" : "0");
+    m_item.Set(PREF_LOOP,   m_skipLoop->boolValue() ? "1" : "0");
     m_item.Set(PREF_RENDER,  m_vidRend->getValue());
     m_item.Set(PREF_DEINT1X, GetQuality(m_singleDeint, m_singleShader, m_singleDriver));
     m_item.Set(PREF_DEINT2X, GetQuality(m_doubleDeint, m_doubleShader, m_doubleDriver));
@@ -1345,7 +1345,7 @@ static HostComboBoxSetting * CurrentPlaybackProfile()
     QString profile = MythVideoProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
-        profile = (profiles.contains("Normal")) ? "Normal" : profiles[0];
+        profile = profiles.contains("Normal") ? "Normal" : profiles[0];
         MythVideoProfile::SetDefaultProfileName(profile, host);
     }
 
@@ -1387,7 +1387,7 @@ void PlaybackSettings::CreateNewPlaybackProfileSlot(const QString &name)
 
     if (not_ok_list.contains(name) || name.isEmpty())
     {
-        QString msg = (name.isEmpty()) ?
+        QString msg = name.isEmpty() ?
             tr("Sorry, playback group\nname cannot be blank.") :
             tr("Sorry, playback group name\n"
                "'%1' is already being used.").arg(name);
@@ -2411,7 +2411,7 @@ static HostComboBoxSetting *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (!scr.empty() && (gCoreContext->GetSetting("GuiVidModeResolution").isEmpty()))
+    if (!scr.empty() && gCoreContext->GetSetting("GuiVidModeResolution").isEmpty())
     {
         int w = 0;
         int h = 0;
@@ -4914,23 +4914,20 @@ void ChannelGroupSetting::Save()
     QList<StandardSetting *>::const_iterator i;
     for (i = children->constBegin(); i != children->constEnd(); ++i)
     {
-        if ((*i)->haveChanged())
+        if ((*i)->haveChanged() && ((*i) != m_groupName))
         {
-            if ((*i) != m_groupName)
+            auto *channel = dynamic_cast<ChannelCheckBoxSetting *>(*i);
+            if (channel)
             {
-                auto *channel = dynamic_cast<ChannelCheckBoxSetting *>(*i);
-                if (channel)
+                if (channel->boolValue())
                 {
-                    if (channel->boolValue())
-                    {
-                        ChannelGroup::AddChannel(channel->getChannelId(),
-                                                 m_groupId);
-                    }
-                    else
-                    {
-                        ChannelGroup::DeleteChannel(channel->getChannelId(),
-                                                    m_groupId);
-                    }
+                    ChannelGroup::AddChannel(channel->getChannelId(),
+                                             m_groupId);
+                }
+                else
+                {
+                    ChannelGroup::DeleteChannel(channel->getChannelId(),
+                                                m_groupId);
                 }
             }
         }

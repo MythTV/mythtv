@@ -7,7 +7,7 @@ enum exit_actions : std::uint8_t {
     NO_EXIT  = 0,
     QUIT     = 1,
     HALT     = 2,
-    REBOOT   = 3
+    REBOOT   = 3,
 };
 
 class ExitPrompter : public QObject

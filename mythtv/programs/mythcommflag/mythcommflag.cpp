@@ -530,39 +530,36 @@ static bool IsMarked(uint chanid, const QDateTime& starttime)
     mark_query.bindValue(":STARTTIME", starttime);
 
     if (mark_query.exec() && mark_query.isActive() &&
-        mark_query.size() > 0)
+        (mark_query.size() > 0) && mark_query.next())
     {
-        if (mark_query.next())
-        {
-            int flagStatus = mark_query.value(0).toInt();
-            int marksFound = mark_query.value(1).toInt();
+        int flagStatus = mark_query.value(0).toInt();
+        int marksFound = mark_query.value(1).toInt();
 
-            QString flagStatusStr = "UNKNOWN";
-            switch (flagStatus) {
-              case COMM_FLAG_NOT_FLAGGED:
-                flagStatusStr = "Not Flagged";
-                break;
-              case COMM_FLAG_DONE:
-                flagStatusStr = QString("Flagged with %1 breaks")
-                                    .arg(marksFound / 2);
-                break;
-              case COMM_FLAG_PROCESSING:
-                flagStatusStr = "Flagging";
-                break;
-              case COMM_FLAG_COMMFREE:
-                flagStatusStr = "Commercial Free";
-                break;
-            }
-
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("Status for chanid %1 @ %2 is '%3'")
-                    .arg(QString::number(chanid),
-                         starttime.toString(Qt::ISODate),
-                         flagStatusStr));
-
-            if ((flagStatus == COMM_FLAG_NOT_FLAGGED) && (marksFound == 0))
-                return false;
+        QString flagStatusStr = "UNKNOWN";
+        switch (flagStatus) {
+        case COMM_FLAG_NOT_FLAGGED:
+            flagStatusStr = "Not Flagged";
+            break;
+        case COMM_FLAG_DONE:
+            flagStatusStr = QString("Flagged with %1 breaks")
+                .arg(marksFound / 2);
+            break;
+        case COMM_FLAG_PROCESSING:
+            flagStatusStr = "Flagging";
+            break;
+        case COMM_FLAG_COMMFREE:
+            flagStatusStr = "Commercial Free";
+            break;
         }
+
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("Status for chanid %1 @ %2 is '%3'")
+            .arg(QString::number(chanid),
+                 starttime.toString(Qt::ISODate),
+                 flagStatusStr));
+
+        if ((flagStatus == COMM_FLAG_NOT_FLAGGED) && (marksFound == 0))
+            return false;
     }
     return true;
 }
@@ -708,15 +705,12 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
         return GENERIC_EXIT_PERMISSIONS_ERROR;
     }
 
-    if (useDB)
+    if (useDB && !MSqlQuery::testDBConnection())
     {
-        if (!MSqlQuery::testDBConnection())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
-            delete tmprbuf;
-            global_program_info = nullptr;
-            return GENERIC_EXIT_DB_ERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Unable to open commflag DB connection");
+        delete tmprbuf;
+        global_program_info = nullptr;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
     auto flags = static_cast<PlayerFlags>(kAudioMuted | kVideoIsNull | kNoITV);
@@ -745,35 +739,32 @@ static int FlagCommercials(ProgramInfo *program_info, int jobid,
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetPlayer(cfp);
 
-    if (useDB)
+    if (useDB && (program_info->GetRecordingEndTime() > MythDate::current()))
     {
-        if (program_info->GetRecordingEndTime() > MythDate::current())
+        gCoreContext->ConnectToMasterServer();
+
+        recorder = RemoteGetExistingRecorder(program_info);
+        if (recorder && (recorder->GetRecorderNumber() != -1))
         {
-            gCoreContext->ConnectToMasterServer();
+            recorderNum =  recorder->GetRecorderNumber();
+            watchingRecording = true;
+            ctx->SetRecorder(recorder);
 
-            recorder = RemoteGetExistingRecorder(program_info);
-            if (recorder && (recorder->GetRecorderNumber() != -1))
-            {
-                recorderNum =  recorder->GetRecorderNumber();
-                watchingRecording = true;
-                ctx->SetRecorder(recorder);
-
-                LOG(VB_COMMFLAG, LOG_INFO,
-                    QString("mythcommflag will flag recording "
-                            "currently in progress on cardid %1")
-                        .arg(recorderNum));
-            }
-            else
-            {
-                recorderNum = -1;
-                watchingRecording = false;
-
-                LOG(VB_GENERAL, LOG_ERR,
-                        "Unable to find active recorder for this "
-                        "recording, realtime flagging will not be enabled.");
-            }
-            cfp->SetWatchingRecording(watchingRecording);
+            LOG(VB_COMMFLAG, LOG_INFO,
+                QString("mythcommflag will flag recording "
+                        "currently in progress on cardid %1")
+                .arg(recorderNum));
         }
+        else
+        {
+            recorderNum = -1;
+            watchingRecording = false;
+
+            LOG(VB_GENERAL, LOG_ERR,
+                "Unable to find active recorder for this "
+                "recording, realtime flagging will not be enabled.");
+        }
+        cfp->SetWatchingRecording(watchingRecording);
     }
 
     // TODO: Add back insertion of job if not in jobqueue

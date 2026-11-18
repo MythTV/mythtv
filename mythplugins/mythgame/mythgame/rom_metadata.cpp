@@ -26,11 +26,9 @@ static int calcOffset(const QString& GameType, uint32_t filesize) {
          if (rom_size < filesize)
              result = filesize - rom_size;
     }
-    else if (GameType == "PCE")
+    else if ((GameType == "PCE") && (filesize & 0x0FFF))
     {
-         if (filesize & 0x0FFF)
-             result = filesize & 0x0FFF;
-
+         result = filesize & 0x0FFF;
     }
 
     return result;

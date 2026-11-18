@@ -114,7 +114,7 @@ class ImageLoader
         m_loadingImagesLock.lock();
 
         // Check to see if the image is being loaded by us in another thread
-        if ((m_loadingImages.contains(cacheKey)) &&
+        if (m_loadingImages.contains(cacheKey) &&
             (m_loadingImages.value(cacheKey) == uitype))
         {
             LOG(VB_GUI | VB_FILE, LOG_DEBUG,

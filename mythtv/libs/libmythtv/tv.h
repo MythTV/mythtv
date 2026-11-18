@@ -45,7 +45,7 @@ enum BrowseDirection : std::int8_t
     BROWSE_DOWN     = 2, ///< Fetch information on next channel
     BROWSE_LEFT     = 3, ///< Fetch information on current channel in the past
     BROWSE_RIGHT    = 4, ///< Fetch information on current channel in the future
-    BROWSE_FAVORITE = 5  ///< Fetch information on the next favorite channel
+    BROWSE_FAVORITE = 5, ///< Fetch information on the next favorite channel
 };
 
 /** \brief TVState is an enumeration of the states used by TV and TVRec.
@@ -117,7 +117,7 @@ enum SleepStatus : std::uint8_t {
       *        to the master backend or is not able to be put to sleep and
       *        awakened.
       */
-    sStatus_Undefined     = 0x8
+    sStatus_Undefined     = 0x8,
 };
 
 enum PictureAdjustType : std::uint8_t

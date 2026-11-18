@@ -82,7 +82,7 @@ class MTV_PUBLIC ProgramInfo
     static constexpr int kNumCatTypes = 5;
     enum CategoryType : std::uint8_t
                       { kCategoryNone, kCategoryMovie, kCategorySeries,
-                        kCategorySports, kCategoryTVShow };
+                        kCategorySports, kCategoryTVShow, };
 
     /// Null constructor
     ProgramInfo(void) { ensureSortFields(); }
@@ -885,7 +885,7 @@ public:
         None,                   // Don't group programs
         ChanNum,                // Group by number and callsign
         CallSign,               // Group by call sign
-        ProgramId               // Group by program ID
+        ProgramId,              // Group by program ID
     };
     static QString toString(ProgGroupBy::Type groupBy);
     Q_ENUM(Type)

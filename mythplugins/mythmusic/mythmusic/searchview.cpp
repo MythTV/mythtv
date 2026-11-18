@@ -110,14 +110,12 @@ void SearchView::customEvent(QEvent *event)
         MusicCommon::customEvent(event);
         handled = true;
 
-        if (m_playTrack == 1 || (m_playTrack == -1 && MusicPlayer::getPlayNow()))
+        if ((m_playTrack == 1 || (m_playTrack == -1 && MusicPlayer::getPlayNow())) &&
+            (event->type() == MusicPlayerEvent::kTrackAddedEvent))
         {
-            if (event->type() == MusicPlayerEvent::kTrackAddedEvent)
-            {
-                // make the added track current and play it
-                m_currentPlaylist->SetItemCurrent(m_currentPlaylist->GetCount() - 1);
-                playlistItemClicked(m_currentPlaylist->GetItemCurrent());
-            }
+            // make the added track current and play it
+            m_currentPlaylist->SetItemCurrent(m_currentPlaylist->GetCount() - 1);
+            playlistItemClicked(m_currentPlaylist->GetItemCurrent());
         }
         m_playTrack = -1;     // use PlayNow preference or menu option
     }

@@ -30,7 +30,7 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
     QStringMap            lowerParams;
 
     if (!pService)
-        throw QString("Invalid argument to MethodInfo::Invoke. pService in nullptr");
+        throw std::runtime_error("Invalid argument to MethodInfo::Invoke. pService in nullptr");
 
      // Change params to lower case for case-insensitive comparison
     for (auto it = reqParams.cbegin(); it != reqParams.cend(); ++it)
@@ -108,8 +108,8 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
                 LOG(VB_GENERAL, LOG_ERR,
                     QString("MethodInfo::Invoke - Type unknown '%1'")
                         .arg(sParamType));
-                throw QString("MethodInfo::Invoke - Type unknown '%1'")
-                          .arg(sParamType);
+                throw std::runtime_error(QString("MethodInfo::Invoke - Type unknown '%1'")
+                                         .arg(sParamType).toStdString());
             }
 
             types[nIdx+1] = nId;
@@ -144,11 +144,16 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
             }
         }
     }
-    catch (QString &sMsg)
+    catch (HttpRedirectException &ex)
+    {
+        bExceptionThrown = true;
+        exception = ex;
+    }
+    catch (const std::runtime_error& ex)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MethodInfo::Invoke - An Exception Occurred: %1")
-                 .arg(sMsg));
+            .arg(ex.what()));
 
         if  ((types[ 0 ] != QMetaType::UnknownType) && (param[ 0 ] != nullptr ))
         {
@@ -157,11 +162,6 @@ QVariant MethodInfo::Invoke( Service *pService, const QStringMap &reqParams ) co
         }
 
         throw;
-    }
-    catch (HttpRedirectException &ex)
-    {
-        bExceptionThrown = true;
-        exception = ex;
     }
     catch (...)
     {
@@ -344,8 +344,8 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
                 }
 
                 if (!bHandled2)
-                    throw QString("Invalid arguments to xsd query: %1")
-                        .arg(pRequest->m_sRequestUrl.section('?', 1));
+                    throw std::runtime_error(QString("Invalid arguments to xsd query: %1")
+                                             .arg(pRequest->m_sRequestUrl.section('?', 1)).toStdString());
 
                 return true;
             }
@@ -439,16 +439,17 @@ bool ServiceHost::ProcessRequest( HTTPRequest *pRequest )
     }
     catch (HttpException &ex)
     {
-        LOG(VB_GENERAL, LOG_ERR, ex.m_msg);
-        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, ex.m_msg);
+        QString msg(ex.what());
+        LOG(VB_GENERAL, LOG_ERR, msg);
+        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, msg);
 
         bHandled = true;
 
     }
-    catch (QString &sMsg)
+    catch (const std::runtime_error& ex)
     {
-        LOG(VB_GENERAL, LOG_ERR, sMsg);
-        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, sMsg);
+        LOG(VB_GENERAL, LOG_ERR, ex.what());
+        pRequest->FormatErrorResponse(UPnPResult_ActionFailed, ex.what());
 
         bHandled = true;
     }

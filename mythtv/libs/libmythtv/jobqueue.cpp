@@ -290,7 +290,7 @@ void JobQueue::ProcessQueue(void)
                 {
                     int otherJobID = GetRunningJobID(jobs[x].chanid,
                                                      jobs[x].recstartts);
-                    if (otherJobID && (jobStatus.contains(otherJobID)) &&
+                    if (otherJobID && jobStatus.contains(otherJobID) &&
                         (!(jobStatus[otherJobID] & JOB_DONE)))
                     {
                         message =
@@ -434,7 +434,7 @@ void JobQueue::ProcessQueue(void)
                     continue;
 
                 if (inTimeWindow &&
-                    (hostname.isEmpty()) &&
+                    hostname.isEmpty() &&
                     (!ChangeJobHost(jobID, m_hostname)))
                 {
                     message = QString("Unable to claim '%1' job for %2")
@@ -469,7 +469,7 @@ void JobQueue::ProcessQueue(void)
         {
             if (m_jobsRunning > 0)
             {
-                if (!(gCoreContext->IsBlockingClient()))
+                if (!gCoreContext->IsBlockingClient())
                 {
                     gCoreContext->BlockShutdown();
                     LOG(VB_JOBQUEUE, LOG_INFO, QString("%1 jobs running. "
@@ -1272,20 +1272,21 @@ bool JobQueue::HasRunningOrPendingJobs(std::chrono::minutes startingWithinMins)
                 return true;
             }
 
-            if (checkForQueuedJobs) {
-                if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE))) {
-                    if (startingWithinMins <= 0min) {
-                        LOG(VB_JOBQUEUE, LOG_INFO, LOC +
-                            "HasRunningOrPendingJobs: found pending job");
-                        return true;
-                    }
-                    if ((*it).schedruntime <= maxSchedRunTime) {
-                        LOG(VB_JOBQUEUE, LOG_INFO, LOC +
-                            QString("HasRunningOrPendingJobs: found pending "
-                                    "job scheduled to start at: %1")
-                            .arg((*it).schedruntime.toString(Qt::ISODate)));
-                        return true;
-                    }
+            if (checkForQueuedJobs &&
+                (tmpStatus != JOB_UNKNOWN) &&
+                (!(tmpStatus & JOB_DONE)))
+            {
+                if (startingWithinMins <= 0min) {
+                    LOG(VB_JOBQUEUE, LOG_INFO, LOC +
+                        "HasRunningOrPendingJobs: found pending job");
+                    return true;
+                }
+                if ((*it).schedruntime <= maxSchedRunTime) {
+                    LOG(VB_JOBQUEUE, LOG_INFO, LOC +
+                        QString("HasRunningOrPendingJobs: found pending "
+                                "job scheduled to start at: %1")
+                        .arg((*it).schedruntime.toString(Qt::ISODate)));
+                    return true;
                 }
             }
         }
@@ -1750,7 +1751,7 @@ void JobQueue::ProcessJob(const JobQueueEntry& job)
     jInfo.command = GetJobCommand(jobID, job.type, pginfo);
     jInfo.pginfo  = pginfo;
 
-    m_runningJobs[jobID] = jInfo;
+    m_runningJobs[jobID] = std::move(jInfo);
 
     if (pginfo)
         pginfo->MarkAsInUse(true, kJobQueueInUseID);
@@ -1908,7 +1909,7 @@ QString JobQueue::PrettyPrint(off_t bytes)
         { .m_suffix="EB",    .m_max=999,  .m_precision=1 },
         { .m_suffix="ZB",    .m_max=999,  .m_precision=1 },
         { .m_suffix="YB",    .m_max=0,    .m_precision=0 },
-    }};
+    },};
     float fbytes = bytes;
 
     unsigned int ii = 0;

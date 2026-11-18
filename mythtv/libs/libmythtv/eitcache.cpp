@@ -121,7 +121,7 @@ enum channel_status : std::uint8_t
 {
     EITDATA      = 0,
     CHANNEL_LOCK = 1,
-    STATISTIC    = 2
+    STATISTIC    = 2,
 };
 
 static bool lock_channel(uint chanid, uint endtime)

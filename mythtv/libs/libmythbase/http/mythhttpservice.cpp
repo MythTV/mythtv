@@ -101,19 +101,15 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
                 authorization = Request->m_queries.value("authorization",{});
         MythSessionManager *sessionManager = gCoreContext->GetSessionManager();
         // methods /Myth/LoginUser and /Myth/GetConnectionInfo do not require authentication
-        if ( ! (Request->m_path == "/Myth/"
-                && (method == "LoginUser" || method == "GetConnectionInfo")) )
+        if (( ! (Request->m_path == "/Myth/"
+                && (method == "LoginUser" || method == "GetConnectionInfo")) ) &&
+            (!authorization.isEmpty() || authReq) &&
+            !sessionManager->IsValidSession(authorization))
         {
-            if (!authorization.isEmpty() || authReq)
-            {
-                if (!sessionManager->IsValidSession(authorization))
-                {
-                    QString error(" Invalid authorization token");
-                    LOG(VB_HTTP, LOG_ERR, LOC + error);
-                    Request->m_status = HTTPUnauthorized;
-                    return MythHTTPResponse::ErrorResponse(Request, error);
-                }
-            }
+            QString error(" Invalid authorization token");
+            LOG(VB_HTTP, LOG_ERR, LOC + error);
+            Request->m_status = HTTPUnauthorized;
+            return MythHTTPResponse::ErrorResponse(Request, error);
         }
     }
     // Sanity check type count (handler should have the return type at least)
@@ -186,16 +182,17 @@ HTTPResponse MythHTTPService::HTTPRequest(const HTTPRequest2& Request)
                 returnvalue = MythHTTPMetaMethod::CreateReturnValue(types[0], param[0]);
             }
         }
-        catch( QString &msg ) {
+        catch (V2HttpRedirectException &ex) {
+            result = MythHTTPResponse::RedirectionResponse(Request, ex.m_hostName);
+        }
+        catch( const std::runtime_error& ex ) {
+            QString msg(ex.what());
             LOG(VB_GENERAL, LOG_ERR, "Service Exception: " + msg);
             if (msg.startsWith("Forbidden:"))
                 Request->m_status = HTTPForbidden;
             else
                 Request->m_status = HTTPBadRequest;
             result = MythHTTPResponse::ErrorResponse(Request, msg);
-        }
-        catch (V2HttpRedirectException &ex) {
-            result = MythHTTPResponse::RedirectionResponse(Request, ex.m_hostName);
         }
 
         if (!returnvalue.isValid())

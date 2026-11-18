@@ -540,16 +540,13 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
         QString RomName = query.value(0).toString();
         QString RomPath = query.value(1).toString();
         QString GameName = query.value(2).toString();
-        if (!RomName.isEmpty())
+        // If it's both on disk and in the database we're done with it.
+        if ((!RomName.isEmpty()) && (!m_gameMap.remove(RomName)))
         {
-            // If it's both on disk and in the database we're done with it.
-            if (!m_gameMap.remove(RomName))
-            {
-                // If it's only in the database add it to our list and mark it for
-                // removal.
-                m_gameMap[RomName] = GameScan(RomName,RomPath + "/" + RomName,inDatabase,
-                                        GameName,RomPath);
-            }
+            // If it's only in the database add it to our list and mark it for
+            // removal.
+            m_gameMap[RomName] = GameScan(RomName,RomPath + "/" + RomName,inDatabase,
+                                          GameName,RomPath);
         }
         if (m_progressDlg)
             m_progressDlg->SetProgress(++counter);
@@ -793,11 +790,8 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 
     for (auto *handler : std::as_const(*handlers))
     {
-        if (handler)
-        {
-            if (rominfo->System() == handler->SystemName())
-                return handler;
-        }
+        if (handler && (rominfo->System() == handler->SystemName()))
+            return handler;
     }
 
     return nullptr;
@@ -810,11 +804,8 @@ GameHandler* GameHandler::GetHandlerByName(const QString& systemname)
 
     for (auto *handler : std::as_const(*handlers))
     {
-        if (handler)
-        {
-            if (handler->SystemName() == systemname)
-                return handler;
-        }
+        if (handler && (handler->SystemName() == systemname))
+            return handler;
     }
 
     return nullptr;
@@ -892,14 +883,12 @@ void GameHandler::Launchgame(RomInfo *romdata, const QString& systemname)
 
     QString savedir = QDir::current().path();
     QDir d;
-    if (!handler->SystemWorkingPath().isEmpty())
+    if (!handler->SystemWorkingPath().isEmpty() &&
+        !d.cd(handler->SystemWorkingPath()))
     {
-        if (!d.cd(handler->SystemWorkingPath()))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("Failed to change to specified Working Directory: %1")
-                    .arg(handler->SystemWorkingPath()));
-        }
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("Failed to change to specified Working Directory: %1")
+            .arg(handler->SystemWorkingPath()));
     }
     LOG(VB_GENERAL, LOG_INFO, LOC + QString("Launching Game : %1 : %2")
            .arg(handler->SystemName(), exec));
@@ -971,14 +960,8 @@ void GameHandler::customEvent(QEvent *event)
         else if (resultid == "clearAllPopup")
         {
             int buttonNum = dce->GetResult();
-            switch (buttonNum)
-            {
-                case 1:
-                    clearAllMetadata();
-                    break;
-                default:
-                    break;
-            }
+            if (buttonNum == 1)
+                clearAllMetadata();
         }
     }
 }

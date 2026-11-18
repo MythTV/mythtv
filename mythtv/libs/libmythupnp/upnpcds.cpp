@@ -285,24 +285,24 @@ static const std::array<const UPnpCDSClientException,5> clientExceptions {{
     // Windows Media Player version 12
     { .nClientType=CDS_ClientWMP,
       .sHeaderKey="User-Agent",
-      .sHeaderValue="Windows-Media-Player/" },
+      .sHeaderValue="Windows-Media-Player/", },
     // Windows Media Player version < 12
     { .nClientType=CDS_ClientWMP,
       .sHeaderKey="User-Agent",
-      .sHeaderValue="Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x" },
+      .sHeaderValue="Mozilla/4.0 (compatible; UPnP/1.0; Windows 9x", },
     // XBMC
     { .nClientType=CDS_ClientXBMC,
       .sHeaderKey="User-Agent",
-      .sHeaderValue="Platinum/" },
+      .sHeaderValue="Platinum/", },
     // XBox 360
     { .nClientType=CDS_ClientXBox,
       .sHeaderKey="User-Agent",
-      .sHeaderValue="Xbox" },
+      .sHeaderValue="Xbox", },
     // Sony Blu-ray players
     { .nClientType=CDS_ClientSonyDB,
       .sHeaderKey="X-AV-Client-Info",
-      .sHeaderValue=R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")" },
-}};
+      .sHeaderValue=R"(cn="Sony Corporation"; mn="Blu-ray Disc Player")", },
+},};
 
 void UPnpCDS::DetermineClient( HTTPRequest *pRequest,
                                UPnpCDSRequest *pCDSRequest )
@@ -1064,9 +1064,7 @@ QString UPnpCDSExtension::CreateIDString(const QString &requestId,
                                          const QString &name,
                                          const QString &value)
 {
-    IDToken currentToken = GetCurrentToken(requestId);
-    QString currentName = currentToken.first;
-    QString currentValue = currentToken.second;
+    auto [currentName, currentValue] = GetCurrentToken(requestId);
 
     // For metadata requests the request ID will be the ID of the result, so
     // we don't need to do anything

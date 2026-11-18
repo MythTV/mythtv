@@ -149,7 +149,7 @@ QDateTime RemoteGetPreviewIfModified(
         cacheLastModified = cachefileinfo.lastModified();
 
     QStringList strlist("QUERY_PIXMAP_GET_IF_MODIFIED");
-    strlist << ((cacheLastModified.isValid()) ? // unix secs, UTC
+    strlist << (cacheLastModified.isValid() ? // unix secs, UTC
                 QString::number(cacheLastModified.toSecsSinceEpoch()) :
                 QString("-1"));
     strlist << QString::number(200 * 1024); // max size of preview file

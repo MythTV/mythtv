@@ -330,25 +330,23 @@ void VideoSelector::updateVideoList(void)
     {
         for (auto *v : *m_videoList)
         {
-            if (v->category == m_categorySelector->GetValue() ||
-                m_categorySelector->GetValue() == tr("All Videos"))
+            if ((v->category == m_categorySelector->GetValue() ||
+                 m_categorySelector->GetValue() == tr("All Videos")) &&
+                (v->parentalLevel <= m_currentParentalLevel))
             {
-                if (v->parentalLevel <= m_currentParentalLevel)
+                auto* item = new MythUIButtonListItem(m_videoButtonList,
+                                                      v->title);
+                item->setCheckable(true);
+                if (m_selectedList.indexOf(v) != -1)
                 {
-                    auto* item = new MythUIButtonListItem(m_videoButtonList,
-                                                          v->title);
-                    item->setCheckable(true);
-                    if (m_selectedList.indexOf(v) != -1)
-                    {
-                        item->setChecked(MythUIButtonListItem::FullChecked);
-                    }
-                    else
-                    {
-                        item->setChecked(MythUIButtonListItem::NotChecked);
-                    }
-
-                    item->SetData(QVariant::fromValue(v));
+                    item->setChecked(MythUIButtonListItem::FullChecked);
                 }
+                else
+                {
+                    item->setChecked(MythUIButtonListItem::NotChecked);
+                }
+
+                item->SetData(QVariant::fromValue(v));
             }
         }
     }

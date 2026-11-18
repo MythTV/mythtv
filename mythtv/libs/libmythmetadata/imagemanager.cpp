@@ -521,7 +521,7 @@ QString ImageAdapterSg::GetAbsFilePath(const ImagePtrK &im) const
 // Database fields used by several image queries
 static constexpr const char* kDBColumns {
 "file_id, filename, name, dir_id, type, modtime, size, "
-"extension, date, hidden, orientation, angle, path, zoom"
+"extension, date, hidden, orientation, angle, path, zoom",
 // Id, filepath, basename, parentId, type, modtime, size,
 // extension, image date, hidden, orientation, cover id, comment, device id
 };

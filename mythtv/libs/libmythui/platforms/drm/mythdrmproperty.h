@@ -18,7 +18,7 @@ class MUI_PUBLIC MythDRMProperty
         Bitmask,
         Blob,
         Object,
-        SignedRange
+        SignedRange,
     };
 
     static  DRMProps GetProperties(int FD, uint32_t ObjectId, uint32_t ObjectType);

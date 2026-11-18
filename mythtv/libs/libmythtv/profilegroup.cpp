@@ -78,7 +78,7 @@ bool ProfileGroup::addMissingDynamicProfiles(void)
 
 
     const std::array<const QString,4> profile_names {
-        "Default", "Live TV", "High Quality", "Low Quality" };
+        "Default", "Live TV", "High Quality", "Low Quality", };
 
     CardUtil::InputTypes cardtypes = CardUtil::GetInputTypes();
 

@@ -367,7 +367,7 @@ void CdDecoder::run()
                     }
 
                     m_outputAt += CDIO_CD_FRAMESIZE_RAW;
-                    ++(m_curPos);
+                    ++m_curPos;
                 }
                 else
                 {

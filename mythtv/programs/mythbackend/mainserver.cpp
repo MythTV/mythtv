@@ -777,10 +777,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MESSAGE")
     {
-        if ((listline.size() >= 2) && (listline[1].startsWith("SET_VERBOSE")))
+        if ((listline.size() >= 2) && listline[1].startsWith("SET_VERBOSE"))
             HandleSetVerbose(listline, pbs);
         else if ((listline.size() >= 2) &&
-                 (listline[1].startsWith("SET_LOG_LEVEL")))
+                 listline[1].startsWith("SET_LOG_LEVEL"))
             HandleSetLogLevel(listline, pbs);
         else
             HandleMessage(listline, pbs);
@@ -1350,8 +1350,8 @@ void MainServer::customEvent(QEvent *e)
             return;
         }
 
-        if ((me->Message().startsWith("DELETE_RECORDING")) ||
-            (me->Message().startsWith("FORCE_DELETE_RECORDING")))
+        if (me->Message().startsWith("DELETE_RECORDING") ||
+            me->Message().startsWith("FORCE_DELETE_RECORDING"))
         {
             QStringList tokens = me->Message().split(" ", Qt::SkipEmptyParts);
             if (tokens.size() < 3 || tokens.size() > 5)
@@ -1614,7 +1614,7 @@ void MainServer::customEvent(QEvent *e)
 
             if (broadcast[1] == "CLEAR_SETTINGS_CACHE")
             {
-                if ((m_ismaster) &&
+                if (m_ismaster &&
                     (pbs->isSlaveBackend() || pbs->wantsEvents()))
                     reallysendit = true;
             }
@@ -1984,8 +1984,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 return;
             }
 
-            if ((path.contains("/../")) ||
-                (path.startsWith("../")))
+            if (path.contains("/../") ||
+                path.startsWith("../"))
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     QString("FileTransfer write filename '%1' does not pass "
@@ -2026,18 +2026,15 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         {
             QString dirPath = finfo.absolutePath();
             QDir qdir(dirPath);
-            if (!qdir.exists())
+            if (!qdir.exists() && !qdir.mkpath(dirPath))
             {
-                if (!qdir.mkpath(dirPath))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, LOC +
-                        QString("FileTransfer filename '%1' is in a "
-                                "subdirectory which does not exist, and can "
-                                "not be created.") .arg(filename));
-                    errlist << "filetransfer_unable_to_create_subdirectory";
-                    socket->WriteStringList(errlist);
-                    return;
-                }
+                LOG(VB_GENERAL, LOG_ERR, LOC +
+                    QString("FileTransfer filename '%1' is in a "
+                            "subdirectory which does not exist, and can "
+                            "not be created.") .arg(filename));
+                errlist << "filetransfer_unable_to_create_subdirectory";
+                socket->WriteStringList(errlist);
+                return;
             }
             QWriteLocker lock(&m_sockListLock);
             if (!m_controlSocketList.remove(socket))
@@ -2973,11 +2970,8 @@ void MainServer::DoHandleStopRecording(
                 std::this_thread::sleep_for(100us);
             }
 
-            if (m_ismaster)
-            {
-                if (m_sched)
-                    m_sched->UpdateRecStatus(&recinfo);
-            }
+            if (m_ismaster && m_sched)
+                m_sched->UpdateRecStatus(&recinfo);
 
             break;
         }
@@ -3495,7 +3489,7 @@ void MainServer::HandleQueryFreeSpaceSummary(PlaybackSock *pbs)
     }
     else
     {
-        unsigned int index = (uint)(strlist.size()) - 2;
+        unsigned int index = (uint)strlist.size() - 2;
         shortlist << strlist[index++];
         shortlist << strlist[index++];
     }
@@ -3632,7 +3626,7 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
     bool exists = false;
 
-    if (recinfo.HasPathname() && (m_ismaster) &&
+    if (recinfo.HasPathname() && m_ismaster &&
         (recinfo.GetHostname() != gCoreContext->GetHostName()) &&
         checkSlaves)
     {
@@ -3749,9 +3743,9 @@ void MainServer::HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs)
     if (slist.size() > 2)
         storageGroup = slist[2];
 
-    if ((filename.isEmpty()) ||
-        (filename.contains("/../")) ||
-        (filename.startsWith("../")))
+    if (filename.isEmpty() ||
+        filename.contains("/../") ||
+        filename.startsWith("../"))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("ERROR checking for file, filename '%1' "
@@ -4313,7 +4307,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs, int cardid)
             enchost = elink->GetHostName();
 
         if ((enchost == pbshost) &&
-            (elink->IsConnected()) &&
+            elink->IsConnected() &&
             (!elink->IsBusy()) &&
             (!elink->IsTunerLocked()))
         {
@@ -4731,14 +4725,14 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "GET_INPUT")
     {
         QString ret = enc->GetInput();
-        ret = (ret.isEmpty()) ? "UNKNOWN" : ret;
+        ret = ret.isEmpty() ? "UNKNOWN" : ret;
         retlist << ret;
     }
     else if (command == "SET_INPUT")
     {
         const QString& input = slist[2];
         QString ret   = enc->SetInput(input);
-        ret = (ret.isEmpty()) ? "UNKNOWN" : ret;
+        ret = ret.isEmpty() ? "UNKNOWN" : ret;
         retlist << ret;
     }
     else if (command == "TOGGLE_CHANNEL_FAVORITE")
@@ -4821,12 +4815,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHECK_CHANNEL")
     {
         const QString& name = slist[2];
-        retlist << QString::number((int)(enc->CheckChannel(name)));
+        retlist << QString::number((int)enc->CheckChannel(name));
     }
     else if (command == "SHOULD_SWITCH_CARD")
     {
         const QString& chanid = slist[2];
-        retlist << QString::number((int)(enc->ShouldSwitchToAnotherInput(chanid)));
+        retlist << QString::number((int)enc->ShouldSwitchToAnotherInput(chanid));
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
@@ -4842,7 +4836,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << QString::number((int)match);
         retlist << QString::number(complete_valid_channel_on_rec);
         retlist << QString::number((int)is_extra_char_useful);
-        retlist << ((needed_spacer.isEmpty()) ? QString("X") : needed_spacer);
+        retlist << (needed_spacer.isEmpty() ? QString("X") : needed_spacer);
     }
     else if (command == "GET_NEXT_PROGRAM_INFO" && (slist.size() >= 6))
     {
@@ -5181,10 +5175,10 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
 
         for (auto *pbs : m_playbackList)
         {
-            if ((pbs->IsDisconnected()) ||
+            if (pbs->IsDisconnected() ||
                 (!pbs->isMediaServer()) ||
-                (pbs->isLocal()) ||
-                (backendsCounted.contains(pbs->getHostname())))
+                pbs->isLocal() ||
+                backendsCounted.contains(pbs->getHostname()))
                 continue;
 
             backendsCounted[pbs->getHostname()] = true;
@@ -5390,9 +5384,9 @@ bool MainServer::HandleDeleteFile(const QString& filename, const QString& storag
     StorageGroup sgroup(storagegroup, "", false);
     QStringList retlist;
 
-    if ((filename.isEmpty()) ||
-        (filename.contains("/../")) ||
-        (filename.startsWith("../")))
+    if (filename.isEmpty() ||
+        filename.contains("/../") ||
+        filename.startsWith("../"))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("ERROR deleting file, filename '%1' "
@@ -5650,8 +5644,8 @@ void MainServer::HandleDownloadFile(const QStringList &command,
         return;
     }
 
-    if ((filename.contains("/../")) ||
-        (filename.startsWith("../")))
+    if (filename.contains("/../") ||
+        filename.startsWith("../"))
     {
         LOG(VB_GENERAL, LOG_ERR, LOC +
             QString("ERROR: %1 write filename '%2' does not pass "
@@ -5987,22 +5981,19 @@ void MainServer::HandleMusicTagUpdateMetadata(const QStringList &slist, Playback
     }
 
     MetaIO *tagger = mdata->getTagger();
-    if (tagger)
+    if (tagger && !tagger->write(mdata->getLocalFilename(), mdata))
     {
-        if (!tagger->write(mdata->getLocalFilename(), mdata))
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("HandleMusicTagUpdateMetadata: "
-                        "Failed to write to tag for trackid: %1")
-                .arg(songID));
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("HandleMusicTagUpdateMetadata: "
+                    "Failed to write to tag for trackid: %1")
+            .arg(songID));
 
-            strlist << "ERROR: write to tag failed";
+        strlist << "ERROR: write to tag failed";
 
-            if (pbssock)
-                SendResponse(pbssock, strlist);
+        if (pbssock)
+            SendResponse(pbssock, strlist);
 
-            return;
-        }
+        return;
     }
 
     strlist << "OK";
@@ -6312,21 +6303,19 @@ void MainServer::HandleMusicTagChangeImage(const QStringList &slist, PlaybackSoc
             // change the image type in the tag if it supports it
             MetaIO *tagger = mdata->getTagger();
 
-            if (tagger && tagger->supportsEmbeddedImages())
+            if (tagger && tagger->supportsEmbeddedImages() &&
+                !tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
             {
-                if (!tagger->changeImageType(mdata->getLocalFilename(), &oldImage, image->m_imageType))
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
+                LOG(VB_GENERAL, LOG_ERR, "HandleMusicTagChangeImage: failed to change image type");
 
-                    strlist << "ERROR: failed to change image type";
+                strlist << "ERROR: failed to change image type";
 
-                    if (pbssock)
-                        SendResponse(pbssock, strlist);
+                if (pbssock)
+                    SendResponse(pbssock, strlist);
 
-                    delete mdata;
-                    delete tagger;
-                    return;
-                }
+                delete mdata;
+                delete tagger;
+                return;
             }
 
             delete tagger;
@@ -7323,7 +7312,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     m_previewRequestedBy[token] = pbs->getHostname();
 
-    if ((m_ismaster) &&
+    if (m_ismaster &&
         (pginfo.GetHostname() != gCoreContext->GetHostName()) &&
         (!m_masterBackendOverride || !pginfo.IsLocal()))
     {
@@ -7418,7 +7407,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
              QDateTime slavetime = slave->PixmapLastModified(&pginfo);
              slave->DecrRef();
 
-             strlist = (slavetime.isValid()) ?
+             strlist = slavetime.isValid() ?
                  QStringList(QString::number(slavetime.toSecsSinceEpoch())) :
                  QStringList("BAD");
 
@@ -7714,10 +7703,9 @@ void MainServer::connectionClosed(MythSocket *socket)
                     QString("SLAVE_DISCONNECTED HOSTNAME %1")
                             .arg(pbs->getHostname()));
             }
-            else if (m_ismaster && pbs->IsFrontend())
+            else if (m_ismaster && pbs->IsFrontend() && gBackendContext)
             {
-                if (gBackendContext)
-                    gBackendContext->SetFrontendDisconnected(pbs->getHostname());
+                gBackendContext->SetFrontendDisconnected(pbs->getHostname());
             }
 
             LiveTVChain *chain = GetExistingChain(sock);
@@ -7952,7 +7940,7 @@ void MainServer::DeleteChain(LiveTVChain *chain)
         if (entry != chain)
             newChains.push_back(entry);
     }
-    m_liveTVChains = newChains;
+    m_liveTVChains = std::move(newChains);
 
     chain->DecrRef();
 }

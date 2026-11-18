@@ -297,7 +297,7 @@ bool SatIPStreamHandler::UpdateFilters(void)
             }
 
             rval = m_rtsp->Play(pids_str);
-            m_oldpids = pids;
+            m_oldpids = std::move(pids);
         }
     }
 
@@ -497,7 +497,7 @@ bool SatIPStreamHandler::Open(void)
     }
 
     m_tunerType = SatIP::toTunerType(m_device);
-    m_baseurl = url;
+    m_baseurl = std::move(url);
 
     return true;
 }

@@ -134,11 +134,11 @@ bool MythUISpinBox::ParseElement(
         QString format = parseText(element);
 
         if (element.attribute("type") == "negative")
-            m_negativeTemplate = format;
+            m_negativeTemplate = std::move(format);
         else if (element.attribute("type") == "zero")
-            m_zeroTemplate = format;
+            m_zeroTemplate = std::move(format);
         else
-            m_positiveTemplate = format;
+            m_positiveTemplate = std::move(format);
 
         m_hasTemplate = true;
     }

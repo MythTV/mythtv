@@ -604,7 +604,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
 #endif // !DEBUG_DVB_OFFSETS
 
     const std::array<const QString,4> modStr {
-        "vsb8", "qam256", "qam128", "qam64" };
+        "vsb8", "qam256", "qam128", "qam64", };
     const std::array<const DTVModulation::Types,4> mod {
                          DTVModulation::kModulation8VSB,
                          DTVModulation::kModulationQAM256,

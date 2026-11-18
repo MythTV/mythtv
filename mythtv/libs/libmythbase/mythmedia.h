@@ -18,7 +18,7 @@ enum MythMediaStatus : std::uint8_t {
     MEDIASTAT_UNFORMATTED,  ///< For devices/media a plugin might erase/format
     MEDIASTAT_USEABLE,
     MEDIASTAT_NOTMOUNTED,
-    MEDIASTAT_MOUNTED
+    MEDIASTAT_MOUNTED,
 };
 
 enum MythMediaType : std::uint16_t {
@@ -39,7 +39,7 @@ enum MythMediaType : std::uint16_t {
 enum MythMediaError : std::uint8_t {
     MEDIAERR_OK,
     MEDIAERR_FAILED,
-    MEDIAERR_UNSUPPORTED
+    MEDIAERR_UNSUPPORTED,
 };
 
 using ext_cnt_t = QMap<QString,uint>;

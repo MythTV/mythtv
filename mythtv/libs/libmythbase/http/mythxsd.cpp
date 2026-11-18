@@ -489,7 +489,7 @@ bool MythXSD::RenderXSD( const HTTPRequest2& pRequest, QObject *pClass )
             if (bCustomType)
             {
                 TypeInfo info = { .sAttrName=sCustomAttr,
-                                  .sContentType=sContentType };
+                                  .sContentType=sContentType, };
                 typesToInclude.insert( sType, info );
             }
 

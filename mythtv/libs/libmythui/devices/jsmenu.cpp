@@ -455,13 +455,13 @@ void JoystickMenuThread::AxisChange(int axis, int value)
     JoystickMap::axis_map_t::const_iterator amap;
     for (amap = m_map.axisMap().begin(); amap < m_map.axisMap().end(); ++amap)
     {
-        if (axis == amap->axis)
+        if ((axis == amap->axis) &&
+            (m_axes[axis] < amap->from || m_axes[axis] > amap->to) &&
+            (value >= amap->from && value <= amap->to))
         {
             /* If we're currently outside the range, and the move is
             **   into the range, then we trigger                        */
-            if (m_axes[axis] < amap->from || m_axes[axis] > amap->to)
-                if (value >= amap->from && value <= amap->to)
-                    EmitKey(amap->keystring);
+            EmitKey(amap->keystring);
         }
     }
 }

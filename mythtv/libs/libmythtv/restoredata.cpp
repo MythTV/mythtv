@@ -103,13 +103,10 @@ RestoreData *RestoreData::s_Instance = nullptr;
 
 RestoreData *RestoreData::getInstance(uint sourceid)
 {
-    if (s_Instance != nullptr)
+    if ((s_Instance != nullptr) && (sourceid != s_Instance->m_sourceid))
     {
-        if (sourceid != s_Instance->m_sourceid)
-        {
-            delete s_Instance;
-            s_Instance = nullptr;
-        }
+        delete s_Instance;
+        s_Instance = nullptr;
     }
     if (s_Instance == nullptr)
         s_Instance = new RestoreData(sourceid, false);

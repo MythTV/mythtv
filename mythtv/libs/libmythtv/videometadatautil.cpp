@@ -70,7 +70,7 @@ QString VideoMetaDataUtil::GetArtPath(const QString &pathname,
         baseURL.setUserName(type);
         QString finalURL =
             baseURL.toString(QUrl::RemovePath) + '/' + artpath;
-        artpath = finalURL;
+        artpath = std::move(finalURL);
     }
 
     ArtPair ins(type, artpath);

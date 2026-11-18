@@ -321,13 +321,11 @@ bool UPNPSubscription::SendUnsubscribeRequest(const QString &usn,
     LOG(VB_UPNP, LOG_DEBUG, LOC + "\n\n" + sub);
 
     BlockingTcpSocket socket;
-    if (socket.connect(QHostAddress(host), port, MAX_WAIT))
+    if (socket.connect(QHostAddress(host), port, MAX_WAIT) &&
+        (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1))
     {
-        if (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1)
-        {
-            QString line = socket.readLine(MAX_WAIT);
-            success = !line.isEmpty();
-        }
+        QString line = socket.readLine(MAX_WAIT);
+        success = !line.isEmpty();
     }
 
     if (success)
@@ -384,38 +382,36 @@ std::chrono::seconds UPNPSubscription::SendSubscribeRequest(const QString &callb
     std::chrono::seconds result = 0s;
 
     BlockingTcpSocket socket;
-    if (socket.connect(QHostAddress(host), port, MAX_WAIT))
+    if (socket.connect(QHostAddress(host), port, MAX_WAIT) &&
+        (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1))
     {
-        if (socket.write(sub.constData(), sub.size(), MAX_WAIT) != -1)
+        bool ok = false;
+        QString line = socket.readLine(MAX_WAIT);
+        while (!line.isEmpty())
         {
-            bool ok = false;
-            QString line = socket.readLine(MAX_WAIT);
-            while (!line.isEmpty())
-            {
-                LOG(VB_UPNP, LOG_DEBUG, LOC + line.trimmed());
-                if (line.contains("HTTP/1.1 200 OK", Qt::CaseInsensitive))
-                    ok = true;
-                else if (line.contains("HTTP/1.1", Qt::CaseInsensitive))
-                    error = line.mid(8).trimmed();
-                if (line.startsWith("SID:", Qt::CaseInsensitive))
-                    uuid = line.mid(4).trimmed().mid(5).trimmed();
-                if (line.startsWith("TIMEOUT:", Qt::CaseInsensitive))
-                    timeout = line.mid(8).trimmed().mid(7).trimmed();
-                if (ok && !uuid.isEmpty() && !timeout.isEmpty())
-                    break;
-                line = socket.readLine(MAX_WAIT);
-            }
-
+            LOG(VB_UPNP, LOG_DEBUG, LOC + line.trimmed());
+            if (line.contains("HTTP/1.1 200 OK", Qt::CaseInsensitive))
+                ok = true;
+            else if (line.contains("HTTP/1.1", Qt::CaseInsensitive))
+                error = line.mid(8).trimmed();
+            if (line.startsWith("SID:", Qt::CaseInsensitive))
+                uuid = line.mid(4).trimmed().mid(5).trimmed();
+            if (line.startsWith("TIMEOUT:", Qt::CaseInsensitive))
+                timeout = line.mid(8).trimmed().mid(7).trimmed();
             if (ok && !uuid.isEmpty() && !timeout.isEmpty())
-            {
-                uuidout = uuid;
-                result  = std::chrono::seconds(timeout.toUInt());
-            }
-            else
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    QString("Error '%1' subscribing to %2").arg(error,usn));
-            }
+                break;
+            line = socket.readLine(MAX_WAIT);
+        }
+
+        if (ok && !uuid.isEmpty() && !timeout.isEmpty())
+        {
+            uuidout = std::move(uuid);
+            result  = std::chrono::seconds(timeout.toUInt());
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                QString("Error '%1' subscribing to %2").arg(error,usn));
         }
     }
 

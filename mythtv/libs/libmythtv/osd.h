@@ -49,7 +49,7 @@ enum OSDFunctionalType : std::uint8_t
     kOSDFunctionalType_TimeStretchAdjust,
     kOSDFunctionalType_AudioSyncAdjust,
     kOSDFunctionalType_SubtitleZoomAdjust,
-    kOSDFunctionalType_SubtitleDelayAdjust
+    kOSDFunctionalType_SubtitleDelayAdjust,
 };
 
 enum OSDTimeout : std::int8_t

@@ -216,7 +216,7 @@ void DVBStreamHandler::RunTS(void)
 
         if (drb)
         {
-            len = drb->Read(&(buffer[remainder]), buffer_size - remainder);
+            len = drb->Read(&buffer[remainder], buffer_size - remainder);
 
             // Check for DRB errors
             if (drb->IsErrored())
@@ -242,7 +242,7 @@ void DVBStreamHandler::RunTS(void)
             }
             else
             {
-                len = read(dvr_fd, &(buffer[remainder]),
+                len = read(dvr_fd, &buffer[remainder],
                            buffer_size - remainder);
             }
 
@@ -277,7 +277,7 @@ void DVBStreamHandler::RunTS(void)
         m_listenerLock.unlock();
 
         if (remainder > 0 && (len > remainder)) // leftover bytes
-            memmove(buffer, &(buffer[len - remainder]), remainder);
+            memmove(buffer, &buffer[len - remainder], remainder);
     }
     LOG(VB_RECORD, LOG_DEBUG, LOC + "RunTS(): " + "shutdown");
 
@@ -450,16 +450,13 @@ void DVBStreamHandler::CycleFiltersByPriority(void)
                 }
             }
 
-            if (freed)
+            if (freed &&
+                m_pidInfo.value(*closed)->Open(m_device, m_usingSectionReader))
             {
                 // if we can open a filter, just do it
-                if (m_pidInfo.value(*closed)->Open(
-                        m_device, m_usingSectionReader))
-                {
-                    m_openPidFilters++;
-                    priority_open_cnt[i]++;
-                    continue;
-                }
+                m_openPidFilters++;
+                priority_open_cnt[i]++;
+                continue;
             }
 
             // we have to cycle within our priority level

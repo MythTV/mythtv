@@ -278,11 +278,8 @@ void V4LChannel::SetFormat(const QString &format)
     int inputNum = m_inputId;
 
     QString fmt = format;
-    if ((fmt == "Default") || format.isEmpty())
-    {
-        if (m_inputId)
-            fmt = mode_to_format(m_videoModeV4L2);
-    }
+    if (((fmt == "Default") || format.isEmpty()) && m_inputId)
+        fmt = mode_to_format(m_videoModeV4L2);
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
             .arg(format, fmt, QString::number(inputNum)));

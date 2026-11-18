@@ -255,15 +255,11 @@ void MHTokenGroup::Activation(MHEngine *engine)
             {
                 engine->FindObject(m_tokenGrpItems.GetAt(i)->m_Object)->Activation(engine);
             }
-            catch(const std::exception& ex)
-            {
-                MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw %1").arg(ex.what()));
-            }
-            catch(char const *e)
+            catch(const std::exception& e)
             {
                 // Ignore null objects
-                if (strcmp(e, "FindObject failed") != 0)
-                    MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw '%1'").arg(e));
+                if (strcmp(e.what(), "FindObject failed") != 0)
+                    MHLOG(MHLogDetail, QString("MHTokenGroup::Activation - threw '%1'").arg(e.what()));
             }
             catch(...)
             {
@@ -306,7 +302,7 @@ void MHTokenGroup::CallActionSlot(int n, MHEngine *engine)
     {
         if (n > 0 && n <= m_noTokenActionSlots.Size())
         {
-            engine->AddActions(*(m_noTokenActionSlots.GetAt(n - 1)));
+            engine->AddActions(*m_noTokenActionSlots.GetAt(n - 1));
         }
     }
     else
@@ -317,7 +313,7 @@ void MHTokenGroup::CallActionSlot(int n, MHEngine *engine)
 
             if (n > 0 && n <= pGroup->m_ActionSlots.Size())
             {
-                engine->AddActions(*(pGroup->m_ActionSlots.GetAt(n - 1)));
+                engine->AddActions(*pGroup->m_ActionSlots.GetAt(n - 1));
             }
         }
     }
@@ -434,15 +430,11 @@ void MHListGroup::Preparation(MHEngine *engine)
                 m_itemList.append(new MHListItem(pItem));
             }
         }
-        catch(const std::exception& ex)
-        {
-            MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw %1").arg(ex.what()));
-        }
-        catch(char const *e)
+        catch(const std::exception& e)
         {
             // Ignore null objects
-            if (strcmp(e, "FindObject failed") != 0)
-                MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw '%1'").arg(e));
+            if (strcmp(e.what(), "FindObject failed") != 0)
+                MHLOG(MHLogDetail, QString("MHListGroup::Preparation - threw '%1'").arg(e.what()));
         }
         catch(...)
         {
@@ -568,7 +560,7 @@ void MHListGroup::Update(MHEngine *engine)
     {
         engine->EventTriggered(this, EventTailItems,
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-			       (m_itemList.size()) - m_nFirstItem);
+			       m_itemList.size() - m_nFirstItem);
 #else
 			       static_cast<int>(m_itemList.size()) - m_nFirstItem);
 #endif

@@ -306,7 +306,7 @@ QStringList PlaybackSock::GenPreviewPixmap(const QString &token,
         strlist.push_back("f");
         strlist.push_back(QString::number(frame));
     }
-    strlist.push_back((outputFile.isEmpty()) ? "<EMPTY>" : outputFile);
+    strlist.push_back(outputFile.isEmpty() ? "<EMPTY>" : outputFile);
     strlist.push_back(QString::number(outputSize.width()));
     strlist.push_back(QString::number(outputSize.height()));
 

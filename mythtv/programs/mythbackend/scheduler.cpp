@@ -1137,21 +1137,17 @@ bool Scheduler::FindNextConflict(
             (((p->m_mplexId != 0U) && p->m_mplexId == q->m_mplexId) ||
              ((p->m_mplexId == 0U) && p->GetChanID() == q->GetChanID()));
 
-        if (p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
-            p->GetRecordingStartTime() == q->GetRecordingEndTime())
+        if ((p->GetRecordingEndTime() == q->GetRecordingStartTime() ||
+             p->GetRecordingStartTime() == q->GetRecordingEndTime()) &&
+            ((openEnd == openEndNever) ||
+             (openEnd == openEndDiffChannel && p->GetChanID() == q->GetChanID()) ||
+             (openEnd == openEndAlways && mplexid_ok)))
         {
-            if (openEnd == openEndNever ||
-                (openEnd == openEndDiffChannel &&
-                 p->GetChanID() == q->GetChanID()) ||
-                (openEnd == openEndAlways &&
-                 mplexid_ok))
-            {
-                if (debugConflicts)
-                    msg += "  no-overlap ";
-                if (mplexid_ok)
-                    ++affinity;
-                continue;
-            }
+            if (debugConflicts)
+                msg += "  no-overlap ";
+            if (mplexid_ok)
+                ++affinity;
+            continue;
         }
 
         if (debugConflicts)
@@ -2642,7 +2638,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
         if (!WakeUpSlave(nexttv->GetHostName()))
             EnqueuePlace("HandleWakeSlave1");
     }
-    else if ((nexttv->IsWaking()) &&
+    else if (nexttv->IsWaking() &&
              ((secsleft - prerollseconds) < 210s) &&
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300) &&
              (nexttv->GetLastWakeTime().secsTo(curtime) > 10))
@@ -2655,7 +2651,7 @@ void Scheduler::HandleWakeSlave(RecordingInfo &ri, std::chrono::seconds prerolls
         if (!WakeUpSlave(nexttv->GetHostName(), false))
             EnqueuePlace("HandleWakeSlave2");
     }
-    else if ((nexttv->IsWaking()) &&
+    else if (nexttv->IsWaking() &&
              ((secsleft - prerollseconds) < 150s) &&
              (nexttv->GetSleepStatusTime().secsTo(curtime) < 300))
     {
@@ -2906,23 +2902,21 @@ bool Scheduler::HandleRecording(
         .arg(ri.GetSourceID());
 
     RecStatus::Type recStatus = RecStatus::Offline;
-    if (m_schedulingEnabled && nexttv->IsConnected())
+    if (m_schedulingEnabled && nexttv->IsConnected() &&
+        (ri.GetRecordingStatus() == RecStatus::WillRecord ||
+         ri.GetRecordingStatus() == RecStatus::Pending))
     {
-        if (ri.GetRecordingStatus() == RecStatus::WillRecord ||
-            ri.GetRecordingStatus() == RecStatus::Pending)
-        {
-            m_schedLock.unlock();
-            recStatus = nexttv->StartRecording(&tempri);
-            m_schedLock.lock();
-            ri.SetRecordingID(tempri.GetRecordingID());
-            ri.SetRecordingStartTime(tempri.GetRecordingStartTime());
+        m_schedLock.unlock();
+        recStatus = nexttv->StartRecording(&tempri);
+        m_schedLock.lock();
+        ri.SetRecordingID(tempri.GetRecordingID());
+        ri.SetRecordingStartTime(tempri.GetRecordingStartTime());
 
-            // activate auto expirer
-            if (m_expirer && recStatus == RecStatus::Tuning)
-                AutoExpire::Update(ri.GetInputID(), fsID, false);
+        // activate auto expirer
+        if (m_expirer && recStatus == RecStatus::Tuning)
+            AutoExpire::Update(ri.GetInputID(), fsID, false);
 
-            RecordingExtender::create(this, ri);
-        }
+        RecordingExtender::create(this, ri);
     }
 
     HandleRecordingStatusChange(ri, recStatus, details);
@@ -3608,7 +3602,7 @@ void Scheduler::PutInactiveSlavesToSleep(void)
     for (auto * enc : std::as_const(*m_tvList))
     {
         if ((!enc->IsLocal()) &&
-            (enc->IsAwake()) &&
+            enc->IsAwake() &&
             (!SlavesInUse.contains(enc->GetHostName())) &&
             (!enc->IsFallingAsleep()))
         {
@@ -4459,16 +4453,13 @@ void Scheduler::AddNewRecords(void)
                                "AND recgroup NOT IN ('LiveTV','Deleted');");
             epicnt.bindValue(":RECID", recid);
 
-            if (epicnt.exec())
+            if (epicnt.exec() && (epicnt.size() >= maxEpisodes - 1))
             {
-                if (epicnt.size() >= maxEpisodes - 1)
+                m_schedAfterStartMap[recid] = true;
+                if (epicnt.size() >= maxEpisodes)
                 {
-                    m_schedAfterStartMap[recid] = true;
-                    if (epicnt.size() >= maxEpisodes)
-                    {
-                        tooManyMap[recid] = true;
-                        checkTooMany = true;
-                    }
+                    tooManyMap[recid] = true;
+                    checkTooMany = true;
                 }
             }
         }
@@ -4703,7 +4694,7 @@ void Scheduler::AddNewRecords(void)
             MythDate::as_utc(result.value(19).toDateTime()),//recendts
 
             result.value(31).toFloat(),//stars
-            (result.value(32).isNull()) ? QDate() :
+            result.value(32).isNull() ? QDate() :
             QDate::fromString(result.value(32).toString(), Qt::ISODate),
             //originalAirDate
 
@@ -5148,12 +5139,10 @@ static bool comp_storage_combination(FileSystemInfo *a, FileSystemInfo *b)
             return true;
         }
     }
-    else if (!a->isLocal() && b->isLocal())
+    else if (!a->isLocal() && b->isLocal() &&
+             (a->getWeight() < b->getWeight()))
     {
-        if (a->getWeight() < b->getWeight())
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;
@@ -5189,11 +5178,10 @@ static bool comp_storage_disk_io(FileSystemInfo *a, FileSystemInfo *b)
     {
         return true;
     }
-    if (a->getWeight() == b->getWeight())
-    {
-        if (a->getFreeSpace() > b->getFreeSpace())
-            return true;
-    }
+    if ((a->getWeight() == b->getWeight()) && (a->getFreeSpace() > b->getFreeSpace()))
+    
+        return true;
+    
 
     return false;
 }
@@ -5214,7 +5202,7 @@ void Scheduler::GetNextLiveTVDir(uint cardid)
     QString recording_dir;
     int fsID = FillRecordingDir(
         "LiveTV",
-        (tv->IsLocal()) ? gCoreContext->GetHostName() : tv->GetHostName(),
+        tv->IsLocal() ? gCoreContext->GetHostName() : tv->GetHostName(),
         "LiveTV", cur, cur.addSecs(3600), cardid,
         recording_dir, m_recList);
 
@@ -5449,9 +5437,9 @@ int Scheduler::FillRecordingDir(
             (thispg->GetRecordingStatus() != RecStatus::WillRecord &&
              thispg->GetRecordingStatus() != RecStatus::Pending) ||
             (thispg->GetInputID() == 0) ||
-            (recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
-                   .arg(thispg->GetRecordingStartTime(MythDate::ISODate)))) ||
-            (thispg->GetPathname().isEmpty()))
+            recsCounted.contains(QString("%1:%2").arg(thispg->GetChanID())
+                   .arg(thispg->GetRecordingStartTime(MythDate::ISODate))) ||
+            thispg->GetPathname().isEmpty())
             continue;
 
         for (const auto* fs : fsInfoList)
@@ -5531,7 +5519,7 @@ int Scheduler::FillRecordingDir(
 
     bool simulateAutoExpire =
        ((gCoreContext->GetSetting("StorageScheduler") == "BalancedFreeSpace") &&
-        (m_expirer) &&
+        m_expirer &&
         (fsInfoList.size() > 1));
 
     // Loop though looking for a directory to put the file in.  The first time
@@ -5668,7 +5656,7 @@ int Scheduler::FillRecordingDir(
                         m_expirer->GetDesiredSpace(fs->getFSysID());
 
                 if ((fs->getHostname() == hostname) &&
-                    (dirlist.contains(fs->getPath())) &&
+                    dirlist.contains(fs->getPath()) &&
                     ((pass > 1) ||
                      (fs->getFreeSpace() > (desiredSpaceKB + maxSizeKB))))
                 {

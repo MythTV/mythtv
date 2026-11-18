@@ -700,7 +700,7 @@ RecStatus::Type TVRec::StartRecording(ProgramInfo *pginfo)
         WaitForEventThreadSleep();
 
         QMutexLocker locker(&m_pendingRecLock);
-        if ((m_curRecording) &&
+        if (m_curRecording &&
             (m_curRecording->GetRecordingStatus() == RecStatus::Failed) &&
             (m_recStatus == RecStatus::Recording ||
              m_recStatus == RecStatus::Tuning ||
@@ -1769,7 +1769,7 @@ void TVRec::HandlePendingRecordings(void)
         if (!(*it).m_ask && !(*it).m_doNotAsk)
             continue;
 
-        auto timeuntil = ((*it).m_doNotAsk) ?
+        auto timeuntil = (*it).m_doNotAsk ?
             -1s: MythDate::secsInFuture((*it).m_recordingStart);
 
         if (has_rec)
@@ -1870,7 +1870,7 @@ bool TVRec::GetDevices(uint inputid,
 
     test = query.value(fireoff + 1).toString();
     if (!test.isEmpty())
-        firewire_opts.m_model = test;
+        firewire_opts.m_model = std::move(test);
 
     firewire_opts.m_connection = query.value(fireoff + 2).toUInt();
 
@@ -3766,7 +3766,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         // Tune with SI table standard (dvb, atsc, mpeg) from database, see issue #452
         m_channel->SetChannelByString(request.m_channel);
 
-        const QString tuningmode = (HasFlags(kFlagEITScannerRunning)) ?
+        const QString tuningmode = HasFlags(kFlagEITScannerRunning) ?
             dtvchan->GetSIStandard() :
             dtvchan->GetSuggestedTuningMode(
                 kState_WatchingLiveTV == m_internalState);
@@ -3779,10 +3779,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             if (atsc)
                 atsc->SetDesiredChannel(request.m_majorChan, request.m_minorChan);
         }
-        else if (request.m_progNum >= 0)
+        else if ((request.m_progNum >= 0) && mpeg)
         {
-            if (mpeg)
-                mpeg->SetDesiredProgram(request.m_progNum);
+            mpeg->SetDesiredProgram(request.m_progNum);
         }
     }
 

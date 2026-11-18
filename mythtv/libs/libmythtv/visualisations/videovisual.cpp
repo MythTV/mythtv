@@ -61,7 +61,7 @@ std::chrono::milliseconds VideoVisual::SetLastUpdate(void)
 {
     QDateTime now = QDateTime::currentDateTimeUtc();
     auto result = std::chrono::milliseconds(m_lastUpdate.time().msecsTo(now.time()));
-    m_lastUpdate = now;
+    m_lastUpdate = std::move(now);
     return result;
 }
 

@@ -400,7 +400,7 @@ void MythPlayer::OpenDummy(void)
     }
 
     m_playerCtx->LockPlayingInfo(__FILE__, __LINE__);
-    auto *dec = new DummyDecoder(this, *(m_playerCtx->m_playingInfo));
+    auto *dec = new DummyDecoder(this, *m_playerCtx->m_playingInfo);
     m_playerCtx->UnlockPlayingInfo(__FILE__, __LINE__);
     SetDecoder(dec);
 }
@@ -929,7 +929,7 @@ void MythPlayer::ResetPlaying(bool resetframes)
 
 void MythPlayer::CheckTVChain(void)
 {
-    bool last = !(m_playerCtx->m_tvchain->HasNext());
+    bool last = !m_playerCtx->m_tvchain->HasNext();
     SetWatchingRecording(last);
 }
 

@@ -73,8 +73,8 @@ static const std::array<std::array<QString,3>,95> comps {{
         {"u", "`", (QChar)0xf9},    {"u", "'", (QChar)0xfa},
         {"u", "^", (QChar)0xfb},    {"u", "\"", (QChar)0xfc},
         {"y", "'", (QChar)0xfd},    {"t", "h", (QChar)0xfe},
-        {"y", "\"", (QChar)0xff}
-}};
+        {"y", "\"", (QChar)0xff},
+},};
 
 MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythUITextEdit *parentEdit)
           : MythScreenType(parentStack, "MythUIVirtualKeyboard"),
@@ -217,11 +217,8 @@ void MythUIVirtualKeyboard::loadKeyDefinitions(const QString &lang)
     while(!n.isNull())
     {
         QDomElement e = n.toElement();
-        if(!e.isNull())
-        {
-            if (e.tagName() == "key")
-                parseKey(e);
-        }
+        if(!e.isNull() && (e.tagName() == "key"))
+            parseKey(e);
         n = n.nextSibling();
     }
 }
@@ -270,17 +267,17 @@ void MythUIVirtualKeyboard::parseKey(const QDomElement &element)
 
     KeyDefinition key;
     key.name = name;
-    key.type = type;
-    key.left = left;
-    key.right = right;
-    key.up = up;
-    key.down = down;
+    key.type = std::move(type);
+    key.left = std::move(left);
+    key.right = std::move(right);
+    key.up = std::move(up);
+    key.down = std::move(down);
     key.normal = decodeChar(normal);
     key.alt = decodeChar(alt);
     key.shift = decodeChar(shift);
     key.altshift = decodeChar(altshift);
 
-    m_keyMap[name] = key;
+    m_keyMap[name] = std::move(key);
 }
 
 void MythUIVirtualKeyboard::updateKeys(bool connectSignals)
@@ -373,13 +370,10 @@ bool MythUIVirtualKeyboard::keyPressEvent(QKeyEvent *e)
 
     bool keyFound = false;
     KeyDefinition key;
-    if (GetFocusWidget())
+    if (GetFocusWidget() && m_keyMap.contains(GetFocusWidget()->objectName()))
     {
-        if (m_keyMap.contains(GetFocusWidget()->objectName()))
-        {
-            key = m_keyMap.value(GetFocusWidget()->objectName());
-            keyFound = true;;
-        }
+        key = m_keyMap.value(GetFocusWidget()->objectName());
+        keyFound = true;;
     }
 
     for (int i = 0; i < actions.size() && !handled; i++)
@@ -431,7 +425,7 @@ void MythUIVirtualKeyboard::charClicked(void)
     {
         if (m_composeStr.isEmpty())
         {
-            m_composeStr = c;
+            m_composeStr = std::move(c);
         }
         else
         {

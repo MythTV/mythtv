@@ -12,6 +12,9 @@
  *
  * ============================================================ */
 
+// c++
+#include <stdexcept>
+
 // qt
 #include <QChar> // Fix Qt6 GCC SFINAE warning
 #include <QDateTime>
@@ -79,7 +82,7 @@ MythUIType* ZMLivePlayer::GetMythUIType(const QString &name, bool optional)
     MythUIType *type = GetChild(name);
 
     if (!optional && !type)
-        throw name;
+        throw std::runtime_error(name.toStdString());
 
     return type;
 }
@@ -128,11 +131,11 @@ bool ZMLivePlayer::hideAll(void)
             }
         }
     }
-    catch (const QString &name)
+    catch (const std::runtime_error& e)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Theme is missing a critical theme element ('%1')")
-                .arg(name));
+                .arg(e.what()));
         return false;
     }
 
@@ -432,16 +435,13 @@ void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
     {
         Monitor *monitor = nullptr;
 
-        if (restore)
+        if (restore && (x <= monList.size()))
         {
-            if (x <= monList.size())
-            {
-                const QString& s = monList.at(x - 1);
-                int monID = s.toInt(); 
+            const QString& s = monList.at(x - 1);
+            int monID = s.toInt();
 
-                // try to find a monitor that matches the monID
-                monitor = ZMClient::get()->getMonitorByID(monID);
-            }
+            // try to find a monitor that matches the monID
+            monitor = ZMClient::get()->getMonitorByID(monID);
         }
 
         if (!monitor)

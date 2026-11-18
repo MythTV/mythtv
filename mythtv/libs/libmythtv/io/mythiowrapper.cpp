@@ -424,7 +424,7 @@ int MythDirOpen(const char *DirName)
 
         s_dirWrapperLock.lockForWrite();
         int id = GetNextDirID();
-        s_remotedirs[id] = list;
+        s_remotedirs[id] = std::move(list);
         s_remotedirPositions[id] = 0;
         s_dirnames[id] = DirName;
         s_dirWrapperLock.unlock();

@@ -7,7 +7,7 @@ enum class SCAN_t : uint8_t {
     UNKNOWN_SCAN,
     INTERLACED,
     PROGRESSIVE,
-    VARIABLE
+    VARIABLE,
 };
 
 #endif // SCAN_TYPE_H_

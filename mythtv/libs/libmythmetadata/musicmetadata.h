@@ -35,7 +35,7 @@ enum ImageType : std::uint8_t
     IT_CD,
     IT_INLAY,
     IT_ARTIST,
-    IT_LAST
+    IT_LAST,
 };
 
 class META_PUBLIC AlbumArtImage
@@ -61,7 +61,7 @@ enum RepoType : std::uint8_t
 {
     RT_Database = 0,
     RT_CD       = 1,
-    RT_Radio    = 2
+    RT_Radio    = 2,
 };
 
 static constexpr uint8_t  METADATA_BITS_FOR_REPO {  8 };

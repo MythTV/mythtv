@@ -165,7 +165,7 @@ class HLSSegment
         m_title         = rhs.m_title;
 #if CONFIG_LIBCRYPTO
         m_pszKeyPath    = rhs.m_pszKeyPath;
-        memcpy(&m_aeskey, &(rhs.m_aeskey), sizeof(m_aeskey));
+        memcpy(&m_aeskey, &rhs.m_aeskey, sizeof(m_aeskey));
         m_keyloaded     = rhs.m_keyloaded;
 #endif
         m_downloading   = rhs.m_downloading;
@@ -436,7 +436,7 @@ class HLSSegment
 
     void CopyAESKey(const HLSSegment &segment)
     {
-        memcpy(&m_aeskey, &(segment.m_aeskey), sizeof(m_aeskey));
+        memcpy(&m_aeskey, &segment.m_aeskey, sizeof(m_aeskey));
         m_keyloaded = segment.m_keyloaded;
     }
 private:
@@ -734,15 +734,12 @@ class HLSStream
         if (segment->HasKeyPath())
         {
             /* Do we have loaded the key ? */
-            if (!segment->KeyLoaded())
+            if (!segment->KeyLoaded() && (ManageSegmentKeys() != RET_OK))
             {
-                if (ManageSegmentKeys() != RET_OK)
-                {
-                    LOG(VB_PLAYBACK, LOG_ERR, LOC +
-                        "couldn't retrieve segment AES-128 key");
-                    segment->Unlock();
-                    return RET_OK;
-                }
+                LOG(VB_PLAYBACK, LOG_ERR, LOC +
+                    "couldn't retrieve segment AES-128 key");
+                segment->Unlock();
+                return RET_OK;
             }
             if (segment->DecodeData(m_aesIv, m_ivloaded) != RET_OK)
             {
@@ -1288,17 +1285,14 @@ protected:
                 break;
 
             /* only consider streams with the same PROGRAM-ID */
-            if (hls->Id() == progid)
+            if ((hls->Id() == progid) && (bw >= hls->Bitrate()) &&
+                (bw_candidate < hls->Bitrate()))
             {
-                if ((bw >= hls->Bitrate()) &&
-                    (bw_candidate < hls->Bitrate()))
-                {
-                    LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
-                        QString("candidate stream %1 bitrate %2 >= %3")
-                        .arg(n).arg(bw).arg(hls->Bitrate()));
-                    bw_candidate = hls->Bitrate();
-                    candidate = n; /* possible candidate */
-                }
+                LOG(VB_PLAYBACK, LOG_DEBUG, LOC +
+                    QString("candidate stream %1 bitrate %2 >= %3")
+                    .arg(n).arg(bw).arg(hls->Bitrate()));
+                bw_candidate = hls->Bitrate();
+                candidate = n; /* possible candidate */
             }
         }
         bandwidth = bw_candidate;
@@ -1730,15 +1724,10 @@ HLSStream *HLSRingBuffer::FindStream(const HLSStream *hls_new,
     for (int n = 0; n < count; n++)
     {
         HLSStream *hls = GetStream(n, streams);
-        if (hls)
+        if (hls && (hls->Id() == hls_new->Id()) &&
+            ((hls->Bitrate() == hls_new->Bitrate()) || (hls_new->Bitrate() == 0)))
         {
-            /* compare */
-            if ((hls->Id() == hls_new->Id()) &&
-                ((hls->Bitrate() == hls_new->Bitrate()) ||
-                 (hls_new->Bitrate() == 0)))
-            {
-                return hls;
-            }
+            return hls;
         }
     }
     return nullptr;

@@ -33,7 +33,7 @@ enum SSDPRequestType : std::uint8_t
     SSDP_Unknown        = 0,
     SSDP_MSearch        = 1,
     SSDP_MSearchResp    = 2,
-    SSDP_Notify         = 3
+    SSDP_Notify         = 3,
 };
 
 class SSDPReceiver : public QObject

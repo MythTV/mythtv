@@ -128,7 +128,7 @@ void CleanupTask::CleanupRecordedTables(void)
         { "recordedcredits", "progstart" },
         { "recordedmarkup", "starttime" },
         { "recordedseek", "starttime" },
-    }};
+    },};
 
     // Because recordedseek can have millions of rows, we don't want to JOIN it
     // with recorded.  Instead, pull out DISTINCT chanid and starttime into a

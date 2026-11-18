@@ -139,7 +139,7 @@ MythDB::~MythDB()
 
 MDBManager *MythDB::GetDBManager(void)
 {
-    return &(d->m_dbmanager);
+    return &d->m_dbmanager;
 }
 
 QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
@@ -166,7 +166,7 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
 #endif
             )
         {
-            val = (it->toString().isNull()) ?
+            val = it->toString().isNull() ?
                 "NULL" : QString("\"%1\"").arg(val);
         }
         const QString curBinding = it.key() + '=' + val + ',';
@@ -365,7 +365,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         return false;
     }
 
-    QString newValue = (newValueRaw.isNull()) ? "" : newValueRaw;
+    QString newValue = newValueRaw.isNull() ? "" : newValueRaw;
 
     if (d->m_ignoreDatabase)
     {
@@ -388,7 +388,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         SingleSetting setting;
         setting.m_host = host;
         setting.m_key = key;
-        setting.m_value = newValue;
+        setting.m_value = std::move(newValue);
         d->m_delayedSettings.append(setting);
         return false;
     }
@@ -446,7 +446,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!query.exec())
         {
             success = false;
-            if (!(GetMythDB()->SuppressDBMessages()))
+            if (!GetMythDB()->SuppressDBMessages())
                 MythDB::DBError(loc + "- query failure: ", query);
         }
     }
@@ -918,7 +918,7 @@ void MythDB::OverrideSettingForSession(
     d->m_settingsCacheLock.lockForWrite();
     d->m_overriddenSettings[mk] = mv;
     d->m_settingsCache[mk]      = mv;
-    d->m_settingsCache[mk2]     = mv;
+    d->m_settingsCache[mk2]     = std::move(mv);
     d->m_settingsCacheLock.unlock();
 }
 

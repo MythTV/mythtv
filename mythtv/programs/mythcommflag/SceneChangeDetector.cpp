@@ -171,15 +171,13 @@ SceneChangeDetector::finished(long long nframes, bool final)
         m_scDiff[frameno] = scenechange_data_diff(&m_scData[frameno - 1],
                 &m_scData[frameno]);
 
-    if (!m_sceneChangeDone && m_debugSceneChange)
+    if (!m_sceneChangeDone && m_debugSceneChange &&
+        final && writeData(m_debugData, m_scDiff))
     {
-        if (final && writeData(m_debugData, m_scDiff))
-        {
-            LOG(VB_COMMFLAG, LOG_INFO, 
-                QString("SceneChangeDetector::finished wrote %1")
-                    .arg(m_debugData));
-            m_sceneChangeDone = true;
-        }
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("SceneChangeDetector::finished wrote %1")
+            .arg(m_debugData));
+        m_sceneChangeDone = true;
     }
 
     /* Identify all scene-change frames (changeMap). */

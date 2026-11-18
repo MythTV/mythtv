@@ -46,7 +46,7 @@ uint64_t MythVideoDRMUtils::FFmpegColorEncodingToDRM(const DRMProp& Property, in
         return result;
 
     const auto *searchstring = "601";
-    switch (Encoding)
+    switch (Encoding) // NOLINT(readability-trivial-switch)
     {
         case AVCOL_SPC_BT709: searchstring = "709"; break;
         // I've only seen 2020 available on amdgpu with a Ryzen3400G. If selected

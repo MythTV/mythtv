@@ -282,7 +282,7 @@ bool Wsdl::GetWSDL( HTTPRequest *pRequest )
     // Return wsdl doc to caller
     // ----------------------------------------------------------------------
 
-    QTextStream os( &(pRequest->m_response) );
+    QTextStream os( &pRequest->m_response );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
 

@@ -285,7 +285,7 @@ MythMimeType MythHTTPEncoding::GetMimeType(HTTPVariant Content)
     // is ambiguous and it resorts to probing. Add to this list as necessary
     static const std::map<QString,QString> s_mimeOverrides =
     {
-        { "ts", "video/mp2t"}
+        { "ts", "video/mp2t"},
     };
 
     auto suffix = MythMimeDatabase::SuffixForFileName(filename);

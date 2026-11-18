@@ -34,14 +34,12 @@ QVulkanWindowRenderer* MythWindowVulkan::createRenderer(void)
 */
 bool MythWindowVulkan::event(QEvent *Event)
 {
-    if (Event->type() == QEvent::UpdateRequest)
+    if ((Event->type() == QEvent::UpdateRequest) &&
+        m_render && !m_render->GetFrameExpected())
     {
-        if (m_render && !m_render->GetFrameExpected())
-        {
-            // Log these for now - they may be important (e.g. QVulkanWindow::grab)
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring spontaneous update request");
-            return QWindow::event(Event); // NOLINT(bugprone-parent-virtual-call)
-        }
+        // Log these for now - they may be important (e.g. QVulkanWindow::grab)
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Ignoring spontaneous update request");
+        return QWindow::event(Event); // NOLINT(bugprone-parent-virtual-call)
     }
     return QVulkanWindow::event(Event);
 }

@@ -55,7 +55,7 @@ MythVideoOutputVulkan::MythVideoOutputVulkan(MythMainWindow* MainWindow, MythRen
         FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
         FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
         FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
-        FMT_P010,     FMT_P016
+        FMT_P010,     FMT_P016,
     };
 
     m_renderFormats = &s_vulkanRenderFormats;
@@ -121,7 +121,7 @@ void MythVideoOutputVulkan::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
 
 void MythVideoOutputVulkan::RenderEnd()
 {
-    if (!(IsValidVulkan()))
+    if (!IsValidVulkan())
         return;
 
     if (VERBOSE_LEVEL_CHECK(VB_GPU, LOG_INFO))

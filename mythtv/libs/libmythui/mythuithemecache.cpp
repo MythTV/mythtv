@@ -316,9 +316,9 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
 
         // For internet images this involves querying the headers of the remote
         // image. This is slow even without redownloading the whole image
-        if ((File.startsWith("http://")) ||
-            (File.startsWith("https://")) ||
-            (File.startsWith("ftp://")))
+        if (File.startsWith("http://") ||
+            File.startsWith("https://") ||
+            File.startsWith("ftp://"))
         {
             // If the image is in the memory cache then skip the last modified
             // check, since memory cached images are loaded in the foreground
@@ -360,30 +360,26 @@ MythImage* MythUIThemeCache::LoadCacheImage(QString File, const QString& Label,
             // If we haven't already loaded the image from the memory cache
             // and we're not ignoring the disk cache, then it's time to load
             // it from there instead
-            if (!ret && (cacheMode == kCacheNormal))
+            if (!ret && (cacheMode == kCacheNormal) && Painter)
             {
+                ret = Painter->GetFormatImage();
 
-                if (Painter)
+                // Load file from disk cache to memory cache
+                if (ret->Load(cachefilepath))
                 {
-                    ret = Painter->GetFormatImage();
+                    // Add to ram cache, and skip saving to disk since that is
+                    // where we found this in the first place.
+                    CacheImage(Label, ret, true);
+                }
+                else
+                {
+                    LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
+                        QString("LoadCacheImage: Could not load: %1")
+                        .arg(cachefilepath));
 
-                    // Load file from disk cache to memory cache
-                    if (ret->Load(cachefilepath))
-                    {
-                        // Add to ram cache, and skip saving to disk since that is
-                        // where we found this in the first place.
-                        CacheImage(Label, ret, true);
-                    }
-                    else
-                    {
-                        LOG(VB_GUI | VB_FILE, LOG_WARNING, LOC +
-                            QString("LoadCacheImage: Could not load: %1")
-                            .arg(cachefilepath));
-
-                        ret->SetIsInCache(false);
-                        ret->DecrRef();
-                        ret = nullptr;
-                    }
+                    ret->SetIsInCache(false);
+                    ret->DecrRef();
+                    ret = nullptr;
                 }
             }
         }

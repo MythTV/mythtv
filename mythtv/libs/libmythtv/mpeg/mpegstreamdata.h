@@ -394,12 +394,12 @@ inline void MPEGStreamData::SetPMTSingleProgram(ProgramMapTable* pmt)
 
 inline int MPEGStreamData::VersionPATSingleProgram() const
 {
-    return (m_patSingleProgram) ? int(m_patSingleProgram->Version()) : -1;
+    return m_patSingleProgram ? int(m_patSingleProgram->Version()) : -1;
 }
 
 inline int MPEGStreamData::VersionPMTSingleProgram() const
 {
-    return (m_pmtSingleProgram) ? int(m_pmtSingleProgram->Version()) : -1;
+    return m_pmtSingleProgram ? int(m_pmtSingleProgram->Version()) : -1;
 }
 
 inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket */*tspacket*/)

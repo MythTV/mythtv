@@ -131,7 +131,7 @@ namespace UPNPProtocol
     enum TransferProtocol : std::uint8_t
     {
         kHTTP,
-        kRTP
+        kRTP,
     };
 }
 

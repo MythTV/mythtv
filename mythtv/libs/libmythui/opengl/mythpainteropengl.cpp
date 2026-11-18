@@ -104,7 +104,7 @@ void MythOpenGLPainter::Begin(QPaintDevice *Parent)
         m_mappedBufferPoolReady = true;
         // initialise the VBO pool
         std::ranges::generate(m_mappedBufferPool,
-            [&]() { return m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize)); });
+            [&] { return m_render->CreateVBO(static_cast<int>(MythRenderOpenGL::kVertexSize)); });
     }
 
     QSize currentsize = m_parent->size();

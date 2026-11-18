@@ -24,7 +24,7 @@ enum SmartPLFieldType : std::uint8_t
     ftString = 1,
     ftNumeric,
     ftDate,
-    ftBoolean
+    ftBoolean,
 };
 
 // used by playlist.cpp

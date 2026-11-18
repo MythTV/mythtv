@@ -48,7 +48,7 @@ enum ImageFileTransform : std::uint8_t {
     kRotateCW       = 1, //!< Rotate clockwise
     kRotateCCW      = 2, //!< Rotate anti-clockwise
     kFlipHorizontal = 3, //!< Reflect about vertical axis
-    kFlipVertical   = 4  //!< Reflect about horizontal axis
+    kFlipVertical   = 4,  //!< Reflect about horizontal axis
 };
 
 

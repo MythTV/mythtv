@@ -21,7 +21,7 @@ class SSDPExtension : public HttpServerExtension
         {
             SSDPM_Unknown         = 0,
             SSDPM_GetDeviceDesc   = 1,
-            SSDPM_GetDeviceList   = 2
+            SSDPM_GetDeviceList   = 2,
         };
 
         static SSDPMethod GetMethod( const QString &sURI );

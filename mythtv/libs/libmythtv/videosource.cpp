@@ -90,7 +90,7 @@ void VideoSourceSelector::Load(void)
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM capturecard, videosource";
 
-    querystr += (m_mustHaveMplexId) ? ", channel " : " ";
+    querystr += m_mustHaveMplexId ? ", channel " : " ";
 
     querystr +=
         "WHERE capturecard.sourceid = videosource.sourceid AND "
@@ -126,11 +126,8 @@ void VideoSourceSelector::Load(void)
         sel = (query.value(1).toUInt() == m_initialSourceId) ? cnt : sel;
     }
 
-    if (m_initialSourceId)
-    {
-        if (cnt)
-            setValue(sel);
-    }
+    if (m_initialSourceId && cnt)
+        setValue(sel);
 
     TransMythUIComboBoxSetting::Load();
 }
@@ -1437,7 +1434,7 @@ void FirewireDesc::SetGUID([[maybe_unused]] const QString &_guid)
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
     name = name.simplified();
-    setValue((name.isEmpty()) ? "" : name);
+    setValue(name.isEmpty() ? "" : name);
 #endif // CONFIG_FIREWIRE
 }
 
@@ -2100,7 +2097,7 @@ void ImportConfigurationGroup::probeCard(const QString &device)
 
     if (fileInfo.exists())
     {
-        if (fileInfo.isReadable() && (fileInfo.isFile()))
+        if (fileInfo.isReadable() && fileInfo.isFile())
         {
             ci = HTTPRequest::TestMimeType(fileInfo.absoluteFilePath());
             cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
@@ -2456,7 +2453,7 @@ void DemoConfigurationGroup::probeCard(const QString &device)
     QFileInfo fileInfo(device);
     if (fileInfo.exists())
     {
-        if (fileInfo.isReadable() && (fileInfo.isFile()))
+        if (fileInfo.isReadable() && fileInfo.isFile())
         {
             ci = HTTPRequest::TestMimeType(fileInfo.absoluteFilePath());
             cs = tr("%1 MB").arg(fileInfo.size() / 1024 / 1024);
@@ -3592,7 +3589,7 @@ void CardInput::channelScanner(void)
     if (ssd->Create())
     {
         connect(ssd, &StandardSettingDialog::Exiting, this,
-                [srcid, this, num_channels_before]()
+                [srcid, this, num_channels_before]
                 {
                     if (SourceUtil::GetChannelCount(srcid))
                         m_startChan->SetSourceID(QString::number(srcid));

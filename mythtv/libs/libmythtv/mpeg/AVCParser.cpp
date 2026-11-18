@@ -1001,9 +1001,8 @@ void AVCParser::decode_SEI(BitReader& br)
         while (br.get_bits(8) == 0xFF)
             size += br.show_bits(8);
 
-        switch (type)
+        if (type == SEI_TYPE_RECOVERY_POINT)
         {
-          case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = br.get_ue_golomb();
 #if 0
             exact_match_flag = (br.get_bits(1) != 0U);
@@ -1014,11 +1013,9 @@ void AVCParser::decode_SEI(BitReader& br)
             if ((size - 12) > 0)
                 br.skip_bits((size - 12) * 8);
             return;
-
-          default:
-            br.skip_bits(size * 8);
-            break;
         }
+
+        br.skip_bits(size * 8);
     }
 }
 

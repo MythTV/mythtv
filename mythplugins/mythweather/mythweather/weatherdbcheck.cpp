@@ -69,7 +69,7 @@ bool InitializeDatabase()
                         "FOREIGN KEY(weathersourcesettings_sourceid) "
                         "REFERENCES weathersourcesettings(sourceid) "
                         "ON DELETE RESTRICT "
-                        "ON UPDATE CASCADE) ENGINE=InnoDB;"
+                        "ON UPDATE CASCADE) ENGINE=InnoDB;",
         };
         /*
          * TODO Possible want to delete old stuff (i.e. agressiveness, locale..)
@@ -86,7 +86,7 @@ bool InitializeDatabase()
         DBUpdates updates {
                    "ALTER TABLE weathersourcesettings ADD COLUMN updated "
                    "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
-                   "          ON UPDATE CURRENT_TIMESTAMP;"
+                   "          ON UPDATE CURRENT_TIMESTAMP;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -114,7 +114,7 @@ bool InitializeDatabase()
             "  MODIFY author varbinary(128) default NULL,"
             "  MODIFY version varbinary(32) default NULL,"
             "  MODIFY email varbinary(255) default NULL,"
-            "  MODIFY types mediumblob;"
+            "  MODIFY types mediumblob;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -144,7 +144,7 @@ bool InitializeDatabase()
             "  MODIFY author varchar(128) CHARACTER SET utf8 default NULL,"
             "  MODIFY version varchar(32) CHARACTER SET utf8 default NULL,"
             "  MODIFY email varchar(255) CHARACTER SET utf8 default NULL,"
-            "  MODIFY types mediumtext CHARACTER SET utf8;"
+            "  MODIFY types mediumtext CHARACTER SET utf8;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -156,7 +156,7 @@ bool InitializeDatabase()
     {
         DBUpdates updates {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETE' AND context = 'Weather';"
+            " WHERE action = 'DELETE' AND context = 'Weather';",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -168,7 +168,7 @@ bool InitializeDatabase()
     {
         DBUpdates updates {
             "ALTER TABLE weatherdatalayout"
-            "  MODIFY location varchar(128) CHARACTER SET utf8 NOT NULL;"
+            "  MODIFY location varchar(128) CHARACTER SET utf8 NOT NULL;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -181,7 +181,7 @@ bool InitializeDatabase()
         DBUpdates updates {
             "ALTER TABLE weathersourcesettings MODIFY COLUMN updated "
             "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP "
-            "            ON UPDATE CURRENT_TIMESTAMP;"
+            "            ON UPDATE CURRENT_TIMESTAMP;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,
@@ -196,7 +196,7 @@ bool InitializeDatabase()
         DBUpdates updates {
             "ALTER TABLE weatherdatalayout DEFAULT CHARACTER SET utf8;"
             "ALTER TABLE weatherscreens DEFAULT CHARACTER SET utf8;"
-            "ALTER TABLE weathersourcesettings DEFAULT CHARACTER SET utf8;"
+            "ALTER TABLE weathersourcesettings DEFAULT CHARACTER SET utf8;",
         };
 
         if (!performActualUpdate("MythWeather", MythWeatherVersionName,

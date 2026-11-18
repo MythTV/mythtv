@@ -72,7 +72,7 @@ class MTV_PUBLIC CardUtil : public QObject
         VBOX      = 19,
         DVBT2     = 20,
         V4L2ENC   = 21,
-        SATIP     = 22
+        SATIP     = 22,
     };
 
     Q_ENUM(INPUT_TYPES)

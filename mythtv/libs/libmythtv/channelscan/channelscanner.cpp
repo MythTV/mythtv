@@ -175,7 +175,7 @@ void ChannelScanner::Scan(
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
-        if ((mod.startsWith("qam", Qt::CaseInsensitive)) &&
+        if (mod.startsWith("qam", Qt::CaseInsensitive) &&
             (m_sigmonScanner->GetSignalTimeout() < 1s))
         {
             m_sigmonScanner->SetSignalTimeout(1s);

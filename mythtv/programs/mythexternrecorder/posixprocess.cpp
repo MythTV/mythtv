@@ -86,12 +86,12 @@ static bool matchCmdline(const std::vector<std::string>& procArgs,
         const std::string& flag = procArgs[1];
 
         // Check if the binary is a common shell executing a string command
-        if ((baseExec == "sh" || baseExec == "bash" || baseExec == "zsh" ||
+        if (((baseExec == "sh" || baseExec == "bash" || baseExec == "zsh" ||
              baseExec == "dash" || baseExec == "cmd.exe") &&
-            (flag == "-c" || flag == "/c"))
+            (flag == "-c" || flag == "/c")) &&
+            (QString::fromStdString(procArgs[2]).trimmed() == target))
         {
-            if (QString::fromStdString(procArgs[2]).trimmed() == target)
-                return true;
+            return true;
         }
     }
 
@@ -203,7 +203,7 @@ LaunchResult PosixProcess::launch(const QString& command,
             LOG(VB_GENERAL, LOG_ERR,
                 QString("Failed to split '%1' into args").arg(command));
             return {false,
-                    QString("Failed to split '%1' into args").arg(command)};
+                    QString("Failed to split '%1' into args").arg(command),};
         }
 
         QString execProg = parsedArgs[0];

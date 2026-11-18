@@ -133,7 +133,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    name VARCHAR(128) NOT NULL,"
             "    hostname VARCHAR(255),"
             "    songlist TEXT NOT NULL"
-            ");"
+            ");",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -205,7 +205,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE musicmetadata ADD relative_volume TINYINT DEFAULT 0;",
             "ALTER TABLE musicmetadata ADD sample_rate     INT UNSIGNED;",
             "ALTER TABLE musicmetadata ADD bpm             SMALLINT UNSIGNED;",
-            "ALTER TABLE musicmetadata ADD INDEX (mythdigest);"
+            "ALTER TABLE musicmetadata ADD INDEX (mythdigest);",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -364,7 +364,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    categoryid = 3, matchtype = \"All\", orderby = \"Artist (A), Album (A)\","
             "    limitto = 0;",
             "INSERT INTO smartplaylistitem SET smartplaylistid = 8, field = \"Play Count\","
-            "    operator = \"is equal to\", value1 = \"0\", value2 = \"0\";"
+            "    operator = \"is equal to\", value1 = \"0\", value2 = \"0\";",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -377,7 +377,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "ALTER TABLE musicmetadata ADD compilation_artist VARCHAR(128) NOT NULL AFTER artist;",
-            "ALTER TABLE musicmetadata ADD INDEX (compilation_artist);"
+            "ALTER TABLE musicmetadata ADD INDEX (compilation_artist);",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -498,7 +498,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "UPDATE music_playlists"
             "  SET hostname=''"
             "  WHERE playlist_name<>'default_playlist_storage'"
-            "    AND playlist_name<>'backup_playlist_storage';"
+            "    AND playlist_name<>'backup_playlist_storage';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -510,7 +510,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
     {
         DBUpdates updates
         {
-            "ALTER TABLE music_genres MODIFY genre VARCHAR(255) NOT NULL default '';"
+            "ALTER TABLE music_genres MODIFY genre VARCHAR(255) NOT NULL default '';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -538,7 +538,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "DELETE FROM music_songs;",
             "ALTER TABLE music_songs ADD COLUMN directory_id int(20) NOT NULL DEFAULT '0';",
             "INSERT INTO music_songs SELECT * FROM tmp_songs;",
-            "ALTER TABLE music_songs ADD INDEX (directory_id);"
+            "ALTER TABLE music_songs ADD INDEX (directory_id);",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -552,7 +552,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             "CREATE TABLE music_albumart (albumart_id int(20) NOT NULL AUTO_INCREMENT "
             "PRIMARY KEY, filename VARCHAR(255) NOT NULL DEFAULT '', directory_id INT(20) "
-            "NOT NULL DEFAULT '0');"
+            "NOT NULL DEFAULT '0');",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -564,7 +564,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
     {
         DBUpdates updates
         {
-            "ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';"
+            "ALTER TABLE music_albumart ADD COLUMN imagetype tinyint(3) NOT NULL DEFAULT '0';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -635,7 +635,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "ALTER TABLE music_albumart ADD COLUMN song_id int(11) NOT NULL DEFAULT '0', "
-            " ADD COLUMN embedded TINYINT(1) NOT NULL DEFAULT '0';"
+            " ADD COLUMN embedded TINYINT(1) NOT NULL DEFAULT '0';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -650,7 +650,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             "ALTER TABLE music_songs ADD INDEX album_id (album_id);",
             "ALTER TABLE music_songs ADD INDEX genre_id (genre_id);",
-            "ALTER TABLE music_songs ADD INDEX artist_id (artist_id);"
+            "ALTER TABLE music_songs ADD INDEX artist_id (artist_id);",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -664,7 +664,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "DROP TABLE musicmetadata;",
-            "DROP TABLE musicplaylist;"
+            "DROP TABLE musicplaylist;",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -713,7 +713,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "  MODIFY eq_preset varbinary(255) default NULL;",
             "ALTER TABLE music_stats"
             "  MODIFY total_time varbinary(12) NOT NULL default '0',"
-            "  MODIFY total_size varbinary(10) NOT NULL default '0';"
+            "  MODIFY total_size varbinary(10) NOT NULL default '0';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -774,7 +774,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE music_stats"
             "  DEFAULT CHARACTER SET utf8,"
             "  MODIFY total_time varchar(12) CHARACTER SET utf8 NOT NULL default '0',"
-            "  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';"
+            "  MODIFY total_size varchar(10) CHARACTER SET utf8 NOT NULL default '0';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -787,7 +787,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETE' AND context = 'Music';"
+            " WHERE action = 'DELETE' AND context = 'Music';",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -800,7 +800,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "ALTER TABLE music_playlists MODIFY COLUMN last_accessed "
-            "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;"
+            "  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -815,7 +815,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "CREATE TEMPORARY TABLE arttype_tmp ( type INT, name VARCHAR(30) );",
             "INSERT INTO arttype_tmp VALUES (0,'unknown'),(1,'front'),(2,'back'),(3,'cd'),(4,'inlay');",
             "UPDATE music_albumart LEFT JOIN arttype_tmp ON type = imagetype "
-            "SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;"
+            "SET filename = CONCAT(song_id, '-', name, '.jpg') WHERE embedded=1;",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -839,7 +839,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    format VARCHAR(10) NOT NULL,"
             "    INDEX (station),"
             "    INDEX (channel)"
-            ");"
+            ");",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -853,7 +853,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             "ALTER TABLE music_songs ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
             qPrintable(QString("UPDATE music_songs SET hostname = '%1';")
-                       .arg(gCoreContext->GetMasterHostName()))
+                       .arg(gCoreContext->GetMasterHostName())),
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -867,7 +867,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         {
             "ALTER TABLE music_albumart ADD COLUMN hostname VARCHAR(255) NOT NULL default '';",
             qPrintable(QString("UPDATE music_albumart SET hostname = '%1';")
-                       .arg(gCoreContext->GetMasterHostName()))
+                       .arg(gCoreContext->GetMasterHostName())),
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -880,7 +880,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         DBUpdates updates
         {
             "CREATE INDEX `song_id` ON music_albumart (song_id);",
-            "CREATE INDEX `artist_id` ON music_albums (artist_id);"
+            "CREATE INDEX `artist_id` ON music_albums (artist_id);",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -926,7 +926,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "    INDEX (channel),"
             "    INDEX (country),"
             "    INDEX (language)"
-            ");"
+            ");",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,
@@ -950,7 +950,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
             "ALTER TABLE music_smartplaylist_items DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_smartplaylists DEFAULT CHARACTER SET utf8;",
             "ALTER TABLE music_songs DEFAULT CHARACTER SET utf8;",
-            "ALTER TABLE music_stats DEFAULT CHARACTER SET utf8;"
+            "ALTER TABLE music_stats DEFAULT CHARACTER SET utf8;",
         };
 
         if (!performActualUpdate("MythMusic", MythMusicVersionName,

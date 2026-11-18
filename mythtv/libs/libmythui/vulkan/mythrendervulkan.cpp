@@ -677,7 +677,7 @@ VkPipeline MythRenderVulkan::CreatePipeline(MythShaderVulkan* Shader,
     VkRect2D scissor { };
     scissor.offset = { .x=Viewport.left(), .y=Viewport.top() };
     scissor.extent = { .width=static_cast<uint32_t>(Viewport.width()),
-                       .height=static_cast<uint32_t>(Viewport.height()) };
+                       .height=static_cast<uint32_t>(Viewport.height()), };
 
     VkPipelineViewportStateCreateInfo viewportstate { };
     viewportstate.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

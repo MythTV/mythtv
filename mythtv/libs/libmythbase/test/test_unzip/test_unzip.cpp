@@ -49,7 +49,7 @@ void TestUnzip::cleanupTestCase()
 void TestUnzip::test_text_file(void)
 {
     QString filename { QStringLiteral(TEST_SOURCE_DIR) +
-        "/zipfiles/ipsum_lorem.zip" };
+        "/zipfiles/ipsum_lorem.zip", };
     bool result = extractZIP(filename, gTmpDir->path());
     QCOMPARE(result, true);
 
@@ -73,7 +73,7 @@ void TestUnzip::test_text_file(void)
 void TestUnzip::test_theme_file(void)
 {
     QString filename { QStringLiteral(TEST_SOURCE_DIR) +
-        "/zipfiles/themes.zip" };
+        "/zipfiles/themes.zip", };
     bool result = extractZIP(filename, gTmpDir->path());
     QCOMPARE(result, true);
 

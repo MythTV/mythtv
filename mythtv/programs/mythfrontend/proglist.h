@@ -29,7 +29,7 @@ enum ProgListType : std::uint8_t {
     plTime = 11,
     plRecordid = 12,
     plStoredSearch = 13,
-    plPreviouslyRecorded = 14
+    plPreviouslyRecorded = 14,
 };
 
 class ProgLister : public ScheduleCommon
@@ -97,7 +97,7 @@ class ProgLister : public ScheduleCommon
     void SwitchToPreviousView(void);
     void SwitchToNextView(void);
 
-    enum SortBy : std::uint8_t { kTimeSort, kPrevTitleSort, kTitleSort, };
+    enum SortBy : std::uint8_t { kTimeSort, kPrevTitleSort, kTitleSort };
     SortBy GetSortBy(void) const;
     void SortList(SortBy sortby, bool reverseSort);
 

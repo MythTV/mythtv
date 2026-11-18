@@ -401,7 +401,7 @@ static std::array<const std::string,6> cplm_info
     "CPLM_LAST",
     "CPLM_ONLY",
     "CPLM_ADD",
-    "CPLM_UPDATE"
+    "CPLM_UPDATE",
 };
 
 cCiCaPmt CreateCAPMT(const ProgramMapTable& /*pmt*/, const dvbca_vector &/*casids*/, uint /*cplm*/);

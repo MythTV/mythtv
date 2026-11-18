@@ -256,9 +256,9 @@ void RSSEditPopup::SlotSave(QNetworkReply* reply)
         QString filename("");
 
         if (!file.isEmpty())
-            filename = file;
+            filename = std::move(file);
         else if (!thumbnailURL.isEmpty())
-            filename = thumbnailURL;
+            filename = std::move(thumbnailURL);
 
         QString link = m_urlEdit->GetText();
 

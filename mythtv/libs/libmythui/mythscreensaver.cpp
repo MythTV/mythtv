@@ -78,10 +78,8 @@ MythScreenSaverControl::MythScreenSaverControl([[maybe_unused]] MythMainWindow* 
 
 bool MythScreenSaverControl::Asleep()
 {
-    for (auto * screensaver : m_screenSavers)
-        if (screensaver->Asleep())
-            return true;
-    return false;
+    return std::ranges::any_of(m_screenSavers,
+                               [](auto * screensaver) { return screensaver->Asleep(); });
 }
 
 #include "moc_mythscreensaver.cpp"

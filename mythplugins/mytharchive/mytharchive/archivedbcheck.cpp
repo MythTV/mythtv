@@ -45,7 +45,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "    hascutlist BOOL NOT NULL DEFAULT 0,"
             "    cutlist TEXT,"
             "    INDEX (title)"
-            ");"
+            ");",
         };
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
                                  updates, "1000", dbver))
@@ -56,7 +56,7 @@ bool UpgradeArchiveDatabaseSchema(void)
     {
         DBUpdates updates
         {
-            "ALTER TABLE archiveitems MODIFY size BIGINT UNSIGNED NOT NULL;"
+            "ALTER TABLE archiveitems MODIFY size BIGINT UNSIGNED NOT NULL;",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
@@ -78,7 +78,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "  MODIFY startdate varbinary(30) default NULL,"
             "  MODIFY starttime varbinary(30) default NULL,"
             "  MODIFY filename blob,"
-            "  MODIFY cutlist blob;"
+            "  MODIFY cutlist blob;",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
@@ -101,7 +101,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "  MODIFY startdate varchar(30) CHARACTER SET utf8 NULL,"
             "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL,"
             "  MODIFY filename text CHARACTER SET utf8 NOT NULL,"
-            "  MODIFY cutlist text CHARACTER SET utf8;"
+            "  MODIFY cutlist text CHARACTER SET utf8;",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
@@ -120,7 +120,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "ADD videoheight INT UNSIGNED NOT NULL DEFAULT 0, "
             "ADD filecodec VARCHAR(50) NOT NULL DEFAULT '', "
             "ADD videocodec VARCHAR(50) NOT NULL DEFAULT '', "
-            "ADD encoderprofile VARCHAR(50) NOT NULL DEFAULT 'NONE';"
+            "ADD encoderprofile VARCHAR(50) NOT NULL DEFAULT 'NONE';",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
@@ -133,7 +133,7 @@ bool UpgradeArchiveDatabaseSchema(void)
         DBUpdates updates
         {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETEITEM' AND context = 'Archive';"
+            " WHERE action = 'DELETEITEM' AND context = 'Archive';",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,
@@ -152,7 +152,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "  MODIFY title varchar(128) CHARACTER SET utf8 NULL,"
             "  MODIFY subtitle varchar(128) CHARACTER SET utf8 NULL,"
             "  MODIFY startdate varchar(30) CHARACTER SET utf8 NULL,"
-            "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL;"
+            "  MODIFY starttime varchar(30) CHARACTER SET utf8 NULL;",
         };
 
         if (!performActualUpdate("MythArchive", MythArchiveVersionName,

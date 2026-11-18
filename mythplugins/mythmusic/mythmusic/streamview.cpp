@@ -174,16 +174,13 @@ void StreamView::customEvent(QEvent *event)
     }
     else if (event->type() == AudioOutput::Event::kPlaying)
     {
-        if (gPlayer->isPlaying())
+        if (gPlayer->isPlaying() && m_streamList)
         {
-            if (m_streamList)
+            MythUIButtonListItem *item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
+            if (item)
             {
-                MythUIButtonListItem *item = m_streamList->GetItemByData(QVariant::fromValue(m_currStream));
-                if (item)
-                {
-                    item->SetFontState("running");
-                    item->DisplayState("playing", "playstate");
-                }
+                item->SetFontState("running");
+                item->DisplayState("playing", "playstate");
             }
         }
 
@@ -544,13 +541,10 @@ void StreamView::addStream(MusicMetadata *mdata)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
         auto *itemsdata = item->GetData().value<MusicMetadata *>();
-        if (itemsdata)
+        if (itemsdata && (url == itemsdata->Url()))
         {
-            if (url == itemsdata->Url())
-            {
-                m_streamList->SetItemCurrent(item);
-                break;
-            }
+            m_streamList->SetItemCurrent(item);
+            break;
         }
     }
 }
@@ -616,13 +610,10 @@ void StreamView::updateStream(MusicMetadata *mdata)
     {
         MythUIButtonListItem *item = m_streamList->GetItemAt(x);
         auto *itemsdata = item->GetData().value<MusicMetadata *>();
-        if (itemsdata)
+        if (itemsdata && (mdata->ID() == itemsdata->ID()))
         {
-            if (mdata->ID() == itemsdata->ID())
-            {
-                m_streamList->SetItemCurrent(item);
-                break;
-            }
+            m_streamList->SetItemCurrent(item);
+            break;
         }
     }
 }
@@ -874,13 +865,11 @@ void SearchStream::streamVisible(MythUIButtonListItem *item)
         return;
 
     auto mdata =  item->GetData().value<MusicMetadata>();
-    if (!mdata.LogoUrl().isEmpty() && mdata.LogoUrl() != "-")
+    if (!mdata.LogoUrl().isEmpty() && (mdata.LogoUrl() != "-") &&
+        (item->GetText("dummy") == " "))
     {
-        if (item->GetText("dummy") == " ")
-        {
-            item->SetImage(mdata.LogoUrl());
-            item->SetText("", "dummy");
-        }
+        item->SetImage(mdata.LogoUrl());
+        item->SetText("", "dummy");
     }
 }
 

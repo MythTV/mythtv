@@ -367,11 +367,8 @@ int main(int argc, char *argv[])
 
     cmdline.ApplySettingsOverride();
 
-    if (!GetMythDB()->HaveSchema())
-    {
-        if (!InitializeMythSchema())
-            return GENERIC_EXIT_DB_ERROR;
-    }
+    if (!GetMythDB()->HaveSchema() && !InitializeMythSchema())
+        return GENERIC_EXIT_DB_ERROR;
 
     setHttpProxy();
 
@@ -491,7 +488,7 @@ int main(int argc, char *argv[])
         {
             printf("%5i %6i %8i %8s    %20s\n",
                    scan.m_scanid,   scan.m_cardid,
-                   scan.m_sourceid, (scan.m_processed) ? "yes" : "no",
+                   scan.m_sourceid, scan.m_processed ? "yes" : "no",
                    scan.m_scandate.toString(Qt::ISODate)
                    .toLatin1().constData());
         }
@@ -535,11 +532,8 @@ int main(int argc, char *argv[])
     // We must reload the translation after a language change and this
     // also means clearing the cached/loaded theme strings, so reload the
     // theme which also triggers a translation reload
-    if (LanguageSelection::prompt())
-    {
-        if (!reloadTheme())
-            return GENERIC_EXIT_NO_THEME;
-    }
+    if (LanguageSelection::prompt() && !reloadTheme())
+        return GENERIC_EXIT_NO_THEME;
 
     if (!DBUtil::CheckTimeZoneSupport())
     {

@@ -47,7 +47,7 @@ class PaneSingle : public GroupSetting
                                      {this,
                                       m_transportSetting,
                                       m_ignoreSignalTimeout,
-                                      m_followNit});
+                                      m_followNit,});
     }
 
     int  GetMultiplex(void) const

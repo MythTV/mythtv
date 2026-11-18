@@ -93,7 +93,7 @@ void MythHDRTracker::Update(MythVideoFrame* Frame)
                 (Frame->m_hdrMetadata.get() && !m_metadata->Equals(Frame->m_hdrMetadata.get())))
             {
                 m_metadata = Frame->m_hdrMetadata ?
-                    std::make_shared<MythHDRVideoMetadata>(*(Frame->m_hdrMetadata.get())) :
+                    std::make_shared<MythHDRVideoMetadata>(*Frame->m_hdrMetadata.get()) :
                     std::make_shared<MythHDRVideoMetadata>();
                 m_hdr->SetHDRMetadata(MythHDR::HDR10, m_metadata);
             }

@@ -356,9 +356,9 @@ bool MythImage::Load(const QString &filename)
 #endif
 
     }
-    else if ((filename.startsWith("http://")) ||
-                (filename.startsWith("https://")) ||
-                (filename.startsWith("ftp://")))
+    else if (filename.startsWith("http://") ||
+                filename.startsWith("https://") ||
+                filename.startsWith("ftp://"))
     {
         QByteArray data;
         if (GetMythDownloadManager()->download(filename, &data))
@@ -459,9 +459,9 @@ MythImage *MythImage::Gradient(MythPainter *painter,
 MythImageReader::MythImageReader(QString fileName)
   : m_fileName(std::move(fileName))
 {
-    if ((m_fileName.startsWith("http://")) ||
-        (m_fileName.startsWith("https://")) ||
-        (m_fileName.startsWith("ftp://")))
+    if (m_fileName.startsWith("http://") ||
+        m_fileName.startsWith("https://") ||
+        m_fileName.startsWith("ftp://"))
     {
         m_networkReply = GetMythDownloadManager()->download(m_fileName);
         if (m_networkReply)
@@ -473,7 +473,7 @@ MythImageReader::MythImageReader(QString fileName)
         {
             QString tmpFile = GetMythUI()->GetThemeDir() + '/' + m_fileName;
             if (QFile::exists(tmpFile))
-                m_fileName = tmpFile;
+                m_fileName = std::move(tmpFile);
         }
         setFileName(m_fileName);
     }

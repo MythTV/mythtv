@@ -668,7 +668,7 @@ void AudioTestThread::run()
         { 0, 2, 1, 5, 4, 3 },           //5.1
         { 0, 2, 1, 6, 4, 5, 3 },        //6.1
         { 0, 2, 1, 7, 5, 4, 6, 3 },     //7.1
-    }};
+    },};
 
     if (isOutputOpen())
     {
@@ -1153,7 +1153,7 @@ HostComboBoxSetting *AudioConfigSettings::MixerDevice()
 
 const std::array<const char *,2> AudioConfigSettings::kMixerControlControls
     {QT_TR_NOOP("PCM"),
-     QT_TR_NOOP("Master")};
+     QT_TR_NOOP("Master"),};
 
 HostComboBoxSetting *AudioConfigSettings::MixerControl()
 {

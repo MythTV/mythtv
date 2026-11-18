@@ -21,7 +21,7 @@ enum ChannelVisibleType : std::int8_t
     kChannelAlwaysVisible = 2,
     kChannelVisible       = 1,
     kChannelNotVisible    = 0,
-    kChannelNeverVisible  = -1
+    kChannelNeverVisible  = -1,
 };
 MTV_PUBLIC QString toString(ChannelVisibleType /*type*/);
 MTV_PUBLIC QString toRawString(ChannelVisibleType /*type*/);

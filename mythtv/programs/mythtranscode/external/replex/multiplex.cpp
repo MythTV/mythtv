@@ -628,33 +628,37 @@ int finish_mpg(multiplex_t *mx)
                                                                                 
         int old = 0;
         int nn=0;
-        while ((n=buffers_filled(mx)) && nn<1000 ){
+        n = buffers_filled(mx);
+        while (n && nn<1000 ){
                 if (n== old) nn++;
                 else  nn=0;
                 old = n;
                 check_times( mx, &video_ok, ext_ok, &start);
                 write_out_packs( mx, video_ok, ext_ok);
+                n=buffers_filled(mx);
         }
 
         old = 0;nn=0;
-	while ((n=ring_avail(mx->index_vrbuffer)/sizeof(index_unit))
-	       && nn<1000){
+	n = ring_avail(mx->index_vrbuffer)/sizeof(index_unit);
+	while (n && nn<1000){
 		if (n== old) nn++;
 		else nn= 0;
 		old = n;
 		writeout_video(mx);  
+		n = ring_avail(mx->index_vrbuffer)/sizeof(index_unit);
 	}
 	
 // flush the rest
         mx->finish = 2;
         old = 0;nn=0;
 	for (int i = 0; i < mx->extcnt; i++){
-		while ((n=ring_avail(&mx->index_extrbuffer[i])/
-				     sizeof(index_unit)) && nn <100){
+	    n=ring_avail(&mx->index_extrbuffer[i])/sizeof(index_unit);
+	    while (n && nn <100){
 			if (n== old) nn++;
 			else nn = 0;
 			old = n;
 			writeout_ext(mx, i);
+                        n = ring_avail(&mx->index_extrbuffer[i])/sizeof(index_unit);
 		}
 	}
 	

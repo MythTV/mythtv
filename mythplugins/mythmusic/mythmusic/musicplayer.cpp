@@ -346,11 +346,8 @@ void MusicPlayer::play(void)
     // Notify others that we are about to play
     gCoreContext->WantingPlayback(this);
 
-    if (!m_output)
-    {
-        if (!openOutputDevice())
-            return;
-    }
+    if (!m_output && !openOutputDevice())
+        return;
 
     if (!getDecoderHandler())
         setupDecoderHandler();
@@ -888,27 +885,24 @@ void MusicPlayer::customEvent(QEvent *event)
         else
             m_currentTime = oe->elapsedSeconds() - m_lastTrackStart;
 
-        if (m_playMode != PLAYMODE_RADIO && !m_updatedLastplay)
+        if (m_playMode != PLAYMODE_RADIO &&
+            !m_updatedLastplay &&
+            ((getCurrentMetadata() &&
+              m_currentTime > duration_cast<std::chrono::seconds>(getCurrentMetadata()->Length()) / 2) ||
+             m_currentTime >= m_lastplayDelay))
         {
             // we update the lastplay and playcount after playing
             // for m_lastplayDelay seconds or half the total track time
-            if ((getCurrentMetadata() &&
-                 m_currentTime > duration_cast<std::chrono::seconds>(getCurrentMetadata()->Length()) / 2) ||
-                 m_currentTime >= m_lastplayDelay)
-            {
-                updateLastplay();
-            }
+            updateLastplay();
         }
 
         // update the current tracks time in the last played list
-        if (m_playMode == PLAYMODE_RADIO)
+        if ((m_playMode == PLAYMODE_RADIO) &&
+            (!m_playedList.isEmpty() && m_currentTime > 0s))
         {
-            if (!m_playedList.isEmpty() && m_currentTime > 0s)
-            {
-                m_playedList.constLast()->setLength(m_currentTime);
-                // this will update any track lengths displayed on screen
-                gPlayer->sendMetadataChangedEvent(m_playedList.constLast()->ID());
-            }
+            m_playedList.constLast()->setLength(m_currentTime);
+            // this will update any track lengths displayed on screen
+            gPlayer->sendMetadataChangedEvent(m_playedList.constLast()->ID());
         }
     }
     else if (event->type() == DecoderEvent::kFinished)
@@ -1308,28 +1302,26 @@ void MusicPlayer::updateLastplay()
 
 void MusicPlayer::updateVolatileMetadata(void)
 {
-    if (m_playMode != PLAYMODE_RADIO && getCurrentMetadata() && getDecoder())
+    if ((m_playMode != PLAYMODE_RADIO) && getDecoder() && getCurrentMetadata() &&
+        getCurrentMetadata()->hasChanged())
     {
-        if (getCurrentMetadata()->hasChanged())
+        getCurrentMetadata()->persist();
+
+        // only write the last played, playcount & rating to the tag if it's enabled by the user
+        if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
         {
-            getCurrentMetadata()->persist();
-
-            // only write the last played, playcount & rating to the tag if it's enabled by the user
-            if (GetMythDB()->GetNumSetting("AllowTagWriting", 0) == 1)
-            {
-                QStringList strList;
-                strList << QString("MUSIC_TAG_UPDATE_VOLATILE")
-                        << getCurrentMetadata()->Hostname()
-                        << QString::number(getCurrentMetadata()->ID())
-                        << QString::number(getCurrentMetadata()->Rating())
-                        << QString::number(getCurrentMetadata()->Playcount())
-                        << getCurrentMetadata()->LastPlay().toString(Qt::ISODate);
-                auto *thread = new SendStringListThread(strList);
-                MThreadPool::globalInstance()->start(thread, "UpdateVolatile");
-            }
-
-            sendTrackStatsChangedEvent(getCurrentMetadata()->ID());
+            QStringList strList;
+            strList << QString("MUSIC_TAG_UPDATE_VOLATILE")
+                    << getCurrentMetadata()->Hostname()
+                    << QString::number(getCurrentMetadata()->ID())
+                    << QString::number(getCurrentMetadata()->Rating())
+                    << QString::number(getCurrentMetadata()->Playcount())
+                    << getCurrentMetadata()->LastPlay().toString(Qt::ISODate);
+            auto *thread = new SendStringListThread(strList);
+            MThreadPool::globalInstance()->start(thread, "UpdateVolatile");
         }
+
+        sendTrackStatsChangedEvent(getCurrentMetadata()->ID());
     }
 }
 

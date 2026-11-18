@@ -170,16 +170,14 @@ void ExternalSignalMonitor::UpdateValues(void)
     if (is_locked && GetStreamData() &&
         HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                    kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
-                   kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
+                   kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT) &&
+        !m_streamHandlerStarted)
     {
-        if (!m_streamHandlerStarted)
-        {
-            m_streamHandler->AddListener(GetStreamData());
-            m_streamHandler->StartStreaming(false,
-                                            m_channel->GetProfileName(),
-                                            "signalmon start");
-            m_streamHandlerStarted = true;
-        }
+        m_streamHandler->AddListener(GetStreamData());
+        m_streamHandler->StartStreaming(false,
+                                        m_channel->GetProfileName(),
+                                        "signalmon start");
+        m_streamHandlerStarted = true;
     }
 
     m_updateDone = true;

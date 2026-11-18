@@ -213,13 +213,10 @@ bool TrackInfoPopup::Create(void)
         ratingState->DisplayState(QString("%1").arg(metadata->Rating()));
 
     MythUIImage *albumImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
-    if (albumImage)
+    if (albumImage && !metadata->getAlbumArtFile().isEmpty())
     {
-        if (!metadata->getAlbumArtFile().isEmpty())
-        {
-            albumImage->SetFilename(metadata->getAlbumArtFile());
-            albumImage->Load();
-        }
+        albumImage->SetFilename(metadata->getAlbumArtFile());
+        albumImage->Load();
     }
 
     m_displayTimer = new QTimer(this);

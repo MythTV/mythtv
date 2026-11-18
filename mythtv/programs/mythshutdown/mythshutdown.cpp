@@ -31,7 +31,7 @@
 
 static void setGlobalSetting(const QString &key, const QString &v)
 {
-    QString value = (v.isNull()) ? QString("") : v;
+    QString value = v.isNull() ? QString("") : v;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
@@ -316,26 +316,22 @@ static int getStatus(bool bWantRecStatus)
     }
 
     // Check for one of the daily wakeup periods
-    if (dtPeriod1Start != dtPeriod1End)
+    if ((dtPeriod1Start != dtPeriod1End) &&
+        dtCurrent >= dtPeriod1Start && dtCurrent <= dtPeriod1End)
     {
-        if (dtCurrent >= dtPeriod1Start && dtCurrent <= dtPeriod1End)
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                QObject::tr("In a daily wakeup period (1).", "mythshutdown") +
-                "\n");
-            res |= 64;
-        }
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("In a daily wakeup period (1).", "mythshutdown") +
+            "\n");
+        res |= 64;
     }
 
-    if (dtPeriod2Start != dtPeriod2End)
+    if ((dtPeriod2Start != dtPeriod2End) &&
+        dtCurrent >= dtPeriod2Start && dtCurrent <= dtPeriod2End)
     {
-        if (dtCurrent >= dtPeriod2Start && dtCurrent <= dtPeriod2End)
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                QObject::tr("In a daily wakeup period (2).", "mythshutdown") +
-                "\n");
-            res |= 64;
-        }
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("In a daily wakeup period (2).", "mythshutdown") +
+            "\n");
+        res |= 64;
     }
 
     // Are we about to start a daily wakeup period
@@ -500,29 +496,25 @@ static int shutdown()
     }
 
     // have we passed the first wakeup time today
-    if (dtPeriod1Start != dtPeriod1End)
+    if ((dtPeriod1Start != dtPeriod1End) &&
+        (dtCurrent < dtPeriod1Start))
     {
-        if (dtCurrent < dtPeriod1Start)
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                QObject::tr("Daily wakeup today at %1", "mythshutdown")
-                .arg(MythDate::toString(dtPeriod1Start, MythDate::kTime)) +
-                "\n");
-            dtNextDailyWakeup = dtPeriod1Start;
-        }
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Daily wakeup today at %1", "mythshutdown")
+            .arg(MythDate::toString(dtPeriod1Start, MythDate::kTime)) +
+            "\n");
+        dtNextDailyWakeup = dtPeriod1Start;
     }
 
     // have we passed the second wakeup time today
-    if (!dtNextDailyWakeup.isValid() && dtPeriod2Start != dtPeriod2End)
+    if ((!dtNextDailyWakeup.isValid() && dtPeriod2Start != dtPeriod2End) &&
+        (dtCurrent < dtPeriod2Start))
     {
-        if (dtCurrent < dtPeriod2Start)
-        {
-            LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
-                QObject::tr("Daily wakeup today at %1", "mythshutdown")
-                .arg(MythDate::toString(dtPeriod2Start, MythDate::kTime)) +
-                "\n");
-            dtNextDailyWakeup = dtPeriod2Start;
-        }
+        LOG(VB_STDIO|VB_FLUSH, LOG_ERR,
+            QObject::tr("Daily wakeup today at %1", "mythshutdown")
+            .arg(MythDate::toString(dtPeriod2Start, MythDate::kTime)) +
+            "\n");
+        dtNextDailyWakeup = dtPeriod2Start;
     }
 
     // if we have at least one valid daily wakeup time

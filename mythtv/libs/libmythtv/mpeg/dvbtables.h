@@ -150,7 +150,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
     // reserved_future_use      8  10.0
     // for (i=0;i<N;i++) {
     ///  service_id            16  0.0+p
-    uint ServiceID(uint i) const { return (m_ptrs[i][0]<<8) | (m_ptrs[i][1]); }
+    uint ServiceID(uint i) const { return (m_ptrs[i][0]<<8) | m_ptrs[i][1]; }
     //   reserved_future_use    6  2.0+p
     //   EIT_schedule_flag      1  2.6+p
     bool HasEITSchedule(uint i) const { return ( m_ptrs[i][2] & 0x02 ) != 0; }
@@ -163,7 +163,7 @@ class MTV_PUBLIC ServiceDescriptionTable : public PSIPTable
     bool IsEncrypted(uint i) const { return ( m_ptrs[i][3] & 0x10 ) != 0; }
     ///  desc_loop_length      12  3.4+p
     uint ServiceDescriptorsLength(uint i) const
-        { return ((m_ptrs[i][3]<<8) | (m_ptrs[i][4])) & 0xfff; }
+        { return ((m_ptrs[i][3]<<8) | m_ptrs[i][4]) & 0xfff; }
     ///  for (j=0;j<N;j++)      x  5.0+p
     ///    { descriptor() }
     const unsigned char* ServiceDescriptors(uint i) const
@@ -356,7 +356,7 @@ class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
     {
         return ((byteBCD2int(Duration(i)[0]) * 3600) +
                 (byteBCD2int(Duration(i)[1]) * 60) +
-                (byteBCD2int(Duration(i)[2])));
+                byteBCD2int(Duration(i)[2]));
     }
     //   running_status         3  10.0+x
     uint RunningStatus(uint i) const { return m_ptrs[i][10] >> 5; }
@@ -364,7 +364,7 @@ class MTV_PUBLIC DVBEventInformationTable : public PSIPTable
     bool IsScrambled(uint i) const { return ( m_ptrs[i][10] & 0x10 ) != 0; }
     //   descriptors_loop_len  12  10.4+x
     uint DescriptorsLength(uint i) const
-        { return ((m_ptrs[i][10]<<8) | (m_ptrs[i][11])) & 0xfff; }
+        { return ((m_ptrs[i][10]<<8) | m_ptrs[i][11]) & 0xfff; }
     //   for(i=0;i<N;i++)       y  12.0+x
     //     { descriptor() }
     const unsigned char* Descriptors(uint i) const

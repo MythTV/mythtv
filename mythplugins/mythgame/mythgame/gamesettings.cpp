@@ -32,8 +32,8 @@ const std::array<GameTypes,12> GameTypeList
     { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "PC GAME"), .m_idStr="PC",     .m_extensions="" },
     { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "PCE/TG16"),.m_idStr="PCE",    .m_extensions="pce" },
     { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "SEGA/MASTER SYSTEM"), .m_idStr="SEGA", .m_extensions="sms" },
-    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    .m_idStr="SNES",   .m_extensions="zip,smc,sfc,fig,swc" }
-}};
+    { .m_nameStr=QT_TRANSLATE_NOOP("(GameTypes)", "SNES"),    .m_idStr="SNES",   .m_extensions="zip,smc,sfc,fig,swc" },
+},};
 
 QString GetGameTypeName(const QString &GameType)
 {

@@ -209,9 +209,10 @@ AVPixelFormat MythVAAPIContext::GetFormat(AVCodecContext* Context, const AVPixel
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
-        if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (MythCodecContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext, "VAAPI context creation") >= 0)
-                return AV_PIX_FMT_VAAPI;
+        if ((*PixFmt == AV_PIX_FMT_VAAPI) &&
+            (MythCodecContext::InitialiseDecoder(Context, MythVAAPIContext::InitialiseContext,
+                                                 "VAAPI context creation") >= 0))
+            return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
@@ -221,9 +222,8 @@ AVPixelFormat MythVAAPIContext::GetFormat2(AVCodecContext* Context, const AVPixe
 {
     while (*PixFmt != AV_PIX_FMT_NONE)
     {
-        if (*PixFmt == AV_PIX_FMT_VAAPI)
-            if (InitialiseContext2(Context) >= 0)
-                return AV_PIX_FMT_VAAPI;
+        if ((*PixFmt == AV_PIX_FMT_VAAPI) && (InitialiseContext2(Context) >= 0))
+            return AV_PIX_FMT_VAAPI;
         PixFmt++;
     }
     return AV_PIX_FMT_NONE;
@@ -301,9 +301,9 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
     if (vendor.contains("i965", Qt::CaseInsensitive))
     {
         int format = VA_FOURCC_NV12;
-        if (vendor.contains("ironlake", Qt::CaseInsensitive))
-            if (CODEC_IS_MPEG(Context->codec_id))
-                format = VA_FOURCC_I420;
+        if (vendor.contains("ironlake", Qt::CaseInsensitive) &&
+            CODEC_IS_MPEG(Context->codec_id))
+            format = VA_FOURCC_I420;
 
         if (format != VA_FOURCC_NV12)
         {
@@ -315,13 +315,13 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
         std::array<VASurfaceAttrib,3> prefs {{
             { .type=VASurfaceAttribPixelFormat,
               .flags=VA_SURFACE_ATTRIB_SETTABLE,
-              .value={ VAGenericValueTypeInteger, { format } } },
+              .value={ VAGenericValueTypeInteger, { format } }, },
             { .type=VASurfaceAttribUsageHint,
               .flags=VA_SURFACE_ATTRIB_SETTABLE,
-              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } } },
+              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_USAGE_HINT_DISPLAY } }, },
             { .type=VASurfaceAttribMemoryType,
               .flags=VA_SURFACE_ATTRIB_SETTABLE,
-              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} } } }};
+              .value={ VAGenericValueTypeInteger, { VA_SURFACE_ATTRIB_MEM_TYPE_VA} }, }, },};
         vaapi_frames_ctx->attributes = prefs.data();
         vaapi_frames_ctx->nb_attributes = 3;
     }
@@ -343,7 +343,7 @@ int MythVAAPIContext::InitialiseContext(AVCodecContext* Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
         av_buffer_unref(&hwdeviceref);
-        av_buffer_unref(&(Context->hw_frames_ctx));
+        av_buffer_unref(&Context->hw_frames_ctx);
         return res;
     }
 
@@ -392,7 +392,7 @@ int MythVAAPIContext::InitialiseContext2(AVCodecContext* Context)
     {
         LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to initialise VAAPI frames context");
         av_buffer_unref(&device);
-        av_buffer_unref(&(Context->hw_frames_ctx));
+        av_buffer_unref(&Context->hw_frames_ctx);
         return -1;
     }
 

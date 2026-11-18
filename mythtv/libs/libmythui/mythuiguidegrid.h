@@ -131,7 +131,7 @@ class MUI_PUBLIC MythUIGuideGrid : public MythUIType
 
     MythFontProperties *m_font  {nullptr};
     int    m_justification      {Qt::AlignLeft | Qt::AlignTop |
-                                 Qt::TextWordWrap};
+                                 Qt::TextWordWrap,};
     bool   m_multilineText      {true};
     bool   m_cutdown            {true};
 

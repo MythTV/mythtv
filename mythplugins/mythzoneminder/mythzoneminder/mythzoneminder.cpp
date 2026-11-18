@@ -36,13 +36,7 @@
 
 static bool checkConnection(void)
 {
-    if (!ZMClient::get()->connected())
-    {
-        if (!ZMClient::setupZMClient())
-            return false;
-    }
-
-    return true;
+    return ZMClient::get()->connected() || ZMClient::setupZMClient();
 }
 
 static void runZMConsole(void)

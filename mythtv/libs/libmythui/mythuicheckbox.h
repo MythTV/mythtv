@@ -22,7 +22,7 @@ class MUI_PUBLIC MythUICheckBox : public MythUIType
 
     enum StateType : std::uint8_t
                    { None = 0, Normal, Disabled, Active, Selected,
-                     SelectedInactive };
+                     SelectedInactive, };
 
     bool gestureEvent(MythGestureEvent *event) override; // MythUIType
     bool keyPressEvent(QKeyEvent *event) override; // MythUIType

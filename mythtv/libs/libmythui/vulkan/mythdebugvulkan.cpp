@@ -52,7 +52,7 @@ void MythDebugVulkan::BeginRegion(VkCommandBuffer CmdBuffer, const char *Name, c
 {
     VkDebugMarkerMarkerInfoEXT begin =
         { VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, nullptr, Name,
-          { Color[0], Color[1], Color[2], Color[3] } };
+          { Color[0], Color[1], Color[2], Color[3] }, };
     m_beginRegion(CmdBuffer, &begin);
 }
 

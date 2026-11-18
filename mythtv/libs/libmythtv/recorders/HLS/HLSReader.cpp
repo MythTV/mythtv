@@ -658,45 +658,43 @@ bool HLSReader::ParseM3U8(const QByteArray& buffer, HLSRecStream* stream)
         SegmentContainer::iterator Iseg = m_segments.end() - 1;
 
         // Does this playlist overlap?
-        if (!m_segments.empty() && !new_segments.empty())
+        if (!m_segments.empty() && !new_segments.empty() &&
+            ((*Iseg).Sequence() >= first_sequence) &&
+            ((*Iseg).Sequence() < sequence_num))
         {
-            if ((*Iseg).Sequence() >= first_sequence &&
-                (*Iseg).Sequence() < sequence_num)
+            // Find the beginning of the overlap
+            while (Iseg != m_segments.begin() &&
+                   (*Iseg).Sequence() > first_sequence &&
+                   (*Iseg).Sequence() < sequence_num)
+                --Iseg;
+
+            int64_t diff = (*Iseg).Sequence() - (*Inew).Sequence();
+            if (diff >= 0 && new_segments.size() > diff)
             {
-                // Find the beginning of the overlap
-                while (Iseg != m_segments.begin() &&
-                       (*Iseg).Sequence() > first_sequence &&
-                       (*Iseg).Sequence() < sequence_num)
-                    --Iseg;
+                Inew += diff;
 
-                int64_t diff = (*Iseg).Sequence() - (*Inew).Sequence();
-                if (diff >= 0 && new_segments.size() > diff)
+                // Update overlapping segment info
+                for ( ; Iseg != m_segments.end(); ++Iseg, ++Inew)
                 {
-                    Inew += diff;
-
-                    // Update overlapping segment info
-                    for ( ; Iseg != m_segments.end(); ++Iseg, ++Inew)
+                    if (Inew == new_segments.end())
                     {
-                        if (Inew == new_segments.end())
-                        {
-                            LOG(VB_RECORD, LOG_ERR, LOC +
-                                QString("Went off the end with %1 left")
-                                .arg(m_segments.end() - Iseg));
-                            break;
-                        }
-                        if ((*Iseg).Sequence() != (*Inew).Sequence())
-                        {
-                            LOG(VB_RECORD, LOG_ERR, LOC +
-                                QString("Sequence non-sequential?  %1 != %2")
-                                .arg((*Iseg).Sequence())
-                                .arg((*Inew).Sequence()));
-                            break;
-                        }
-
-                        (*Iseg).m_duration = (*Inew).Duration();
-                        (*Iseg).m_title    = (*Inew).Title();
-                        (*Iseg).m_url      = (*Inew).Url();
+                        LOG(VB_RECORD, LOG_ERR, LOC +
+                            QString("Went off the end with %1 left")
+                            .arg(m_segments.end() - Iseg));
+                        break;
                     }
+                    if ((*Iseg).Sequence() != (*Inew).Sequence())
+                    {
+                        LOG(VB_RECORD, LOG_ERR, LOC +
+                            QString("Sequence non-sequential?  %1 != %2")
+                            .arg((*Iseg).Sequence())
+                            .arg((*Inew).Sequence()));
+                        break;
+                    }
+
+                    (*Iseg).m_duration = (*Inew).Duration();
+                    (*Iseg).m_title    = (*Inew).Title();
+                    (*Iseg).m_url      = (*Inew).Url();
                 }
             }
         }

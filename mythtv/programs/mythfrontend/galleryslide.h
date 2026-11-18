@@ -229,13 +229,13 @@ public:
     Slide &GetCurrent()
     {
         QMutexLocker lock(&m_mutexQ);
-        return *(m_queue.head());
+        return *m_queue.head();
     }
 
     Slide  &GetNext()
     {
         QMutexLocker lock(&m_mutexQ);
-        return *(m_queue.at(1));
+        return *m_queue.at(1);
     }
 
 signals:

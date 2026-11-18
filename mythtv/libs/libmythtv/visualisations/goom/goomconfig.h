@@ -21,7 +21,7 @@ enum COLOR : uint8_t {
     BLEU = 3,
     VERT = 2,
     ALPHA = 0,
-#endif
+#endif // NOLINT(readability-trailing-comma)
 };
 		
 

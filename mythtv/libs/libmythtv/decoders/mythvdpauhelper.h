@@ -45,7 +45,7 @@ class MythVDPAUHelper : public QObject
     {
         VDPMixerNone     = 0x00,
         VDPMixerTemporal = 0x01,
-        VDPMixerSpatial  = 0x02
+        VDPMixerSpatial  = 0x02,
     };
 
     Q_DECLARE_FLAGS(VDPMixerFeatures, VDPMixerFeature)

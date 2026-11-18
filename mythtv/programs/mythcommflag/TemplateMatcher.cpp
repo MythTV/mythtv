@@ -1,6 +1,7 @@
 // C++ headers
 #include <algorithm>
 #include <cmath>
+#include <stdexcept>
 #include <cstdlib>
 
 // Qt headers
@@ -378,15 +379,12 @@ TemplateMatcher::MythPlayerInited(MythPlayer *_player,
 
     m_match = new unsigned char[nframes];
 
-    if (m_debugMatches)
+    if (m_debugMatches && readMatches(m_debugData, m_matches, nframes))
     {
-        if (readMatches(m_debugData, m_matches, nframes))
-        {
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("TemplateMatcher::MythPlayerInited read %1")
-                    .arg(m_debugData));
-            m_matchesDone = true;
-        }
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("TemplateMatcher::MythPlayerInited read %1")
+            .arg(m_debugData));
+        m_matchesDone = true;
     }
 
     if (m_matchesDone)
@@ -446,31 +444,31 @@ TemplateMatcher::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     {
         const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
         if (pgm == nullptr)
-            throw 1;
+            throw std::runtime_error("1");
 
         start = nowAsDuration<std::chrono::microseconds>();
 
         if (pgm_crop(&m_cropped, pgm, pgmheight, m_tmplRow, m_tmplCol,
                     m_tmplWidth, m_tmplHeight))
-            throw 2;
+            throw std::runtime_error("2");
 
         edges = m_edgeDetector->detectEdges(&m_cropped, m_tmplHeight, FRAMESGMPCTILE);
         if (edges == nullptr)
-            throw 3;
+            throw std::runtime_error("3");
 
         if (pgm_match(m_tmpl, edges, m_tmplHeight, JITTER_RADIUS, &m_matches[frameno]))
-            throw 4;
+            throw std::runtime_error("4");
 
         end = nowAsDuration<std::chrono::microseconds>();
         m_analyzeTime += (end - start);
 
         return ANALYZE_OK;
     }
-    catch (int e)
+    catch (const std::runtime_error& e)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateMatcher::analyzeFrame error at frame %1, step %2")
-            .arg(frameno).arg(e));
+            .arg(frameno).arg(e.what()));
         return ANALYZE_ERROR;
     }
 }
@@ -494,14 +492,12 @@ TemplateMatcher::finished(long long nframes, bool final)
     int       minseglen = 1;
     long long brkb = 0;
 
-    if (!m_matchesDone && m_debugMatches)
+    if (!m_matchesDone && m_debugMatches && final &&
+        writeMatches(m_debugData, m_matches, nframes))
     {
-        if (final && writeMatches(m_debugData, m_matches, nframes))
-        {
-            LOG(VB_COMMFLAG, LOG_INFO,
-                QString("TemplateMatcher::finished wrote %1") .arg(m_debugData));
-            m_matchesDone = true;
-        }
+        LOG(VB_COMMFLAG, LOG_INFO,
+            QString("TemplateMatcher::finished wrote %1") .arg(m_debugData));
+        m_matchesDone = true;
     }
 
     int tmpledges = pgm_set(m_tmpl, m_tmplHeight);
@@ -516,11 +512,9 @@ TemplateMatcher::finished(long long nframes, bool final)
     for (long long ii = 0; ii < nframes; ii++)
         m_match[ii] = m_matches[ii] >= mintmpledges ? 1 : 0;
 
-    if (m_debugLevel >= 2)
-    {
-        if (final && finishedDebug(nframes, m_matches, m_match))
-            return -1;
-    }
+    if ((m_debugLevel >= 2) && final &&
+        finishedDebug(nframes, m_matches, m_match))
+        return -1;
 
     /*
      * Construct breaks; find the first logo break.

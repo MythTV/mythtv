@@ -54,7 +54,7 @@ static inline int get_macroblock_modes (mpeg2_decoder_t * const decoder)
 	DUMPBITS (bit_buf, bits, tab->len);
 	macroblock_modes = tab->modes;
 
-	if ((! (decoder->frame_pred_frame_dct)) &&
+	if ((! decoder->frame_pred_frame_dct) &&
 	    (decoder->picture_structure == FRAME_PICTURE)) {
 	    macroblock_modes |= UBITS (bit_buf, 1) * DCT_TYPE_INTERLACED;
 	    DUMPBITS (bit_buf, bits, 1);
@@ -609,7 +609,8 @@ static int get_non_intra_block (mpeg2_decoder_t * const decoder,
 
 	    continue;
 
-	} else if (bit_buf >= 0x02000000) {
+	}
+	if (bit_buf >= 0x02000000) {
 	    tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
 	    i += tab->run;
 	    if (i < 64)
@@ -848,7 +849,8 @@ static int get_mpeg1_non_intra_block (mpeg2_decoder_t * const decoder)
 
 	    continue;
 
-	} else if (bit_buf >= 0x02000000) {
+	}
+	if (bit_buf >= 0x02000000) {
 	    tab = DCT_B14_10 + (UBITS (bit_buf, 10) - 8);
 	    i += tab->run;
 	    if (i < 64)
@@ -1676,7 +1678,7 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
     }
     decoder->v_offset = (code - 1) * 16;
     int offset = 0;
-    if (!(decoder->convert) || decoder->coding_type != B_TYPE)
+    if (!decoder->convert || decoder->coding_type != B_TYPE)
 	offset = (code - 1) * decoder->slice_stride;
 
     decoder->dest[0] = decoder->picture_dest[0] + offset;
@@ -1723,7 +1725,7 @@ static inline int slice_init (mpeg2_decoder_t * const decoder, int code)
 
     while (decoder->offset - decoder->width >= 0) {
 	decoder->offset -= decoder->width;
-	if (!(decoder->convert) || decoder->coding_type != B_TYPE) {
+	if (!decoder->convert || decoder->coding_type != B_TYPE) {
 	    decoder->dest[0] += decoder->slice_stride;
 	    decoder->dest[1] += decoder->slice_uv_stride;
 	    decoder->dest[2] += decoder->slice_uv_stride;

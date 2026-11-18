@@ -41,7 +41,7 @@ class ChannelEditor : public MythScreenType
   private:
     enum sourceFilter : std::int8_t {
         FILTER_ALL = -1,
-        FILTER_UNASSIGNED = 0
+        FILTER_UNASSIGNED = 0,
     };
 
     int     m_sourceFilter           {FILTER_ALL};

@@ -55,7 +55,7 @@ enum TCTypes : std::uint8_t
     TC_VIDEO = 0,
     TC_AUDIO,
     TC_SUB,
-    TC_CC
+    TC_CC,
 };
 static constexpr size_t TCTYPESMAX { 4 };
 using tctype_arr = std::array<std::chrono::milliseconds,TCTYPESMAX>;

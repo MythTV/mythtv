@@ -40,14 +40,14 @@ enum UPnpCDSMethod : std::uint8_t
     CDSM_GetSortCapabilities    = 5,
     CDSM_GetSystemUpdateID      = 6,
     CDSM_GetFeatureList         = 7,
-    CDSM_GetServiceResetToken   = 8
+    CDSM_GetServiceResetToken   = 8,
 };
 
 enum UPnpCDSBrowseFlag : std::uint8_t
 {
     CDS_BrowseUnknown         = 0,
     CDS_BrowseMetadata        = 1,
-    CDS_BrowseDirectChildren  = 2
+    CDS_BrowseDirectChildren  = 2,
 };
 
 enum UPnpCDSClient : std::uint8_t
@@ -182,7 +182,7 @@ class UPNP_PUBLIC UPnPShortcutFeature : public UPnPFeature
         VIDEOS_ALL,
         VIDEOS_FOLDER_STRUCTURE,
 
-        FOLDER_STRUCTURE
+        FOLDER_STRUCTURE,
     };
 
     bool AddShortCut(ShortCutType type, const QString &objectID);

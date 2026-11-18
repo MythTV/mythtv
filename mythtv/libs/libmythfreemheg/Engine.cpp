@@ -162,13 +162,11 @@ std::chrono::milliseconds MHEngine::RunAll()
             }
         }
 
-        if (! m_externContentTable.isEmpty())
+        if (!m_externContentTable.isEmpty() &&
+            (nNextTime == 0ms || nNextTime > CONTENT_CHECK_TIME))
         {
             // If we have an outstanding request for external content we need to set a timer.
-            if (nNextTime == 0ms || nNextTime > CONTENT_CHECK_TIME)
-            {
-                nNextTime = CONTENT_CHECK_TIME;
-            }
+            nNextTime = CONTENT_CHECK_TIME;
         }
 
         if (! m_eventQueue.isEmpty())
@@ -489,7 +487,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
     // Can now actually delete the old scene.
     if (pApp->m_pCurrentScene)
     {
-        delete(pApp->m_pCurrentScene);
+        delete pApp->m_pCurrentScene;
         pApp->m_pCurrentScene = nullptr;
     }
 
@@ -604,7 +602,7 @@ MHRoot *MHEngine::FindObject(const MHObjectRef &oRef, bool failOnNotFound)
         // Another case was a call to CallActionSlot with an object reference variable
         // that had been initialised to zero.
         MHLOG(MHLogWarning, QString("WARN Reference %1 not found").arg(oRef.m_nObjectNo));
-        throw "FindObject failed";
+        throw std::runtime_error("FindObject failed");
     }
 
     return nullptr; // If we don't generate an error.
@@ -1053,7 +1051,7 @@ void MHEngine::RequestExternalContent(MHIngredient *pRequester)
         MHLOG(MHLogNotifications, QString("Waiting for %1 <= %2")
             .arg(pRequester->m_ObjectReference.Printable(), csPath.left(128)) );
         auto *pContent = new MHExternContent;
-        pContent->m_FileName = csPath;
+        pContent->m_FileName = std::move(csPath);
         pContent->m_pRequester = pRequester;
         pContent->m_time.start();
         m_externContentTable.append(pContent);
@@ -1217,7 +1215,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
             MHUnion *pValue = pEntry->m_Data.GetAt(i);
             MHLOG(MHLogNotifications, QString("Load Persistent(%1) #%2=%3")
                 .arg(csFile).arg(i).arg(pValue->Printable()) );
-            FindObject(*(variables.GetAt(i)))->SetVariableValue(*pValue);
+            FindObject(*variables.GetAt(i))->SetVariableValue(*pValue);
         }
     }
 
@@ -1234,7 +1232,7 @@ bool MHEngine::LoadStorePersistent(bool fIsLoad, const MHOctetString &fileName, 
         {
             auto *pValue = new MHUnion;
             pEntry->m_Data.Append(pValue);
-            FindObject(*(variables.GetAt(i)))->GetVariableValue(*pValue, this);
+            FindObject(*variables.GetAt(i))->GetVariableValue(*pValue, this);
             MHLOG(MHLogNotifications, QString("Store Persistent(%1) %2=>#%3")
                 .arg(csFile, pValue->Printable(), QString::number(i)) );
         }

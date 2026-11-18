@@ -100,7 +100,7 @@ bool LinuxAVCInfo::SendAVCCommand(
         result.push_back((ret[i]>>24) & 0xff);
         result.push_back((ret[i]>>16) & 0xff);
         result.push_back((ret[i]>>8)  & 0xff);
-        result.push_back((ret[i])     & 0xff);
+        result.push_back(ret[i]    & 0xff);
     }
 
     avc1394_transaction_block_close(m_fwHandle);

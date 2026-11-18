@@ -289,12 +289,9 @@ bool FillData::Run(DataSourceList &sourcelist)
                       "      AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.next())
-        {
-            if (!query.isNull(0))
-                GuideDataBefore =
+        if (query.exec() && query.next() && !query.isNull(0))
+            GuideDataBefore =
                     MythDate::fromString(query.value(0).toString());
-        }
 
         m_channelUpdateRun = false;
         m_endOfData = false;
@@ -453,7 +450,7 @@ bool FillData::Run(DataSourceList &sourcelist)
             int grabdays = REFRESH_MAX;
 
             grabdays = (m_maxDays > 0)          ? m_maxDays : grabdays;
-            grabdays = (m_onlyUpdateChannels)   ? 1         : grabdays;
+            grabdays = m_onlyUpdateChannels  ? 1         : grabdays;
 
             std::vector<bool> refresh_request;
             refresh_request.resize(grabdays, m_refreshAll);
@@ -477,7 +474,7 @@ bool FillData::Run(DataSourceList &sourcelist)
                 if (MythDate::current().date() != qCurrentDate)
                 {
                     QDate newDate = MythDate::current().date();
-                    i += (newDate.daysTo(qCurrentDate));
+                    i += newDate.daysTo(qCurrentDate);
                     i = std::max(i, 0);
                     qCurrentDate = newDate;
                 }
@@ -691,11 +688,8 @@ bool FillData::Run(DataSourceList &sourcelist)
                       "AND manualid = 0 AND c.xmltvid != '';");
         query.bindValue(":SRCID", (*it).id);
 
-        if (query.exec() && query.next())
-        {
-            if (!query.isNull(0))
-                GuideDataAfter = MythDate::fromString(query.value(0).toString());
-        }
+        if (query.exec() && query.next() && !query.isNull(0))
+            GuideDataAfter = MythDate::fromString(query.value(0).toString());
 
         if (GuideDataAfter == GuideDataBefore)
         {

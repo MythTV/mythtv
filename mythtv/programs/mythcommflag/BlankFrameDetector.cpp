@@ -234,7 +234,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         { .m_len=20s,  .m_delta=2s },
         { .m_len=30s,  .m_delta=5s },
         { .m_len=60s,  .m_delta=5s },
-    }};
+    },};
 
     /*
      * TUNABLE:

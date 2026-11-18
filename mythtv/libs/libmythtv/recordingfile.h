@@ -13,7 +13,7 @@ enum AVContainer : std::uint8_t
     formatUnknown  = 0,
     formatNUV      = 1,
     formatMPEG2_TS = 2,
-    formatMPEG2_PS = 3
+    formatMPEG2_PS = 3,
 };
 
 /** \class RecordingFile

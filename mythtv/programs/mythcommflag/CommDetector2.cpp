@@ -310,28 +310,22 @@ CommDetector2::CommDetector2(
      * Look for blank frames to use as delimiters between commercial and
      * non-commercial segments.
      */
-    if ((m_commDetectMethod & COMM_DETECT_2_BLANK))
+    if ((m_commDetectMethod & COMM_DETECT_2_BLANK) && !m_blankFrameDetector)
     {
-        if (!m_blankFrameDetector)
-        {
-            m_blankFrameDetector = new BlankFrameDetector(histogramAnalyzer,
-                    m_debugdir);
-            pass1.push_back(m_blankFrameDetector);
-        }
+        m_blankFrameDetector = new BlankFrameDetector(histogramAnalyzer,
+                                                      m_debugdir);
+        pass1.push_back(m_blankFrameDetector);
     }
 
     /*
      * Look for "scene changes" to use as delimiters between commercial and
      * non-commercial segments.
      */
-    if ((m_commDetectMethod & COMM_DETECT_2_SCENE))
+    if ((m_commDetectMethod & COMM_DETECT_2_SCENE) && !m_sceneChangeDetector)
     {
-        if (!m_sceneChangeDetector)
-        {
-            m_sceneChangeDetector = new SceneChangeDetector(histogramAnalyzer,
-                    m_debugdir);
-            pass1.push_back(m_sceneChangeDetector);
-        }
+        m_sceneChangeDetector = new SceneChangeDetector(histogramAnalyzer,
+                                                        m_debugdir);
+        pass1.push_back(m_sceneChangeDetector);
     }
 
     /*
@@ -454,10 +448,9 @@ int CommDetector2::computeBreaks(long long nframes)
         if (matcher->computeBreaks(&m_breaks))
             return -1;
     }
-    else if (m_blankFrameDetector)
+    else if (m_blankFrameDetector && m_blankFrameDetector->computeBreaks(&m_breaks))
     {
-        if (m_blankFrameDetector->computeBreaks(&m_breaks))
-            return -1;
+        return -1;
     }
 
     return 0;

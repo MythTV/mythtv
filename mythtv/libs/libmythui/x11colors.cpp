@@ -773,7 +773,7 @@ QColor createColor(const QString &color)
         { "dark", 139, 0, 0},
         { "darkred", 139, 0, 0},
         { "light", 144, 238, 144},
-        { "lightgreen", 144, 238, 144}
+        { "lightgreen", 144, 238, 144},
         }};
 
         for (const auto& entry : kCMap)

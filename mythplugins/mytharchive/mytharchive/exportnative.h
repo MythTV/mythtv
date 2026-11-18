@@ -17,7 +17,7 @@ enum NativeItemType : std::uint8_t
 {
     RT_RECORDING = 1,
     RT_VIDEO,
-    RT_FILE
+    RT_FILE,
 };
 
 class MythUIText;

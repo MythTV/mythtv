@@ -130,7 +130,7 @@ static const TBuiltInResource s_TBuiltInResource = {
         .generalSamplerIndexing = true,
         .generalVariableIndexing = true,
         .generalConstantMatrixVectorIndexing = true,
-    }
+    },
 };
 
 static auto GLSLangCompile(EShLanguage Stage, const QString &Code)
@@ -448,7 +448,7 @@ bool MythShaderVulkan::CreateShaderFromSPIRV(const std::vector<MythSPIRVStage> &
         VkShaderModuleCreateInfo create { VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, nullptr, 0, size, code };
         success &= (m_vulkanFuncs->vkCreateShaderModule(m_vulkanDevice, &create, nullptr, &module) == VK_SUCCESS);
         m_stages.push_back( { VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr,
-                              0, static_cast<VkShaderStageFlagBits>(stage.first), module, "main", nullptr } );
+                              0, static_cast<VkShaderStageFlagBits>(stage.first), module, "main", nullptr, } );
         m_spirv.push_back(code);
     }
     return success;

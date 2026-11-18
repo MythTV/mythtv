@@ -25,7 +25,7 @@ class PaneDVBS2 : public GroupSetting
                                       m_pmodsys     = new ScanDVBSModSys(),
                                       m_pfec        = new ScanFec(),
                                       m_pinversion  = new ScanInversion(),
-                                      m_prolloff    = new ScanRollOff()});
+                                      m_prolloff    = new ScanRollOff(),});
 
         // Update default tuning parameters when reference transponder is selected
         connect(m_transponder, qOverload<StandardSetting *>(&StandardSetting::valueChanged),

@@ -56,7 +56,7 @@ class ImportIconsWizard : public MythScreenType
     {
         STATE_NORMAL,
         STATE_SEARCHING,
-        STATE_DISABLED
+        STATE_DISABLED,
     };
 
     struct CSVEntry                  //! describes the TV channel name

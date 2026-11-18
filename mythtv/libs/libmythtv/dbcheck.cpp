@@ -514,7 +514,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             "    set videodevice=left(videodevice, "
             "                         locate('-', videodevice)-1) "
             "    where cardtype='HDHOMERUN' "
-            "          and videodevice like '%-%'"
+            "          and videodevice like '%-%'",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1349", dbver))
@@ -535,7 +535,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videosource ADD COLUMN bouquet_id INT DEFAULT 0;",
-            "ALTER TABLE videosource ADD COLUMN region_id INT DEFAULT 0;"
+            "ALTER TABLE videosource ADD COLUMN region_id INT DEFAULT 0;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1351", dbver))
@@ -547,7 +547,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         DBUpdates updates {
             "ALTER TABLE videosource MODIFY bouquet_id INT UNSIGNED;",
             "ALTER TABLE videosource MODIFY region_id INT UNSIGNED;",
-            "ALTER TABLE channel ADD COLUMN service_type INT UNSIGNED DEFAULT 0 AFTER serviceid;"
+            "ALTER TABLE channel ADD COLUMN service_type INT UNSIGNED DEFAULT 0 AFTER serviceid;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1352", dbver))
@@ -557,7 +557,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1352")
     {
         DBUpdates updates {
-            "ALTER TABLE capturecard MODIFY schedgroup TINYINT(1) DEFAULT 1 NOT NULL"
+            "ALTER TABLE capturecard MODIFY schedgroup TINYINT(1) DEFAULT 1 NOT NULL",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1353", dbver))
@@ -567,7 +567,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1353")
     {
         DBUpdates updates {
-            "ALTER TABLE channel ADD COLUMN deleted TIMESTAMP NULL"
+            "ALTER TABLE channel ADD COLUMN deleted TIMESTAMP NULL",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1354", dbver))
@@ -577,7 +577,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1354")
     {
         DBUpdates updates {
-            "ALTER TABLE videosource ADD COLUMN scanfrequency INT UNSIGNED DEFAULT 0;"
+            "ALTER TABLE videosource ADD COLUMN scanfrequency INT UNSIGNED DEFAULT 0;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1355", dbver))
@@ -589,7 +589,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         DBUpdates updates {
             "UPDATE capturecard "
             "SET displayname = CONCAT('Input ', cardid) "
-            "WHERE displayname = ''"
+            "WHERE displayname = ''",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1356", dbver))
@@ -601,7 +601,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         DBUpdates updates {
             "REPLACE INTO recordfilter (filterid, description, clause, "
             "                          newruledefault) "
-            "  VALUES (12, 'Priority channel', 'channel.recpriority > 0', 0)"
+            "  VALUES (12, 'Priority channel', 'channel.recpriority > 0', 0)",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1357", dbver))
@@ -667,13 +667,12 @@ static bool doUpgradeTVDatabaseSchema(void)
                     newdecoder = "mmal-dec";
                     newrender  = "opengl-yv12";
                 }
-                if ((olddecoder == "mediacodec") || (olddecoder == "nvdec") ||
+                if (((olddecoder == "mediacodec") || (olddecoder == "nvdec") ||
                     (olddecoder == "vda") || (olddecoder == "vaapi2") ||
                     (olddecoder == "vaapi" && oldrender == "openglvaapi") ||
-                    (olddecoder == "vdpau" && oldrender == "vdpau"))
+                    (olddecoder == "vdpau" && oldrender == "vdpau")) && (oldrender != "opengl-hw"))
                 {
-                    if (oldrender != "opengl-hw")
-                        newrender = "opengl-hw";
+                    newrender = "opengl-hw";
                 }
                 if (olddecoder == "vda")
                     newdecoder = "vtb";
@@ -756,7 +755,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
         // remove old studio levels keybinding
         DBUpdates updates {
-            "DELETE FROM keybindings WHERE action='TOGGLESTUDIOLEVELS'"
+            "DELETE FROM keybindings WHERE action='TOGGLESTUDIOLEVELS'",
         };
 
         if (!performActualUpdate("MythTV", "DBSchemaVer",
@@ -777,7 +776,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             // Remove potential clear text credentials no longer usable
             "UPDATE videosource "
             "  SET userid = NULL, password = NULL "
-            "  WHERE xmltvgrabber IN ('schedulesdirect1', 'datadirect')"
+            "  WHERE xmltvgrabber IN ('schedulesdirect1', 'datadirect')",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1359", dbver))
@@ -790,7 +789,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         // setups but now acts as an override for the display aspect ratio.
         // 0.0 indicates 'Auto' - which should be the default.
         DBUpdates updates {
-            "UPDATE settings SET data='0.0' WHERE value='XineramaMonitorAspectRatio'"
+            "UPDATE settings SET data='0.0' WHERE value='XineramaMonitorAspectRatio'",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1360", dbver))
@@ -901,7 +900,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         }
 
         DBUpdates updates {
-            "CREATE INDEX recordedartwork_ix1 ON recordedartwork (inetref); "
+            "CREATE INDEX recordedartwork_ix1 ON recordedartwork (inetref); ",
         };
 
         // do not create index if already done.
@@ -971,7 +970,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         // Set depmethod to none for all manual, recording rules.
         DBUpdates updates {
-            "UPDATE record SET dupmethod = 1 WHERE search = 5"
+            "UPDATE record SET dupmethod = 1 WHERE search = 5",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1365", dbver))
@@ -981,7 +980,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1365")
     {
         DBUpdates updates {
-            "ALTER TABLE channelscan_channel ADD COLUMN service_type INT UNSIGNED NOT NULL DEFAULT 0;"
+            "ALTER TABLE channelscan_channel ADD COLUMN service_type INT UNSIGNED NOT NULL DEFAULT 0;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1366", dbver))
@@ -991,7 +990,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1366")
     {
         DBUpdates updates {
-            "ALTER TABLE channelscan_dtv_multiplex ADD COLUMN signal_strength INT NOT NULL DEFAULT 0;"
+            "ALTER TABLE channelscan_dtv_multiplex ADD COLUMN signal_strength INT NOT NULL DEFAULT 0;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1367", dbver))
@@ -1001,7 +1000,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1367")
     {
         DBUpdates updates {
-            "ALTER TABLE videosource ADD COLUMN lcnoffset INT UNSIGNED DEFAULT 0;"
+            "ALTER TABLE videosource ADD COLUMN lcnoffset INT UNSIGNED DEFAULT 0;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1368", dbver))
@@ -1058,7 +1057,7 @@ static bool doUpgradeTVDatabaseSchema(void)
         // Migrate users from ttvdb.py to ttvdb4.py
         DBUpdates updates {
             "UPDATE settings SET data=REPLACE(data, 'ttvdb.py', 'ttvdb4.py') "
-             "WHERE value='TelevisionGrabber'"
+             "WHERE value='TelevisionGrabber'",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1371", dbver))
@@ -1113,7 +1112,7 @@ static bool doUpgradeTVDatabaseSchema(void)
             "UPDATE videometadata SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
             "UPDATE program SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
             "UPDATE recordedprogram SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
-            "UPDATE recordedartwork SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');"
+            "UPDATE recordedartwork SET inetref=REPLACE(inetref, 'ttvdb.py', 'ttvdb4.py');",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1374", dbver))
@@ -1172,7 +1171,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1378")
     {
         DBUpdates updates {
-            "CREATE INDEX dir_id ON gallery_files (dir_id);"
+            "CREATE INDEX dir_id ON gallery_files (dir_id);",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1379", dbver))
@@ -1183,7 +1182,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE channelscan_channel ADD COLUMN logical_channel INT UNSIGNED NOT NULL DEFAULT 0 AFTER service_type;"
-            "ALTER TABLE channelscan_channel ADD COLUMN simulcast_channel INT UNSIGNED NOT NULL DEFAULT 0 AFTER logical_channel;"
+            "ALTER TABLE channelscan_channel ADD COLUMN simulcast_channel INT UNSIGNED NOT NULL DEFAULT 0 AFTER logical_channel;",
         };
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1380", dbver))
@@ -1193,7 +1192,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1380")
     {
         DBUpdates updates {
-            "ALTER TABLE filemarkup ADD INDEX (type);"
+            "ALTER TABLE filemarkup ADD INDEX (type);",
         } ;
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1381", dbver))
@@ -1204,7 +1203,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE iptv_channel ADD INDEX (chanid);"
-            "ALTER TABLE channelgroup ADD INDEX (chanid);"
+            "ALTER TABLE channelgroup ADD INDEX (chanid);",
         } ;
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1382", dbver))
@@ -1214,7 +1213,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1382")
     {
         DBUpdates updates {
-            "ALTER TABLE iptv_channel MODIFY iptvid INT UNSIGNED;"
+            "ALTER TABLE iptv_channel MODIFY iptvid INT UNSIGNED;",
         } ;
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1383", dbver))
@@ -1224,7 +1223,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     if (dbver == "1383")
     {
         DBUpdates updates {
-            "ALTER TABLE iptv_channel MODIFY iptvid INT UNSIGNED AUTO_INCREMENT;"
+            "ALTER TABLE iptv_channel MODIFY iptvid INT UNSIGNED AUTO_INCREMENT;",
         } ;
         if (!performActualUpdate("MythTV", "DBSchemaVer",
                                  updates, "1384", dbver))
@@ -3158,7 +3157,7 @@ bool InitializeMythSchema(void)
 "INSERT INTO `videotypes` VALUES (29,'ts','Internal',0,0);",
 "INSERT INTO `videotypes` VALUES (30,'swf','Internal',0,0);",
 "INSERT INTO `videotypes` VALUES (31,'f4v','Internal',0,0);",
-"INSERT INTO `videotypes` VALUES (32,'nuv','Internal',0,0);"
+"INSERT INTO `videotypes` VALUES (32,'nuv','Internal',0,0);",
 
 // NOLINTEND(modernize-raw-string-literal)
 

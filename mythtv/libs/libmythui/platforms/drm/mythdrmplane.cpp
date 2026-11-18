@@ -173,7 +173,7 @@ bool MythDRMPlane::FormatIsVideo(uint32_t Format)
         DRM_FORMAT_YUV420, DRM_FORMAT_YVU420, DRM_FORMAT_YUV422, DRM_FORMAT_YVU422,
         DRM_FORMAT_YUV444, DRM_FORMAT_YVU444,
         // Packed formats
-        DRM_FORMAT_YUYV, DRM_FORMAT_YVYU, DRM_FORMAT_UYVY, DRM_FORMAT_VYUY
+        DRM_FORMAT_YUYV, DRM_FORMAT_YVYU, DRM_FORMAT_UYVY, DRM_FORMAT_VYUY,
     };
 
 #ifdef __cpp_lib_ranges_contains
@@ -193,7 +193,7 @@ bool MythDRMPlane::HasOverlayFormat(const FOURCCVec &Formats)
         DRM_FORMAT_XRGB8888,    DRM_FORMAT_XRGB8888,    DRM_FORMAT_XBGR8888,
         DRM_FORMAT_ARGB8888,    DRM_FORMAT_ABGR8888,    DRM_FORMAT_RGB565,
         DRM_FORMAT_BGR565,      DRM_FORMAT_XRGB2101010, DRM_FORMAT_XBGR2101010,
-        DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010
+        DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010,
     };
 
     return std::ranges::any_of(Formats,
@@ -212,7 +212,7 @@ uint32_t MythDRMPlane::GetAlphaFormat(const FOURCCVec &Formats)
     // N.B. Prioritised list
     static const FOURCCVec s_alphaFormats =
     {
-        DRM_FORMAT_ARGB8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010
+        DRM_FORMAT_ARGB8888, DRM_FORMAT_ABGR8888, DRM_FORMAT_ARGB2101010, DRM_FORMAT_ABGR2101010,
     };
 
     for (auto format : s_alphaFormats)

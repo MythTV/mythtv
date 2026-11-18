@@ -313,7 +313,7 @@ class DiSEqCDevRotor : public DiSEqCDevDevice
     bool Store(void) const override; // DiSEqCDevDevice
 
     // Sets
-    enum dvbdev_rotor_t : std::uint8_t { kTypeDiSEqC_1_2 = 0, kTypeDiSEqC_1_3 = 1, };
+    enum dvbdev_rotor_t : std::uint8_t { kTypeDiSEqC_1_2 = 0, kTypeDiSEqC_1_3 = 1 };
     void   SetType(dvbdev_rotor_t type)    { m_type     = type;  }
     void   SetLoSpeed(double speed)        { m_speedLo = speed;  }
     void   SetHiSpeed(double speed)        { m_speedHi = speed;  }

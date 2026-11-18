@@ -37,7 +37,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     });
 
     // Seeking has finished; remove slow seek user feedback window
-    connect(this, &MythPlayerUI::SeekingComplete, this, [&]()
+    connect(this, &MythPlayerUI::SeekingComplete, this, [&]
     {
         m_osdLock.lock();
         m_osd.HideWindow(OSD_WIN_MESSAGE);
@@ -45,7 +45,7 @@ MythPlayerUI::MythPlayerUI(MythMainWindow* MainWindow, TV* Tv,
     });
 
     // Seeking has finished; update position on OSD
-    connect(this, &MythPlayerUI::SeekingDone, this, [&]()
+    connect(this, &MythPlayerUI::SeekingDone, this, [&]
     {
         UpdateOSDPosition();
     });
@@ -141,17 +141,15 @@ void MythPlayerUI::EventLoop()
     CheckScanUpdate(m_videoOutput, m_frameInterval);
 
     // refresh the position map for an in-progress recording while editing
-    if (m_hasFullPositionMap && IsWatchingInprogress() && m_deleteMap.IsEditing())
+    if (m_hasFullPositionMap && IsWatchingInprogress() && m_deleteMap.IsEditing() &&
+        m_editUpdateTimer.hasExpired(2000))
     {
-        if (m_editUpdateTimer.hasExpired(2000))
-        {
-            // N.B. the positionmap update and osd refresh are asynchronous
-            m_forcePositionMapSync = true;
-            m_osdLock.lock();
-            m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
-            m_osdLock.unlock();
-            m_editUpdateTimer.start();
-        }
+        // N.B. the positionmap update and osd refresh are asynchronous
+        m_forcePositionMapSync = true;
+        m_osdLock.lock();
+        m_deleteMap.UpdateOSD(m_framesPlayed, m_videoFrameRate, &m_osd);
+        m_osdLock.unlock();
+        m_editUpdateTimer.start();
     }
 
     // Refresh the programinfo in use status
@@ -173,13 +171,13 @@ void MythPlayerUI::EventLoop()
         m_playerCtx->m_tvchain->JumpToNext(true, 0s);
         JumpToProgram();
     }
-    else if ((!m_allPaused || GetEof() != kEofStateNone) &&
+    else if (((!m_allPaused || GetEof() != kEofStateNone) &&
              m_playerCtx->m_tvchain &&
-             (m_decoder && !m_decoder->GetWaitForChange()))
+             (m_decoder && !m_decoder->GetWaitForChange())) &&
+             m_playerCtx->m_tvchain->NeedsToSwitch())
     {
         // Switch to the next program in livetv
-        if (m_playerCtx->m_tvchain->NeedsToSwitch())
-            SwitchToProgram();
+        SwitchToProgram();
     }
 
     // Jump to the next program in livetv
@@ -856,7 +854,7 @@ void MythPlayerUI::GetPlaybackData(InfoMap& Map)
         .arg(m_display->GetResolution().width())
         .arg(m_display->GetResolution().height())
         .arg(m_display->GetRefreshRate(), 0, 'f', 2);
-    Map["displayfps"] = displayfps;
+    Map["displayfps"] = std::move(displayfps);
 }
 
 void MythPlayerUI::GetCodecDescription(InfoMap& Map)

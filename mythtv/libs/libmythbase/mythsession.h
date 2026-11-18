@@ -13,7 +13,7 @@
 enum DigestUserActions : std::uint8_t {
     DIGEST_USER_ADD,
     DIGEST_USER_REMOVE,
-    DIGEST_USER_CHANGE_PW
+    DIGEST_USER_CHANGE_PW,
 };
 
 class MBASE_PUBLIC MythUserSession

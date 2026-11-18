@@ -48,11 +48,8 @@ void Playlist::copyTracks(Playlist *to_ptr, bool update_display)
     for (int x = 0; x < m_songs.size(); x++)
     {
         MusicMetadata *mdata = getRawSongAt(x);
-        if (mdata)
-        {
-            if (mdata->isDBTrack())
-                to_ptr->addTrack(mdata->ID(), update_display);
-        }
+        if (mdata && mdata->isDBTrack())
+            to_ptr->addTrack(mdata->ID(), update_display);
     }
 
     enableSaves();
@@ -764,7 +761,7 @@ int Playlist::fillSonglistFromQuery(const QString& whereClause,
         }
 
         default:
-            new_songlist = orig_songlist;
+            new_songlist = std::move(orig_songlist);
     }
 
     fillSongsFromSonglist(new_songlist);
@@ -834,7 +831,7 @@ int Playlist::fillSonglistFromList(const QList<int> &songList,
         }
 
         default:
-            new_songlist = orig_songlist;
+            new_songlist = std::move(orig_songlist);
     }
 
     fillSongsFromSonglist(new_songlist);

@@ -810,7 +810,7 @@ void VideoMetadataImp::SetCategoryID(int id)
             QString cat;
             if (VideoCategory::GetCategory().get(id, cat))
             {
-                m_category = cat;
+                m_category = std::move(cat);
                 m_categoryID = id;
             }
             else
@@ -931,7 +931,7 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     }
 
     imageMap[QStringLiteral(u"bannerfile")] = bannerfile;
-    imageMap[QStringLiteral(u"banner")] = bannerfile;
+    imageMap[QStringLiteral(u"banner")] = std::move(bannerfile);
 
     QString fanartfile;
     if (IsHostSet() && !GetFanart().startsWith('/')
@@ -946,12 +946,12 @@ void VideoMetadataImp::GetImageMap(InfoMap &imageMap) const
     }
 
     imageMap[QStringLiteral(u"fanartfile")] = fanartfile;
-    imageMap[QStringLiteral(u"fanart")] = fanartfile;
+    imageMap[QStringLiteral(u"fanart")] = std::move(fanartfile);
 
     QString smartimage = coverfile;
     if (!screenshotfile.isEmpty () && (GetSeason() > 0 || GetEpisode() > 0))
-        smartimage = screenshotfile;
-    imageMap[QStringLiteral(u"smartimage")] = smartimage;
+        smartimage = std::move(screenshotfile);
+    imageMap[QStringLiteral(u"smartimage")] = std::move(smartimage);
 }
 
 // This should be the equivalent of GetImageMap, only the image names
@@ -1272,7 +1272,7 @@ VideoMetadata &VideoMetadata::operator=(const VideoMetadata &rhs)
     if (this != &rhs)
     {
         delete m_imp;
-        m_imp = new VideoMetadataImp(*(rhs.m_imp));
+        m_imp = new VideoMetadataImp(*rhs.m_imp);
     }
 
     return *this;
@@ -1430,7 +1430,7 @@ void VideoMetadata::GetStateMap(InfoMap &stateMap) const
 {
     stateMap[QStringLiteral(u"trailerstate")] = TrailerToState(GetTrailer());
     stateMap[QStringLiteral(u"userratingstate")] =
-            QString::number((int)(GetUserRating()));
+            QString::number((int)GetUserRating());
     stateMap[QStringLiteral(u"watchedstate")] = WatchedToState(GetWatched());
     stateMap[QStringLiteral(u"videolevel")] = ParentalLevelToState(GetShowLevel());
 }
@@ -1442,7 +1442,7 @@ QString VideoMetadata::GetState(const QString& name) const
     if (name == QStringLiteral(u"trailerstate"))
         return TrailerToState(GetTrailer());
     if (name == QStringLiteral(u"userratingstate"))
-        return QString::number((int)(GetUserRating()));
+        return QString::number((int)GetUserRating());
     if (name == QStringLiteral(u"watchedstate"))
         return WatchedToState(GetWatched());
     if (name == QStringLiteral(u"videolevel"))

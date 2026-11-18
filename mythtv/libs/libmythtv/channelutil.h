@@ -215,7 +215,7 @@ class MTV_PUBLIC ChannelUtil
     {
         kChanGroupByCallsign,
         kChanGroupByCallsignAndChannum,
-        kChanGroupByChanid // Because of the nature of the query we always need to group
+        kChanGroupByChanid, // Because of the nature of the query we always need to group
     };
 
     /**

@@ -40,7 +40,7 @@ enum ObjectTypes : std::uint8_t
     OT_Undefined  = 0,
     OT_Container  = 1,
     OT_Item       = 2,
-    OT_Res        = 3
+    OT_Res        = 3,
 };
 
 //////////////////////////////////////////////////////////////////////////////

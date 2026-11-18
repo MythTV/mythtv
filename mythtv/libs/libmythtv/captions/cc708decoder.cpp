@@ -32,7 +32,7 @@ const std::array<const std::string, 4> cc_types =
     "NTSC line 21 field 1 closed captions"
     "NTSC line 21 field 2 closed captions"
     "DTVCC Channel Packet Data"
-    "DTVCC Channel Packet Start"
+    "DTVCC Channel Packet Start",
 };
 
 static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt,
@@ -211,7 +211,7 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
             .arg(cc->m_delayed[service_num]) .arg(blk_start) .arg(blk_size));
 #endif
 
-    for (i = (cc->m_delayed[service_num]) ? blk_size : blk_start;
+    for (i = cc->m_delayed[service_num] ? blk_size : blk_start;
          i < blk_size; )
     {
         const int old_i = i;
@@ -416,10 +416,10 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     }
     else if (SPA==code && ((i+2)<blk_size))
     {
-        int pen_size  = (blk_buf[i+1]   ) & 0x3;
+        int pen_size  = blk_buf[i+1]   & 0x3;
         int offset    = (blk_buf[i+1]>>2) & 0x3;
         int text_tag  = (blk_buf[i+1]>>4) & 0xf;
-        int font_tag  = (blk_buf[i+2]   ) & 0x7;
+        int font_tag  = blk_buf[i+2]   & 0x7;
         int edge_type = (blk_buf[i+2]>>3) & 0x7;
         int underline = (blk_buf[i+2]>>6) & 0x1;
         int italic    = (blk_buf[i+2]>>7) & 0x1;
@@ -430,9 +430,9 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     }
     else if (SPC==code && ((i+3)<blk_size))
     {
-        int fg_color   = (blk_buf[i+1]   ) & 0x3f;
+        int fg_color   = blk_buf[i+1]   & 0x3f;
         int fg_opacity = (blk_buf[i+1]>>6) & 0x03;
-        int bg_color   = (blk_buf[i+2]   ) & 0x3f;
+        int bg_color   = blk_buf[i+2]   & 0x3f;
         int bg_opacity = (blk_buf[i+2]>>6) & 0x03;
         int edge_color = (blk_buf[i+3]>>6) & 0x3f;
         send_str(cc, service_num);
@@ -450,16 +450,16 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     }
     else if (SWA==code && ((i+4)<blk_size))
     {
-        int fill_color    = (blk_buf[i+1]   ) & 0x3f;
+        int fill_color    = blk_buf[i+1]   & 0x3f;
         int fill_opacity  = (blk_buf[i+1]>>6) & 0x03;
-        int border_color  = (blk_buf[i+2]   ) & 0x3f;
+        int border_color  = blk_buf[i+2]   & 0x3f;
         int border_type01 = (blk_buf[i+2]>>6) & 0x03;
-        int justify       = (blk_buf[i+3]   ) & 0x03;
+        int justify       = blk_buf[i+3]   & 0x03;
         int scroll_dir    = (blk_buf[i+3]>>2) & 0x03;
         int print_dir     = (blk_buf[i+3]>>4) & 0x03;
         int word_wrap     = (blk_buf[i+3]>>6) & 0x01;
         int border_type   = (blk_buf[i+3]>>5) | border_type01;
-        int display_eff   = (blk_buf[i+4]   ) & 0x03;
+        int display_eff   = blk_buf[i+4]   & 0x03;
         int effect_dir    = (blk_buf[i+4]>>2) & 0x03;
         int effect_speed  = (blk_buf[i+4]>>4) & 0x0f;
         send_str(cc, service_num);
@@ -472,7 +472,7 @@ static int handle_cc_c1(CC708Reader* cc, uint service_num, int i)
     else if ((code>=DF0) && (code<=DF7) && ((i+6)<blk_size))
     {
         // param1
-        int priority = ( blk_buf[i+1]  ) & 0x7;
+        int priority = blk_buf[i+1]  & 0x7;
         int col_lock = (blk_buf[i+1]>>3) & 0x1;
         int row_lock = (blk_buf[i+1]>>4) & 0x1;
         bool visible  = ((blk_buf[i+1]>>5) & 0x1) != 0;
@@ -665,14 +665,11 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
         }
         off+=block_size+1;
     }
-    if (off<pkt_size) // must end in null service block, if packet is not full.
+    if (off<pkt_size && (pkt_buf[off] != 0)) // must end in null service block, if packet is not full.
     {
-        if (pkt_buf[off] != 0)
-        {
-            LOG(VB_VBI, LOG_ERR,
-                QString("CEA-708 packet error: pkt_size=%1, pkt_buf[%2]=%3")
-                .arg(pkt_size).arg(off).arg(pkt_buf[off]));
-        }
+        LOG(VB_VBI, LOG_ERR,
+            QString("CEA-708 packet error: pkt_size=%1, pkt_buf[%2]=%3")
+            .arg(pkt_size).arg(off).arg(pkt_buf[off]));
     }
 }
 

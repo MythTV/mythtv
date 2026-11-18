@@ -84,7 +84,7 @@ bool MythUIShape::ParseElement(
         QString type = getFirstText(element);
 
         if (type == "box" || type == "roundbox" || type == "ellipse") // Validate input
-            m_type = type;
+            m_type = std::move(type);
     }
     else if (element.tagName() == "fill")
     {

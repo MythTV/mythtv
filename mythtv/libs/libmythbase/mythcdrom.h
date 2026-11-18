@@ -27,7 +27,7 @@ class MBASE_PUBLIC MythCDROM : public MythMediaDevice
     {
         kUnknown,
         kBluray,
-        kDVD
+        kDVD,
     };
 
     static ImageType inspectImage(const QString& path);

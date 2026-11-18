@@ -294,36 +294,33 @@ static int CalcTrackLength(const MythUtilCommandLineParser &cmdline)
 
         avcodec_string(buf.data(), buf.size(), avctx, static_cast<int>(false));
 
-        switch (inputFC->streams[i]->codecpar->codec_type)
+        if (inputFC->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
         {
-            case AVMEDIA_TYPE_AUDIO:
+            AVPacket *pkt = av_packet_alloc();
+            if (pkt == nullptr)
             {
-                AVPacket *pkt = av_packet_alloc();
-                if (pkt == nullptr)
-                {
-                    LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
-                    break;
-                }
-
-                while (av_read_frame(inputFC, pkt) >= 0)
-                {
-                    if (pkt->stream_index == (int)i)
-                        time = time + pkt->duration;
-
-                    av_packet_unref(pkt);
-                }
-
-                av_packet_free(&pkt);
-
-                duration = secondsFromFloat(time * av_q2d(inputFC->streams[i]->time_base));
-                break;
+                LOG(VB_GENERAL, LOG_ERR, "packet allocation failed");
+                avcodec_free_context(&avctx);
+                continue;
             }
 
-            default:
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("Skipping unsupported codec %1 on stream %2")
-                        .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
-                break;
+            while (av_read_frame(inputFC, pkt) >= 0)
+            {
+                if (pkt->stream_index == (int)i)
+                    time = time + pkt->duration;
+
+                av_packet_unref(pkt);
+            }
+
+            av_packet_free(&pkt);
+
+            duration = secondsFromFloat(time * av_q2d(inputFC->streams[i]->time_base));
+        }
+        else
+        {
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Skipping unsupported codec %1 on stream %2")
+                    .arg(inputFC->streams[i]->codecpar->codec_type).arg(i));
         }
         avcodec_free_context(&avctx);
     }
@@ -581,7 +578,7 @@ static int FindLyrics(const MythUtilCommandLineParser &cmdline)
                            QString("--artist=%1").arg(artist),
                            QString("--album=%1").arg(album),
                            QString("--title=%1").arg(title),
-                           QString("--filename=%1").arg(filename) };
+                           QString("--filename=%1").arg(filename), };
         p.start(PYTHON_LOCAL_EXE, args);
         p.waitForFinished(-1);
         QString result = p.readAllStandardOutput();

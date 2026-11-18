@@ -33,6 +33,7 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(QString DBSchemaSetting,
     // Users and developers can choose to live dangerously,
     // either to silently and automatically upgrade,
     // or an expert option to allow use of existing:
+    // NOLINTNEXTLINE(readability-trivial-switch)
     switch (gCoreContext->GetNumSetting("DBSchemaAutoUpgrade"))
     {
         case  1: m_autoUpgrade = true; break;
@@ -355,7 +356,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     }
     else if (!validDBMS)
     {
-        message = warnOldDBMS;
+        message = std::move(warnOldDBMS);
         returnValue = MYTH_SCHEMA_ERROR;
     }
     else if (m_versionsBehind > 0)

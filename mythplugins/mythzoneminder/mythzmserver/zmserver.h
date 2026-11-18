@@ -71,7 +71,7 @@ enum State : std::uint8_t
     PREALARM,
     ALARM,
     ALERT,
-    TAPE
+    TAPE,
 };
 
 // Prevent clang-tidy modernize-avoid-c-arrays warnings in these

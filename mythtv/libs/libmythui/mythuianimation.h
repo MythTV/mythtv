@@ -17,7 +17,7 @@ class UIEffects
     enum Centre : std::uint8_t
                 { TopLeft, Top, TopRight,
                   Left, Middle, Right,
-                  BottomLeft, Bottom, BottomRight };
+                  BottomLeft, Bottom, BottomRight, };
 
     UIEffects() = default;
 

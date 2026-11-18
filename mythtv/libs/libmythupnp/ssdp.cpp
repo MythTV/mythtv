@@ -265,7 +265,7 @@ static bool ProcessSearchRequest(const QMap<QString, QString> &sHeaders,
 
     nMX = std::clamp(nMX, 0s, 120s);
 
-    auto nNewMX = std::chrono::milliseconds(MythRandom(0, (duration_cast<std::chrono::milliseconds>(nMX)).count()));
+    auto nNewMX = std::chrono::milliseconds(MythRandom(0, duration_cast<std::chrono::milliseconds>(nMX).count()));
 
     // ----------------------------------------------------------------------
     // See what they are looking for...
@@ -295,7 +295,7 @@ static bool ProcessSearchRequest(const QMap<QString, QString> &sHeaders,
     // ----------------------------------------------------------------------
 
     QString sUDN = UPnp::g_UPnpDeviceDesc.FindDeviceUDN(
-        &(UPnp::g_UPnpDeviceDesc.m_rootDevice), sST );
+        &UPnp::g_UPnpDeviceDesc.m_rootDevice, sST );
 
     if (sUDN.length() > 0)
     {

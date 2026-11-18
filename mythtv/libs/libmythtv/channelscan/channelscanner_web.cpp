@@ -557,7 +557,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
         msg = QString("%1% S/N %2 %3 : %4 (%5) %6")
                   .arg(m_statusProgress, 3)
                   .arg(m_statusSnr)
-                  .arg((m_statusLock) ? "l" : "L",
+                  .arg(m_statusLock ? "l" : "L",
                        qPrintable(m_statusText),
                        qPrintable(scanEvent->strValue()))
                   .arg("", 20);
@@ -569,7 +569,7 @@ void ChannelScannerWeb::HandleEvent(const ScannerEvent *scanEvent)
         if (msg != s_oldMsg)
         {
             LOG(VB_CHANSCAN, LOG_INFO, LOC + msg);
-            s_oldMsg = msg;
+            s_oldMsg = std::move(msg);
         }
     }
     else if (VERBOSE_LEVEL_NONE())

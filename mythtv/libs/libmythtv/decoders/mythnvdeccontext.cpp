@@ -56,9 +56,8 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
     if (!Decoder.startsWith("nvdec") || qEnvironmentVariableIsSet("NO_NVDEC") || !HaveNVDEC() || IsUnsupportedProfile(*Context))
         return failure;
 
-    if (!decodeonly)
-        if (!FrameTypeIsSupported(*Context, FMT_NVDEC))
-            return failure;
+    if (!decodeonly && !FrameTypeIsSupported(*Context, FMT_NVDEC))
+        return failure;
 
     QString codecstr = avcodec_get_name((*Context)->codec_id);
     QString profile  = avcodec_profile_name((*Context)->codec_id, (*Context)->profile);
@@ -87,7 +86,7 @@ MythCodecID MythNVDECContext::GetSupportedCodec(AVCodecContext **Context,
 
     // N.B. on stream changes format is set to CUDA/NVDEC. This may break if the new
     // stream has an unsupported chroma but the decoder should fail gracefully - just later.
-    if ((FMT_NVDEC == type) || (MythVideoFrame::FormatIs420(type)))
+    if ((FMT_NVDEC == type) || MythVideoFrame::FormatIs420(type))
         cudaformat = cudaVideoChromaFormat_420;
     else if (MythVideoFrame::FormatIs422(type))
         cudaformat = cudaVideoChromaFormat_422;
@@ -327,15 +326,13 @@ void MythNVDECContext::SetDeinterlacing(AVCodecContext *Context,
     if (DEINT_BASIC == deinterlacer)
         mode = "bob";
     int result = av_opt_set(Context->priv_data, "deint", mode.toLocal8Bit().constData(), 0);
-    if (result == 0)
+    if ((result == 0) &&
+        (av_opt_set_int(Context->priv_data, "drop_second_field", static_cast<int>(!DoubleRate), 0) == 0))
     {
-        if (av_opt_set_int(Context->priv_data, "drop_second_field", static_cast<int>(!DoubleRate), 0) == 0)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup decoder deinterlacer '%1'")
-                .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_DRIVER, DoubleRate, FMT_NVDEC)));
-            m_deinterlacer = deinterlacer;
-            m_deinterlacer2x = DoubleRate;
-        }
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + QString("Setup decoder deinterlacer '%1'")
+            .arg(MythVideoFrame::DeinterlacerName(deinterlacer | DEINT_DRIVER, DoubleRate, FMT_NVDEC)));
+        m_deinterlacer = deinterlacer;
+        m_deinterlacer2x = DoubleRate;
     }
 }
 

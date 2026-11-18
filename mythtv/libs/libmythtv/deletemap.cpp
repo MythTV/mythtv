@@ -210,7 +210,7 @@ void DeleteMap::UpdateOSD(uint64_t frame, double frame_rate, OSD *osd)
     relLengthDisplay = CreateTimeString(total, true, frame_rate, false);
     infoMap["timedisplay"]  = timestr;
     infoMap["framedisplay"] = QString::number(frame);
-    infoMap["cutindicator"] = cutmarker;
+    infoMap["cutindicator"] = std::move(cutmarker);
     infoMap["title"]        = tr("Edit");
     infoMap["seekamount"]   = m_seekText;;
     infoMap["reltimedisplay"] = relTimeDisplay;

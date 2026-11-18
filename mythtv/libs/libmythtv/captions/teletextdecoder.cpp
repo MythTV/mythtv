@@ -103,51 +103,48 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
     int b2=0;
     int b3=0;
     int b4=0;
-    switch (packet)
+    if (packet == 0) // Page Header
     {
-        case 0:  // Page Header
-            switch (vbimode)
-            {
-                case VBI_IVTV:
-                    b1 = hamm16(buf, &err);// page number
-                    b2 = hamm16(buf+2, &err);// subpage number + flags
-                    b3 = hamm16(buf+4, &err);// subpage number + flags
-                    b4 = hamm16(buf+6, &err);// language code + more flags
-                    if (err & 0xf000)
-                        return;
+        switch (vbimode)
+        {
+            case VBI_IVTV:
+                b1 = hamm16(buf, &err);// page number
+                b2 = hamm16(buf+2, &err);// subpage number + flags
+                b3 = hamm16(buf+4, &err);// subpage number + flags
+                b4 = hamm16(buf+6, &err);// language code + more flags
+                if (err & 0xf000)
+                    return;
 
-                    break;
+                break;
 
-                case VBI_DVB:
-                case VBI_DVB_SUBTITLE:
-                    b1 = (hamm84(buf+1, &err)*16)+hamm84(buf, &err);
-                    b2 = (hamm84(buf+3, &err)*16)+hamm84(buf+2, &err);
-                    b3 = (hamm84(buf+5, &err)*16)+hamm84(buf+4, &err);
-                    b4 = (hamm84(buf+7, &err)*16)+hamm84(buf+6, &err);
-                    if (err == 1)
-                        return;
+            case VBI_DVB:
+            case VBI_DVB_SUBTITLE:
+                b1 = (hamm84(buf+1, &err)*16)+hamm84(buf, &err);
+                b2 = (hamm84(buf+3, &err)*16)+hamm84(buf+2, &err);
+                b3 = (hamm84(buf+5, &err)*16)+hamm84(buf+4, &err);
+                b4 = (hamm84(buf+7, &err)*16)+hamm84(buf+6, &err);
+                if (err == 1)
+                    return;
 
-                    break;
+                break;
 
-                default:
-                    return; // error in vbimode
-            }
+            default:
+                return; // error in vbimode
+        }
 
-            subpagenum= (b2 + (b3 * 256)) & 0x3f7f;
-            pagenum = ((magazine ? magazine : 8)*256) + b1;
+        subpagenum= (b2 + (b3 * 256)) & 0x3f7f;
+        pagenum = ((magazine ? magazine : 8)*256) + b1;
 
-            lang = "\0\4\2\6\1\5\3\7"[b4 >> 5] + (latin1 ? 0 : 8);
-            flags = b4 & 0x1F;
-            flags |= b3 & 0xC0;
-            flags |= (b2 & 0x80) >> 2;
-            m_teletextReader->AddPageHeader(pagenum, subpagenum, buf,
-                                            vbimode, lang, flags);
-
-            break;
-
-        default: // Page Data
-            m_teletextReader->AddTeletextData((magazine ? magazine : 8), packet,
-                                              buf, vbimode);
-            break;
+        lang = "\0\4\2\6\1\5\3\7"[b4 >> 5] + (latin1 ? 0 : 8);
+        flags = b4 & 0x1F;
+        flags |= b3 & 0xC0;
+        flags |= (b2 & 0x80) >> 2;
+        m_teletextReader->AddPageHeader(pagenum, subpagenum, buf,
+                                        vbimode, lang, flags);
+    }
+    else // Page Data
+    {
+        m_teletextReader->AddTeletextData((magazine ? magazine : 8), packet,
+                                          buf, vbimode);
     }
 }

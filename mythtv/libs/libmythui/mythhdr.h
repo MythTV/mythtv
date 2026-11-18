@@ -37,7 +37,7 @@ class MUI_PUBLIC MythHDR
     {
         SDR   = 0x00,
         HDR10 = 0x01,
-        HLG   = 0x02
+        HLG   = 0x02,
     };
     Q_DECLARE_FLAGS(HDRTypes, HDRType)
     Q_FLAG(HDRTypes)

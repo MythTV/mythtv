@@ -105,16 +105,14 @@ class ScreenSaverDBusPrivate
     }
     void UnInhibit()
     {
-        if (m_interface->isValid())
+        if (m_interface->isValid() && (m_cookie != 0))
         {
             // Don't block waiting for the reply, there isn't one
             // method void org.freedesktop.ScreenSaver.UnInhibit(uint cookie) (or equivalent)
-            if (m_cookie != 0) {
-                m_interface->call(QDBus::NoBlock, m_unInhibit , m_cookie);
-                m_cookie = 0;
-                LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screensaver uninhibited via %1")
-                    .arg(m_serviceUsed));
-            }
+            m_interface->call(QDBus::NoBlock, m_unInhibit , m_cookie);
+            m_cookie = 0;
+            LOG(VB_GENERAL, LOG_INFO, LOC + QString("Screensaver uninhibited via %1")
+                .arg(m_serviceUsed));
         }
     }
     void SetUnInhibit(const QString &method) { m_unInhibit = method; }

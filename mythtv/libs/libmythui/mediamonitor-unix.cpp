@@ -556,17 +556,15 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
                 LOG(VB_MEDIA, LOG_DEBUG, LOC +
                         "GetCDROMBlockDevices: path: " + entry.path());
 
-                if (DetectDevice(entry, mythdevice, description, dev))
+                if (DetectDevice(entry, mythdevice, description, dev) &&
+                    (mythdevice == UDisks2DVD))
                 {
-                    if (mythdevice == UDisks2DVD)
-                    {
-                        LOG(VB_MEDIA, LOG_DEBUG, LOC +
-                            "GetCDROMBlockDevices: Added: " + dev);
+                    LOG(VB_MEDIA, LOG_DEBUG, LOC +
+                        "GetCDROMBlockDevices: Added: " + dev);
 
-                        if (dev.startsWith("/dev/"))
-                            dev.remove(0,5);
-                        l.push_back(dev);
-                    }
+                    if (dev.startsWith("/dev/"))
+                        dev.remove(0,5);
+                    l.push_back(dev);
                 }
             }
         }
@@ -796,11 +794,9 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     if (pDevice)
     {
         pDevice->setMountPath(mep->fs_file);
-        if (pDevice->testMedia() == MEDIAERR_OK)
-        {
-            if (MediaMonitorUnix::AddDevice(pDevice))
-                return true;
-        }
+        if ((pDevice->testMedia() == MEDIAERR_OK) &&
+            MediaMonitorUnix::AddDevice(pDevice))
+            return true;
         pDevice->deleteLater();
     }
 

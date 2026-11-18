@@ -214,7 +214,7 @@ void HLSStreamHandler::run(void)
         if (remainder > 0)
         {
             if (size > remainder) // unprocessed bytes
-                memmove(m_readbuffer, &(m_readbuffer[size - remainder]),
+                memmove(m_readbuffer, &m_readbuffer[size - remainder],
                         remainder);
 
             LOG(VB_RECORD, LOG_INFO, LOC +

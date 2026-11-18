@@ -13,6 +13,7 @@
 #ifndef HTTPREQUEST_H_
 #define HTTPREQUEST_H_
 
+#include <stdexcept>
 #include <utility>
 
 // Qt headers
@@ -35,7 +36,7 @@
 static constexpr const char* SOAP_ENVELOPE_BEGIN
 { "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" " \
   "s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"      \
-  "<s:Body>" };
+  "<s:Body>", };
 static constexpr const char* SOAP_ENVELOPE_END { "</s:Body>\r\n</s:Envelope>" };
 
 
@@ -61,7 +62,7 @@ enum HttpRequestType : std::uint16_t
     RequestTypeUnsubscribe  = 0x0400,
     RequestTypeNotify       = 0x0800,
     // Not a request type
-    RequestTypeResponse     = 0x1000
+    RequestTypeResponse     = 0x1000,
 
 };
 
@@ -85,7 +86,7 @@ enum HttpResponseType : std::int8_t
     ResponseTypeSVG      =  6,
     ResponseTypeFile     =  7,
     ResponseTypeOther    =  8,
-    ResponseTypeHeader   =  9
+    ResponseTypeHeader   =  9,
 };
 
 struct MIMETypes
@@ -286,7 +287,7 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         quint16  GetHostPort     () override; // HTTPRequest
         QString  GetPeerAddress  () override; // HTTPRequest
         int      getSocketHandle () override // HTTPRequest
-            {return( m_pSocket->socketDescriptor() ); }
+            {return m_pSocket->socketDescriptor() ; }
 
 };
 
@@ -294,18 +295,17 @@ class BufferedSocketDeviceRequest : public HTTPRequest
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class UPNP_PUBLIC HttpException
+class UPNP_PUBLIC HttpException : public std::runtime_error
 {
     public:
         int     m_code {-1};
-        QString m_msg;
 
-        explicit HttpException( int nCode = -1, QString sMsg = "")
-               : m_code( nCode ), m_msg (std::move( sMsg  ))
+        explicit HttpException( int nCode = -1, const QString& sMsg = "")
+               : runtime_error( sMsg.toStdString() ), m_code( nCode )
         {}
 
         // Needed to force a v-table.
-        virtual ~HttpException() = default;
+        ~HttpException() override = default;
 };
 
 class UPNP_PUBLIC HttpRedirectException : public HttpException

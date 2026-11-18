@@ -78,7 +78,7 @@ static const std::vector<MimeType> SupportedMimeTypes
     { "application/x-troff-msvideo", "avi",   true },
     { "video/avi",                   "avi",   true },
     { "video/msvideo",               "avi",   true },
-    { "video/x-msvideo",             "avi",   true }
+    { "video/x-msvideo",             "avi",   true },
 };
 
 

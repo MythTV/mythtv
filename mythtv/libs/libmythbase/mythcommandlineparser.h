@@ -126,7 +126,7 @@ class MBASE_PUBLIC MythCommandLineParser
         kCombOptVal   = 4,
         kArg          = 5,
         kPassthrough  = 6,
-        kInvalid      = 7
+        kInvalid      = 7,
     };
 
     static QStringList MythSplitCommandString(const QString &line); // used in MythExternRecApp

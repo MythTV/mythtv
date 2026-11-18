@@ -16,7 +16,7 @@ class MythScreenType;
 enum InfoVisibleState : std::uint8_t
                       { kNoInfo,    //!< Details not displayed
                         kBasicInfo, //!< Shows just the most useful exif tags
-                        kFullInfo   //!< Shows all exif tags
+                        kFullInfo,   //!< Shows all exif tags
                       };
 
 //! The image info/details buttonlist overlay that displays exif tags

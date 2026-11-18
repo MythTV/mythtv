@@ -476,7 +476,7 @@ bool AudioOutputALSA::OpenDevice()
         default:
         {
             QString message {QCoreApplication::translate("AudioOutputALSA", "Unknown sample format: %1")
-                .arg(m_outputFormat)};
+                .arg(m_outputFormat),};
             dispatchError(message);
             LOG(VB_GENERAL, LOG_ERR, message);
             return false;
@@ -627,7 +627,7 @@ void AudioOutputALSA::WriteAudio(uchar *aubuf, int size)
             case -EBADFD:
             {
                 QString message {QString("WriteAudio: device is in a bad state (state = %1)")
-                    .arg(snd_pcm_state(m_pcmHandle))};
+                    .arg(snd_pcm_state(m_pcmHandle)),};
                 dispatchError(message);
                 LOG(VB_GENERAL, LOG_ERR, message);
                 return;
@@ -688,7 +688,7 @@ int AudioOutputALSA::SetParameters(snd_pcm_t *handle, snd_pcm_format_t format,
     if (handle == nullptr)
     {
         QString message {QCoreApplication::translate("AudioOutputALSA",
-            "SetParameters() called with handle == nullptr!")};
+            "SetParameters() called with handle == nullptr!"),};
         dispatchError(message);
         LOG(VB_GENERAL, LOG_ERR, message);
         return -1;
@@ -922,7 +922,7 @@ bool AudioOutputALSA::OpenMixer(void)
     QByteArray dev_ba = m_mixer.device.toLatin1();
     struct snd_mixer_selem_regopt regopts =
         {.ver=1, .abstract=SND_MIXER_SABSTRACT_NONE, .device=dev_ba.constData(),
-         .playback_pcm=nullptr, .capture_pcm=nullptr};
+         .playback_pcm=nullptr, .capture_pcm=nullptr,};
 
     chk = snd_mixer_selem_register(m_mixer.handle, &regopts, nullptr);
     if (chk < 0)

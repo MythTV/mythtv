@@ -12,21 +12,21 @@ enum MenuCategory : std::uint8_t
 {
     kMenuCategoryItem,
     kMenuCategoryItemlist,
-    kMenuCategoryMenu
+    kMenuCategoryMenu,
 };
 
 enum MenuShowContext : std::uint8_t
 {
     kMenuShowActive,
     kMenuShowInactive,
-    kMenuShowAlways
+    kMenuShowAlways,
 };
 
 enum MenuCurrentContext : std::uint8_t
 {
     kMenuCurrentDefault,
     kMenuCurrentActive,
-    kMenuCurrentAlways
+    kMenuCurrentAlways,
 };
 
 // These correlate to the four MythTVMenu objects that are allocated

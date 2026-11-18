@@ -72,27 +72,24 @@ void Cutter::Activate(float v2a, int64_t total)
 
 void Cutter::NewFrame(int64_t currentFrame)
 {
-    if (m_active)
+    if (m_active && (m_videoFramesToCut == 0))
     {
-        if (m_videoFramesToCut == 0)
-        {
-            uint64_t jumpTo = 0;
+        uint64_t jumpTo = 0;
 
-            if (m_tracker.TrackerWantsToJump(currentFrame, jumpTo))
-            {
-                // Reset the tracker and work out how much video and audio
-                // to drop
-                m_tracker.TrackerReset(jumpTo);
-                m_videoFramesToCut = jumpTo - currentFrame;
-                m_audioFramesToCut += llroundf(m_videoFramesToCut *
-                                               m_audioFramesPerVideoFrame);
-                LOG(VB_GENERAL, LOG_INFO,
-                    QString("Clean cut: discarding frame from %1 to %2: "
-                            "vid %3 aud %4")
-                    .arg(currentFrame).arg((long)jumpTo)
-                    .arg(m_videoFramesToCut)
-                    .arg(m_audioFramesToCut));
-            }
+        if (m_tracker.TrackerWantsToJump(currentFrame, jumpTo))
+        {
+            // Reset the tracker and work out how much video and audio
+            // to drop
+            m_tracker.TrackerReset(jumpTo);
+            m_videoFramesToCut = jumpTo - currentFrame;
+            m_audioFramesToCut += llroundf(m_videoFramesToCut *
+                                           m_audioFramesPerVideoFrame);
+            LOG(VB_GENERAL, LOG_INFO,
+                QString("Clean cut: discarding frame from %1 to %2: "
+                        "vid %3 aud %4")
+                .arg(currentFrame).arg((long)jumpTo)
+                .arg(m_videoFramesToCut)
+                .arg(m_audioFramesToCut));
         }
     }
 }

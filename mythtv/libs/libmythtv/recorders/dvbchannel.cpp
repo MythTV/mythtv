@@ -119,8 +119,8 @@ DVBChannel::~DVBChannel()
             new_master = dynamic_cast<DVBChannel*>(s_master_map.value(m_key).constFirst());
         if (new_master)
         {
-            QMutexLocker master_locker(&(master->m_hwLock));
-            QMutexLocker new_master_locker(&(new_master->m_hwLock));
+            QMutexLocker master_locker(&master->m_hwLock);
+            QMutexLocker new_master_locker(&new_master->m_hwLock);
             new_master->m_isOpen = master->m_isOpen;
         }
     }
@@ -181,11 +181,8 @@ void DVBChannel::Close(DVBChannel *who)
 
 bool DVBChannel::Open(DVBChannel *who)
 {
-    if (!m_inputId)
-    {
-        if (!InitializeInput())
-            return false;
-    }
+    if (!m_inputId && !InitializeInput())
+        return false;
 
     LOG(VB_CHANNEL, LOG_INFO, LOC + "Opening DVB channel");
 
@@ -897,7 +894,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             cmdseq_clear.num   = 1;
             cmdseq_clear.props = &p_clear;
 
-            if ((ioctl(m_fdFrontend, FE_SET_PROPERTY, &cmdseq_clear)) < 0)
+            if (ioctl(m_fdFrontend, FE_SET_PROPERTY, &cmdseq_clear) < 0)
             {
                 LOG(VB_GENERAL, LOG_ERR, LOC +
                     "Tune(): Clearing DTV properties cache failed." + ENO);
@@ -1081,7 +1078,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     tuning = dvbparams_to_dtvmultiplex(m_tunerType, params);
 
     tuning.m_mplex       = mplex;
-    tuning.m_sistandard  = sistandard;
+    tuning.m_sistandard  = std::move(sistandard);
 
     return true;
 }
@@ -1407,16 +1404,14 @@ double DVBChannel::GetBitErrorRateDVBv5(bool *ok) const
     if (ok)
         *ok = tmpOk;
     double value = 0;
-    if (tmpOk)
+    if (tmpOk &&
+        (cmd.props[0].u.st.stat[0].scale == FE_SCALE_COUNTER) &&
+        (cmd.props[1].u.st.stat[0].scale == FE_SCALE_COUNTER) &&
+        (cmd.props[1].u.st.stat[0].uvalue != 0))
     {
-        if ((cmd.props[0].u.st.stat[0].scale == FE_SCALE_COUNTER) &&
-            (cmd.props[1].u.st.stat[0].scale == FE_SCALE_COUNTER) &&
-            (cmd.props[1].u.st.stat[0].uvalue != 0))
-        {
-            value = static_cast<double>(
-                    static_cast<long double>(cmd.props[0].u.st.stat[0].uvalue) /
-                    cmd.props[1].u.st.stat[0].uvalue);
-        }
+        value = static_cast<double>(
+            static_cast<long double>(cmd.props[0].u.st.stat[0].uvalue) /
+            cmd.props[1].u.st.stat[0].uvalue);
     }
     return value;
 }
@@ -1481,11 +1476,8 @@ double DVBChannel::GetUncorrectedBlockCountDVBv5(bool *ok) const
     if (ok)
         *ok = tmpOk;
     double value = 0;
-    if (tmpOk)
-    {
-        if (cmd.props->u.st.stat[0].scale == FE_SCALE_COUNTER)
-            value = cmd.props->u.st.stat[0].uvalue;
-    }
+    if (tmpOk && (cmd.props->u.st.stat[0].scale == FE_SCALE_COUNTER))
+        value = cmd.props->u.st.stat[0].uvalue;
     return value;
 }
 
@@ -1590,7 +1582,7 @@ bool DVBChannel::WaitForBackend(std::chrono::milliseconds timeout_ms)
     auto usecs = duration_cast<std::chrono::microseconds>(timeout_ms) - seconds;
     struct timeval select_timeout = {
          .tv_sec=static_cast<time_t>(seconds.count()),
-         .tv_usec=static_cast<suseconds_t>(usecs.count())};
+         .tv_usec=static_cast<suseconds_t>(usecs.count()),};
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set); // NOLINT(readability-isolate-declaration)
     FD_SET (fd, &fd_select_set);
@@ -1752,8 +1744,8 @@ static struct dtv_properties *dtvmultiplex_to_dtvproperties(uint inputId,
     if (!cmdseq)
         return nullptr;
 
-    cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*(cmdseq->props)));
-    if (!(cmdseq->props))
+    cmdseq->props = (struct dtv_property*) calloc(20, sizeof(*cmdseq->props));
+    if (!cmdseq->props)
     {
         free(cmdseq);
         return nullptr;

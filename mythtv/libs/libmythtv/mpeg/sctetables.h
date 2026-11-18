@@ -177,7 +177,7 @@ class ModulationModeSubtable
     uint SymbolRate(void) const
     {
         return (((m_beg[2]&0xf)<<24) | (m_beg[3]<<16) |
-                (m_beg[4]<<8) | (m_beg[5]));
+                (m_beg[4]<<8) | m_beg[5]);
     }
     //   descriptors_count     8    6.0+m_beg
     uint DescriptorsCount(void) const { return m_beg[6]; }

@@ -95,7 +95,7 @@ int find_mpg_header(uint8_t head, const uint8_t *buf, int length)
 
 		case 3:
 			if (buf[c] == head) return c-3;
-			else found = 0;
+			found = 0;
 			break;
 		}
 		c++;
@@ -202,7 +202,7 @@ int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le)
 
 		case 3:
 			if (b == head) return c-3-off;
-			else found = 0;
+			found = 0;
 			break;
 		}
 		c++;

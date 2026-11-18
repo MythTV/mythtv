@@ -34,7 +34,7 @@ bool UpgradeBrowserDatabaseSchema(void)
             "id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY, "
             "category VARCHAR(100) NOT NULL, "
             "name VARCHAR(100) NOT NULL, "
-            "url VARCHAR(255) NOT NULL);"
+            "url VARCHAR(255) NOT NULL);",
         };
         if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
                                  updates, "1000", dbver))
@@ -45,7 +45,7 @@ bool UpgradeBrowserDatabaseSchema(void)
     { 
         DBUpdates updates
         {
-            "UPDATE settings SET data = 'Internal' WHERE data LIKE '%mythbrowser' AND value = 'WebBrowserCommand';"
+            "UPDATE settings SET data = 'Internal' WHERE data LIKE '%mythbrowser' AND value = 'WebBrowserCommand';",
         };
         if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
                                  updates, "1001", dbver))
@@ -57,7 +57,7 @@ bool UpgradeBrowserDatabaseSchema(void)
         DBUpdates updates
         {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETETAB' AND context = 'Browser';"
+            " WHERE action = 'DELETETAB' AND context = 'Browser';",
         };
         if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
                                  updates, "1002", dbver))
@@ -68,7 +68,7 @@ bool UpgradeBrowserDatabaseSchema(void)
     {
         DBUpdates updates
         {
-            "ALTER TABLE `websites` ADD `homepage` BOOL NOT NULL;"
+            "ALTER TABLE `websites` ADD `homepage` BOOL NOT NULL;",
         };
         if (!performActualUpdate("MythBrowser", MythBrowserVersionName,
                                  updates, "1003", dbver))

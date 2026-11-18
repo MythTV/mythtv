@@ -50,14 +50,14 @@ class AVCParser : public H2645Parser
         NALU_prefix     = 14,
         SPS_subset      = 15,
         AUXILIARY_SLICE = 19,
-        SLICE_EXTENSION = 20
+        SLICE_EXTENSION = 20,
     };
 
     enum SEI_type : std::uint8_t {
         SEI_TYPE_PIC_TIMING             = 1,
         SEI_FILLER_PAYLOAD              = 3,
         SEI_TYPE_USER_DATA_UNREGISTERED = 5,
-        SEI_TYPE_RECOVERY_POINT         = 6
+        SEI_TYPE_RECOVERY_POINT         = 6,
     };
 
     field_type getFieldType(void) const override;

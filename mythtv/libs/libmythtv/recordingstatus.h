@@ -41,7 +41,7 @@ class MTV_PUBLIC RecStatus : public QObject
         Repeat = 9,
         Inactive = 10,
         NeverRecord = 11,
-        Offline = 12
+        Offline = 12,
         //OtherShowing = 13 (obsolete)
     }; // note stored in int8_t in ProgramInfo
     Q_ENUM(Type)

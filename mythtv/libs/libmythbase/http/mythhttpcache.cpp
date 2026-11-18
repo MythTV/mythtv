@@ -98,7 +98,7 @@ void MythHTTPCache::PreConditionCheck(const HTTPResponse& Response)
         else
         {
             QString nonematch = MythHTTP::GetHeader(Response->m_requestHeaders, "if-none-match");
-            if (!nonematch.isEmpty() && (nonematch.contains(etag)))
+            if (!nonematch.isEmpty() && nonematch.contains(etag))
                 Response->m_status = HTTPNotModified;
         }
     }

@@ -23,7 +23,7 @@ enum InputFilter : std::uint8_t
     FilterNumeric = 0x02,
     FilterAlphaNumeric = 0x03,
     FilterSymbols = 0x04,
-    FilterPunct = 0x08
+    FilterPunct = 0x08,
 };
 
 /** \class MythUITextEdit
@@ -54,7 +54,7 @@ class MUI_PUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void SetMaxLength(int length);
 
     enum MoveDirection : std::uint8_t
-                       { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd };
+                       { MoveLeft, MoveRight, MoveUp, MoveDown, MovePageUp, MovePageDown, MoveEnd, };
     bool MoveCursor(MoveDirection moveDir);
 
     void SetKeyboardPosition(PopupPosition pos) { m_keyboardPosition = pos; }

@@ -191,7 +191,7 @@ QStringList MythCommandLineParser::MythSplitCommandString(const QString &line)
                 state = START;
                 break;
             }
-            else if (c == '\'') {
+            if (c == '\'') {
                 state = INSQUOTE;
             } else if (c == '\"') {
                 state = INDQUOTE;
@@ -819,7 +819,7 @@ CommandLineArg* CommandLineArg::SetDeprecated(QString depstr)
 {
     if (depstr.isEmpty())
         depstr = "and will be removed in a future version.";
-    m_deprecated = depstr;
+    m_deprecated = std::move(depstr);
     return this;
 }
 
@@ -829,7 +829,7 @@ CommandLineArg* CommandLineArg::SetRemoved(QString remstr, QString remver)
 {
     if (remstr.isEmpty())
         remstr = "and is no longer available in this version.";
-    m_removed = remstr;
+    m_removed = std::move(remstr);
     m_removedversion = std::move(remver);
     return this;
 }
@@ -1505,7 +1505,7 @@ MythCommandLineParser::Result MythCommandLineParser::getOpt(int argc, const char
     if (m_passthroughActive)
     {
         // pass through has been activated
-        val = tmp;
+        val = std::move(tmp);
         return Result::kArg;
     }
 
@@ -1553,12 +1553,12 @@ MythCommandLineParser::Result MythCommandLineParser::getOpt(int argc, const char
             return Result::kOptOnly;
         }
 
-        val = tmp;
+        val = std::move(tmp);
         return Result::kOptVal;
     }
 
     // input is not an option string, return as arg
-    val = tmp;
+    val = std::move(tmp);
     return Result::kArg;
 }
 
@@ -2026,20 +2026,18 @@ bool MythCommandLineParser::ReconcileLinks(void)
             (*args_it)->m_requiredby.begin(); // clazy:exclude=detaching-member (erases item)
         while (req_it != (*args_it)->m_requiredby.end())
         {
-            if ((*req_it)->m_type == QMetaType::UnknownType)
+            if (((*req_it)->m_type == QMetaType::UnknownType) &&
+                m_namedArgs.contains((*req_it)->m_name))
             {
                 // if its not an invalid, it shouldnt be here anyway
-                if (m_namedArgs.contains((*req_it)->m_name))
+                m_namedArgs.value((*req_it)->m_name)->SetRequires(*args_it);
+                if (m_verbose)
                 {
-                    m_namedArgs.value((*req_it)->m_name)->SetRequires(*args_it);
-                    if (m_verbose)
-                    {
-                        std::cerr << QString("  Setting %1 as blocking %2")
-                                         .arg((*args_it)->m_name,
-                                              (*req_it)->m_name)
-                                         .toLocal8Bit().constData()
-                                  << '\n';
-                    }
+                    std::cerr << QString("  Setting %1 as blocking %2")
+                        .arg((*args_it)->m_name,
+                             (*req_it)->m_name)
+                        .toLocal8Bit().constData()
+                              << '\n';
                 }
             }
 

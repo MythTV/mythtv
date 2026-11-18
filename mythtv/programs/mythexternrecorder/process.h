@@ -19,7 +19,7 @@ class Process : public QObject
         Starting,
         Running,
         Stopping,
-        Finished
+        Finished,
     };
     Q_ENUM(State)
 
@@ -28,7 +28,7 @@ class Process : public QObject
           Unknown,
           Success,
           Failed,
-          Crashed
+          Crashed,
       };
     Q_ENUM(Result)
 

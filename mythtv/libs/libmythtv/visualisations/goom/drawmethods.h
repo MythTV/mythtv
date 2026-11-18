@@ -67,14 +67,14 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 	/* vertical line */
 	if (dx == 0) {
 		if (y1 < y2) {
-			p = &(data[(screenx * y1) + x1]);
+			p = &data[(screenx * y1) + x1];
 			for (y = y1; y <= y2; y++) {
 				DRAWMETHOD;
 				p += screenx;
 			}
 		}
 		else {
-			p = &(data[(screenx * y2) + x1]);
+			p = &data[(screenx * y2) + x1];
 			for (y = y2; y <= y1; y++) {
 				DRAWMETHOD;
 				p += screenx;
@@ -85,14 +85,14 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 	/* horizontal line */
 	if (dy == 0) {
 		if (x1 < x2) {
-			p = &(data[(screenx * y1) + x1]);
+			p = &data[(screenx * y1) + x1];
 			for (x = x1; x <= x2; x++) {
 				DRAWMETHOD;
 				p++;
 			}
 			return;
 		}
-                p = &(data[(screenx * y1) + x2]);
+                p = &data[(screenx * y1) + x2];
                 for (x = x2; x <= x1; x++) {
                     DRAWMETHOD;
                     p++;
@@ -109,7 +109,7 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			x = x1 << 16;
 			for (y = y1; y <= y2; y++) {
 				int xx = x >> 16;
-				p = &(data[(screenx * y) + xx]);
+				p = &data[(screenx * y) + xx];
 				DRAWMETHOD;
 #if 0
 				if (xx < (screenx - 1)) {
@@ -125,7 +125,7 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                 y = y1 << 16;
                 for (x = x1; x <= x2; x++) {
                     int yy = y >> 16;
-                    p = &(data[(screenx * yy) + x]);
+                    p = &data[(screenx * yy) + x];
                     DRAWMETHOD;
                     y += dy;
                 }
@@ -140,7 +140,7 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
 			x = (x1 + 1) << 16;
 			for (y = y1; y >= y2; y--) {
 				int xx = x >> 16;
-				p = &(data[(screenx * y) + xx]);
+				p = &data[(screenx * y) + xx];
 				DRAWMETHOD;
 #if 0
 				if (xx < (screenx - 1)) {
@@ -156,7 +156,7 @@ inline void draw_line (int *data, int x1, int y1, int x2, int y2, int col, int s
                 y = y1 << 16;
                 for (x = x1; x <= x2; x++) {
                     int yy = y >> 16;
-                    p = &(data[(screenx * yy) + x]);
+                    p = &data[(screenx * yy) + x];
                     DRAWMETHOD;
                     y += dy;
                 }

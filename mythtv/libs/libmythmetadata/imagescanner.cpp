@@ -430,7 +430,7 @@ void ImageScanThread<DBFS>::PopulateMetadata(
     orientation  = metadata->GetOrientation();
     comment      = metadata->GetComment().simplified();
     QDateTime dt = metadata->GetOriginalDateTime();
-    time         = (dt.isValid()) ? std::chrono::seconds(dt.toSecsSinceEpoch()) : 0s;
+    time         = dt.isValid() ? std::chrono::seconds(dt.toSecsSinceEpoch()) : 0s;
 
     delete metadata;
 }
@@ -534,7 +534,7 @@ void ImageScanThread<DBFS>::SyncFile(const QFileInfo &fileInfo, int devId,
     m_seenFile.insert(im->m_filePath, absFilePath);
 
     // Populate absolute filename so that thumbgen doesn't need to locate file
-    im->m_filePath = absFilePath;
+    im->m_filePath = std::move(absFilePath);
 
     // Ensure thumbnail exists.
     m_thumb.CreateThumbnail(im);

@@ -181,7 +181,7 @@ bool DecoderBase::PosMapFromDb(void)
     {
         PosMapEntry e = {.index=it.key(),
                          .adjFrame=it.key() * m_keyframeDist,
-                         .pos=*it};
+                         .pos=*it,};
         m_positionMap.push_back(e);
     }
 
@@ -252,7 +252,7 @@ bool DecoderBase::PosMapFromEnc(void)
 
         PosMapEntry e = {.index=it.key(),
                          .adjFrame=it.key() * m_keyframeDist,
-                         .pos=*it};
+                         .pos=*it,};
         m_positionMap.push_back(e);
     }
 
@@ -586,7 +586,7 @@ long long DecoderBase::GetKey(const PosMapEntry &e) const
 {
     long long kf = (m_ringBuffer && m_ringBuffer->IsDisc()) ?
         1LL : m_keyframeDist;
-    return (m_hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - m_indexOffset) * kf;
+    return m_hasKeyFrameAdjustTable ? e.adjFrame :(e.index - m_indexOffset) * kf;
 }
 
 bool DecoderBase::DoRewindSeek(long long desiredFrame)
@@ -1132,21 +1132,19 @@ int DecoderBase::AutoSelectTrack(uint Type)
         // Find best track favoring forced.
         selTrack = BestTrack(Type, true);
 
-        if (Type == kTrackTypeSubtitle)
+        if ((Type == kTrackTypeSubtitle) &&
+            m_tracks[Type][selTrack].m_forced)
         {
-            if (m_tracks[Type][selTrack].m_forced)
-            {
-                // A forced AV Subtitle tracks is handled without the user
-                // explicitly enabling subtitles. Try to find a good non-forced
-                // track that can be swapped to in the case the user does
-                // explicitly enable subtitles.
-                int nonForcedTrack = BestTrack(Type, false);
+            // A forced AV Subtitle tracks is handled without the user
+            // explicitly enabling subtitles. Try to find a good non-forced
+            // track that can be swapped to in the case the user does
+            // explicitly enable subtitles.
+            int nonForcedTrack = BestTrack(Type, false);
 
-                if (!m_tracks[Type][nonForcedTrack].m_forced)
-                {
-                    m_selectedForcedTrack[Type] = m_tracks[Type][selTrack];
-                    selTrack = nonForcedTrack;
-                }
+            if (!m_tracks[Type][nonForcedTrack].m_forced)
+            {
+                m_selectedForcedTrack[Type] = m_tracks[Type][selTrack];
+                selTrack = nonForcedTrack;
             }
         }
     }
@@ -1349,12 +1347,12 @@ std::chrono::milliseconds DecoderBase::TranslatePositionFrameToMs(long long posi
     {
         frm_pos_map_t::const_iterator it = m_frameToDurMap.cend();
         --it;
-        if (position > it.key())
-        {
-            if (!m_lastPositionMapUpdate.isValid() ||
+        if ((position > it.key()) &&
+            (!m_lastPositionMapUpdate.isValid() ||
                 (QDateTime::currentDateTime() >
-                 m_lastPositionMapUpdate.addSecs(3)))
-                SyncPositionMap();
+                 m_lastPositionMapUpdate.addSecs(3))))
+        {
+            SyncPositionMap();
         }
     }
     return std::chrono::milliseconds(TranslatePositionAbsToRel(cutlist, position, m_frameToDurMap,

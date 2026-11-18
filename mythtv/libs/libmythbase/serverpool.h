@@ -30,7 +30,7 @@ enum PoolServerType : std::uint8_t
 {
     kTCPServer,
     kUDPServer,
-    kSSLServer
+    kSSLServer,
 };
 
 // Making a 'Priv' server public is a contradiction, it was this or passing

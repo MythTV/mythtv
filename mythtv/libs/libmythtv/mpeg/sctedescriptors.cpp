@@ -56,8 +56,7 @@ QString CueIdentifierDescriptor::CueStreamTypeString(void) const
         default:
             if (CueStreamType() <= 0x7f)
                 return QString("Reserved(0x%1)").arg(CueStreamType(),0,16);
-            else
-                return QString("User(0x%1)").arg(CueStreamType(),0,16);
+            return QString("User(0x%1)").arg(CueStreamType(),0,16);
     }
 }
 

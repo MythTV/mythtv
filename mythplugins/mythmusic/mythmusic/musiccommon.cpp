@@ -1627,17 +1627,15 @@ void MusicCommon::customEvent(QEvent *event)
             Playlist *playlist = gMusicData->m_all_playlists->getPlaylist(resulttext);
             gPlayer->playlistChanged(playlist->getID());
         }
-        else if (resultid == "updateplaylist")
+        else if ((resultid == "updateplaylist") &&
+                 gPlayer->getCurrentPlaylist())
         {
-            if (gPlayer->getCurrentPlaylist())
-            {
-                Playlist *playlist = gMusicData->m_all_playlists->getPlaylist(resulttext);
-                QString songList = gPlayer->getCurrentPlaylist()->toRawSonglist();
-                playlist->removeAllTracks();
-                playlist->fillSongsFromSonglist(songList);
-                playlist->changed();
-                gPlayer->playlistChanged(playlist->getID());
-            }
+            Playlist *playlist = gMusicData->m_all_playlists->getPlaylist(resulttext);
+            QString songList = gPlayer->getCurrentPlaylist()->toRawSonglist();
+            playlist->removeAllTracks();
+            playlist->fillSongsFromSonglist(songList);
+            playlist->changed();
+            gPlayer->playlistChanged(playlist->getID());
         }
     }
     else if (event->type() == MusicPlayerEvent::kTrackChangeEvent)
@@ -1722,10 +1720,10 @@ void MusicCommon::customEvent(QEvent *event)
 
         // if we have just removed the playing track from the playlist
         // move to the next track
-        if (gPlayer->getCurrentMetadata())
+        if (gPlayer->getCurrentMetadata() &&
+            (gPlayer->getCurrentMetadata()->ID() == (MusicMetadata::IdType) trackID))
         {
-            if (gPlayer->getCurrentMetadata()->ID() == (MusicMetadata::IdType) trackID)
-                gPlayer->next();
+            gPlayer->next();
         }
 
         if (gPlayer->getCurrentPlaylist())
@@ -1869,22 +1867,20 @@ void MusicCommon::customEvent(QEvent *event)
             {
                 MythUIButtonListItem *item = m_currentPlaylist->GetItemAt(x);
                 auto *mdata = item->GetData().value<MusicMetadata*>();
-                if (mdata && mdata->ID() == trackID)
+                if ((mdata && mdata->ID() == trackID) &&
+                    (!item->GetImageFilename().isEmpty()))
                 {
                     // reload the albumart image if one has already been loaded for this track
-                    if (!item->GetImageFilename().isEmpty())
+                    QString artFile = mdata->getAlbumArtFile();
+                    if (artFile.isEmpty())
                     {
-                        QString artFile = mdata->getAlbumArtFile();
-                        if (artFile.isEmpty())
-                        {
-                            item->SetImage("");
-                            item->SetImage("", "coverart");
-                        }
-                        else
-                        {
-                            item->SetImage(mdata->getAlbumArtFile());
-                            item->SetImage(mdata->getAlbumArtFile(), "coverart");
-                        }
+                        item->SetImage("");
+                        item->SetImage("", "coverart");
+                    }
+                    else
+                    {
+                        item->SetImage(mdata->getAlbumArtFile());
+                        item->SetImage(mdata->getAlbumArtFile(), "coverart");
                     }
                 }
             }
@@ -2194,8 +2190,8 @@ void MusicCommon::updatePlaylistStats(void)
         QString playlisttotal = QLocale::system().toString(trackCount);
 
         map["playlistposition"] = tr("%1 of %2").arg(playlistcurrent, playlisttotal);
-        map["playlistcurrent"] = playlistcurrent;
-        map["playlistcount"] = playlisttotal;
+        map["playlistcurrent"] = std::move(playlistcurrent);
+        map["playlistcount"] = std::move(playlisttotal);
         map["playlisttime"] = getTimeString(m_playlistPlayedTime + m_currentTime, m_playlistMaxTime);
         map["playlistplayedtime"] = getTimeString(m_playlistPlayedTime + m_currentTime, 0s);
         map["playlisttotaltime"] = getTimeString(m_playlistMaxTime, 0s);
@@ -2204,7 +2200,7 @@ void MusicCommon::updatePlaylistStats(void)
             playlistName = tr("Default Playlist");
         else if (playlistName ==  "stream_playlist")
             playlistName = tr("Stream Playlist");
-        map["playlistname"] = playlistName;
+        map["playlistname"] = std::move(playlistName);
         map["playedtime"] = getTimeString(m_currentTime, 0s); // v34 - parts
         map["totaltime"] = getTimeString(m_maxTime, 0s);
         map["trackspeed"] = getTimeString(-1s, 0s);
@@ -2886,13 +2882,10 @@ bool TrackInfoDialog::Create(void)
         ratingState->DisplayState(QString("%1").arg(m_metadata->Rating()));
 
     MythUIImage *albumImage = dynamic_cast<MythUIImage *>(GetChild("coverart"));
-    if (albumImage)
+    if (albumImage && !m_metadata->getAlbumArtFile().isEmpty())
     {
-        if (!m_metadata->getAlbumArtFile().isEmpty())
-        {
-            albumImage->SetFilename(m_metadata->getAlbumArtFile());
-            albumImage->Load();
-        }
+        albumImage->SetFilename(m_metadata->getAlbumArtFile());
+        albumImage->Load();
     }
 
     // hide the song ID by default

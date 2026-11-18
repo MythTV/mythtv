@@ -76,7 +76,7 @@ class FrontendActions
                                       ACTION_SETCONTRAST,  ACTION_SETCOLOUR,
                                       ACTION_SETHUE,       ACTION_JUMPCHAPTER,
                                       ACTION_SWITCHTITLE,  ACTION_SWITCHANGLE,
-                                      ACTION_SEEKABSOLUTE };
+                                      ACTION_SEEKABSOLUTE, };
     }
 
   private:
@@ -369,7 +369,7 @@ QString MythFrontendService::GetSetting(
                             const QString &sDefault )
 {
     if (sKey.isEmpty())
-        throw( QString("Missing or empty Key (settings.value)") );
+        throw std::runtime_error("Missing or empty Key (settings.value)");
     return gCoreContext->GetSetting(sKey, sDefault);
 }
 

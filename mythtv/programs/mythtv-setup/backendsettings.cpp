@@ -1167,7 +1167,7 @@ void BackendSettings::Load(void)
     }
     bool ismaster = (mastername == gCoreContext->GetHostName());
     m_isMasterBackend->setValue(ismaster);
-    m_priorMasterName = mastername;
+    m_priorMasterName = std::move(mastername);
     m_isLoaded=true;
     masterBackendChanged();
     listenChanged();

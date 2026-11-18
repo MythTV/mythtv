@@ -56,7 +56,7 @@ int ring_init (ringbuffer *rbuf, int size)
 
 int ring_reinit (ringbuffer *rbuf, int size)
 {
-	if (size > (int)(rbuf->size)) {
+	if (size > (int)rbuf->size) {
                 try {
                     rbuf->buffer.resize(size);
                 } catch (const std::bad_alloc& e) {

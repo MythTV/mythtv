@@ -87,7 +87,7 @@ class META_PUBLIC LyricsData : public QObject
       STATUS_NOTLOADED = 0, // not looked for any lyrics yet
       STATUS_SEARCHING,     // search is taking place
       STATUS_FOUND,         // search completed and some lyrics have been found
-      STATUS_NOTFOUND       // search completed but no lyrics have been found
+      STATUS_NOTFOUND,       // search completed but no lyrics have been found
     };
 
     Status getStatus(void) { return m_status; }

@@ -1,6 +1,7 @@
 // ANSI C headers
 #include <algorithm>
 #include <cmath>
+#include <stdexcept>
 #include <cstdlib>
 #include <utility>
 
@@ -919,7 +920,7 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
     {
         const AVFrame *pgm = m_pgmConverter->getImage(frame, frameno, &pgmwidth, &pgmheight);
         if (pgm == nullptr)
-            throw 1;
+            throw std::runtime_error("1");
 
         if (!m_borderDetector->getDimensions(pgm, pgmheight, frameno,
                     &croprow, &cropcol, &cropwidth, &cropheight))
@@ -934,11 +935,11 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
             m_maxContentRow1 = std::max(croprow + cropheight, m_maxContentRow1);
 
             if (resetBuffers(cropwidth, cropheight))
-                throw 2;
+                throw std::runtime_error("2");
 
             if (pgm_crop(&m_cropped, pgm, pgmheight, croprow, cropcol,
                         cropwidth, cropheight))
-                throw 3;
+                throw std::runtime_error("3");
 
             /*
              * Translate the excluded area of the screen into "cropped"
@@ -954,18 +955,17 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
             const AVFrame *edges =
                 m_edgeDetector->detectEdges(&m_cropped, cropheight, FRAMESGMPCTILE);
             if (edges == nullptr)
-                throw 4;
+                throw std::runtime_error("4");
 
             if (pgm_scorepixels(m_scores, pgmwidth, croprow, cropcol,
                         edges, cropheight))
-                throw 5;
+                throw std::runtime_error("5");
 
-            if (m_debugLevel >= 2)
-            {
-                if (!analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
-                            cropheight, croprow, cropcol, m_debugFrames, m_debugDir))
-                    throw 6;
-            }
+            if ((m_debugLevel >= 2) &&
+                !analyzeFrameDebug(frameno, pgm, pgmheight, &m_cropped, edges,
+                                   cropheight, croprow, cropcol, m_debugFrames,
+                                   m_debugDir))
+                throw std::runtime_error("6");
 
             auto end = nowAsDuration<std::chrono::microseconds>();
             m_analyzeTime += (end - start);
@@ -976,11 +976,11 @@ TemplateFinder::analyzeFrame(const MythVideoFrame *frame, long long frameno,
 
         return ANALYZE_OK;
     }
-    catch (int e)
+    catch (const std::runtime_error& e)
     {
         LOG(VB_COMMFLAG, LOG_ERR,
             QString("TemplateFinder::analyzeFrame error at frame %1, step %2")
-            .arg(frameno).arg(e));
+            .arg(frameno).arg(e.what()));
 
         if (m_nextFrame > m_endFrame)
             return ANALYZE_FINISHED;

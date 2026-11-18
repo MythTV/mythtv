@@ -96,7 +96,7 @@ bool HLSRecSegment::SetAESIV(QString line)
 #endif
     QByteArray ba = QByteArray(padding, 0x0);
     ba.append(QByteArray::fromHex(QByteArray(line.toLatin1().constData() + 2)));
-    m_aesIV = ba;
+    m_aesIV = std::move(ba);
     m_ivLoaded = true;
     return true;
 }

@@ -209,7 +209,7 @@ class MUI_PUBLIC MythUIFileBrowserSetting : public StandardSetting
         : StandardSetting(_storage) {}
     QDir::Filters      m_typeFilter {QDir::AllDirs  | QDir::Drives |
                                      QDir::Files    | QDir::Readable |
-                                     QDir::Writable | QDir::Executable};
+                                     QDir::Writable | QDir::Executable,};
     QStringList        m_nameFilter {"*"};
 };
 

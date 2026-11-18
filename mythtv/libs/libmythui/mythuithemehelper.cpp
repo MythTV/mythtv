@@ -259,7 +259,7 @@ bool MythUIThemeHelper::FindThemeFile(QString& Path)
 
         if (QFile::exists(file))
         {
-            Path = file;
+            Path = std::move(file);
             foundit = true;
             break;
         }

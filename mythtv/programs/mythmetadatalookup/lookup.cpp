@@ -252,7 +252,7 @@ void LookerUpper::customEvent(QEvent *levent)
             {
                 auto *pginfo = list[p]->GetData().value<ProgramInfo *>();
 
-                if (pginfo && (QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive)) == 0)
+                if (pginfo && QString::compare(pginfo->GetTitle(), list[p]->GetBaseTitle(), Qt::CaseInsensitive) == 0)
                 {
                     bool hasArtwork = ((!(list[p]->GetArtwork(kArtworkFanart)).empty()) ||
                                        (!(list[p]->GetArtwork(kArtworkCoverart)).empty()) ||
@@ -278,7 +278,7 @@ void LookerUpper::customEvent(QEvent *levent)
                 }
 
                 if (pginfo && !pginfo->GetSeriesID().isEmpty() &&
-                    pginfo->GetSeriesID() == (list[p])->GetTMSref())
+                    pginfo->GetSeriesID() == list[p]->GetTMSref())
                 {
                     MetadataLookup *lookup = list[p];
                     if (lookup->GetSubtype() != kProbableGenericTelevision)
@@ -288,8 +288,8 @@ void LookerUpper::customEvent(QEvent *levent)
                     return;
                 }
                 if (pginfo && pginfo->GetYearOfInitialRelease() != 0 &&
-                         (list[p])->GetYear() != 0 &&
-                         pginfo->GetYearOfInitialRelease() == (list[p])->GetYear())
+                         list[p]->GetYear() != 0 &&
+                         pginfo->GetYearOfInitialRelease() == list[p]->GetYear())
                 {
                     if (yearindex != -1)
                     {

@@ -79,16 +79,15 @@ MythVideoTextureOpenGL* MythOpenGLTonemap::Map(std::vector<MythVideoTextureOpenG
     OpenGLLocker locker(m_render);
     bool changed = m_outputSize != DisplaySize;
 
-    if (!m_texture || changed)
-        if (!CreateTexture(DisplaySize))
-            return nullptr;
+    if ((!m_texture || changed) && !CreateTexture(DisplaySize))
+        return nullptr;
 
     changed |= (m_inputCount != size) || (m_inputType != Inputs[0]->m_frameFormat) ||
                (m_inputSize != Inputs[0]->m_size);
 
-    if (!m_shader || changed)
-        if (!CreateShader(size, Inputs[0]->m_frameFormat, Inputs[0]->m_size))
-            return nullptr;
+    if ((!m_shader || changed) &&
+        !CreateShader(size, Inputs[0]->m_frameFormat, Inputs[0]->m_size))
+        return nullptr;
 
     if (!m_storageBuffer)
     {

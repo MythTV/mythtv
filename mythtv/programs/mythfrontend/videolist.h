@@ -12,7 +12,7 @@ enum TreeNodeType : std::int8_t {
 
 // Tree node attribute index
 enum TreeNodeAttributes : std::uint8_t {
-    kNodeSort
+    kNodeSort,
 };
 
 class MythGenericTree;

@@ -297,7 +297,7 @@ Trace (FRACTAL * F, F_PT xo, F_PT yo)
 	F_PT    x = NAN;
 	F_PT    y = NAN;
 
-	SIMI *Cur = (Cur_F->m_components).data();
+	SIMI *Cur = Cur_F->m_components.data();
 	for (int i = Cur_F->m_nbSimi; i != 0; --i, Cur++) {
 		Transform (Cur, xo, yo, &x, &y);
 
@@ -323,7 +323,7 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	SIMI   *Cur = nullptr;
 	SIMI   *Simi = nullptr;
 
-	for (Cur = (F->m_components).data(), i = F->m_nbSimi; i; --i, Cur++) {
+	for (Cur = F->m_components.data(), i = F->m_nbSimi; i; --i, Cur++) {
 		Cur->m_fCx = DBL_To_F_PT (Cur->m_dCx);
 		Cur->m_fCy = DBL_To_F_PT (Cur->m_dCy);
 
@@ -340,11 +340,11 @@ Draw_Fractal ( void /* ModeInfo * mi */ )
 	Cur_Pt = 0;
 	Cur_F = F;
 	Buf = F->m_buffer2.data();
-	for (Cur = (F->m_components).data(), i = F->m_nbSimi; i; --i, Cur++) {
+	for (Cur = F->m_components.data(), i = F->m_nbSimi; i; --i, Cur++) {
 		F_PT xo = Cur->m_fCx;
 		F_PT yo = Cur->m_fCy;
 		int j = 0;
-		for (Simi = (F->m_components).data(), j = F->m_nbSimi; j; --j, Simi++) {
+		for (Simi = F->m_components.data(), j = F->m_nbSimi; j; --j, Simi++) {
 			F_PT x = NAN;
 			F_PT y = NAN;
 			if (Simi == Cur)
@@ -398,7 +398,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	if (F->m_buffer1.empty())
 		return nullptr;
 
-	DBL u = (DBL) (F->m_count) * (DBL) (F->m_speed) / 1000.0;
+	DBL u = (DBL) F->m_count * (DBL) F->m_speed / 1000.0;
 	DBL uu = u * u;
 	DBL v = 1.0 - u;
 	DBL vv = v * v;
@@ -407,7 +407,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	DBL u2 = 3.0 * v * uu;
 	DBL u3 = u * uu;
 
-	SIMI *S  = (F->m_components).data();
+	SIMI *S  = F->m_components.data();
 	SIMI *S1 = &F->m_components[1 * F->m_nbSimi];
 	SIMI *S2 = &F->m_components[2 * F->m_nbSimi];
 	SIMI *S3 = &F->m_components[3 * F->m_nbSimi];
@@ -427,7 +427,7 @@ draw_ifs ( /* ModeInfo * mi */ int *nbPoints)
 	Draw_Fractal ( /* mi */ );
 
 	if (F->m_count >= 1000 / F->m_speed) {
-		S  = (F->m_components).data();
+		S  = F->m_components.data();
 		S1 = &F->m_components[1 * F->m_nbSimi];
 		S2 = &F->m_components[2 * F->m_nbSimi];
 		S3 = &F->m_components[3 * F->m_nbSimi];

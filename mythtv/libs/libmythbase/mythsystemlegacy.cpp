@@ -159,7 +159,7 @@ void MythSystemLegacy::SetCommand(const QString &command,
     }
 
     // check for execute rights
-    if (!GetSetting("UseShell") && (access(command.toUtf8().constData(), X_OK)) != 0)
+    if (!GetSetting("UseShell") && access(command.toUtf8().constData(), X_OK) != 0)
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("MythSystemLegacy(%1) command not executable, ")

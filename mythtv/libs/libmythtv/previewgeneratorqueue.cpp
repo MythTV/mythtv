@@ -453,7 +453,7 @@ QString PreviewGeneratorQueue::GeneratePreviewImage(
     }
 
     // keep in sync with default filename in PreviewGenerator::RunReal
-    QString filename = (outputfile.isEmpty()) ?
+    QString filename = outputfile.isEmpty() ?
         pginfo.GetPathname() + ".png" : outputfile;
     QString ret_file = filename;
     QString ret;

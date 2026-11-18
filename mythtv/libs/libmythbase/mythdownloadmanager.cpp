@@ -185,6 +185,7 @@ MythDownloadManager::~MythDownloadManager()
 
     wait();
 
+    delete m_proxy;
     delete m_infoLock;
     delete m_inCookieJar;
 }
@@ -453,7 +454,7 @@ bool MythDownloadManager::download(const QString &url, QByteArray *data,
                      nullptr, nullptr, nullptr, &redirected))
         return false;
     if (!redirected.isEmpty() && finalUrl != nullptr)
-        *finalUrl = redirected;
+        *finalUrl = std::move(redirected);
     return true;
 }
 
@@ -707,7 +708,7 @@ void MythDownloadManager::downloadQNetworkRequest(MythDownloadInfo *dlInfo)
         m_infoLock->lock();
         QNetworkCacheMetaData urlData = m_manager->cache()->metaData(qurl);
         m_infoLock->unlock();
-        if ((urlData.isValid()) &&
+        if (urlData.isValid() &&
             ((!urlData.expirationDate().isValid()) ||
              (urlData.expirationDate().toUTC().secsTo(now) < 10)))
         {
@@ -840,7 +841,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
            (dlInfo->m_errorCode == QNetworkReply::NoError) &&
            (((!dlInfo->m_url.startsWith("myth://")) &&
              (MythDate::secsInPast(dlInfo->m_lastStat) < 60s)) ||
-            ((dlInfo->m_url.startsWith("myth://")) &&
+            (dlInfo->m_url.startsWith("myth://") &&
              (MythDate::secsInPast(startedAt) < 20s))))
     {
         m_infoLock->unlock();
@@ -857,7 +858,7 @@ bool MythDownloadManager::downloadNow(MythDownloadInfo *dlInfo, bool deleteInfo)
     {
         dlInfo->m_data = nullptr;   // Prevent downloadFinished() from updating
         dlInfo->m_syncMode = false; // Let downloadFinished() cleanup for us
-        if ((dlInfo->m_reply) &&
+        if (dlInfo->m_reply &&
             (dlInfo->m_errorCode == QNetworkReply::NoError))
         {
             LOG(VB_FILE, LOG_DEBUG,

@@ -160,7 +160,7 @@ bool MythPainterVulkan::Ready()
     {
         const auto & sizes = m_textureShader->GetPoolSizes(0);
         VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
-                                          0, 1, static_cast<uint32_t>(sizes.size()), sizes.data() };
+                                          0, 1, static_cast<uint32_t>(sizes.size()), sizes.data(), };
         if (m_vulkan->Funcs()->vkCreateDescriptorPool(m_vulkan->Device(), &pool, nullptr, &m_projectionDescriptorPool) != VK_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create descriptor pool for projection");
@@ -219,7 +219,7 @@ bool MythPainterVulkan::Ready()
         std::ranges::transform(sizes, std::back_inserter(adjsizes),
                        [](VkDescriptorPoolSize Size){ return VkDescriptorPoolSize { Size.type, MAX_TEXTURE_COUNT }; });
         VkDescriptorPoolCreateInfo pool { VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr,
-                                          0, MAX_TEXTURE_COUNT, static_cast<uint32_t>(adjsizes.size()), adjsizes.data() };
+                                          0, MAX_TEXTURE_COUNT, static_cast<uint32_t>(adjsizes.size()), adjsizes.data(), };
         if (m_vulkan->Funcs()->vkCreateDescriptorPool(m_vulkan->Device(), &pool, nullptr, &m_textureDescriptorPool) != VK_SUCCESS)
         {
             LOG(VB_GENERAL, LOG_ERR, LOC + "Failed to create descriptor pool");

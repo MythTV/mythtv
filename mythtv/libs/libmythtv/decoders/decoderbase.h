@@ -59,7 +59,7 @@ enum AudioTrackType : std::uint8_t
     kAudioTypeCleanEffects, // No dialog, soundtrack or effects only e.g. Karaoke
     kAudioTypeHearingImpaired, // Greater contrast between dialog and background audio
     kAudioTypeSpokenSubs, // Spoken subtitles for the visually impaired
-    kAudioTypeCommentary // Director/actor/etc Commentary
+    kAudioTypeCommentary, // Director/actor/etc Commentary
 };
 QString toString(AudioTrackType type);
 
@@ -68,7 +68,7 @@ enum EofState : std::uint8_t
 {
     kEofStateNone,     // no eof
     kEofStateDelayed,  // decoder eof, but let player drain buffered frames
-    kEofStateImmediate // true eof
+    kEofStateImmediate, // true eof
 };
 
 class StreamInfo

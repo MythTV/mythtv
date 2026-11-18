@@ -32,7 +32,7 @@
 
 MHDynamicLineArt::~MHDynamicLineArt()
 {
-    delete(m_picture);
+    delete m_picture;
 }
 
 
@@ -69,7 +69,7 @@ void MHDynamicLineArt::Display(MHEngine * /*engine*/)
 // Get the opaque area.  This is only opaque if the background is opaque.
 QRegion MHDynamicLineArt::GetOpaqueArea()
 {
-    if ((GetColour(m_origFillColour)).alpha() == 255)
+    if (GetColour(m_origFillColour).alpha() == 255)
     {
         return GetVisibleArea();
     }

@@ -84,7 +84,7 @@ enum MythHTTPVersion : uint8_t
     HTTPUnknownVersion = 0,
     HTTPZeroDotNine,
     HTTPOneDotZero,
-    HTTPOneDotOne
+    HTTPOneDotOne,
 };
 
 enum MythHTTPRequestType : uint8_t
@@ -95,7 +95,7 @@ enum MythHTTPRequestType : uint8_t
     HTTPPost    = 0x0004,
     HTTPPut     = 0x0008,
     HTTPDelete  = 0x0010,
-    HTTPOptions = 0x0020
+    HTTPOptions = 0x0020,
 };
 
 // POST is needed here because all services are invoked with POST when using
@@ -122,21 +122,21 @@ enum MythHTTPStatus : uint16_t
     HTTPNotImplemented      = 501,
     HTTPBadGateway          = 502,
     HTTPServiceUnavailable  = 503,
-    HTTPNetworkAuthenticationRequired = 511
+    HTTPNetworkAuthenticationRequired = 511,
 };
 
 enum MythHTTPConnection : uint8_t
 {
     HTTPConnectionClose     = 0,
     HTTPConnectionKeepAlive,
-    HTTPConnectionUpgrade
+    HTTPConnectionUpgrade,
 };
 
 enum MythHTTPEncode : uint8_t
 {
     HTTPNoEncode = 0,
     HTTPGzip,
-    HTTPChunked
+    HTTPChunked,
 };
 
 enum MythHTTPCacheType : uint16_t
@@ -147,7 +147,7 @@ enum MythHTTPCacheType : uint16_t
     HTTPLastModified = 0x0004,
     HTTPShortLife    = 0x0100,
     HTTPMediumLife   = 0x0200,
-    HTTPLongLife     = 0x0400
+    HTTPLongLife     = 0x0400,
 };
 
 static QString s_multipartBoundary = "mYtHtVxXxXxX";

@@ -122,12 +122,7 @@ MSqlDatabase::~MSqlDatabase()
 
 bool MSqlDatabase::isOpen()
 {
-    if (m_db.isValid())
-    {
-        if (m_db.isOpen())
-            return true;
-    }
-    return false;
+    return m_db.isValid() && m_db.isOpen();
 }
 
 bool MSqlDatabase::OpenDatabase(bool skipdb)
@@ -867,7 +862,7 @@ bool MSqlQuery::prepare(const QString& query)
     if (!ok && lostConnectionCheck())
         ok = true;
 
-    if (!ok && !(GetMythDB()->SuppressDBMessages()))
+    if (!ok && !GetMythDB()->SuppressDBMessages())
     {
         LOG(VB_GENERAL, LOG_ERR,
             QString("Error preparing query: %1").arg(query));

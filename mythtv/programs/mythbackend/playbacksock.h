@@ -22,7 +22,7 @@ enum PlaybackSockEventsMode : std::uint8_t {
     kPBSEvents_None       = 0,
     kPBSEvents_Normal     = 1,
     kPBSEvents_NonSystem  = 2,
-    kPBSEvents_SystemOnly = 3
+    kPBSEvents_SystemOnly = 3,
 };
 
 class PlaybackSock : public ReferenceCounter

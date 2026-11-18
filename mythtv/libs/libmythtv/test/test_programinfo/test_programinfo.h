@@ -545,9 +545,9 @@ class TestProgramInfo : public QObject
         QDateTime recEndTs   {startTs};
 
         static const std::array<const QString,4> s_timeStr
-            { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
+            { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND" };
         static const std::array<const QDateTime *,4> time_dtr
-            { &recStartTs, &recEndTs, &startTs, &endTs, };
+            { &recStartTs, &recEndTs, &startTs, &endTs };
         QCOMPARE(s_timeStr.size(), (size_t)4);
         QCOMPARE(time_dtr.size(), (size_t)4);
     }

@@ -114,13 +114,11 @@ void MythUIButtonTree::SetTreeState(bool refreshAll)
         if (node)
             selectedNode = node->getSelectedChild(true);
 
-        if (refreshAll || m_activeListID < listid)
+        if ((refreshAll || m_activeListID < listid) &&
+            !UpdateList(list, node))
         {
-            if (!UpdateList(list, node))
-            {
-                listid++;
-                continue;
-            }
+            listid++;
+            continue;
         }
 
         if (m_active && (listid == m_activeListID))
@@ -290,40 +288,37 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
 
     bool foundit = false;
 
-    if (!route.isEmpty())
+    if (!route.isEmpty() && (route[0] == m_rootNode->GetText()))
     {
-        if (route[0] == m_rootNode->GetText())
+        if (route.size() > 1)
         {
-            if (route.size() > 1)
+            for (int i = 1; i < route.size(); i ++)
             {
-                for (int i = 1; i < route.size(); i ++)
+                MythGenericTree *node = foundNode->getChildByName(route[i]);
+
+                if (node)
                 {
-                    MythGenericTree *node = foundNode->getChildByName(route[i]);
+                    node->becomeSelectedChild();
+                    foundNode = node;
+                    foundit = true;
+                }
+                else
+                {
+                    node = foundNode->getChildAt(0);
 
                     if (node)
                     {
                         node->becomeSelectedChild();
                         foundNode = node;
-                        foundit = true;
                     }
-                    else
-                    {
-                        node = foundNode->getChildAt(0);
 
-                        if (node)
-                        {
-                            node->becomeSelectedChild();
-                            foundNode = node;
-                        }
-
-                        break;
-                    }
+                    break;
                 }
             }
-            else
-            {
-                foundit = true;
-            }
+        }
+        else
+        {
+            foundit = true;
         }
     }
 

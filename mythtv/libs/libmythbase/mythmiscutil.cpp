@@ -397,7 +397,7 @@ QString createTempFile(QString name_template, bool dir)
 
     if (dir)
     {
-        ret = (mkdtemp(ctemplate.data())) ? 0 : -1;
+        ret = mkdtemp(ctemplate.data()) ? 0 : -1;
     }
     else
     {

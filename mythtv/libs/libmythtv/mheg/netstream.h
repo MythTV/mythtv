@@ -97,7 +97,7 @@ private:
     mutable QMutex    m_mutex; // Protects r/w access to the following data
     QNetworkRequest   m_request;
     enum : std::uint8_t
-         { kClosed, kPending, kStarted, kReady, kFinished } m_state {kClosed};
+         { kClosed, kPending, kStarted, kReady, kFinished, } m_state {kClosed};
     NetStreamRequest* m_pending       {nullptr};
     QNetworkReply*    m_reply         {nullptr};
     int               m_nRedirections {0};

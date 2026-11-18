@@ -90,8 +90,8 @@ V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "V2Capture Cards."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "V2Capture Cards.");
 
     QString str = "SELECT cardid, parentid, videodevice, audiodevice, vbidevice, "
                   "cardtype, defaultinput, audioratelimit, hostname, "
@@ -124,7 +124,7 @@ V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::GetCaptureCardList()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -192,13 +192,13 @@ V2CaptureCardList* V2Capture::GetCaptureCardList( const QString &sHostName,
 V2CaptureCard* V2Capture::GetCaptureCard( int nCardId )
 {
     if ( nCardId < 1 )
-        throw( QString( "The Card ID is invalid."));
+        throw std::runtime_error("The Card ID is invalid.");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "V2Capture Cards."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "V2Capture Cards.");
 
     QString str = "SELECT cardid, parentid, videodevice, audiodevice, vbidevice, "
                   "cardtype, defaultinput, audioratelimit, hostname, "
@@ -219,7 +219,7 @@ V2CaptureCard* V2Capture::GetCaptureCard( int nCardId )
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::GetCaptureCard()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     auto* pCaptureCard = new V2CaptureCard();
@@ -331,7 +331,7 @@ bool V2Capture::RemoveAllCaptureCards( void )
 bool V2Capture::RemoveCaptureCard( int nCardId )
 {
     if ( nCardId < 1 )
-        throw( QString( "The Card ID is invalid."));
+        throw std::runtime_error("The Card ID is invalid.");
 
     bool bResult = CardUtil::DeleteInput(nCardId);
 
@@ -368,8 +368,8 @@ int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                                   bool             bDVBEITScan)
 {
     if ( sVideoDevice.isEmpty() || CardType.isEmpty() || sHostName.isEmpty() )
-        throw( QString( "This API requires at least a video device node, a card type, "
-                        "and a hostname." ));
+        throw std::runtime_error( "This API requires at least a video device "
+                                  "node, a card type, and a hostname.");
 
     int nResult = CardUtil::CreateCaptureCard(sVideoDevice, sAudioDevice,
                       sVBIDevice, CardType, nAudioRateLimit,
@@ -380,7 +380,7 @@ int V2Capture::AddCaptureCard     ( const QString    &sVideoDevice,
                       nColour, nHue, nDiSEqCId, bDVBEITScan);
 
     if ( nResult < 1 )
-        throw( QString( "Unable to create capture device." ));
+        throw std::runtime_error("Unable to create capture device.");
 
     return nResult;
 }
@@ -392,7 +392,7 @@ bool V2Capture::UpdateCaptureCard  ( int              nCardId,
                                    const QString    &sValue )
 {
     if ( nCardId < 1 || sSetting.isEmpty() )
-        throw( QString( "Card ID and Setting Name are required." ));
+        throw std::runtime_error("Card ID and Setting Name are required.");
 
     return set_on_input(sSetting, nCardId, sValue);
 }
@@ -402,7 +402,7 @@ bool V2Capture::UpdateCaptureCard  ( int              nCardId,
 bool V2Capture::RemoveCardInput( int nCardInputId )
 {
     if ( nCardInputId < 1 )
-        throw( QString( "The Input ID is invalid."));
+        throw std::runtime_error("The Input ID is invalid.");
 
     bool bResult = CardUtil::DeleteInput(nCardInputId);
 
@@ -427,11 +427,11 @@ int V2Capture::AddCardInput       ( const uint nCardId,
 {
     if ( nCardId < 1 || nSourceId < 1 ||
          sInputName.isEmpty() || sInputName == "None" )
-        throw( QString( "This API requires at least a card ID, a source ID, "
-                        "and an input name." ));
+        throw std::runtime_error("This API requires at least a card ID, a "
+                                 "source ID, and an input name.");
 
     if ( !CardUtil::IsUniqueDisplayName(sDisplayName, 0 ))
-        throw QString(" DisplayName is not set or is not unique.");
+        throw std::runtime_error("DisplayName is not set or is not unique.");
 
     int nResult = CardUtil::CreateCardInput(nCardId, nSourceId, sInputName,
                       sExternalCommand, sChangerDevice, sChangerModel,
@@ -447,7 +447,7 @@ bool V2Capture::UpdateCardInput    ( int              nCardInputId,
                                    const QString    &sValue )
 {
     if ( nCardInputId < 1 || sSetting.isEmpty() || sValue.isEmpty() )
-        throw( QString( "Input ID, Setting Name, and Value are required." ));
+        throw std::runtime_error("Input ID, Setting Name, and Value are required.");
 
     return set_on_input(sSetting, nCardInputId, sValue);
 }
@@ -529,8 +529,8 @@ V2InputGroupList*  V2Capture::GetUserInputGroupList ( void )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Input Groups."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Input Groups.");
 
     QString q = "SELECT cardinputid,inputgroupid,inputgroupname "
                 "FROM inputgroup WHERE inputgroupname LIKE 'user:%' "
@@ -556,7 +556,7 @@ V2InputGroupList*  V2Capture::GetUserInputGroupList ( void )
 int V2Capture::AddUserInputGroup(const QString & Name)
 {
     if (Name.isEmpty())
-        throw( QString( "Input group name cannot be empty." ) );
+        throw std::runtime_error("Input group name cannot be empty.");
 
     QString new_name = QString("user:") + Name;
 
@@ -564,7 +564,8 @@ int V2Capture::AddUserInputGroup(const QString & Name)
 
     if (inputgroupid == 0)
     {
-        throw( QString( "Failed to add or retrieve %1" ).arg(new_name) );
+        throw std::runtime_error(QString("Failed to add or retrieve %1")
+                                  .arg(new_name).toStdString());
     }
 
     return inputgroupid;
@@ -574,8 +575,8 @@ bool V2Capture::LinkInputGroup(const uint InputId,
                                const uint InputGroupId)
 {
     if (!CardUtil::LinkInputGroup(InputId, InputGroupId))
-        throw( QString ( "Failed to link input %1 to group %2" )
-               .arg(InputId).arg(InputGroupId));
+        throw std::runtime_error(QString("Failed to link input %1 to group %2")
+                                 .arg(InputId).arg(InputGroupId).toStdString());
     return true;
 }
 
@@ -584,8 +585,8 @@ bool V2Capture::UnlinkInputGroup(const uint InputId,
                                  const uint InputGroupId)
 {
     if (!CardUtil::UnlinkInputGroup(InputId, InputGroupId))
-        throw( QString ( "Failed to unlink input %1 from group %2" )
-               .arg(InputId).arg(InputGroupId));
+        throw std::runtime_error(QString("Failed to unlink input %1 from group %2")
+                                 .arg(InputId).arg(InputGroupId).toStdString());
     return true;
 }
 
@@ -816,8 +817,8 @@ V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "DiseqcTrees."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "DiseqcTrees.");
 
     QString str =  "SELECT diseqcid, "
                    "parentid, "
@@ -845,7 +846,7 @@ V2DiseqcTreeList* V2Capture::GetDiseqcTreeList  (  )
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::GetDiseqcTreeList()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -975,7 +976,7 @@ int  V2Capture::AddDiseqcTree ( uint           ParentId,
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::AddDiseqcTree()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     uint DiSEqCId  = query.lastInsertId().toInt();
     return DiSEqCId;
@@ -1059,7 +1060,7 @@ bool V2Capture::UpdateDiseqcTree  ( uint           DiSEqCId,
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::UpdateDiseqcTree()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     return true;
 }
@@ -1074,7 +1075,7 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiSEqCId)
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::RemoveDiseqcTree()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     bool childOK = true;
@@ -1090,7 +1091,7 @@ bool  V2Capture::RemoveDiseqcTree  ( uint DiSEqCId)
     if (!query2.exec())
     {
         MythDB::DBError("MythAPI::RemoveDiseqcTree()", query2);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     int numrows = query2.numRowsAffected();
     return numrows > 0 && childOK;
@@ -1103,8 +1104,8 @@ V2DiseqcConfigList* V2Capture::GetDiseqcConfigList  ( void )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "DiseqcConfigs."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "DiseqcConfigs.");
 
     QString str =  "SELECT cardinputid, "
                    "diseqcid, "
@@ -1116,7 +1117,7 @@ V2DiseqcConfigList* V2Capture::GetDiseqcConfigList  ( void )
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::GetDiseqcConfigList()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -1158,7 +1159,7 @@ bool V2Capture::AddDiseqcConfig  ( uint           CardId,
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::AddDiseqcConfig()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     return true;
 }
@@ -1172,7 +1173,7 @@ bool V2Capture::RemoveDiseqcConfig  ( uint  CardId )
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::RemoveDiseqcConfig()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     int numrows = query.numRowsAffected();
     return numrows > 0;
@@ -1220,7 +1221,7 @@ V2RecProfileGroupList* V2Capture::GetRecProfileGroupList ( uint GroupId, uint Pr
     if (!query.exec())
     {
         MythDB::DBError("MythAPI::GetRecProfileGroupList()", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -1295,7 +1296,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::AddRecProfile", query);
-        throw( QString( "Database Error executing SELECT." ));
+        throw std::runtime_error("Database Error executing SELECT.");
     }
     if (query.next())
     {
@@ -1317,7 +1318,7 @@ int V2Capture::AddRecProfile  ( uint GroupId, const QString& ProfileName,
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::AddRecProfile", query);
-        throw( QString( "Database Error executing INSERT." ));
+        throw std::runtime_error("Database Error executing INSERT.");
     }
     int id = query.lastInsertId().toInt();
     RecordingProfile profile(ProfileName);
@@ -1339,7 +1340,7 @@ bool V2Capture::UpdateRecProfile ( uint ProfileId,
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
-        throw( QString( "Database Error executing SELECT." ));
+        throw std::runtime_error("Database Error executing SELECT.");
     }
     uint id = -1;
     if (query.next())
@@ -1363,7 +1364,7 @@ bool V2Capture::UpdateRecProfile ( uint ProfileId,
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
-        throw( QString( "Database Error executing UPDATE." ));
+        throw std::runtime_error("Database Error executing UPDATE.");
     }
     RecordingProfile profile;
     profile.loadByID(ProfileId);
@@ -1383,7 +1384,7 @@ bool V2Capture::DeleteRecProfile ( uint ProfileId )
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
-        throw( QString( "Database Error executing DELETE." ));
+        throw std::runtime_error("Database Error executing DELETE.");
     }
     int rows = query.numRowsAffected();
     query.prepare(
@@ -1393,7 +1394,7 @@ bool V2Capture::DeleteRecProfile ( uint ProfileId )
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
-        throw( QString( "Database Error executing DELETE." ));
+        throw std::runtime_error("Database Error executing DELETE.");
     }
     return (rows > 0);
 }
@@ -1414,7 +1415,7 @@ bool V2Capture::UpdateRecProfileParam ( uint ProfileId, const QString  &Name, co
     if (!query.exec())
     {
         MythDB::DBError("V2Capture::UpdateRecProfileParam", query);
-        throw( QString( "Database Error executing REPLACE." ));
+        throw std::runtime_error("Database Error executing REPLACE.");
     }
     return true;
 }

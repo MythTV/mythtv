@@ -405,7 +405,7 @@ void SignalMonitor::RemoveListener(SignalMonitorListener *listener)
             new_listeners.push_back(entry);
     }
 
-    m_listeners = new_listeners;
+    m_listeners = std::move(new_listeners);
 }
 
 void SignalMonitor::SendMessage(

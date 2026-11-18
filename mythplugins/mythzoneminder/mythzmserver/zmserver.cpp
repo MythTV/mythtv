@@ -230,29 +230,29 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
     {
         shared_data_size = sizeof(SharedData34) +
             sizeof(TriggerData26) +
-            ((m_imageBufferCount) * (sizeof(struct timeval))) +
-            ((m_imageBufferCount) * frame_size) + 64;
+            (m_imageBufferCount * (sizeof(struct timeval))) +
+            (m_imageBufferCount * frame_size) + 64;
     }
     else if (checkVersion(1, 32, 0))
     {
         shared_data_size = sizeof(SharedData32) +
             sizeof(TriggerData26) +
-            ((m_imageBufferCount) * (sizeof(struct timeval))) +
-            ((m_imageBufferCount) * frame_size) + 64;
+            (m_imageBufferCount * (sizeof(struct timeval))) +
+            (m_imageBufferCount * frame_size) + 64;
     }
     else if (checkVersion(1, 26, 0))
     {
         shared_data_size = sizeof(SharedData26) +
             sizeof(TriggerData26) +
-            ((m_imageBufferCount) * (sizeof(struct timeval))) +
-            ((m_imageBufferCount) * frame_size) + 64;
+            (m_imageBufferCount * (sizeof(struct timeval))) +
+            (m_imageBufferCount * frame_size) + 64;
     }
     else
     {
         shared_data_size = sizeof(SharedData) +
             sizeof(TriggerData) +
-            ((m_imageBufferCount) * (sizeof(struct timeval))) +
-            ((m_imageBufferCount) * frame_size);
+            (m_imageBufferCount * (sizeof(struct timeval))) +
+            (m_imageBufferCount * frame_size);
     }
 
 #if _POSIX_MAPPED_FILES > 0L
@@ -344,7 +344,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData34) + sizeof(TriggerData26) + sizeof(VideoStoreData) +
-            ((m_imageBufferCount) * sizeof(struct timeval)) ;
+            (m_imageBufferCount * sizeof(struct timeval)) ;
 
         if (((unsigned long)m_sharedImages % 64) != 0)
         {
@@ -361,7 +361,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData32) + sizeof(TriggerData26) + sizeof(VideoStoreData) +
-            ((m_imageBufferCount) * sizeof(struct timeval)) ;
+            (m_imageBufferCount * sizeof(struct timeval)) ;
 
         if (((unsigned long)m_sharedImages % 64) != 0)
         {
@@ -378,7 +378,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData26) + sizeof(TriggerData26) +
-            ((m_imageBufferCount) * sizeof(struct timeval));
+            (m_imageBufferCount * sizeof(struct timeval));
 
         if (((unsigned long)m_sharedImages % 16) != 0)
         {
@@ -395,7 +395,7 @@ void MONITOR::initMonitor(bool debug, const std::string &mmapPath, int shmKey)
 
         m_sharedImages = (unsigned char*) m_shmPtr +
             sizeof(SharedData) + sizeof(TriggerData) +
-            ((m_imageBufferCount) * sizeof(struct timeval));
+            (m_imageBufferCount * sizeof(struct timeval));
     }
 }
 

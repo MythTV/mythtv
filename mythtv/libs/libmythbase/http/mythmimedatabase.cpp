@@ -39,7 +39,7 @@ class MythMimeDatabasePriv
             { "application/x-plist",               ".plist", { QByteArrayLiteral("bplist00") }, 50, {}},
             { "application/x-apple-binary-plist",  ".plist", { QByteArrayLiteral("bplist00") }, 50, {}},
             { "text/x-apple-plist+xml",            ".plist", { QStringLiteral("http://www.apple.com/DTDs/PropertyList-1.0.dtd") },
-              50, { "text/plain", "application/xml"}}
+              50, { "text/plain", "application/xml"},},
         };
 
         LOG(VB_GENERAL, LOG_DEBUG, LOC +
@@ -93,10 +93,11 @@ class MythMimeDatabasePriv
                 if (Data.contains(*bytes) && (mime.m_weight > result.m_weight))
                     result = mime;
             }
-            else if (const auto * string = std::get_if<QString>(&mime.m_magic); string)
+            else if (const auto * string = std::get_if<QString>(&mime.m_magic);
+                     string && QString(Data.constData()).contains(*string, Qt::CaseInsensitive) &&
+                     (mime.m_weight > result.m_weight))
             {
-                if (QString(Data.constData()).contains(*string, Qt::CaseInsensitive) && (mime.m_weight > result.m_weight))
-                    result = mime;
+                result = mime;
             }
         }
         return result;

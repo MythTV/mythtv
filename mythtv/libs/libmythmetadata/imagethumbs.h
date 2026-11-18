@@ -33,7 +33,7 @@ enum ImageThumbPriority : std::int8_t {
     kUrgentPriority     = -10, //!< Scanner request needed to complete a scan
     kPicRequestPriority =  -7, //!< Client request to display an image thumbnail
     kDirRequestPriority =  -3, //!< Client request to display a directory thumbnail
-    kBackgroundPriority =   0  //!< Scanner background request
+    kBackgroundPriority =   0,  //!< Scanner background request
 };
 
 

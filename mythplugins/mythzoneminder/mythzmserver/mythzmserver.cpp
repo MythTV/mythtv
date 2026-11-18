@@ -284,7 +284,7 @@ int main(int argc, char **argv)
     myaddr.sin_family = AF_INET;
     myaddr.sin_addr.s_addr = INADDR_ANY;
     myaddr.sin_port = htons(port);
-    memset(&(myaddr.sin_zero), '\0', 8);
+    memset(&myaddr.sin_zero, '\0', 8);
     if (::bind(listener, (struct sockaddr *)&myaddr, sizeof(myaddr)) == -1)
     {
         perror("bind");

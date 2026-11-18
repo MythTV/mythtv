@@ -118,7 +118,7 @@ class MTV_PUBLIC MythCodecContext
         AV1Main,
         AV1High,
         AV1Professional,
-        MJPEG
+        MJPEG,
     };
 
     explicit MythCodecContext(DecoderBase *Parent, MythCodecID CodecID);

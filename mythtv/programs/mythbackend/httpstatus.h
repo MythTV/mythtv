@@ -22,7 +22,7 @@ enum HttpStatusMethod : std::uint8_t
 {
     HSM_Unknown         =  0,
     HSM_GetStatusHTML   =  1,
-    HSM_GetStatusXML    =  2
+    HSM_GetStatusXML    =  2,
 
 };
 

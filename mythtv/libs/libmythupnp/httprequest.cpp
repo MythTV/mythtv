@@ -190,8 +190,8 @@ static std::array<const MIMETypes,66> g_MIMETypes
     // Font Mime Types
     { .pszExtension="ttf"  , .pszType="font/ttf"                  },
     { .pszExtension="woff" , .pszType="font/woff"                 },
-    { .pszExtension="woff2", .pszType="font/woff2"                }
-}};
+    { .pszExtension="woff2", .pszType="font/woff2"                },
+},};
 
 // NOTE 1
 // This formerly was video/x-matroska, but got changed due to #8643
@@ -401,7 +401,7 @@ qint64 HTTPRequest::SendResponse( void )
             LOG(VB_HTTP, LOG_INFO,
                 QString("HTTPRequest::SendResponse( File ) :%1 -> %2:")
                     .arg(GetResponseStatus(), GetPeerAddress()));
-            return( SendResponseFile( m_sFileName ));
+            return SendResponseFile( m_sFileName );
         case ResponseTypeOther:
         case ResponseTypeHeader:
         default:
@@ -988,11 +988,11 @@ QString HTTPRequest::GetResponseProtocol()
 HttpContentType HTTPRequest::SetContentType( const QString &sType )
 {
     if ((sType == "application/x-www-form-urlencoded"          ) ||
-        (sType.startsWith("application/x-www-form-urlencoded;")))
+        sType.startsWith("application/x-www-form-urlencoded;"))
         return( m_eContentType = ContentType_Urlencoded );
 
     if ((sType == "text/xml"                                   ) ||
-        (sType.startsWith("text/xml;")                         ))
+        sType.startsWith("text/xml;")                         )
         return( m_eContentType = ContentType_XML        );
 
     if ((sType == "application/json") ||
@@ -1099,7 +1099,7 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
         ext = type.pszExtension;
 
         if ( sFileExtension.compare(ext, Qt::CaseInsensitive) == 0 )
-            return( type.pszType );
+            return type.pszType ;
     }
 
     return "text/plain";
@@ -2089,7 +2089,7 @@ QString BufferedSocketDeviceRequest::ReadLine( std::chrono::milliseconds msecs )
         timer.start();
         while (!m_pSocket->canReadLine() && !timeout)
         {
-            timeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
+            timeout = !m_pSocket->waitForReadyRead( msecs.count() );
 
             if ( timer.elapsed() >= msecs )
             {
@@ -2116,14 +2116,14 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
         m_pSocket->state() == QAbstractSocket::ConnectedState)
     {
         if (msecs == 0ms)
-            return( m_pSocket->read( pData, nMaxLen ));
+            return m_pSocket->read( pData, nMaxLen );
 
         bool bTimeout = false;
         MythTimer timer;
         timer.start();
         while ( (m_pSocket->bytesAvailable() < (int)nMaxLen) && !bTimeout ) // This can end up waiting far longer than msecs
         {
-            bTimeout = !(m_pSocket->waitForReadyRead( msecs.count() ));
+            bTimeout = !m_pSocket->waitForReadyRead( msecs.count() );
 
             if ( timer.elapsed() >= msecs )
             {
@@ -2134,7 +2134,7 @@ qint64 BufferedSocketDeviceRequest::ReadBlock(char *pData, qint64 nMaxLen,
 
         // Just return what we have even if timed out.
 
-        return( m_pSocket->read( pData, nMaxLen ));
+        return m_pSocket->read( pData, nMaxLen );
     }
 
     return( -1 );
@@ -2172,7 +2172,7 @@ QString BufferedSocketDeviceRequest::GetHostAddress()
 
 quint16 BufferedSocketDeviceRequest::GetHostPort()
 {
-    return( m_pSocket->localPort() );
+    return m_pSocket->localPort() ;
 }
 
 

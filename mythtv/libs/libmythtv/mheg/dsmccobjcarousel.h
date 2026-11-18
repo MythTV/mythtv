@@ -38,7 +38,7 @@ class DSMCCCacheModuleData
     /// Return the, possibly uncompressed, module size
     unsigned long  DataSize(void) const
     {
-        return (m_descriptorData.m_isCompressed) ?
+        return m_descriptorData.m_isCompressed ?
             m_descriptorData.m_originalSize : m_moduleSize;
     }
 

@@ -82,7 +82,7 @@ bool PrePostRollFlagger::go()
         m_myTotalFrames = m_player->GetTotalFrameCount();
     else
         m_myTotalFrames = (long long)(m_player->GetFrameRate() *
-                        (m_recordingStartedAt.secsTo(m_recordingStopsAt)));
+                        m_recordingStartedAt.secsTo(m_recordingStopsAt));
 
 
 
@@ -266,7 +266,7 @@ long long PrePostRollFlagger::findBreakInrange(long long startFrame,
 
         if (((currentFrameNumber % 500) == 0) ||
             (((currentFrameNumber % 100) == 0) &&
-             (m_stillRecording)))
+             m_stillRecording))
         {
             emit breathe();
             if (m_bStop)

@@ -37,17 +37,17 @@
 
 const std::array<const int,14> MpegRecorder::kAudRateL1
 {
-    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
+    32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448,
 };
 
 const std::array<const int,14> MpegRecorder::kAudRateL2
 {
-    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384
+    32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384,
 };
 
 const std::array<const int,14> MpegRecorder::kAudRateL3
 {
-    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320,
 };
 
 const std::array<const std::string,15> MpegRecorder::kStreamType
@@ -55,12 +55,12 @@ const std::array<const std::string,15> MpegRecorder::kStreamType
     "MPEG-2 PS", "MPEG-2 TS",     "MPEG-1 VCD",    "PES AV",
     "",          "PES V",          "",             "PES A",
     "",          "",              "DVD",           "VCD",
-    "SVCD",      "DVD-Special 1", "DVD-Special 2"
+    "SVCD",      "DVD-Special 1", "DVD-Special 2",
 };
 
 const std::array<const std::string,4> MpegRecorder::kAspectRatio
 {
-    "Square", "4:3", "16:9", "2.21:1"
+    "Square", "4:3", "16:9", "2.21:1",
 };
 
 void MpegRecorder::TeardownAll(void)
@@ -926,7 +926,7 @@ bool MpegRecorder::SetVBIOptions(int chanfd)
 bool MpegRecorder::Open(void)
 {
     ResetForNewFile();
-    return (m_deviceIsMpegFile) ? OpenMpegFileAsInput() : OpenV4L2DeviceAsInput();
+    return m_deviceIsMpegFile ? OpenMpegFileAsInput() : OpenV4L2DeviceAsInput();
 }
 
 void MpegRecorder::run(void)
@@ -1037,7 +1037,7 @@ void MpegRecorder::run(void)
         if (m_deviceReadBuffer)
         {
             len = m_deviceReadBuffer->Read
-                  (&(buffer[remainder]), m_bufferSize - remainder);
+                  (&buffer[remainder], m_bufferSize - remainder);
 
             // Check for DRB errors
             if (m_deviceReadBuffer->IsErrored())
@@ -1136,7 +1136,7 @@ void MpegRecorder::run(void)
                 }
             }
 
-            len = read(m_readfd, &(buffer[remainder]), m_bufferSize - remainder);
+            len = read(m_readfd, &buffer[remainder], m_bufferSize - remainder);
 
             if (len < 0 && !has_select)
             {
@@ -1146,7 +1146,7 @@ void MpegRecorder::run(void)
                 continue;
             }
 
-            if ((len == 0) && (m_deviceIsMpegFile))
+            if ((len == 0) && m_deviceIsMpegFile)
             {
                 close(m_readfd);
                 m_readfd = open(vdevice.constData(), O_RDONLY);
@@ -1154,7 +1154,7 @@ void MpegRecorder::run(void)
                 if (m_readfd >= 0)
                 {
                     len = read(m_readfd,
-                               &(buffer[remainder]), m_bufferSize - remainder);
+                               &buffer[remainder], m_bufferSize - remainder);
                 }
 
                 if (len <= 0)

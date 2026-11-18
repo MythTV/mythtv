@@ -157,18 +157,14 @@ QString toString(const QDate date, uint format)
         else
             stringformat = gCoreContext->GetSetting("DateFormat", "ddd d MMMM");
 
-        if (format & kAddYear)
-        {
-            if (!stringformat.contains("yy")) // Matches both 2 or 4 digit year
-                stringformat.append(" yyyy");
-        }
+        if ((format & kAddYear) &&
+            !stringformat.contains("yy")) // Matches both 2 or 4 digit year
+            stringformat.append(" yyyy");
 
-        if (format & kAutoYear)
-        {
-            if (!stringformat.contains("yy") // Matches both 2 or 4 digit year
-                && date.year() != QDateTime::currentDateTime().date().year())
-                stringformat.append(" yyyy");
-        }
+        if ((format & kAutoYear) &&
+            !stringformat.contains("yy") && // Matches both 2 or 4 digit year
+            date.year() != QDateTime::currentDateTime().date().year())
+            stringformat.append(" yyyy");
 
         if (format & ~kDateShort)
         {

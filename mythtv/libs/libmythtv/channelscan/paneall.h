@@ -44,7 +44,7 @@ class PaneAll : public GroupSetting
         setting->addTargetedChildren(target,
                                      {this,
                                       m_ignoreSignalTimeout,
-                                      m_followNit});
+                                      m_followNit,});
     }
 
     bool ignoreSignalTimeout(void) const

@@ -36,7 +36,7 @@ bool UpgradeNewsDatabaseSchema(void)
             "  category  VARCHAR(255) NOT NULL,"
             "  url  VARCHAR(255) NOT NULL,"
             "  ico  VARCHAR(255),"
-            "  updated INT UNSIGNED);"
+            "  updated INT UNSIGNED);",
         };
         if (!performActualUpdate("MythNews", MythNewsVersionName,
                                  updates, "1000", dbver))
@@ -47,7 +47,7 @@ bool UpgradeNewsDatabaseSchema(void)
     {
         DBUpdates updates
         {
-            "ALTER TABLE `newssites` ADD `podcast` BOOL NOT NULL DEFAULT '0';"
+            "ALTER TABLE `newssites` ADD `podcast` BOOL NOT NULL DEFAULT '0';",
         };
 
         if (!performActualUpdate("MythNews", MythNewsVersionName,

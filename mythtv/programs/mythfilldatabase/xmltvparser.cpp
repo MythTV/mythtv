@@ -302,7 +302,7 @@ bool XMLTVParser::parseFile(
                             {
                                 QString base = baseUrl.toString(QUrl::StripTrailingSlash);
                                 chaninfo->m_icon = base +
-                                                   ((path.startsWith("/")) ? path : QString("/") + path);
+                                                   (path.startsWith("/") ? path : QString("/") + path);
                             }
                             else if (!path.isEmpty())
                             {
@@ -471,12 +471,9 @@ bool XMLTVParser::parseFile(
                         {
                             if (!readNextWithErrorCheck(xml))
                                 return false;
-                            if (xml.isStartElement())
+                            if (xml.isStartElement() && (xml.name() == QString("value")))
                             {
-                                if (xml.name() == QString("value"))
-                                {
-                                    stars=xml.readElementText(QXmlStreamReader::SkipChildElements);
-                                }
+                                stars=xml.readElementText(QXmlStreamReader::SkipChildElements);
                             }
                         }
                         if (pginfo->m_stars == 0.0F)
@@ -501,12 +498,9 @@ bool XMLTVParser::parseFile(
                         {
                             if (!readNextWithErrorCheck(xml))
                                 return false;
-                            if (xml.isStartElement())
+                            if (xml.isStartElement() && (xml.name() == QString("value")))
                             {
-                                if (xml.name() == QString("value"))
-                                {
-                                    rat=xml.readElementText(QXmlStreamReader::SkipChildElements);
-                                }
+                                rat=xml.readElementText(QXmlStreamReader::SkipChildElements);
                             }
                         }
 
@@ -522,7 +516,7 @@ bool XMLTVParser::parseFile(
                     {
                         pginfo->m_previouslyshown = true;
                         QString prevdate = xml.attributes().value( "start").toString();
-                        if ((!prevdate.isEmpty()) && (pginfo->m_originalairdate.isNull()))
+                        if ((!prevdate.isEmpty()) && pginfo->m_originalairdate.isNull())
                         {
                             QDateTime date;
                             fromXMLTVDate(prevdate, date);
@@ -577,27 +571,24 @@ bool XMLTVParser::parseFile(
                         {
                             if (!readNextWithErrorCheck(xml))
                                 return false;
-                            if (xml.isStartElement())
+                            if (xml.isStartElement() && (xml.name() == QString("stereo")))
                             {
-                                if (xml.name() == QString("stereo"))
+                                QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
+                                if (text2 == "mono")
                                 {
-                                    QString text2=xml.readElementText(QXmlStreamReader::SkipChildElements);
-                                    if (text2 == "mono")
-                                    {
-                                        pginfo->m_audioProps |= AUD_MONO;
-                                    }
-                                    else if (text2 == "stereo")
-                                    {
-                                        pginfo->m_audioProps |= AUD_STEREO;
-                                    }
-                                    else if (text2 == "dolby" || text2 == "dolby digital")
-                                    {
-                                        pginfo->m_audioProps |= AUD_DOLBY;
-                                    }
-                                    else if (text2 == "surround")
-                                    {
-                                        pginfo->m_audioProps |= AUD_SURROUND;
-                                    }
+                                    pginfo->m_audioProps |= AUD_MONO;
+                                }
+                                else if (text2 == "stereo")
+                                {
+                                    pginfo->m_audioProps |= AUD_STEREO;
+                                }
+                                else if (text2 == "dolby" || text2 == "dolby digital")
+                                {
+                                    pginfo->m_audioProps |= AUD_DOLBY;
+                                }
+                                else if (text2 == "surround")
+                                {
+                                    pginfo->m_audioProps |= AUD_SURROUND;
                                 }
                             }
                         }
@@ -615,10 +606,10 @@ bool XMLTVParser::parseFile(
                                     if (xml.readElementText(QXmlStreamReader::SkipChildElements) == "HDTV")
                                         pginfo->m_videoProps |= VID_HDTV;
                                 }
-                                else if (xml.name() == QString("aspect"))
+                                else if ((xml.name() == QString("aspect")) &&
+                                         (xml.readElementText(QXmlStreamReader::SkipChildElements) == "16:9"))
                                 {
-                                    if (xml.readElementText(QXmlStreamReader::SkipChildElements) == "16:9")
-                                        pginfo->m_videoProps |= VID_WIDESCREEN;
+                                    pginfo->m_videoProps |= VID_WIDESCREEN;
                                 }
                             }
                         }
@@ -695,7 +686,7 @@ bool XMLTVParser::parseFile(
                                 pginfo->m_subtitle = xml.readElementText(QXmlStreamReader::SkipChildElements);
                             }
                         }
-                        else if ((system == "themoviedb.org") &&  (m_movieGrabberPath.endsWith(QString("/tmdb3.py"))))
+                        else if ((system == "themoviedb.org") &&  m_movieGrabberPath.endsWith(QString("/tmdb3.py")))
                         {
                             // text is movie/<inetref>
                             QString inetrefRaw(xml.readElementText(QXmlStreamReader::SkipChildElements));
@@ -705,7 +696,7 @@ bool XMLTVParser::parseFile(
                                 pginfo->m_inetref = inetref;
                             }
                         }
-                        else if ((system == "thetvdb.com") && (m_tvGrabberPath.endsWith(QString("/ttvdb4.py"))))
+                        else if ((system == "thetvdb.com") && m_tvGrabberPath.endsWith(QString("/ttvdb4.py")))
                         {
                             // text is series/<inetref>
                             QString inetrefRaw(xml.readElementText(QXmlStreamReader::SkipChildElements));
@@ -798,7 +789,7 @@ bool XMLTVParser::parseFile(
                     }
                 }
                 pginfo->m_programId = programid;
-                if (!(pginfo->m_starttime.isValid()))
+                if (!pginfo->m_starttime.isValid())
                 {
                     LOG(VB_GENERAL, LOG_WARNING, QString("Invalid programme (%1), " "invalid start time, " "skipping").arg(pginfo->m_title));
                 }

@@ -79,7 +79,7 @@ void TestSubtitleScreen::test608()
     CC608Text line5 { QChar(0x7001) + QString("Line 5"), 0, 0};
     CC608Text line6 { QString("Line 6") + QChar(0x7000), 0, 0};
     const std::vector<CC608Text*> buffers {
-        &line0, &line1, &line2, &line3, &line4, &line5, &line6};
+        &line0, &line1, &line2, &line3, &line4, &line5, &line6,};
 
     auto *cc608 = new FormattedTextSubtitle608(buffers, dummy, QRect(), nullptr);
     QVERIFY(cc608 != nullptr);

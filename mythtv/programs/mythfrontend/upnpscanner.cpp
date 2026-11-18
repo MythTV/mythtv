@@ -508,12 +508,12 @@ void UPNPScanner::Update(void)
     for (auto *server : std::as_const(m_servers))
     {
         if ((server->m_connectionAttempts < MAX_ATTEMPTS) &&
-            (server->m_controlURL.isEmpty()))
+            server->m_controlURL.isEmpty())
         {
             bool sent = false;
             QUrl url { server->m_serverURL };
             if (!m_descriptionRequests.contains(url) &&
-                (m_descriptionRequests.empty()) &&
+                m_descriptionRequests.empty() &&
                 url.isValid())
             {
                 QNetworkReply *reply = m_network->get(QNetworkRequest(url));
@@ -1394,9 +1394,8 @@ void UPNPScanner::ParseServiceList(QDomElement &element, QUrl &controlURL,
     while (!list.isNull())
     {
         QDomElement e = list.toElement();
-        if (!e.isNull())
-            if (e.tagName() == "service")
-                ParseService(e, controlURL, eventURL);
+        if (!e.isNull() && (e.tagName() == "service"))
+            ParseService(e, controlURL, eventURL);
         list = list.nextSibling();
     }
 }
@@ -1427,8 +1426,8 @@ void UPNPScanner::ParseService(QDomElement &element, QUrl &controlURL,
 
     if (iscds)
     {
-        controlURL = control_url;
-        eventURL   = event_url;
+        controlURL = std::move(control_url);
+        eventURL   = std::move(event_url);
     }
 }
 

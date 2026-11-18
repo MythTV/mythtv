@@ -19,24 +19,24 @@
 
 enum DialogType : std::uint8_t
                 { DLG_DEFAULT = 0, DLG_GALLERY = 0x1, DLG_TREE = 0x2,
-                  DLG_BROWSER = 0x4 };
+                  DLG_BROWSER = 0x4, };
 
 enum TreeNodeType : std::int8_t {
     kSubFolder = -1,
     kUpFolder = -2,
     kRootNode = -3,
-    kNoFilesFound = -4
+    kNoFilesFound = -4,
 };
 
 // Tree node attribute index
 enum TreeNodeAttributes : std::uint8_t {
-    kNodeSort
+    kNodeSort,
 };
 
 enum NodeOrder : std::uint8_t {
     kOrderUp,
     kOrderSub,
-    kOrderItem
+    kOrderItem,
 };
 
 class NetTree : public NetBase

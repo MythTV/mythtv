@@ -113,7 +113,7 @@ void MythDRMHDR::SetHDRMetadata(HDRType Type, const MythHDRMetaPtr& Metadata)
     {
         HDMI_STATIC_METADATA_TYPE1,
         { static_cast<__u8>(eotf), HDMI_STATIC_METADATA_TYPE1,
-          {{.x=0, .y=0}}, {.x=0,.y=0}, 0, 0, 0, 0}
+          {{.x=0, .y=0}}, {.x=0,.y=0}, 0, 0, 0, 0,},
     };
 
     if (Metadata)

@@ -1733,7 +1733,7 @@ void MetadataOptions::customEvent(QEvent *levent)
             for (int p = 0; p != list.size(); ++p)
             {
                 if (!m_recordingRule->m_seriesid.isEmpty() &&
-                    m_recordingRule->m_seriesid == (list[p])->GetTMSref())
+                    m_recordingRule->m_seriesid == list[p]->GetTMSref())
                 {
                     MetadataLookup *lookup = list[p];
                     QueryComplete(lookup);
@@ -1741,8 +1741,8 @@ void MetadataOptions::customEvent(QEvent *levent)
                 }
                 if (m_recInfo &&
                     m_recInfo->GetYearOfInitialRelease() != 0 &&
-                    (list[p])->GetYear() != 0 &&
-                    m_recInfo->GetYearOfInitialRelease() == (list[p])->GetYear())
+                    list[p]->GetYear() != 0 &&
+                    m_recInfo->GetYearOfInitialRelease() == list[p]->GetYear())
                 {
                     if (yearindex > -1)
                     {

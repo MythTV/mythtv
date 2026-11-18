@@ -620,18 +620,16 @@ void MythOpenGLVideo::PrepareFrame(MythVideoFrame* Frame, FrameScanType Scan)
 
     // Rotate textures if necessary
     bool current = true;
-    if (m_deinterlacer == DEINT_MEDIUM || m_deinterlacer == DEINT_HIGH)
+    if ((m_deinterlacer == DEINT_MEDIUM || m_deinterlacer == DEINT_HIGH) &&
+        !m_nextTextures.empty() && !m_prevTextures.empty())
     {
-        if (!m_nextTextures.empty() && !m_prevTextures.empty())
-        {
-            if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
-                ResetTextures();
-            std::vector<MythVideoTextureOpenGL*> temp = m_prevTextures;
-            m_prevTextures = m_inputTextures;
-            m_inputTextures = m_nextTextures;
-            m_nextTextures = temp;
-            current = false;
-        }
+        if (qAbs(Frame->m_frameCounter - m_discontinuityCounter) > 1)
+            ResetTextures();
+        std::vector<MythVideoTextureOpenGL*> temp = m_prevTextures;
+        m_prevTextures = m_inputTextures;
+        m_inputTextures = m_nextTextures;
+        m_nextTextures = std::move(temp);
+        current = false;
     }
 
     m_discontinuityCounter = Frame->m_frameCounter;
@@ -880,7 +878,7 @@ void MythOpenGLVideo::RenderFrame(MythVideoFrame* Frame, bool TopFieldFirst, Fra
     // check hardware frames have the correct filtering
     if (hwframes)
     {
-        QOpenGLTexture::Filter filter = (resize.testFlag(Sampling)) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
+        QOpenGLTexture::Filter filter = resize.testFlag(Sampling) ? QOpenGLTexture::Nearest : QOpenGLTexture::Linear;
         if (inputtextures[0]->m_filter != filter)
             MythVideoTextureOpenGL::SetTextureFilters(m_openglRender, inputtextures, filter);
     }
@@ -1045,24 +1043,22 @@ void MythOpenGLVideo::ResetTextures()
 void MythOpenGLVideo::BindTextures(bool Deinterlacing, std::vector<MythVideoTextureOpenGL*>& Current,
                                    std::vector<MythGLTexture*>& Textures)
 {
-    if (Deinterlacing && !MythVideoFrame::HardwareFormat(m_inputType))
+    if (Deinterlacing && !MythVideoFrame::HardwareFormat(m_inputType) &&
+        (m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
     {
-        if ((m_nextTextures.size() == Current.size()) && (m_prevTextures.size() == Current.size()))
-        {
-            // if we are using reference frames, we want the current frame in the middle
-            // but next will be the first valid, followed by current...
-            size_t count = Current.size();
-            std::vector<MythVideoTextureOpenGL*>& current = Current[0]->m_valid ? Current : m_nextTextures;
-            std::vector<MythVideoTextureOpenGL*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
+        // if we are using reference frames, we want the current frame in the middle
+        // but next will be the first valid, followed by current...
+        size_t count = Current.size();
+        std::vector<MythVideoTextureOpenGL*>& current = Current[0]->m_valid ? Current : m_nextTextures;
+        std::vector<MythVideoTextureOpenGL*>& prev    = m_prevTextures[0]->m_valid ? m_prevTextures : current;
 
-            for (uint i = 0; i < count; ++i)
-                Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
-            for (uint i = 0; i < count; ++i)
-                Textures.push_back(reinterpret_cast<MythGLTexture*>(current[i]));
-            for (uint i = 0; i < count; ++i)
-                Textures.push_back(reinterpret_cast<MythGLTexture*>(m_nextTextures[i]));
-            return;
-        }
+        for (uint i = 0; i < count; ++i)
+            Textures.push_back(reinterpret_cast<MythGLTexture*>(prev[i]));
+        for (uint i = 0; i < count; ++i)
+            Textures.push_back(reinterpret_cast<MythGLTexture*>(current[i]));
+        for (uint i = 0; i < count; ++i)
+            Textures.push_back(reinterpret_cast<MythGLTexture*>(m_nextTextures[i]));
+        return;
     }
 
     std::ranges::transform(Current, std::back_inserter(Textures),

@@ -106,7 +106,7 @@ void HDHRRecorder::run(void)
     m_streamData->AddAVListener(this);
     m_streamData->AddWritingListener(this);
     m_streamHandler->AddListener(m_streamData, false, false,
-                         (m_recordMpts) ? m_ringBuffer->GetFilename() : QString());
+                         m_recordMpts ? m_ringBuffer->GetFilename() : QString());
 
     while (IsRecordingRequested() && !IsErrored())
     {

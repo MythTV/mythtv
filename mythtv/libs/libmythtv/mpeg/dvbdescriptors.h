@@ -120,8 +120,8 @@ class LinkageDescriptor : public MPEGDescriptor
                 m_data = nullptr;
                 return;
             }
-            end += (HasMobileNetworkID()) ? 2 : 0;
-            end += (HasMobileInitialServiceID()) ? 2 : 0;
+            end += HasMobileNetworkID() ? 2 : 0;
+            end += HasMobileInitialServiceID() ? 2 : 0;
             if (DescriptorLength() < end)
                 m_data = nullptr;
             m_offset = end + 2;
@@ -766,7 +766,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     uint FrequencyRaw(void) const
     {
         return ((m_data[2]<<24) | (m_data[3]<<16) |
-                (m_data[4]<<8)  | (m_data[5]));
+                (m_data[4]<<8)  | m_data[5]);
     }
     unsigned long long FrequencyHz(void) const
     {
@@ -849,7 +849,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     uint FrequencyRaw(void) const
     {
         return ((m_data[2]<<24) | (m_data[3]<<16) |
-                (m_data[4]<<8)  | (m_data[5]));
+                (m_data[4]<<8)  | m_data[5]);
     }
     uint64_t FrequencykHz(void) const
     {
@@ -862,7 +862,7 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     {
         uint num = OrbitalPosition();
         return QString("%1.%2 %3").arg(num / 10).arg(num % 10)
-            .arg((IsEast()) ? "East" : "West");
+            .arg(IsEast() ? "East" : "West");
     }
     double OrbitalPositionFloat()  const
         { return ((double) OrbitalPosition()) / 10.0; }
@@ -958,7 +958,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     uint Frequency(void) const
     {
         return ((m_data[2]<<24) | (m_data[3]<<16) |
-                (m_data[4]<<8)  | (m_data[5]));
+                (m_data[4]<<8)  | m_data[5]);
     }
     uint64_t FrequencyHz(void) const { return uint64_t(Frequency()) * 10ULL; }
 
@@ -1038,7 +1038,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString CodeRateHPString(void) const
     {
         static const std::array<const QString,8> cr {
-            "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
+            "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto",
         };
         return cr[CodeRateHP()];
     }
@@ -1047,7 +1047,7 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     QString CodeRateLPString(void) const
     {
         static const std::array<const QString,8> cr {
-            "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto"
+            "1/2", "2/3", "3/4", "5/6", "7/8", "auto", "auto", "auto",
         };
         return cr[CodeRateLP()];
     }
@@ -1158,7 +1158,7 @@ class T2DeliverySystemDescriptor : public MPEGDescriptor
     // T2_system_id            16   4.0
     uint T2SystemID(void) const
     {
-        return ((m_data[4]<<8) | (m_data[5]));
+        return ((m_data[4]<<8) | m_data[5]);
     }
 
     // SISO/MISO                2   6.0
@@ -1520,7 +1520,7 @@ class C2DeliverySystemDescriptor : public MPEGDescriptor
     uint Frequency(void) const
     {
         return ((m_data[5]<<24) | (m_data[6]<<16) |
-                (m_data[7]<<8)  | (m_data[8]));
+                (m_data[7]<<8)  | m_data[8]);
     }
 
     //
@@ -1647,7 +1647,7 @@ class FrequencyListDescriptor : public MPEGDescriptor
             return (((unsigned long long)m_data[(i*4)+3]<<24) |
                                         (m_data[(i*4)+4]<<16) |
                                         (m_data[(i*4)+5]<<8)  |
-                                        (m_data[(i*4)+6]));
+                                        m_data[(i*4)+6]);
         }
         return byte4BCD2int(m_data[(i*4)+3], m_data[(i*4)+4],
                             m_data[(i*4)+5], m_data[(i*4)+6]);
@@ -2542,14 +2542,14 @@ class AC3Descriptor : public MPEGDescriptor
     // if (bsid_flag == 1)
     //   { bsid                 8 uimsbf }
     uint BSID(void) const
-        { return (HasComponentType()) ? m_data[4] : m_data[3]; }
+        { return HasComponentType() ? m_data[4] : m_data[3]; }
     // if (mainid_flag == 1)
     //   { mainid               8 uimsbf }
     uint MainID(void) const
     {
         int offset = 3;
-        offset += (HasComponentType()) ? 1 : 0;
-        offset += (HasBSID()) ? 1 : 0;
+        offset += HasComponentType() ? 1 : 0;
+        offset += HasBSID() ? 1 : 0;
         return m_data[offset];
     }
     // if (asvc_flag==1)
@@ -2557,9 +2557,9 @@ class AC3Descriptor : public MPEGDescriptor
     uint ASVC(void) const
     {
         int offset = 3;
-        offset += (HasComponentType()) ? 1 : 0;
-        offset += (HasBSID()) ? 1 : 0;
-        offset += (HasMainID()) ? 1 : 0;
+        offset += HasComponentType() ? 1 : 0;
+        offset += HasBSID() ? 1 : 0;
+        offset += HasMainID() ? 1 : 0;
         return m_data[offset];
     }
     // for (I=0;I<N;I++)

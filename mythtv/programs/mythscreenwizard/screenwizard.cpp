@@ -152,9 +152,9 @@ bool ScreenWizard::moveTLUp(void)
 
 bool ScreenWizard::moveTLDown(void)
 {
-    if (m_topLeftY > (m_bottomRightY - m_change - kMinHeight))
-        if (!moveBRDown())
-            return false;
+    if ((m_topLeftY > (m_bottomRightY - m_change - kMinHeight)) &&
+        !moveBRDown())
+        return false;
 
     m_topLeftY += m_change;
     return true;
@@ -171,9 +171,9 @@ bool ScreenWizard::moveTLLeft(void)
 
 bool ScreenWizard::moveTLRight(void)
 {
-    if (m_topLeftX > (m_bottomRightX - m_change - kMinWidth))
-        if (!moveBRRight())
-            return false;
+    if ((m_topLeftX > (m_bottomRightX - m_change - kMinWidth)) &&
+        !moveBRRight())
+        return false;
 
     m_topLeftX += m_change;
     return true;
@@ -181,9 +181,9 @@ bool ScreenWizard::moveTLRight(void)
 
 bool ScreenWizard::moveBRUp(void)
 {
-    if (m_bottomRightY < (m_topLeftY + m_change + kMinHeight))
-        if (!moveTLUp())
-            return false;
+    if ((m_bottomRightY < (m_topLeftY + m_change + kMinHeight)) &&
+        !moveTLUp())
+        return false;
 
     m_bottomRightY -= m_change;
     return true;
@@ -200,9 +200,9 @@ bool ScreenWizard::moveBRDown(void)
 
 bool ScreenWizard::moveBRLeft(void)
 {
-    if (m_bottomRightX < (m_topLeftX + m_change + kMinWidth))
-        if (!moveTLLeft())
-            return false;
+    if ((m_bottomRightX < (m_topLeftX + m_change + kMinWidth)) &&
+        !moveTLLeft())
+        return false;
 
     m_bottomRightX -= m_change;
     return true;

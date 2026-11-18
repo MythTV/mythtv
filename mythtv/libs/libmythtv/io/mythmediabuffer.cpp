@@ -137,7 +137,7 @@ MythMediaBuffer *MythMediaBuffer::Create(const QString &Filename, bool Write,
     if (!StreamOnly && mythurl)
     {
         struct stat fileInfo {};
-        if ((RemoteFile::Exists(filename, &fileInfo)) &&
+        if (RemoteFile::Exists(filename, &fileInfo) &&
             (S_ISDIR(fileInfo.st_mode)))
         {
             if (RemoteFile::Exists(filename + "/VIDEO_TS"))
@@ -886,7 +886,7 @@ void MythMediaBuffer::run(void)
             (m_ignoreReadPos >= 0) || m_commsError || m_stopReads)
         {
             ignoreForReadTiming |= (m_ignoreReadPos >= 0) || m_commsError || m_stopReads;
-            m_generalWait.wait(&m_rwLock, (m_stopReads) ? 50 : 1000);
+            m_generalWait.wait(&m_rwLock, m_stopReads ? 50 : 1000);
             LOG(VB_FILE, LOG_DEBUG, LOC +
                 QString("run: Not reading continuing: totfree(%1) "
                         "readsallowed(%2) ignorereadpos(%3) commserror(%4) "
@@ -1820,7 +1820,7 @@ long long MythMediaBuffer::GetWritePosition(void) const
 bool MythMediaBuffer::LiveMode(void) const
 {
     m_rwLock.lockForRead();
-    bool ret = (m_liveTVChain);
+    bool ret = m_liveTVChain;
     m_rwLock.unlock();
     return ret;
 }

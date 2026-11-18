@@ -48,22 +48,22 @@ static const std::array<const SmartPLField,13> SmartPLFields
     { .m_name="Genre",         .m_sqlName="music_genres.genre"        },
     { .m_name="Year",          .m_sqlName="music_songs.year",
       .m_type=ftNumeric,
-      .m_minValue=1900, .m_maxValue=2099, .m_defaultValue=2000 },
+      .m_minValue=1900, .m_maxValue=2099, .m_defaultValue=2000, },
     { .m_name="Track No.",     .m_sqlName="music_songs.track",
-      .m_type=ftNumeric,       .m_maxValue=99   },
+      .m_type=ftNumeric,       .m_maxValue=99,   },
     { .m_name="Rating",        .m_sqlName="music_songs.rating",
-      .m_type=ftNumeric,       .m_maxValue=10   },
+      .m_type=ftNumeric,       .m_maxValue=10,   },
     { .m_name="Play Count",    .m_sqlName="music_songs.numplays",
-      .m_type=ftNumeric,       .m_maxValue=9999 },
+      .m_type=ftNumeric,       .m_maxValue=9999, },
     { .m_name="Compilation",   .m_sqlName="music_albums.compilation",
-      .m_type=ftBoolean,       .m_maxValue=0    },
+      .m_type=ftBoolean,       .m_maxValue=0,    },
     { .m_name="Comp. Artist",  .m_sqlName="music_comp_artists.artist_name",
       .m_type=ftString, },
     { .m_name="Last Play",     .m_sqlName="FROM_DAYS(TO_DAYS(music_songs.lastplay))",
-      .m_type=ftDate   },
+      .m_type=ftDate,   },
     { .m_name="Date Imported", .m_sqlName="FROM_DAYS(TO_DAYS(music_songs.date_entered))",
-      .m_type=ftDate   },
-}};
+      .m_type=ftDate,   },
+},};
 
 struct SmartPLOperator
 {
@@ -86,7 +86,7 @@ static const std::array<const SmartPLOperator,11> SmartPLOperators
     { .m_name="is between",       .m_noOfArguments=2      },
     { .m_name="is set",           .m_noOfArguments=0      },
     { .m_name="is not set",       .m_noOfArguments=0      },
-}};
+},};
 
 static const SmartPLOperator *lookupOperator(const QString& name)
 {

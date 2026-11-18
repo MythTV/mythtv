@@ -526,9 +526,9 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             QCoreApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
-                  (nc->getArg(curToken).at(0).isLetterOrNumber())) ||
+                  nc->getArg(curToken).at(0).isLetterOrNumber()) ||
                  ((tokenLen >= 1) &&
-                  (nc->getArg(curToken).contains("+"))))
+                  nc->getArg(curToken).contains("+")))
         {
             QKeySequence a(nc->getArg(curToken));
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
@@ -558,11 +558,8 @@ QString NetworkControl::processKey(NetworkCommand *nc)
             int keyCode = a[0].key();
             Qt::KeyboardModifiers modifiers = a[0].keyboardModifiers();
 #endif
-            if (tokenLen == 1)
-            {
-                if (nc->getArg(curToken) == nc->getArg(curToken).toUpper())
-                    modifiers |= Qt::ShiftModifier;
-            }
+            if ((tokenLen == 1) && (nc->getArg(curToken) == nc->getArg(curToken).toUpper()))
+                modifiers |= Qt::ShiftModifier;
 
             MythMainWindow::ResetScreensaver();
 
@@ -597,7 +594,7 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                        .arg(nc->getArg(0));
 
     if ((nc->getArgCount() >= 3) &&
-        (is_abbrev("file", nc->getArg(1))))
+        is_abbrev("file", nc->getArg(1)))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu")
         {
@@ -623,9 +620,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
         }
     }
     else if ((nc->getArgCount() >= 4) &&
-             (is_abbrev("program", nc->getArg(1))) &&
-             (nc->getArg(2).contains(kChanID1RE)) &&
-             (nc->getArg(3).contains(kStartTimeRE)))
+             is_abbrev("program", nc->getArg(1)) &&
+             nc->getArg(2).contains(kChanID1RE) &&
+             nc->getArg(3).contains(kStartTimeRE))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
         {
@@ -899,9 +896,9 @@ QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
                            .arg(nc->getArg(0));
 
         QString token2 = nc->getArg(2).toLower();
-        if ((token2.contains(kSpeed1RE)) ||
-            (token2.contains(kSpeed2RE)) ||
-            (token2.contains(kSpeed3RE)))
+        if (token2.contains(kSpeed1RE) ||
+            token2.contains(kSpeed2RE) ||
+            token2.contains(kSpeed3RE))
             message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
         else if (is_abbrev("normal", token2))
             message = QString("NETWORK_CONTROL SPEED normal");
@@ -1112,8 +1109,8 @@ QString NetworkControl::processQuery(NetworkCommand *nc)
     }
     else if ((nc->getArgCount() == 4) &&
              is_abbrev("recording", nc->getArg(1)) &&
-             (nc->getArg(2).contains(kChanID1RE)) &&
-             (nc->getArg(3).contains(kStartTimeRE)))
+             nc->getArg(2).contains(kChanID1RE) &&
+             nc->getArg(3).contains(kStartTimeRE))
     {
         return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
     }
@@ -1526,12 +1523,12 @@ QString NetworkControl::processHelp(NetworkCommand *nc)
         helpText +=
             "exit                  - Terminates session\r\n\r\n";
     }
-    else if ((is_abbrev("message", command)))
+    else if (is_abbrev("message", command))
     {
         helpText +=
             "message               - Displays a simple text message popup\r\n";
     }
-    else if ((is_abbrev("notification", command)))
+    else if (is_abbrev("notification", command))
     {
         helpText +=
             "notification          - Displays a simple text message notification\r\n";
@@ -1625,7 +1622,7 @@ void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
         *clientStream << reply;
 
         if ((!reply.contains(crlfRegEx)) ||
-            ( reply.contains(crlfcrlfRegEx)))
+            reply.contains(crlfcrlfRegEx))
             *clientStream << "\r\n" << m_prompt;
 
         clientStream->flush();

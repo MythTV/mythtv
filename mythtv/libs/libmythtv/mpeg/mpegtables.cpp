@@ -976,7 +976,7 @@ QString ProgramMapTable::toStringXML(uint indent_level) const
             .arg(StreamInfoLength(i));
         std::vector<const unsigned char*> ldesc =
             MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
-        str += (ldesc.empty()) ? " />\n" : ">\n";
+        str += ldesc.empty() ? " />\n" : ">\n";
         for (auto & ld : ldesc)
         {
             str += MPEGDescriptor(ld, 300)
@@ -1227,7 +1227,7 @@ QString ConditionalAccessTable::toStringXML(uint indent_level) const
 
     std::vector<const unsigned char*> gdesc =
         MPEGDescriptor::Parse(Descriptors(), DescriptorsLength());
-    str += (gdesc.empty()) ? " />\n" : ">\n";
+    str += gdesc.empty() ? " />\n" : ">\n";
     for (auto & gd : gdesc)
     {
         str += MPEGDescriptor(gd, 300)

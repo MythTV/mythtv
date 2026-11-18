@@ -466,7 +466,7 @@ void ChannelEditor::setSortMode(MythUIButtonListItem *item)
 
     if (m_currentSortMode != sortName)
     {
-        m_currentSortMode = sortName;
+        m_currentSortMode = std::move(sortName);
         fillList();
     }
 }
@@ -481,7 +481,7 @@ void ChannelEditor::setSourceID(MythUIButtonListItem *item)
 
     if (m_sourceFilter != sourceID)
     {
-        m_sourceFilterName = sourceName;
+        m_sourceFilterName = std::move(sourceName);
         m_sourceFilter = sourceID;
         fillList();
     }

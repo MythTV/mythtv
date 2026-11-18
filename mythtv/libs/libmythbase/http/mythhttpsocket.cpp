@@ -330,13 +330,11 @@ void MythHTTPSocket::Read()
     }
 
     // Try error page handler
-    if (response == nullptr || response->m_status == HTTPNotFound)
+    if ((response == nullptr || response->m_status == HTTPNotFound) &&
+        (m_config.m_errorPageHandler.first.length() > 0))
     {
-        if(m_config.m_errorPageHandler.first.length() > 0)
-        {
-            auto function = m_config.m_errorPageHandler.second;
-            response = std::invoke(function, request);
-        }
+        auto function = m_config.m_errorPageHandler.second;
+        response = std::invoke(function, request);
     }
 
     // nothing to see

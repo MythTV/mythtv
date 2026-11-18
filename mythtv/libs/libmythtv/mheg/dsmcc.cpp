@@ -475,17 +475,14 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
         if (found)
             break;
     }
-    if (!found && dataBroadcastId == 0x0106)
+    if ((!found && dataBroadcastId == 0x0106) && AddTap(componentTag, carouselId))
     {
         // We haven't seen this stream before but it has the correct
         // data_broadcast_id. Create a carousel for it.
         // This will only happen at start-up
-        if (AddTap(componentTag, carouselId))
-        {
-            LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Initial stream tag %1").arg(componentTag));
-            m_startTag = componentTag;
-            found = true;
-        }
+        LOG(VB_DSMCC, LOG_INFO, QString("[dsmcc] Initial stream tag %1").arg(componentTag));
+        m_startTag = componentTag;
+        found = true;
     }
 
     if (!found)
@@ -498,7 +495,7 @@ void Dsmcc::ProcessSection(const unsigned char *data, int length,
         return; // Ignore this stream.
     }
 
-    unsigned short section_len = ((data[1] & 0xF) << 8) | (data[2]);
+    unsigned short section_len = ((data[1] & 0xF) << 8) | data[2];
     section_len += 3;/* 3 bytes before length count starts */
     if (section_len > length)
     {
@@ -612,7 +609,7 @@ static const std::array<const uint32_t,256> crc_table
     0xea23f0af, 0xeee2ed18, 0xf0a5bd1d, 0xf464a0aa, 0xf9278673, 0xfde69bc4,
     0x89b8fd09, 0x8d79e0be, 0x803ac667, 0x84fbdbd0, 0x9abc8bd5, 0x9e7d9662,
     0x933eb0bb, 0x97ffad0c, 0xafb010b1, 0xab710d06, 0xa6322bdf, 0xa2f33668,
-    0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
+    0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 };
 
 static uint32_t crc32(const unsigned char *data, int len)

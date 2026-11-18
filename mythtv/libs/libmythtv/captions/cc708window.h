@@ -131,14 +131,14 @@ class CC708CharacterAttribute
     uint GetFGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
-        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00, };
+        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00 };
         return alpha[m_fgOpacity & 0x3];
     }
 
     uint GetBGAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
-        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00, };
+        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00 };
         return alpha[m_bgOpacity & 0x3];
     }
 
@@ -230,7 +230,7 @@ class MTV_PUBLIC CC708Window
     uint GetFillAlpha(void) const
     {
         //SOLID=0, FLASH=1, TRANSLUCENT=2, and TRANSPARENT=3.
-        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00, };
+        static constexpr std::array<const uint,4> alpha = { 0xff, 0xff, 0x7f, 0x00 };
         return alpha[m_fill_opacity & 0x3];
     }
 

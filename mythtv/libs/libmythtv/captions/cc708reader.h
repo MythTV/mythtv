@@ -24,7 +24,7 @@ class CC708Reader
     void ClearBuffers(void);
 
     CC708Service* GetService(uint service_num)
-        { return &(m_cc708services[service_num]); }
+        { return &m_cc708services[service_num]; }
     CC708Window &GetCCWin(uint service_num, uint window_id)
         { return m_cc708services[service_num].m_windows[window_id]; }
     CC708Window &GetCCWin(uint svc_num)

@@ -55,14 +55,14 @@ class JoystickMap
         {
             buttonMapType new_button = { .button=in_button,
                                          .keystring=std::move(in_keystr),
-                                         .chord=in_chord };
+                                         .chord=in_chord, };
             m_buttonMap.push_back(new_button);
         }
 
         void AddAxis(int in_axis, int in_from, int in_to, QString in_keystr)
         {
             axisMapType new_axis = { .axis=in_axis, .from=in_from, .to=in_to,
-                                     .keystring=std::move(in_keystr)};
+                                     .keystring=std::move(in_keystr),};
             m_axisMap.push_back(new_axis);
         }
 

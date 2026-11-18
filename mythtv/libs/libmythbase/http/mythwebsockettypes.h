@@ -27,7 +27,7 @@ enum WSOpCode : std::uint8_t
     WSOpReservedC    = 0xC,
     WSOpReservedD    = 0xD,
     WSOpReservedE    = 0xE,
-    WSOpReservedF    = 0xF
+    WSOpReservedF    = 0xF,
 };
 
 enum WSErrorCode : std::uint16_t
@@ -44,7 +44,7 @@ enum WSErrorCode : std::uint16_t
     WSCloseNoExtensions  = 1010,
     WSCloseUnexpectedErr = 1011,
     WSCloseNoTLS         = 1012,
-    WSCloseTLSHandshakeError = 1015
+    WSCloseTLSHandshakeError = 1015,
 };
 
 using WSQueue      = std::deque<DataPayload>;

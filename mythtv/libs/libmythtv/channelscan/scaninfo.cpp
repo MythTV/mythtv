@@ -35,7 +35,7 @@ uint SaveScan(const ScanDTVTransportList &scan)
     const std::vector<ScanInfo> list = LoadScanList(sourceid);
     for (uint i = 0; i < list.size(); i++)
     {
-        if (((i + 10) < (list.size())) ||
+        if (((i + 10) < list.size()) ||
             (list[i].m_scandate < MythDate::current().addMonths(-6)))
         {
             LOG(VB_CHANSCAN, LOG_INFO, "SaveScan() " +
@@ -140,7 +140,7 @@ ScanDTVTransportList LoadScan(uint scanid)
         while (query2.next())
         {
             QString si_standard = query2.value(22).toString();
-            si_standard = (si_standard.isEmpty()) ?
+            si_standard = si_standard.isEmpty() ?
                 query.value(13).toString() : si_standard;
 
             ChannelInsertInfo chan(

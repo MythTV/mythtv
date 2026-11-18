@@ -164,7 +164,7 @@ bool MythTerminal::Create(void)
 
     connect(m_enterButton, &MythUIButton::Clicked,
             this,
-            [this]()
+            [this]
             {
                 QMutexLocker locker(&m_lock);
                 if (m_running) // NOLINT(clang-analyzer-core.NullDereference)

@@ -121,7 +121,7 @@ enum CDROMdiscStatus : std::uint8_t
     MEDIA_IS_EMPTY      = 0x0,
     MEDIA_IS_APPENDABLE = 0x1,
     MEDIA_IS_COMPLETE   = 0x2,
-    MEDIA_IS_OTHER      = 0x3
+    MEDIA_IS_OTHER      = 0x3,
 };
 
 
@@ -284,12 +284,8 @@ int MythCDROMLinux::SCSIstatus()
 
 MythMediaError MythCDROMLinux::eject(bool open_close)
 {
-    if (!isDeviceOpen())
-    {
-        if (!openDevice())
-            return MEDIAERR_FAILED;
-    }
-
+    if (!isDeviceOpen() && !openDevice())
+        return MEDIAERR_FAILED;
     MythMediaError err = ejectCDROM(open_close);
     if (MEDIAERR_OK != err && open_close)
         err = ejectSCSI();
@@ -324,13 +320,6 @@ MythMediaError MythCDROMLinux::ejectCDROM(bool open_close)
     return MEDIAERR_OK;
 }
 
-struct StHandle {
-    const int m_fd;
-    explicit StHandle(const char *dev) : m_fd(open(dev, O_RDWR | O_NONBLOCK)) { }
-    ~StHandle() { close(m_fd); }
-    operator int() const { return m_fd; } // NOLINT(google-explicit-constructor)
-};
-
 // This is copied from eject.c by Jeff Tranter (tranter@pobox.com)
 MythMediaError MythCDROMLinux::ejectSCSI()
 {
@@ -344,7 +333,11 @@ MythMediaError MythCDROMLinux::ejectSCSI()
     const unsigned DRIVER_OK = 0;
 
     // ALLOW_MEDIUM_REMOVAL requires r/w access so re-open the device
-    struct StHandle fd(qPrintable(m_devicePath));
+    int fd = open(qPrintable(m_devicePath) , O_RDWR | O_NONBLOCK);
+
+    // Automatically close file at function exit
+    auto close_fd = [](const int *fd2) { close(*fd2); };
+    std::unique_ptr<int,decltype(close_fd)> cleanup { &fd, close_fd };
 
     LOG(VB_MEDIA, LOG_DEBUG, LOC + ":ejectSCSI");
     if ((ioctl(fd, SG_GET_VERSION_NUM, &k) < 0) || (k < 30000))

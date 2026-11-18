@@ -46,7 +46,7 @@ void MHRoot::InvalidAction(const char *actionName)
 {
     MHLOG(MHLogWarning, QString("WARN Action \"%1\" is not understood by class \"%2\"")
           .arg(actionName, ClassName()));
-    throw "Invalid Action";
+    throw std::runtime_error("Invalid Action");
 }
 
 // Preparation - sets up the run-time representation.  Sets m_fAvailable and generates IsAvailable event.

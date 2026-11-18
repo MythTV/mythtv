@@ -129,7 +129,7 @@ bool MythVideoDRM::RenderFrame(AVDRMFrameDescriptor* DRMDesc, MythVideoFrame* Fr
             { id, m_videoPlane->m_srcXProp->m_id, m_lastSrc.left() << 16 },
             { id, m_videoPlane->m_srcYProp->m_id, m_lastSrc.top() << 16 },
             { id, m_videoPlane->m_srcWProp->m_id, m_lastSrc.width() << 16 },
-            { id, m_videoPlane->m_srcHProp->m_id, m_lastSrc.height() << 16 }});
+            { id, m_videoPlane->m_srcHProp->m_id, m_lastSrc.height() << 16 },});
     }
 
     if (m_lastDst != Frame->m_dstRect)
@@ -139,7 +139,7 @@ bool MythVideoDRM::RenderFrame(AVDRMFrameDescriptor* DRMDesc, MythVideoFrame* Fr
            { id, m_videoPlane->m_crtcXProp->m_id, (m_lastDst.left() + 1) & ~1 },
            { id, m_videoPlane->m_crtcYProp->m_id, (m_lastDst.top() + 1) & ~1 },
            { id, m_videoPlane->m_crtcWProp->m_id, (m_lastDst.width() + 1) & ~1 },
-           { id, m_videoPlane->m_crtcHProp->m_id, (m_lastDst.height() + 1) & ~1 }});
+           { id, m_videoPlane->m_crtcHProp->m_id, (m_lastDst.height() + 1) & ~1 },});
     }
 
     return m_device->QueueAtomics({{ id, m_videoPlane->m_fbIdProp->m_id, handle->GetFB() }});

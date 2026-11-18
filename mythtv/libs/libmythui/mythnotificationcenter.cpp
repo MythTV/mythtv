@@ -574,7 +574,7 @@ void MythNotificationScreen::UpdateMetaData(const DMAP &data)
     tmp = data["asfm"];
     if (!(tmp.isNull() && (m_update & kMetaData)))
     {
-        m_extra = tmp;
+        m_extra = std::move(tmp);
     }
     // We need to re-run init
     m_refresh = true;
@@ -731,11 +731,8 @@ bool MythNotificationScreen::keyPressEvent(QKeyEvent *event)
     {
         const QString& action = actions[i];
 
-        if (action == "ESCAPE")
-        {
-            if (MythDate::current() < m_creation.addMSecs(MIN_LIFE))
-                return true; // was updated less than 1s ago, ignore
-        }
+        if ((action == "ESCAPE") && (MythDate::current() < m_creation.addMSecs(MIN_LIFE)))
+            return true; // was updated less than 1s ago, ignore
     }
     if (!handled)
     {
@@ -1115,14 +1112,12 @@ void NCPrivate::DeleteUnregistered(void)
         if (m_registrations.contains(id))
         {
             screen = m_registrations.value(id);
-            if (screen != nullptr && !m_suspended.contains(id))
+            if ((screen != nullptr) && !m_suspended.contains(id) &&
+                (screen->m_duration <= 0s || closeimemdiately))
             {
                 // mark the screen for deletion if no timer is set
-                if (screen->m_duration <= 0s || closeimemdiately)
-                {
-                    m_deletedScreens.append(screen);
-                    needdelete = true;
-                }
+                m_deletedScreens.append(screen);
+                needdelete = true;
             }
             m_registrations.remove(id);
         }
@@ -1274,7 +1269,7 @@ void NCPrivate::GetNotificationScreens(QList<MythScreenType*> &_screens)
             list.append(item);
         }
     }
-    _screens = list;
+    _screens = std::move(list);
 }
 
 int NCPrivate::DisplayedNotifications(void) const

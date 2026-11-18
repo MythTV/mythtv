@@ -11,6 +11,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "service.h"
+#include <stdexcept>
 #include <QMetaEnum>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -88,7 +89,7 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
 #else
             dt.setTimeZone( QTimeZone(QTimeZone::UTC) );
 #endif
-            *(( QDateTime      *)pParam) = dt;
+            *(( QDateTime      *)pParam) = std::move(dt);
             break;
         }
         case QMetaType::QTime       : *(( QTime          *)pParam) = QTime::fromString    ( sValue, Qt::ISODate ); break;
@@ -105,7 +106,7 @@ void* Service::ConvertToParameterPtr( int            nTypeId,
             }
             else
             {
-                throw QString("Invalid JSON: %1").arg(sValue);
+                throw std::runtime_error(QString("Invalid JSON: %1").arg(sValue).toStdString());
             }
 
             break;

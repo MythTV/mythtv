@@ -96,14 +96,11 @@ bool ZMClient::connectToHost(const QString &lhostname, unsigned int lport)
         std::this_thread::sleep_for(1s);
     }
 
-    if (!m_bConnected)
+    if (!m_bConnected && GetNotificationCenter())
     {
-        if (GetNotificationCenter())
-        {
-            ShowNotificationError(tr("Can't connect to the mythzmserver") , "MythZoneMinder",
-                               tr("Is it running? "
-                                  "Have you set the correct IP and port in the settings?"));
-        }
+        ShowNotificationError(tr("Can't connect to the mythzmserver") , "MythZoneMinder",
+                              tr("Is it running? "
+                                 "Have you set the correct IP and port in the settings?"));
     }
 
     // check the server uses the same protocol as us
@@ -613,15 +610,12 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
         else
         {
             std::chrono::milliseconds elapsed = timer.elapsed();
-            if (elapsed  > 10s)
+            if ((elapsed  > 10s) && ((elapsed - errmsgtime) > 10s))
             {
-                if ((elapsed - errmsgtime) > 10s)
-                {
-                    errmsgtime = elapsed;
-                    LOG(VB_GENERAL, LOG_ERR,
-                        QString("m_socket->: Waiting for data: %1 %2")
-                            .arg(read).arg(dataSize));
-                }
+                errmsgtime = elapsed;
+                LOG(VB_GENERAL, LOG_ERR,
+                    QString("m_socket->: Waiting for data: %1 %2")
+                    .arg(read).arg(dataSize));
             }
 
             if (elapsed > 100s)

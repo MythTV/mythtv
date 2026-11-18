@@ -39,7 +39,7 @@ class MBASE_PUBLIC MythPower : public QObject, public ReferenceCounter
         FeatureSuspend     = 0x02,
         FeatureHibernate   = 0x04,
         FeatureRestart     = 0x08,
-        FeatureHybridSleep = 0x10
+        FeatureHybridSleep = 0x10,
     };
 
     Q_DECLARE_FLAGS(Features, Feature)

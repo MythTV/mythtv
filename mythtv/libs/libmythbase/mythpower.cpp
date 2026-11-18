@@ -109,9 +109,8 @@ MythPower* MythPower::AcquireRelease(void *Reference, bool Acquire, std::chrono:
         s_delays.remove(Reference);
 
         // Decref and ensure nulled on last use
-        if (s_instance)
-            if (s_instance->DecrRef() == 0)
-                s_instance = nullptr;
+        if (s_instance && (s_instance->DecrRef() == 0))
+            s_instance = nullptr;
     }
 
     if (s_instance)

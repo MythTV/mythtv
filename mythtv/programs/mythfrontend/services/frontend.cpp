@@ -138,7 +138,7 @@ bool Frontend::PlayRecording(int RecordedId, int ChanId,
 
     if ((RecordedId <= 0) &&
         (ChanId <= 0 || !StartTime.isValid()))
-        throw QString("Recorded ID or Channel ID and StartTime appears invalid.");
+        throw std::runtime_error("Recorded ID or Channel ID and StartTime appears invalid.");
 
     if (RecordedId > 0)
     {

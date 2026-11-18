@@ -94,19 +94,16 @@ bool MythUIStateType::DisplayState(const QString &name)
     else
         m_currentState = nullptr;
 
-    if (m_currentState != old)
+    if ((m_currentState != old) && (m_showEmpty || m_currentState))
     {
-        if (m_showEmpty || m_currentState)
-        {
-            if (m_deferload && m_currentState)
-                m_currentState->LoadNow();
+        if (m_deferload && m_currentState)
+            m_currentState->LoadNow();
 
-            if (old)
-                old->SetVisible(false);
+        if (old)
+            old->SetVisible(false);
 
-            if (m_currentState)
-                m_currentState->SetVisible(true);
-        }
+        if (m_currentState)
+            m_currentState->SetVisible(true);
     }
     AdjustDependence();
 
@@ -123,19 +120,16 @@ bool MythUIStateType::DisplayState(StateType type)
     else
         m_currentState = nullptr;
 
-    if (m_currentState != old)
+    if ((m_currentState != old) && (m_showEmpty || m_currentState))
     {
-        if (m_showEmpty || m_currentState)
-        {
-            if (m_deferload && m_currentState)
-                m_currentState->LoadNow();
+        if (m_deferload && m_currentState)
+            m_currentState->LoadNow();
 
-            if (old)
-                old->SetVisible(false);
+        if (old)
+            old->SetVisible(false);
 
-            if (m_currentState)
-                m_currentState->SetVisible(true);
-        }
+        if (m_currentState)
+            m_currentState->SetVisible(true);
     }
     AdjustDependence();
 
@@ -194,15 +188,14 @@ void MythUIStateType::Clear()
  */
 void MythUIStateType::Reset()
 {
-    if (!DisplayState("default") && !DisplayState("active"))
+    if (!DisplayState("default") &&
+        !DisplayState("active") &&
+        !DisplayState(None))
     {
-        if (!DisplayState(None))
-        {
-            if (m_currentState)
-                m_currentState->SetVisible(false);
+        if (m_currentState)
+            m_currentState->SetVisible(false);
 
-            m_currentState = nullptr;
-        }
+        m_currentState = nullptr;
     }
 
     MythUIType::Reset();
@@ -247,10 +240,9 @@ bool MythUIStateType::ParseElement(
             if (uitype && !m_objectsByState.contains((int)stype))
                 AddObject(stype, uitype);
         }
-        else if (!name.isEmpty())
+        else if (!name.isEmpty() && uitype && !m_objectsByName.contains(name))
         {
-            if (uitype && !m_objectsByName.contains(name))
-                AddObject(name, uitype);
+            AddObject(name, uitype);
         }
     }
     else

@@ -95,19 +95,18 @@ bool doLoadScreens(const QString &filename, ScreenListMap &screens)
             n = n.nextSibling())
     {
         QDomElement e = n.toElement();
-        if (!e.isNull())
+        if (!e.isNull() &&
+            (e.tagName() == "screen") &&
+            !screens.contains(e.attribute("name")) )
         {
-            if ( (e.tagName() == "screen") && !screens.contains(e.attribute("name")) )
-            {
-                screens[e.attribute("name")].m_multiLoc = false;
-                screens[e.attribute("name")].m_name = e.attribute("name");
-                screens[e.attribute("name")].m_title =
-                                            getScreenTitle(e.attribute("name"));
-                QString hasUnits = e.attribute("hasunits");
-                screens[e.attribute("name")].m_hasUnits =
-                    hasUnits.toLower() != "no";
-                screens[e.attribute("name")].m_dataTypes = loadScreen(e);
-            }
+            screens[e.attribute("name")].m_multiLoc = false;
+            screens[e.attribute("name")].m_name = e.attribute("name");
+            screens[e.attribute("name")].m_title =
+                getScreenTitle(e.attribute("name"));
+            QString hasUnits = e.attribute("hasunits");
+            screens[e.attribute("name")].m_hasUnits =
+                hasUnits.toLower() != "no";
+            screens[e.attribute("name")].m_dataTypes = loadScreen(e);
         }
     }
     return true;
@@ -122,13 +121,10 @@ QStringList loadScreen(const QDomElement& ScreenListInfo)
             n = n.nextSibling())
     {
         QDomElement e = n.toElement();
-        if (!e.isNull())
+        if (!e.isNull() && (e.tagName() == "datum"))
         {
-            if (e.tagName() == "datum")
-            {
-                QString name = e.attribute("name");
-                typesList << name;
-            }
+            QString name = e.attribute("name");
+            typesList << name;
         }
     }
 

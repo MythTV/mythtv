@@ -85,17 +85,15 @@ void MetadataImageDownload::run()
         QString sFilename = getDownloadFilename(thumb->title, thumb->url);
 
         bool exists = QFile::exists(sFilename);
-        if (!exists && !thumb->url.isEmpty())
+        if (!exists && !thumb->url.isEmpty() &&
+            !GetMythDownloadManager()->download(thumb->url, sFilename))
         {
-            if (!GetMythDownloadManager()->download(thumb->url, sFilename))
-            {
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("MetadataImageDownload: failed to download thumbnail from: %1")
-                    .arg(thumb->url));
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("MetadataImageDownload: failed to download thumbnail from: %1")
+                .arg(thumb->url));
 
-                delete thumb;
-                continue;
-            }
+            delete thumb;
+            continue;
         }
 
         // inform parent we have thumbnail ready for it
@@ -143,16 +141,13 @@ void MetadataImageDownload::run()
             {
                 QString path = getLocalWritePath(lookup->GetType(), type);
                 QDir dirPath(path);
-                if (!dirPath.exists())
+                if (!dirPath.exists() && !dirPath.mkpath(path))
                 {
-                    if (!dirPath.mkpath(path))
-                    {
-                        LOG(VB_GENERAL, LOG_ERR,
-                            QString("Metadata Image Download: Unable to create "
-                                    "path %1, aborting download.").arg(path));
-                        errored = true;
-                        break;
-                    }
+                    LOG(VB_GENERAL, LOG_ERR,
+                        QString("Metadata Image Download: Unable to create "
+                                "path %1, aborting download.").arg(path));
+                    errored = true;
+                    break;
                 }
                 QString finalfile = path + "/" + filename;
                 QString oldurl = info.url;

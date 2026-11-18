@@ -402,12 +402,12 @@ void ExternIO::Fork(void)
         std::cerr << "dup2(stdin) failed: " << strerror(errno);
         _exit(GENERIC_EXIT_PIPE_FAILURE);
     }
-    else if (dup2(out[1], 1) < 0)
+    if (dup2(out[1], 1) < 0)
     {
         std::cerr << "dup2(stdout) failed: " << strerror(errno);
         _exit(GENERIC_EXIT_PIPE_FAILURE);
     }
-    else if (dup2(err[1], 2) < 0)
+    if (dup2(err[1], 2) < 0)
     {
         std::cerr << "dup2(stderr) failed: " << strerror(errno);
         _exit(GENERIC_EXIT_PIPE_FAILURE);
@@ -716,24 +716,19 @@ void ExternalStreamHandler::run(void)
                 status_timer.restart();
             }
 
-            if (buffer.size() > TOO_FAST_SIZE)
+            if ((buffer.size() > TOO_FAST_SIZE) && (!m_pollMode))
             {
-                if (!m_pollMode)
+                // Data is comming a little too fast, so XOFF
+                // to give us time to process it.
+                if (!ProcessCommand(QString("XOFF"), result) &&
+                    result.startsWith("ERR"))
                 {
-                    // Data is comming a little too fast, so XOFF
-                    // to give us time to process it.
-                    if (!ProcessCommand(QString("XOFF"), result))
-                    {
-                        if (result.startsWith("ERR"))
-                        {
-                            m_errMsg = QString("Aborting: XOFF -> %2")
-                                       .arg(result);
-                            LOG(VB_GENERAL, LOG_ERR, LOC + m_errMsg);
-                            m_bError = true;
-                        }
-                    }
-                    m_xon = false;
+                    m_errMsg = QString("Aborting: XOFF -> %2")
+                        .arg(result);
+                    LOG(VB_GENERAL, LOG_ERR, LOC + m_errMsg);
+                    m_bError = true;
                 }
+                m_xon = false;
             }
 
             read_len = 0;
@@ -1156,11 +1151,8 @@ void ExternalStreamHandler::ReplayStream(void)
         m_replay = false;
 
         // Let the external app know that we are ready
-        if (!m_pollMode)
-        {
-            if (ProcessCommand(QString("XON"), result))
-                m_xon = true;
-        }
+        if (!m_pollMode && ProcessCommand(QString("XON"), result))
+            m_xon = true;
     }
 }
 
@@ -1847,10 +1839,10 @@ bool ExternalStreamHandler::Monitor(void)
                     }
 
                     if (message.trimmed().startsWith("damage",
-                                                     Qt::CaseInsensitive))
+                                                     Qt::CaseInsensitive) &&
+                        m_recording)
                     {
-                        if (m_recording)
-                            m_damaged |= true;
+                        m_damaged |= true;
                     }
 
                     LOG(VB_RECORD, level,

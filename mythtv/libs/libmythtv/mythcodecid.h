@@ -289,7 +289,7 @@ enum MythCodecID : std::uint8_t
     kCodec_HEVC_DRMPRIME  = 204,
     kCodec_AV1_DRMPRIME   = 205,
 
-    kCodec_DRMPRIME_END   = 206
+    kCodec_DRMPRIME_END   = 206,
 };
 
 // MythCodecID convenience functions

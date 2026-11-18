@@ -316,7 +316,7 @@ const std::array<const QString,253> rchTagNames
     ":EventSource",
     ":EventType",
     ":EventData",
-    ":ActionSlots"
+    ":ActionSlots",
 };
 
 // Some example programs use these colour names
@@ -339,8 +339,8 @@ static std::array<const struct colourTable,13> colourTable
     { .m_name="darkgreen",       .m_r=0,   .m_g=128, .m_b=0,   .m_t=0 },
     { .m_name="yellow",          .m_r=255, .m_g=255, .m_b=0,   .m_t=0 },
     { .m_name="cyan",            .m_r=0,   .m_g=255, .m_b=255, .m_t=0 },
-    { .m_name="magenta",         .m_r=255, .m_g=0,   .m_b=255, .m_t=0 }
-}};
+    { .m_name="magenta",         .m_r=255, .m_g=0,   .m_b=255, .m_t=0 },
+},};
 
 
 // Search for a tag and return it if it exists.  Returns -1 if it isn't found.

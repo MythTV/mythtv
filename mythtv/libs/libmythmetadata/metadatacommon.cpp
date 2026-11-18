@@ -1209,7 +1209,7 @@ MetadataLookup* ParseMetadataMovieNFO(const QDomElement& item,
     if (!director.isEmpty())
     {
         PersonInfo info;
-        info.name = director;
+        info.name = std::move(director);
         people.insert(kPersonDirector, info);
     }
 

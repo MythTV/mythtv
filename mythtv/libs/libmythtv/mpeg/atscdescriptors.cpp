@@ -238,7 +238,7 @@ QString AC3AudioStreamDescriptor::SampleRateCodeString(void) const
     {
         "48kbps", "44.1kbps", "32kbps", "Reserved",
         "48kbps or 44.1kbps", "48kbps or 32kbps",
-        "44.1kbps or 32kbps", "48kbps or 44.1kbps or 32kbps"
+        "44.1kbps or 32kbps", "48kbps or 44.1kbps or 32kbps",
     };
     return QString::fromStdString(s_asd[SampleRateCode()]);
 }
@@ -250,14 +250,14 @@ QString AC3AudioStreamDescriptor::BitRateCodeString(void) const
         "=32kbps",  "=40kbps",  "=48kbps",  "=56kbps",  "=64kbps",
         "=80kbps",  "=96kbps",  "=112kbps", "=128kbps", "=160kbps",
         "=192kbps", "=224kbps", "=256kbps", "=320kbps", "=384kbps",
-        "=448kbps", "=512kbps", "=576kbps", "=640kbps"
+        "=448kbps", "=512kbps", "=576kbps", "=640kbps",
     };
     static const std::array<const std::string,19> s_ubr
     {
         "<=32kbps",  "<=40kbps", "<=48kbps",  "<=56kbps",  "<=64kbps",
         "<=80kbps",  "<=96kbps", "<=112kbps", "<=128kbps", "<=160kbps",
         "<=192kbps","<=224kbps", "<=256kbps", "<=320kbps", "<=384kbps",
-        "<=448kbps","<=512kbps", "<=576kbps", "<=640kbps"
+        "<=448kbps","<=512kbps", "<=576kbps", "<=640kbps",
     };
 
     if (BitRateCode() <= 18)
@@ -286,7 +286,7 @@ QString AC3AudioStreamDescriptor::ChannelsString(void) const
         "1 + 1",    "1/0",      "2/0",      "3/0",
         "2/1",      "3/1",      "2/2 ",     "3/2",
         "1",        "<= 2",     "<= 3",     "<= 4",
-        "<= 5",     "<= 6",     "Reserved", "Reserved"
+        "<= 5",     "<= 6",     "Reserved", "Reserved",
     };
     return QString::fromStdString(s_cs[Channels()]);
 }

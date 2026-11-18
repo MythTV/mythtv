@@ -408,10 +408,9 @@ bool DiSEqCDevTree::Exists(int cardid)
     {
         MythDB::DBError("DiSEqCDevTree::Load", query);
     }
-    else if (query.next())
+    else if (query.next() && (query.value(0).toUInt() > 0))
     {
-        if (query.value(0).toUInt() > 0)
-            return true;
+        return true;
     }
 
     return false;
@@ -1373,10 +1372,10 @@ bool DiSEqCDevSwitch::ExecuteLegacy([[maybe_unused]] const DiSEqCDevSettings &se
                                     [[maybe_unused]] uint pos)
 {
 #if CONFIG_DVB && defined(FE_DISHNETWORK_SEND_LEGACY_CMD)
-    static const cmd_vec_t kSw21Cmds  { 0x34, 0x65, };
-    static const cmd_vec_t kSw42Cmds  { 0x46, 0x17, };
-    static const cmd_vec_t kSw64VCmds { 0x39, 0x4b, 0x0d, };
-    static const cmd_vec_t kSw64HCmds { 0x1a, 0x5c, 0x2e, };
+    static const cmd_vec_t kSw21Cmds  { 0x34, 0x65 };
+    static const cmd_vec_t kSw42Cmds  { 0x46, 0x17 };
+    static const cmd_vec_t kSw64VCmds { 0x39, 0x4b, 0x0d };
+    static const cmd_vec_t kSw64HCmds { 0x1a, 0x5c, 0x2e };
 
     cmd_vec_t cmds {};
     unsigned char horizcmd = 0x00;
@@ -1689,7 +1688,7 @@ const std::vector<DiSEqCDevDevice::TypeTable> DiSEqCDevRotor::kRotorTypeTable
 {
     { "diseqc_1_2", kTypeDiSEqC_1_2 },
     { "diseqc_1_3", kTypeDiSEqC_1_3 },
-    { nullptr, kTypeDiSEqC_1_3 }
+    { nullptr, kTypeDiSEqC_1_3 },
 };
 
 DiSEqCDevRotor::~DiSEqCDevRotor()
@@ -2036,7 +2035,7 @@ bool DiSEqCDevRotor::ExecuteUSALS(const DiSEqCDevSettings& /*settings*/,
     uint az16 = (uint) (abs(azimuth) * 16.0);
     cmd_vec_t cmd {
         static_cast<uint8_t>(((azimuth > 0.0) ? 0xE0 : 0xD0) | ((az16 >> 8) & 0x0f)),
-        static_cast<uint8_t>(az16 & 0xff) };
+        static_cast<uint8_t>(az16 & 0xff), };
 
     return m_tree.SendCommand(DISEQC_ADR_POS_AZ, DISEQC_CMD_GOTO_X,
                               m_repeat, cmd);
@@ -2157,7 +2156,7 @@ bool DiSEqCDevSCR::Execute(const DiSEqCDevSettings &settings, const DTVMultiplex
     // build command
     cmd_vec_t data {
         static_cast<uint8_t>(t >> 8 | m_scrUserband << 5),
-        static_cast<uint8_t>(t & 0x00FF) };
+        static_cast<uint8_t>(t & 0x00FF), };
 
     if (high_band)
         data[0] |= (1 << 2);
@@ -2192,7 +2191,7 @@ bool DiSEqCDevSCR::PowerOff(void) const
 
     // build command
     cmd_vec_t data {
-        static_cast<uint8_t>(m_scrUserband << 5), 0x00 };
+        static_cast<uint8_t>(m_scrUserband << 5), 0x00, };
 
     // send command
     if (m_scrPin >= 0 && m_scrPin <= 255)
@@ -2536,7 +2535,7 @@ uint32_t DiSEqCDevLNB::GetIntermediateFrequency(
     const DiSEqCDevSettings& /*settings*/, const DTVMultiplex &tuning) const
 {
     uint64_t abs_freq = tuning.m_frequency;
-    uint lof = (IsHighBand(tuning)) ? m_lofHi : m_lofLo;
+    uint lof = IsHighBand(tuning) ? m_lofHi : m_lofLo;
 
     return (lof > abs_freq) ? (lof - abs_freq) : (abs_freq - lof);
 }

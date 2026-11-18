@@ -38,7 +38,7 @@ class VideoSetupWizard : public MythScreenType
     {
         ttNone = 0,
         ttHighDefinition,
-        ttStandardDefinition
+        ttStandardDefinition,
     };
 
     QString              m_downloadFile;

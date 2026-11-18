@@ -808,11 +808,8 @@ void PlaylistEditorView::createRootNode(void )
     for (int x = 0; x < alltracks->count(); x++)
     {
         MusicMetadata *mdata = alltracks->at(x);
-        if (mdata)
-        {
-            if (mdata->Compilation())
-                compTracks->append(mdata);
-        }
+        if (mdata && mdata->Compilation())
+            compTracks->append(mdata);
     }
     node->SetData(QVariant::fromValue(compTracks));
 
@@ -1109,22 +1106,19 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
         for (int x = 0; x < tracks->count(); x++)
         {
             MusicMetadata *mdata = tracks->at(x);
-            if (mdata)
+            if (mdata && (mdata->CompilationArtist() != mdata->Artist()))
             {
-                if (mdata->CompilationArtist() != mdata->Artist())
+                if (map.contains(mdata->CompilationArtist()))
                 {
-                    if (map.contains(mdata->CompilationArtist()))
-                    {
-                        MetadataPtrList *filteredTracks = map.value(mdata->CompilationArtist());
-                        filteredTracks->append(mdata);
-                    }
-                    else
-                    {
-                        auto *filteredTracks = new MetadataPtrList;
-                        m_deleteList.append(filteredTracks);
-                        filteredTracks->append(mdata);
-                        map.insert(mdata->CompilationArtist(), filteredTracks);
-                    }
+                    MetadataPtrList *filteredTracks = map.value(mdata->CompilationArtist());
+                    filteredTracks->append(mdata);
+                }
+                else
+                {
+                    auto *filteredTracks = new MetadataPtrList;
+                    m_deleteList.append(filteredTracks);
+                    filteredTracks->append(mdata);
+                    map.insert(mdata->CompilationArtist(), filteredTracks);
                 }
             }
         }
@@ -1401,13 +1395,10 @@ void PlaylistEditorView::filterTracks(MusicGenericTree *node)
             for (int x = 0; x < tracks2->count(); x++)
             {
                 MusicMetadata *mdata = tracks2->at(x);
-                if (mdata)
+                if (mdata && (mdata->Artist() != mdata->CompilationArtist()))
                 {
-                    if (mdata->Artist() != mdata->CompilationArtist())
-                    {
-                        found = true;
-                        break;
-                    }
+                    found = true;
+                    break;
                 }
             }
 
@@ -1771,16 +1762,13 @@ void PlaylistEditorView::deleteSmartPlaylist(bool ok)
     if (node)
     {
         auto *mnode = dynamic_cast<MusicGenericTree*>(node);
-        if (mnode)
+        if (mnode && (mnode->getAction() == "smartplaylist"))
         {
-            if (mnode->getAction() == "smartplaylist")
-            {
-                QString category = mnode->getParent()->GetText();
-                QString name = mnode->GetText();
+            QString category = mnode->getParent()->GetText();
+            QString name = mnode->GetText();
 
-                SmartPlaylistEditor::deleteSmartPlaylist(category, name);
-                reloadTree();
-            }
+            SmartPlaylistEditor::deleteSmartPlaylist(category, name);
+            reloadTree();
         }
     }
 }
@@ -1794,15 +1782,12 @@ void PlaylistEditorView::deletePlaylist(bool ok)
     if (node)
     {
         auto *mnode = dynamic_cast<MusicGenericTree*>(node);
-        if (mnode)
+        if (mnode && (mnode->getAction() == "playlist"))
         {
-            if (mnode->getAction() == "playlist")
-            {
-                int id = mnode->getInt();
+            int id = mnode->getInt();
 
-                gMusicData->m_all_playlists->deletePlaylist(id);
-                m_playlistTree->RemoveCurrentItem(true);
-            }
+            gMusicData->m_all_playlists->deletePlaylist(id);
+            m_playlistTree->RemoveCurrentItem(true);
         }
     }
 }

@@ -127,11 +127,8 @@ void LyricsView::customEvent(QEvent *event)
             {
                 MythUIButtonListItem * item = m_lyricsList->GetItemAt(x);
                 auto *lyric = item->GetData().value<LyricsLine*>();
-                if (lyric)
-                {
-                    if (lyric->m_time > 1s && rs >= lyric->m_time)
-                        pos = x;
-                }
+                if (lyric && (lyric->m_time > 1s) && (rs >= lyric->m_time))
+                    pos = x;
             }
 
             m_lyricsList->SetItemCurrent(pos);
@@ -209,10 +206,10 @@ void LyricsView::customEvent(QEvent *event)
             m_bufferProgress->SetUsed(available);
         }
     }
-    else if (event->type() == DecoderHandlerEvent::kOperationStop)
+    else if ((event->type() == DecoderHandlerEvent::kOperationStop) &&
+             m_bufferStatus)
     {
-        if (m_bufferStatus)
-            m_bufferStatus->Reset();
+        m_bufferStatus->Reset();
     }
 
     if (!handled)

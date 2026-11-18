@@ -29,15 +29,15 @@ static const MythBindingMap k450ShaderBindings = {
         { { 0, { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT, nullptr } } },
         { },
         { },
-        { VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE } }
+        { VK_SHADER_STAGE_VERTEX_BIT, 0, MYTH_PUSHBUFFER_SIZE }, },
     },
     { DefaultFragment450,
         { VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
         { { 1, { 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr } } },
         { },
         { },
-        { } }
-    }
+        { }, },
+    },
 };
 
 static const MythShaderMap k450DefaultShaders = {
@@ -253,8 +253,8 @@ DefaultVertex450,
 0x00000066, 0x00050041, 0x00000069, 0x0000006A,
 0x00000011, 0x00000068, 0x0004003D, 0x0000000D,
 0x0000006B, 0x0000006A, 0x0003003E, 0x00000067,
-0x0000006B, 0x000100FD, 0x00010038
-} } },
+0x0000006B, 0x000100FD, 0x00010038,
+}, }, },
 {
 DefaultFragment450,
 {
@@ -312,8 +312,8 @@ DefaultFragment450,
 0x00000007, 0x00000016, 0x00000015, 0x00050085,
 0x00000007, 0x00000017, 0x00000013, 0x00000016,
 0x0003003E, 0x00000009, 0x00000017, 0x000100FD,
-0x00010038
-} } }
+0x00010038,
+}, }, },
 };
 
 #endif

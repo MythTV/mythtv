@@ -86,12 +86,9 @@ void MediaServer::Init(bool bIsMaster, bool bDisableUPnp /* = false */)
 
     m_webSocketServer = new WebSocketServer();
 
-    if (!m_webSocketServer->isListening())
+    if (!m_webSocketServer->isListening() && !m_webSocketServer->listen(nWSPort))
     {
-        if (!m_webSocketServer->listen(nWSPort))
-        {
-            LOG(VB_GENERAL, LOG_ERR, "MediaServer: WebSocketServer Create Error");
-        }
+        LOG(VB_GENERAL, LOG_ERR, "MediaServer: WebSocketServer Create Error");
     }
 
     QString sFileName = GetMythDB()->GetSetting("upnpDescXmlPath", m_sSharePath);

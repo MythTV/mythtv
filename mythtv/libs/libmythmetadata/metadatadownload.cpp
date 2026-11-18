@@ -884,7 +884,7 @@ static QString getNameWithExtension(const QString &filename, const QString &type
     }
 
     if (RemoteFile::Exists(newname))
-        ret = newname;
+        ret = std::move(newname);
 
     return ret;
 }

@@ -46,7 +46,7 @@ class MUI_PUBLIC MythUIButtonListItem
         CantCheck = -1,
         NotChecked = 0,
         HalfChecked = 1,
-        FullChecked = 2
+        FullChecked = 2,
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, QString text,
@@ -207,9 +207,9 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
 
     enum MovementUnit : std::uint8_t
                       { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
-                        MoveMid, MoveByAmount };
+                        MoveMid, MoveByAmount, };
     enum LayoutType : std::uint8_t
-                     { LayoutVertical, LayoutHorizontal, LayoutGrid };
+                     { LayoutVertical, LayoutHorizontal, LayoutGrid, };
 
 #if 0
     void SetDrawFromBottom(bool draw);
@@ -283,12 +283,12 @@ class MUI_PUBLIC MythUIButtonList : public MythUIType
     void customEvent(QEvent *event) override; // MythUIType
 
     enum ScrollStyle : std::uint8_t
-                     { ScrollFree, ScrollCenter, ScrollGroupCenter };
+                     { ScrollFree, ScrollCenter, ScrollGroupCenter, };
     enum ArrangeType : std::uint8_t
-                     { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
+                     { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack, };
     enum WrapStyle   : std::int8_t
                      { WrapCaptive = -1, WrapNone = 0, WrapSelect = 1,
-                       WrapItems = 2, WrapFlowing = 3 };
+                       WrapItems = 2, WrapFlowing = 3, };
 
     void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                   int alphaMod, QRect clipRect) override; // MythUIType

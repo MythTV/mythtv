@@ -148,13 +148,11 @@ AudioOutput *AudioOutput::OpenAudio(AudioSettings &settings,
             device_name.remove(0, 5);
             QMap<QString, QString> *alsadevs =
                 AudioOutputALSA::GetDevices("pcm");
-            if (!alsadevs->empty() && alsadevs->contains(device_name))
-            {
-                if (alsadevs->value(device_name).contains("pulse",
+            if (!alsadevs->empty() && alsadevs->contains(device_name) &&
+                alsadevs->value(device_name).contains("pulse",
                                                           Qt::CaseInsensitive))
-                {
-                    ispulse = true;
-                }
+            {
+                ispulse = true;
             }
             delete alsadevs;
         }
@@ -297,7 +295,7 @@ AudioOutput::AudioDeviceConfig* AudioOutput::GetAudioDeviceConfig(
     AudioOutput *ao = OpenAudio(name, QString(), willsuspendpa);
     if (ao)
     {
-        aosettings = *(ao->GetOutputSettingsCleaned());
+        aosettings = *ao->GetOutputSettingsCleaned();
         delete ao;
     }
     if (aosettings.IsInvalid())

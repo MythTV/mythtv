@@ -31,7 +31,7 @@ enum ExpireMethodType : std::uint16_t {
     emNormalLiveTVPrograms  = 10001,
     emOldDeletedPrograms    = 10002,
     emNormalDeletedPrograms = 10003,
-    emQuickDeletedPrograms  = 10004
+    emQuickDeletedPrograms  = 10004,
 };
 
 class AutoExpire;

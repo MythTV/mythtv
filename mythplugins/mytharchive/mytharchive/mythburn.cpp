@@ -1123,13 +1123,11 @@ void BurnMenu::start(void)
 
 void BurnMenu::customEvent(QEvent *event)
 {
-    if (auto *dce = dynamic_cast<DialogCompletionEvent*>(event))
+    auto *dce = dynamic_cast<DialogCompletionEvent*>(event);
+    if (dce && (dce->GetId() == "action"))
     {
-        if (dce->GetId() == "action")
-        {
-            doBurn(dce->GetResult());
-            deleteLater();
-        }
+        doBurn(dce->GetResult());
+        deleteLater();
     }
 }
 

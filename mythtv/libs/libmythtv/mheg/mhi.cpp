@@ -87,11 +87,10 @@ MHIContext::MHIContext(InteractiveTV *parent)
             ft_loaded = true;
     }
 
-    if (ft_loaded)
+    if (ft_loaded && LoadFont(FONT_TO_USE))
     {
         // TODO: We need bold and italic versions.
-        if (LoadFont(FONT_TO_USE))
-            m_faceLoaded = true;
+        m_faceLoaded = true;
     }
 }
 
@@ -129,8 +128,8 @@ bool MHIContext::LoadFont(const QString& name)
 MHIContext::~MHIContext()
 {
     StopEngine();
-    delete(m_engine);
-    delete(m_dsmcc);
+    delete m_engine;
+    delete m_dsmcc;
     if (m_faceLoaded) FT_Done_Face(m_face);
 
     ClearDisplay();
@@ -443,11 +442,10 @@ bool MHIContext::GetCarouselData(const QString& objectPath, QByteArray &result)
 {
     QByteArray cert;
     bool const isIC = objectPath.startsWith("http:") || objectPath.startsWith("https:");
-    if (isIC)
+    if (isIC && !CheckAccess(objectPath, cert))
     {
         // Verify access to server
-        if (!CheckAccess(objectPath, cert))
-            return false;
+        return false;
     }
 
     // Get the path components.  The string will normally begin with "//"
@@ -1336,14 +1334,11 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
         FT_GlyphSlot slot = face->glyph; /* a small shortcut */
         FT_Pos advance = slot->metrics.horiAdvance + kerning;
 
-        if (maxSize >= 0)
+        if ((maxSize >= 0) && (FT2Point(width + advance) > maxSize))
         {
-            if (FT2Point(width + advance) > maxSize)
-            {
-                // There isn't enough space for this character.
-                strLen = n;
-                break;
-            }
+            // There isn't enough space for this character.
+            strLen = n;
+            break;
         }
         // Calculate the ascent and descent of this glyph.
         int descent = slot->metrics.height - slot->metrics.horiBearingY;

@@ -284,10 +284,10 @@ void GallerySlideView::customEvent(QEvent *event)
             if (selected && selected->m_id == id)
                 m_infoList.Display(*selected, extra.mid(1));
         }
-        else if (message == "THUMB_AVAILABLE")
+        else if ((message == "THUMB_AVAILABLE") &&
+                 !extra.isEmpty() && m_view->Update(extra[0].toInt()))
         {
-            if (!extra.isEmpty() && m_view->Update(extra[0].toInt()))
-                ShowSlide(0);
+            ShowSlide(0);
         }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)

@@ -118,11 +118,8 @@ void ImportIconsWizard::Init()
     if (m_nMaxCount > 0)
     {
         m_missingIter = m_missingEntries.begin();
-        if (!doLoad())
-        {
-            if (!m_strMatches.isEmpty())
-                askSubmit(m_strMatches);
-        }
+        if (!doLoad() && !m_strMatches.isEmpty())
+            askSubmit(m_strMatches);
     }
 }
 

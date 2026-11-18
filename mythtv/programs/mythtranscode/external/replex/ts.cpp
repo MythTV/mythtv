@@ -175,7 +175,7 @@ static const std::array <const uint32_t,256> crc_table {
    0xea23f0af, 0xeee2ed18, 0xf0a5bd1d, 0xf464a0aa, 0xf9278673, 0xfde69bc4,
    0x89b8fd09, 0x8d79e0be, 0x803ac667, 0x84fbdbd0, 0x9abc8bd5, 0x9e7d9662,
    0x933eb0bb, 0x97ffad0c, 0xafb010b1, 0xab710d06, 0xa6322bdf, 0xa2f33668,
-   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4};
+   0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,};
 
 static unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned int crc)
 {
@@ -289,7 +289,7 @@ int write_audio_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 		   uint8_t ptsdts, ringbuffer *arbuffer)
 {
 	static std::array<int,32> s_count {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -332,7 +332,7 @@ int write_ac3_ts(int n, uint64_t pts, uint8_t *buf, int *alength,
 	 uint8_t ptsdts, int nframes, ringbuffer *ac3rbuffer)
 {
 	static std::array<int,32> s_count {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+					   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
 	int pos = 0;
 	int stuff = 0;
 	int length = *alength;
@@ -387,10 +387,10 @@ void write_ts_patpmt(extdata_t *ext, int extcnt, uint8_t prog_num, uint8_t *buf)
 	//PMT PID = 0x20
 	std::array<uint8_t,17> pat
 	    {0x00, 0x00, 0xb0, 0x0d, 0xfe, 0xef, 0xc1, 0x00, 0x00,
-	     0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00};
+	     0x00, 0x00, 0xe0, PMTPID, 0x00, 0x00, 0x00, 0x00,};
 	std::array<uint8_t,184> pmt
 	    {0x00, 0x02, 0xb0, 0x00, 0x00, 0x00, 0xc1, 0x00, 0x00,
-	     0x00, 0x00, 0xf0, 0x00};
+	     0x00, 0x00, 0xf0, 0x00,};
 
 	//PAT
 	pat[10] = prog_num;

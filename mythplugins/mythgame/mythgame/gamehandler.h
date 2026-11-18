@@ -26,7 +26,7 @@ enum GameFound : std::uint8_t
     inNone,
     inFileSystem,
     inDatabase,
-    inBoth
+    inBoth,
 };
 
 class GameScan

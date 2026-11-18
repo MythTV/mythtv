@@ -19,7 +19,7 @@ QString MasterGuideTable::TableClassString(uint i) const
         QString("EIT + 0x100"),
         QString("Event ETT + 0x200"),
         QString("DCCT + 0x1400"),
-        QString("RTT + 0x300")
+        QString("RTT + 0x300"),
     };
     int tt = TableClass(i) + 1;
     return kTts[tt];
@@ -161,7 +161,7 @@ QString MasterGuideTable::toStringXML(uint indent_level) const
         std::vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(
                 TableDescriptors(i), TableDescriptorsLength(i));
-        str += (desc.empty()) ? " />\n" : ">\n";
+        str += desc.empty() ? " />\n" : ">\n";
         for (auto & j : desc)
         {
             str += MPEGDescriptor(j, 300)

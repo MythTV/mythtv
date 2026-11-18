@@ -1047,7 +1047,7 @@ bool MythMainWindow::IsExitingToMain() const
 
 void MythMainWindow::ExitToMainMenu(void)
 {
-    bool jumpdone = !(m_priv->m_popwindows);
+    bool jumpdone = !m_priv->m_popwindows;
 
     m_priv->m_exitingtomain = true;
 
@@ -1149,12 +1149,12 @@ bool MythMainWindow::TranslateKeyPress(const QString& Context, QKeyEvent* Event,
 
     QStringList localActions;
     auto * keycontext = m_priv->m_keyContexts.value(Context);
-    if (AllowJumps && (m_priv->m_jumpMap.contains(keynum)) &&
-        (!m_priv->m_jumpMap[keynum]->m_localAction.isEmpty()) &&
-        keycontext && (keycontext->GetMapping(keynum, localActions)))
+    if (AllowJumps && m_priv->m_jumpMap.contains(keynum) &&
+        !m_priv->m_jumpMap[keynum]->m_localAction.isEmpty() &&
+        keycontext && keycontext->GetMapping(keynum, localActions) &&
+        localActions.contains(m_priv->m_jumpMap.value(keynum)->m_localAction))
     {
-        if (localActions.contains(m_priv->m_jumpMap.value(keynum)->m_localAction))
-            AllowJumps = false;
+        AllowJumps = false;
     }
 
     if (AllowJumps && m_priv->m_jumpMap.contains(keynum) &&
@@ -1298,7 +1298,7 @@ void MythMainWindow::RegisterKey(const QString& Context, const QString& Action,
                 query.bindValue(":ACTION",      Action);
                 query.bindValue(":HOSTNAME",    GetMythDB()->GetHostName());
 
-                if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
+                if (!query.exec() && !GetMythDB()->SuppressDBMessages())
                 {
                     MythDB::DBError("Update Keybinding", query);
                 }
@@ -1318,7 +1318,7 @@ void MythMainWindow::RegisterKey(const QString& Context, const QString& Action,
             query.bindValue(":KEYLIST", inskey);
             query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
-            if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
+            if (!query.exec() && !GetMythDB()->SuppressDBMessages())
             {
                 MythDB::DBError("Insert Keybinding", query);
             }
@@ -1467,8 +1467,8 @@ void MythMainWindow::RegisterJump(const QString& Destination, const QString& Des
 
     JumpData jd = { .m_callback=Callback, .m_destination=Destination,
                     .m_description=Description, .m_exittomain=Exittomain,
-                    .m_localAction=std::move(LocalAction) };
-    m_priv->m_destinationMap[Destination] = jd;
+                    .m_localAction=std::move(LocalAction), };
+    m_priv->m_destinationMap[Destination] = std::move(jd);
     BindJump(Destination, keybind);
 }
 
@@ -1694,15 +1694,8 @@ bool MythMainWindow::eventFilter(QObject* Watched, QEvent* Event)
             if (event && event->key() <= 0)
             {
                 int keycode = 0;
-                switch (event->nativeScanCode())
-                {
-                    case 209: // XF86AudioPause
-                        keycode = Qt::Key_MediaPause;
-                        break;
-                    default:
-                        break;
-                }
-
+                if (event->nativeScanCode() == 209) // XF86AudioPause
+                    keycode = Qt::Key_MediaPause;
                 if (keycode > 0)
                 {
                     auto * key = new QKeyEvent(QEvent::KeyPress, keycode, event->modifiers());

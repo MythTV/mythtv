@@ -21,20 +21,18 @@ void SatIPRTCPPacket::parse()
         uint16_t length = ((m_data.at(offset + 2) & 0xFF) << 8) | (m_data.at(offset + 3) & 0xFF);
         length++;
 
-        if (type == RTCP_TYPE_APP && offset + 15 < pkt_length)
+        if ((type == RTCP_TYPE_APP && offset + 15 < pkt_length) &&
+            (m_data.at(offset + 8) == 'S') && (m_data.at(offset + 9) == 'E') &&
+            (m_data.at(offset + 10) == 'S') && (m_data.at(offset + 11) == '1'))
         {
-            if ((m_data.at(offset + 8) == 'S') && (m_data.at(offset + 9) == 'E') &&
-                (m_data.at(offset + 10) == 'S') && (m_data.at(offset + 11) == '1'))
-            {
-                uint16_t str_length = ((m_data.at(offset + 14) & 0xFF) << 8) | (m_data.at(offset + 15) & 0xFF);
+            uint16_t str_length = ((m_data.at(offset + 14) & 0xFF) << 8) | (m_data.at(offset + 15) & 0xFF);
 
-                if (offset + 16 + str_length <= pkt_length)
-                {
-                    // clazy:exclude-next-line=detaching-member (modifies item)
-                    QString str = QString::fromUtf8(m_data.data() + offset + 16, str_length);
-                    m_satipData = str;
-                    return;
-                }
+            if (offset + 16 + str_length <= pkt_length)
+            {
+                // clazy:exclude-next-line=detaching-member (modifies item)
+                QString str = QString::fromUtf8(m_data.data() + offset + 16, str_length);
+                m_satipData = std::move(str);
+                return;
             }
         }
 

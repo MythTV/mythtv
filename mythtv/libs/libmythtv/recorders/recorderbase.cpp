@@ -608,7 +608,7 @@ void RecorderBase::SavePositionMap(bool force, bool finished)
 
     bool has_delta = !m_positionMapDelta.empty();
     // set pm_elapsed to a fake large value if the timer hasn't yet started
-    std::chrono::milliseconds pm_elapsed = (m_positionMapTimer.isRunning()) ?
+    std::chrono::milliseconds pm_elapsed = m_positionMapTimer.isRunning() ?
         m_positionMapTimer.elapsed() : std::chrono::milliseconds::max();
     // save on every 1.5 seconds if in the first few frames of a recording
     needToSave |= (m_positionMap.size() < 30) &&

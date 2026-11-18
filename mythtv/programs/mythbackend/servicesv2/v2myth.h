@@ -63,7 +63,7 @@ class V2Myth : public MythHTTPService
         kWebOnlyDBTimezone = 2,
         kWebOnlyWebOnlyParm = 3,
         kWebOnlyIPAddress = 4,
-        kWebOnlySchemaUpdate = 5
+        kWebOnlySchemaUpdate = 5,
     };
     static inline WebOnlyStartup s_WebOnlyStartup {kWebOnlyNone};
 

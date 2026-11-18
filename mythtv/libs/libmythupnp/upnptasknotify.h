@@ -26,7 +26,7 @@
 enum UPnpNotifyNTS : std::uint8_t
 {
     NTS_alive   = 0,
-    NTS_byebye  = 1
+    NTS_byebye  = 1,
 };
 
 class UPnpNotifyTask : public Task

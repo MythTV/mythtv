@@ -338,24 +338,19 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
     }
 
     // burn the dvd if needed
-    if (mediaType != AD_FILE && bDoBurn)
+    if ((mediaType != AD_FILE) && bDoBurn &&
+        (!burnISOImage(mediaType, bEraseDVDRW, true)))
     {
-        if (!burnISOImage(mediaType, bEraseDVDRW, true))
-        {
-            LOG(VB_JOBQUEUE, LOG_ERR,
-                "Native archive job failed to complete");
-            return 1;
-        }
+        LOG(VB_JOBQUEUE, LOG_ERR,
+            "Native archive job failed to complete");
+        return 1;
     }
 
     // create an iso image if needed
-    if (bCreateISO)
+    if (bCreateISO && (!createISOImage(saveDirectory)))
     {
-        if (!createISOImage(saveDirectory))
-        {
-            LOG(VB_JOBQUEUE, LOG_ERR, "Native archive job failed to complete");
-            return 1;
-        }
+        LOG(VB_JOBQUEUE, LOG_ERR, "Native archive job failed to complete");
+        return 1;
     }
 
     LOG(VB_JOBQUEUE, LOG_INFO, "Native archive job completed OK");
@@ -961,14 +956,11 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
             "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", chanID);
     query.bindValue(":STARTTIME", startTime);
-    if (query.exec())
+    if (query.exec() && query.isActive() && query.size())
     {
-        if (query.isActive() && query.size())
-        {
-            LOG(VB_JOBQUEUE, LOG_ERR,
-                "This recording appears to already exist!!");
-            return 1;
-        }
+        LOG(VB_JOBQUEUE, LOG_ERR,
+            "This recording appears to already exist!!");
+        return 1;
     }
 
     QString destFile = MythCoreContext::GenMythURL(gCoreContext->GetMasterHostName(),
@@ -1163,14 +1155,11 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     for (int x = 0; x < dirList.count() - 1; x++)
     {
         path += "/" + dirList[x];
-        if (!dir.exists(path))
+        if (!dir.exists(path) && !dir.mkdir(path))
         {
-            if (!dir.mkdir(path))
-            {
-                LOG(VB_JOBQUEUE, LOG_ERR,
-                    QString("Couldn't create directory '%1'").arg(path));
-                return 1;
-            }
+            LOG(VB_JOBQUEUE, LOG_ERR,
+                QString("Couldn't create directory '%1'").arg(path));
+            return 1;
         }
     }
 
@@ -2426,54 +2415,39 @@ static int main_local(int argc, char **argv)
         }
     }
 
-    if (bGetDBParameters)
+    if (bGetDBParameters && outFile.isEmpty())
     {
-        if (outFile.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Missing argument to -p/--getdbparameters "
-                                     "option");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Missing argument to -p/--getdbparameters "
+            "option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (bIsRemote)
+    if (bIsRemote && inFile.isEmpty())
     {
-        if (inFile.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "Missing argument to -r/--isremote option");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+        LOG(VB_GENERAL, LOG_ERR,
+            "Missing argument to -r/--isremote option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (bDoBurn)
+    if (bDoBurn && (mediaType < 0 || mediaType > 2))
     {
-        if (mediaType < 0 || mediaType > 2)
-        {
-            LOG(VB_GENERAL, LOG_ERR, QString("Invalid mediatype given: %1")
-                    .arg(mediaType));
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+        LOG(VB_GENERAL, LOG_ERR, QString("Invalid mediatype given: %1")
+            .arg(mediaType));
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (bNativeArchive)
+    if (bNativeArchive && outFile.isEmpty())
     {
-        if (outFile.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Missing argument to -n/--nativearchive "
-                                     "option");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Missing argument to -n/--nativearchive "
+            "option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
-    if (bImportArchive)
+    if (bImportArchive && inFile.isEmpty())
     {
-        if (inFile.isEmpty())
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Missing --infile argument to "
-                                     "-f/--importarchive option");
-            return GENERIC_EXIT_INVALID_CMDLINE;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Missing --infile argument to "
+            "-f/--importarchive option");
+        return GENERIC_EXIT_INVALID_CMDLINE;
     }
 
     if (bGetFileInfo)

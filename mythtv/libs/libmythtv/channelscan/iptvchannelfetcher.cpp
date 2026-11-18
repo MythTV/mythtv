@@ -468,20 +468,17 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         }
 
         // No channel number found, try to find channel in database and use that channel number
-        if (fetcher)
+        if (fetcher && channum.isEmpty())
         {
-            if (channum.isEmpty())
+            uint sourceId = fetcher->m_sourceId;
+            QString channum_db = ChannelUtil::GetChannelNumber(sourceId, info.m_name);
+            if (!channum_db.isEmpty())
             {
-                uint sourceId = fetcher->m_sourceId;
-                QString channum_db = ChannelUtil::GetChannelNumber(sourceId, info.m_name);
-                if (!channum_db.isEmpty())
-                {
-                    LOG(VB_RECORD, LOG_INFO, LOC +
-                        QString("Found channel in database, channel number: %1 for channel: %2")
-                            .arg(channum_db, info.m_name));
+                LOG(VB_RECORD, LOG_INFO, LOC +
+                    QString("Found channel in database, channel number: %1 for channel: %2")
+                    .arg(channum_db, info.m_name));
 
-                    channum = channum_db;
-                }
+                channum = channum_db;
             }
         }
 
@@ -490,12 +487,9 @@ fbox_chan_map_t IPTVChannelFetcher::ParsePlaylist(
         {
             bool ok = false;
             int channel_number = channum.toInt(&ok);
-            if (ok && channel_number > 0)
+            if (ok && (channel_number > 0) && (channel_number >= nextChanNum))
             {
-                if (channel_number >= nextChanNum)
-                {
-                    nextChanNum = channel_number + 1;
-                }
+                nextChanNum = channel_number + 1;
             }
         }
 

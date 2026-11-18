@@ -99,7 +99,7 @@ enum scheduleEditTypes : uint8_t {
     kScheduledRecording,
     kViewSchedule,
     kPlaybackBox,
-    kScheduleProgramList
+    kScheduleProgramList,
 };
 
 /**
@@ -302,7 +302,7 @@ class MTV_PUBLIC TV : public TVPlaybackState, public MythTVMenuItemDisplayer, pu
     enum BookmarkAction : uint8_t {
         kBookmarkAlways,
         kBookmarkNever,
-        kBookmarkAuto // set iff db_playback_exit_prompt==2
+        kBookmarkAuto, // set iff db_playback_exit_prompt==2
     };
     void PrepareToExitPlayer(int Line);
     void SetExitPlayer(bool SetIt, bool WantsTo);

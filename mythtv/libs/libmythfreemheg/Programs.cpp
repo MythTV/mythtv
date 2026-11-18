@@ -206,8 +206,8 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetCurrentDate(mJDN, nTimeAsSecs);
                 int nModJulianDate = std::clamp<int64_t>(mJDN, 0, std::numeric_limits<int>::max());
 
-                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(nModJulianDate);
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(nTimeAsSecs);
+                engine->FindObject(*args.GetAt(0)->GetReference())->SetVariableValue(nModJulianDate);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(nTimeAsSecs);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -283,7 +283,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 }
 
                 MHParameter *pResString = args.GetAt(3);
-                engine->FindObject(*(pResString->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*pResString->GetReference())->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -307,7 +307,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 {
                     dayOfWeek = 0;
                 }
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(dayOfWeek);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(dayOfWeek);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -330,7 +330,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 std::uniform_int_distribution<int> distrib {0, nLimit};
                 int r = distrib(generator);
                 engine->FindObject(
-                    *(pResInt->GetReference()))->SetVariableValue(r);
+                    *pResInt->GetReference())->SetVariableValue(r);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -348,7 +348,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetString(args.GetAt(0), string, engine);
                 MHContentRef result;
                 result.m_contentRef.Copy(string);
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -365,7 +365,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 MHObjectRef result;
                 GetString(args.GetAt(0), result.m_groupId, engine);
                 result.m_nObjectNo = GetInt(args.GetAt(1), engine);
-                engine->FindObject(*(args.GetAt(2)->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*args.GetAt(2)->GetReference())->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -383,7 +383,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 GetString(args.GetAt(0), string, engine);
                 MHParameter *pResInt = args.GetAt(1);
                 SetSuccessFlag(success, true, engine);
-                engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(string.Size());
+                engine->FindObject(*pResInt->GetReference())->SetVariableValue(string.Size());
             }
             else
             {
@@ -405,7 +405,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 MHParameter *pResString = args.GetAt(3);
                 // Returns beginExtract to endExtract inclusive.
-                engine->FindObject(*(pResString->GetReference()))->SetVariableValue(
+                engine->FindObject(*pResString->GetReference())->SetVariableValue(
                     MHOctetString(string, nBeginExtract - 1, nEndExtract - nBeginExtract + 1));
                 SetSuccessFlag(success, true, engine);
             }
@@ -456,11 +456,11 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 if (nPos <= string.Size() - searchString.Size())   // Found
                 {
                     // Set the index to the position of the string, counting from 1.
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos + 1);
+                    engine->FindObject(*pResInt->GetReference())->SetVariableValue(nPos + 1);
                 }
                 else   // Not found.  Set the result index to -1
                 {
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(-1);
+                    engine->FindObject(*pResInt->GetReference())->SetVariableValue(-1);
                 }
             }
             else
@@ -512,15 +512,15 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 if (nPos <= string.Size() - searchString.Size())   // Found
                 {
                     // Set the index to the position AFTER the string, counting from 1.
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nPos + 1 + searchString.Size());
+                    engine->FindObject(*pResInt->GetReference())->SetVariableValue(nPos + 1 + searchString.Size());
                     // Return the sequence from nStart-1 of length nPos-nStart+1
                     MHOctetString resultString(string, nStart - 1, nPos - nStart + 1);
-                    engine->FindObject(*(pResString->GetReference()))->SetVariableValue(resultString);
+                    engine->FindObject(*pResString->GetReference())->SetVariableValue(resultString);
                 }
                 else   // Not found.  Set the result string to empty and the result index to -1
                 {
-                    engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(-1);
-                    engine->FindObject(*(pResString->GetReference()))->SetVariableValue(MHOctetString(""));
+                    engine->FindObject(*pResInt->GetReference())->SetVariableValue(-1);
+                    engine->FindObject(*pResString->GetReference())->SetVariableValue(MHOctetString(""));
                 }
             }
             else
@@ -542,7 +542,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // or rec://svc/lcn/N where N is the "logical channel number" i.e. the Freeview channel.
                 QString str = QString::fromUtf8((const char *)string.Bytes(), string.Size());
                 int nResult = engine->GetContext()->GetChannelIndex(str);
-                engine->FindObject(*(pResInt->GetReference()))->SetVariableValue(nResult);
+                engine->FindObject(*pResInt->GetReference())->SetVariableValue(nResult);
                 SetSuccessFlag(success, nResult >= 0, engine);
             }
             else
@@ -598,10 +598,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 if (res)
                 {
-                    engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(netId);
-                    engine->FindObject(*(args.GetAt(2)->GetReference()))->SetVariableValue(origNetId);
-                    engine->FindObject(*(args.GetAt(3)->GetReference()))->SetVariableValue(transportId);
-                    engine->FindObject(*(args.GetAt(4)->GetReference()))->SetVariableValue(serviceId);
+                    engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(netId);
+                    engine->FindObject(*args.GetAt(2)->GetReference())->SetVariableValue(origNetId);
+                    engine->FindObject(*args.GetAt(3)->GetReference())->SetVariableValue(transportId);
+                    engine->FindObject(*args.GetAt(4)->GetReference())->SetVariableValue(serviceId);
                 }
 
                 SetSuccessFlag(success, res, engine);
@@ -625,7 +625,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             if (args.Size() == 3)
             {
                 MHUnion un;
-                un.GetValueFrom(*(args.GetAt(0)), engine);
+                un.GetValueFrom(*args.GetAt(0), engine);
                 un.CheckType(MHUnion::U_ContentRef);
                 MHContentRef fileName;
                 fileName.Copy(un.m_contentRefVal);
@@ -641,10 +641,10 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
 
                 // Set the result variable.
                 MHParameter *pResFlag = args.GetAt(1);
-                engine->FindObject(*(pResFlag->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*pResFlag->GetReference())->SetVariableValue(result);
                 MHParameter *pResCR = args.GetAt(2);
                 // Copy the file name to the resulting content ref.
-                engine->FindObject(*(pResCR->GetReference()))->SetVariableValue(fileName);
+                engine->FindObject(*pResCR->GetReference())->SetVariableValue(fileName);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -715,7 +715,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 result.Append(engine->GetContext()->GetDSMCCId());
 #endif
                 MHLOG(MHLogNotifications, "NOTE WhoAmI -> " + QString::fromUtf8((const char *)result.Bytes(), result.Size()) );
-                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*args.GetAt(0)->GetReference())->SetVariableValue(result);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -732,7 +732,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             for (int i = 0; i < args.Size(); i++)
             {
                 MHUnion un;
-                un.GetValueFrom(*(args.GetAt(i)), engine);
+                un.GetValueFrom(*args.GetAt(i), engine);
 
                 switch (un.m_Type)
                 {
@@ -785,7 +785,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 MHLOG(MHLogNotifications, "NOTE InteractionChannel " + QString(
                     ICstatus == 0 ? "active" : ICstatus == 1 ? "inactive" :
                     ICstatus == 2 ? "disabled" : "undefined"));
-                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(ICstatus);
+                engine->FindObject(*args.GetAt(0)->GetReference())->SetVariableValue(ICstatus);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -813,7 +813,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     GetString(args.GetAt(i), string, engine);
                     QString name = QString::fromUtf8((const char *)string.Bytes(), string.Size());
                     MHUnion un;
-                    un.GetValueFrom(*(args.GetAt(i+1)), engine);
+                    un.GetValueFrom(*args.GetAt(i+1), engine);
                     q.addQueryItem(name, un.Printable());
                 }
                 url.setQuery(q);
@@ -828,11 +828,11 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                     .arg(text.size()) );
 
                 // HTTP response code, 0= none
-                engine->FindObject(*(args.GetAt(i)->GetReference()))->SetVariableValue(ok ? 200 : 0);
+                engine->FindObject(*args.GetAt(i)->GetReference())->SetVariableValue(ok ? 200 : 0);
                 // HTTP response data
                 MHOctetString result;
                 result.Append(text.constData());
-                engine->FindObject(*(args.GetAt(i+1)->GetReference()))->SetVariableValue(result);
+                engine->FindObject(*args.GetAt(i+1)->GetReference())->SetVariableValue(result);
 
                 SetSuccessFlag(success, true, engine);
             }
@@ -862,7 +862,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         else if (m_name.Equal("PST")) { // PersistentStorageInfo
             if (args.Size() == 1)
             {
-                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
+                engine->FindObject(*args.GetAt(0)->GetReference())->SetVariableValue(true);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -905,7 +905,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 MHLOG(MHLogNotifications, QString("NOTE MeasureStreamPerformance '%1' %2 bytes")
                     .arg(url).arg(GetInt(args.GetAt(1), engine)) );
 
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(-1);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(-1);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -921,7 +921,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 QString info = QString::fromUtf8((const char *)string.Bytes(), string.Size());
                 MHLOG(MHLogNotifications, QString("NOTE PromptForGuidance '%1'").arg(info) );
 
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(true);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(true);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -934,7 +934,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                  m_name.Equal("GSP")) { // GetSubtitlePref
             if (args.Size() == 1)
             {
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(false);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(false);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -948,7 +948,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
                 // -1= PIN is not supported
                 //  0= PIN is supported and disabled
                 //  1= PIN is supported and enabled
-                engine->FindObject(*(args.GetAt(1)->GetReference()))->SetVariableValue(0);
+                engine->FindObject(*args.GetAt(1)->GetReference())->SetVariableValue(0);
                 SetSuccessFlag(success, true, engine);
             }
             else
@@ -963,7 +963,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
             // Required for BBC Freeview iPlayer
             MHLOG(MHLogNotifications, "NOTE Undocumented ResidentProgram XBM" );
             if (args.Size() == 1)
-                engine->FindObject(*(args.GetAt(0)->GetReference()))->SetVariableValue(true);
+                engine->FindObject(*args.GetAt(0)->GetReference())->SetVariableValue(true);
             SetSuccessFlag(success, true, engine);
         }
 
@@ -979,7 +979,7 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         for (int i = 0; i < args.Size(); ++i)
         {
             MHUnion un;
-            un.GetValueFrom(*(args.GetAt(i)), engine);
+            un.GetValueFrom(*args.GetAt(i), engine);
             params += QString(MHUnion::GetAsString(un.m_Type)) + "=" + un.Printable();
         }
         MHLOG(MHLogWarning, QString("Arguments (%1)").arg(params.join(",")) );

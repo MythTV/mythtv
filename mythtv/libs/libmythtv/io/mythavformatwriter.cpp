@@ -199,7 +199,7 @@ bool MythAVFormatWriter::CloseFile(void)
 
 bool MythAVFormatWriter::NextFrameIsKeyFrame(void)
 {
-    return (m_bufferedVideoFrameTypes.isEmpty()) ||
+    return m_bufferedVideoFrameTypes.isEmpty() ||
            (m_bufferedVideoFrameTypes.constFirst() == AV_PICTURE_TYPE_I);
 }
 
@@ -580,7 +580,7 @@ AVStream* MythAVFormatWriter::AddAudioStream(void)
     context->codec_type   = AVMEDIA_TYPE_AUDIO;
     context->bit_rate     = m_audioBitrate;
     context->sample_rate  = m_audioFrameRate;
-    av_channel_layout_default(&(context->ch_layout), m_audioChannels);
+    av_channel_layout_default(&context->ch_layout, m_audioChannels);
 
     // c->flags |= CODEC_FLAG_QSCALE; // VBR
     // c->global_quality = blah;

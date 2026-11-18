@@ -39,7 +39,7 @@ enum EventType : std::uint8_t
        EventHeadItems, EventTailItems, EventItemSelected, EventItemDeselected, EventEntryFieldFull,
        EventEngineEvent,
        // The next two events are added in UK MHEG.
-       EventFocusMoved, EventSliderValueChanged };
+       EventFocusMoved, EventSliderValueChanged, };
 
 class MHRoot  
 {

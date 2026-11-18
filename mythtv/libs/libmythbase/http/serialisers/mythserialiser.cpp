@@ -52,13 +52,13 @@ HTTPData MythSerialiser::Serialise(const QString &Name, const QVariant& Value, c
     static const std::array<MythMimeType,2> s_jsonTypes =
     {
         MythMimeDatabase::MimeTypeForName("application/json"),
-        MythMimeDatabase::MimeTypeForName("text/javascript")
+        MythMimeDatabase::MimeTypeForName("text/javascript"),
     };
 
     static const std::array<MythMimeType,2> s_binaryPlists =
     {
         MythMimeDatabase::MimeTypeForName("application/x-plist"),
-        MythMimeDatabase::MimeTypeForName("application/x-apple-binary-plist")
+        MythMimeDatabase::MimeTypeForName("application/x-apple-binary-plist"),
     };
 
     // Check for preformatted xml or html

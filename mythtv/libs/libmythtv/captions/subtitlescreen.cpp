@@ -414,7 +414,7 @@ void SubtitleFormat::CreateProviderDefault(const QString &family,
             "Droid Sans",      // prop sans
             "Purisa",          // casual
             "TeX Gyre Chorus", // cursive
-            "Droid Serif"      // small caps, QFont::SmallCaps will be applied
+            "Droid Serif",      // small caps, QFont::SmallCaps will be applied
         };
         font->GetFace()->setFamily(QString::fromStdString(s_cc708Fonts[attr.m_fontTag & 0x7]));
     }
@@ -750,7 +750,7 @@ bool FormattedTextChunk::PreRender(bool isFirst, bool isLast,
     m_textFont = m_parent->GetFont(m_format);
     if (!m_textFont)
         return false;
-    QFontMetrics font(*(m_textFont->GetFace()));
+    QFontMetrics font(*m_textFont->GetFace());
     // If the chunk starts with whitespace, the leading whitespace
     // ultimately gets lost due to the text.trimmed() operation in the
     // MythUISimpleText constructor.  To compensate, we manually
@@ -1432,7 +1432,7 @@ SubtitleScreen::SubtitleScreen(MythPlayer *Player, MythPainter *Painter,
 {
     m_painter = Painter;
 
-    connect(m_player, &MythPlayer::SeekingDone, this, [&]()
+    connect(m_player, &MythPlayer::SeekingDone, this, [&]
     {
         LOG(VB_PLAYBACK, LOG_INFO, LOC + "SeekingDone signal received.");
         m_atEnd = false;
@@ -1564,7 +1564,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     uint w = hl_button->w;
     QRect rect = QRect(hl_button->x, hl_button->y, w, h);
     QImage bg_image(hl_button->data[0], w, h, w, QImage::Format_Indexed8);
-    auto *bgpalette = (uint32_t *)(hl_button->data[1]);
+    auto *bgpalette = (uint32_t *)hl_button->data[1];
 
     QVector<uint32_t> bg_palette(4);
     for (int i = 0; i < 4; i++)
@@ -1575,7 +1575,7 @@ void SubtitleScreen::DisplayDVDButton(AVSubtitle* dvdButton, QRect &buttonPos)
     const QRect fg_rect(buttonPos.translated(-hl_button->x, -hl_button->y));
     QImage fg_image = bg_image.copy(fg_rect);
     QVector<uint32_t> fg_palette(4);
-    auto *fgpalette = (uint32_t *)(dvdButton->rects[1]->data[1]);
+    auto *fgpalette = (uint32_t *)dvdButton->rects[1]->data[1];
     if (fgpalette)
     {
         for (int i = 0; i < 4; i++)
@@ -1883,7 +1883,7 @@ void SubtitleScreen::DisplayAVSubtitles(void)
         return;
 
     AVSubtitles* subs = m_subreader->GetAVSubtitles();
-    QMutexLocker lock(&(subs->m_lock));
+    QMutexLocker lock(&subs->m_lock);
     if (subs->m_buffers.empty()
       && (kDisplayAVSubtitle != m_subtitleType)
       && (kDisplayTextSubtitle != m_subtitleType))

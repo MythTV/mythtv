@@ -775,15 +775,12 @@ QByteArray WebSocketWorker::CreateFrame(WebSocketFrame::OpCode type,
         return frame;
     }
 
-    if (type >= 0x08)
+    if ((type >= 0x08) && (payloadSize > 125))
     {
         //if (!m_finalFrame)
         //   SendClose(kCloseProtocolError, "Control frames MUST NOT be fragmented");
-        if (payloadSize > 125)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::CreateFrame() - Control frames MUST NOT have payload greater than 125bytes");
-            return frame;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "WebSocketWorker::CreateFrame() - Control frames MUST NOT have payload greater than 125bytes");
+        return frame;
     }
 
     uint16_t header = 0;

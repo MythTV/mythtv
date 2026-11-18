@@ -163,13 +163,11 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
     {
         LOG(VB_GENERAL, LOG_ERR, QString("LAME encoder error."));
     } 
-    else if (lameret > 0 && m_out)
+    else if ((lameret > 0 && m_out) &&
+             (write_buffer(m_mp3Buf, lameret, m_out) != lameret))
     {
-        if (write_buffer(m_mp3Buf, lameret, m_out) != lameret)
-        {
-            LOG(VB_GENERAL, LOG_ERR, "Failed to write mp3 data. Aborting.");
-            return EENCODEERROR;
-        }
+        LOG(VB_GENERAL, LOG_ERR, "Failed to write mp3 data. Aborting.");
+        return EENCODEERROR;
     }
 
     return 0;

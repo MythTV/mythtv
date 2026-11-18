@@ -49,7 +49,7 @@ static constexpr int64_t kLookForwardTime { 1LL * 60 * 60 };
 
 static constexpr std::chrono::minutes kExtensionTime {10};
 static constexpr int kExtensionTimeInSec {
-    (duration_cast<std::chrono::seconds>(kExtensionTime).count()) };
+    duration_cast<std::chrono::seconds>(kExtensionTime).count(), };
 static const QRegularExpression kVersusPattern {R"(\s(at|@|vs\.?)\s)"};
 static const QRegularExpression kSentencePattern {R"(:|\.+\s)"};
 
@@ -110,14 +110,14 @@ bool ActiveGame::teamsMatch(const QStringList& names, const QStringList& abbrevs
         return true;
 
     // One name or the other is shortened
-    if (((m_team1Normalized.contains(names[0])) ||
-         (names[0].contains(m_team1Normalized))) &&
-        ((m_team2Normalized.contains(names[1])) ||
+    if ((m_team1Normalized.contains(names[0]) ||
+         names[0].contains(m_team1Normalized)) &&
+        (m_team2Normalized.contains(names[1]) ||
          names[1].contains(m_team2Normalized)))
         return true;
-    if (((m_team1Normalized.contains(names[1])) ||
-         (names[1].contains(m_team1Normalized))) &&
-        ((m_team2Normalized.contains(names[0])) ||
+    if ((m_team1Normalized.contains(names[1]) ||
+         names[1].contains(m_team1Normalized)) &&
+        (m_team2Normalized.contains(names[0]) ||
          names[0].contains(m_team2Normalized)))
         return true;
 
@@ -919,16 +919,14 @@ GameState RecExtMlbDataPage::findGameScore(ActiveGame& game)
         return {};
     }
 
-     if (detailedGameState != "Scheduled")
+     if ((detailedGameState != "Scheduled") &&
+         (!getJsonInt(json, "liveData/linescore/currentInning", period) ||
+          !getJsonString(json, "liveData/linescore/currentInningOrdinal", inningOrdinal) ||
+          !getJsonString(json, "liveData/linescore/inningState", inningState)))
      {
-         if (!getJsonInt(   json, "liveData/linescore/currentInning", period) ||
-             !getJsonString(json, "liveData/linescore/currentInningOrdinal", inningOrdinal) ||
-             !getJsonString(json, "liveData/linescore/inningState", inningState))
-         {
-             LOG(VB_GENERAL, LOG_INFO, LOC +
-                 QString("malformed json document (%d)").arg(2));
-             return {};
-         }
+         LOG(VB_GENERAL, LOG_INFO, LOC +
+             QString("malformed json document (%d)").arg(2));
+         return {};
      }
 
     bool gameOver = (abstractGameState == "Final") ||

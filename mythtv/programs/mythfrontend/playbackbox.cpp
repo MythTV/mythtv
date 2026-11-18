@@ -74,9 +74,9 @@ static int comp_programid_rev(const ProgramInfo *a, const ProgramInfo *b)
 
 static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
 {
-    QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
+    QDate dt1 = a->GetOriginalAirDate().isValid() ?
         a->GetOriginalAirDate() : a->GetScheduledStartTime().date();
-    QDate dt2 = (b->GetOriginalAirDate().isValid()) ?
+    QDate dt2 = b->GetOriginalAirDate().isValid() ?
         b->GetOriginalAirDate() : b->GetScheduledStartTime().date();
 
     if (dt1 == dt2)
@@ -87,9 +87,9 @@ static int comp_originalAirDate(const ProgramInfo *a, const ProgramInfo *b)
 
 static int comp_originalAirDate_rev(const ProgramInfo *a, const ProgramInfo *b)
 {
-    QDate dt1 = (a->GetOriginalAirDate().isValid()) ?
+    QDate dt1 = a->GetOriginalAirDate().isValid() ?
         a->GetOriginalAirDate() : a->GetScheduledStartTime().date();
-    QDate dt2 = (b->GetOriginalAirDate().isValid()) ?
+    QDate dt2 = b->GetOriginalAirDate().isValid() ?
         b->GetOriginalAirDate() : b->GetScheduledStartTime().date();
 
     if (dt1 == dt2)
@@ -250,7 +250,7 @@ static bool comp_season_rev_less_than(
 }
 
 static const std::array<const uint,3> s_artDelay
-    { kArtworkFanTimeout, kArtworkBannerTimeout, kArtworkCoverTimeout,};
+    { kArtworkFanTimeout, kArtworkBannerTimeout, kArtworkCoverTimeout};
 
 static PlaybackBox::ViewMask m_viewMaskToggle(PlaybackBox::ViewMask mask,
         PlaybackBox::ViewMask toggle)
@@ -499,7 +499,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, const QString& name,
         m_player->IncrRef();
         QString tmp = m_player->GetRecordingGroup();
         if (!tmp.isEmpty())
-            m_recGroup = tmp;
+            m_recGroup = std::move(tmp);
     }
 
     // recording group stuff
@@ -776,7 +776,7 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         desc = tr("There is no recording in this display group.");
     }
 
-    infoMap["description"] = desc;
+    infoMap["description"] = std::move(desc);
     infoMap["rec_count"] = QString("%1").arg(countInGroup);
 
     ResetMap(m_currentMap);
@@ -833,7 +833,7 @@ static const std::array<const std::string,9> disp_flags
 {
     "playlist", "watched", "preserve",
     "cutlist", "autoexpire", "editing",
-    "bookmark", "inuse", "transcoded"
+    "bookmark", "inuse", "transcoded",
 };
 
 void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
@@ -1255,13 +1255,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo->GetAudioProperties() & (*it))
+            if ((pginfo->GetAudioProperties() & (*it)) &&
+                iconState->DisplayState(it.key().mid(1)))
             {
-                if (iconState->DisplayState(it.key().mid(1)))
-                {
-                    haveIcon = true;
-                    break;
-                }
+                haveIcon = true;
+                break;
             }
         }
     }
@@ -1293,13 +1291,10 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
 
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (props & (*it))
+            if ((props & (*it)) && iconState->DisplayState(it.key()))
             {
-                if (iconState->DisplayState(it.key()))
-                {
-                    haveIcon = true;
-                    break;
-                }
+                haveIcon = true;
+                break;
             }
         }
     }
@@ -1315,13 +1310,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo->GetVideoProperties() & (*it))
+            if ((pginfo->GetVideoProperties() & (*it)) &&
+                iconState->DisplayState(it.key()))
             {
-                if (iconState->DisplayState(it.key()))
-                {
-                    haveIcon = true;
-                    break;
-                }
+                haveIcon = true;
+                break;
             }
         }
     }
@@ -1340,13 +1333,11 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
         {
-            if (pginfo->GetSubtitleType() & (*it))
+            if ((pginfo->GetSubtitleType() & (*it)) &&
+                iconState->DisplayState(it.key()))
             {
-                if (iconState->DisplayState(it.key()))
-                {
-                    haveIcon = true;
-                    break;
-                }
+                haveIcon = true;
+                break;
             }
         }
     }
@@ -1355,11 +1346,9 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("categorytype"));
-    if (iconState)
-    {
-        if (!(pginfo && iconState->DisplayState(pginfo->GetCategoryTypeString())))
-            iconState->Reset();
-    }
+    if (iconState &&
+        (!(pginfo && iconState->DisplayState(pginfo->GetCategoryTypeString()))))
+        iconState->Reset();
 }
 
 bool PlaybackBox::IsUsageUIVisible(void) const
@@ -1766,12 +1755,12 @@ bool PlaybackBox::UpdateUILists(void)
     QStringList itemSelPref;
     QStringList itemTopPref;
     if (!save_position(m_groupList, m_recordingList,
-                       groupSelPref, itemSelPref, itemTopPref))
+                       groupSelPref, itemSelPref, itemTopPref) &&
+        m_watchListStart && (m_viewMask & VIEW_WATCHLIST))
     {
         // If user wants to start in watchlist and watchlist is displayed, then
         // make it the current group
-        if (m_watchListStart && (m_viewMask & VIEW_WATCHLIST))
-            groupSelPref.push_back(m_watchGroupLabel);
+        groupSelPref.push_back(m_watchGroupLabel);
     }
 
     // Cache available status for later restoration
@@ -3056,9 +3045,9 @@ MythMenu* PlaybackBox::createStorageMenu()
         return nullptr;
 
     QString title = tr("Storage Options") + CreateProgramInfoString(*pginfo);
-    QString autoExpireText = (pginfo->IsAutoExpirable()) ?
+    QString autoExpireText = pginfo->IsAutoExpirable() ?
         tr("Disable Auto Expire") : tr("Enable Auto Expire");
-    QString preserveText = (pginfo->IsPreserved()) ?
+    QString preserveText = pginfo->IsPreserved() ?
         tr("Do not preserve this episode") : tr("Preserve this episode");
 
     auto *menu = new MythMenu(title, this, "slotmenu");
@@ -3535,9 +3524,9 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
     {
         ProgramInfo *tmpItem = FindProgramInUILists(*it);
         if (tmpItem &&
-            (JobQueue::IsJobQueuedOrRunning(
+            JobQueue::IsJobQueuedOrRunning(
                 jobType,
-                tmpItem->GetChanID(), tmpItem->GetRecordingStartTime())))
+                tmpItem->GetChanID(), tmpItem->GetRecordingStartTime()))
         {
             JobQueue::ChangeJobCmds(
                 jobType, tmpItem->GetChanID(),
@@ -3667,9 +3656,9 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(uint recordingID,
 {
     // LiveTV ProgramInfo's are not in the aggregated list
     std::array<ProgramList::iterator,2> _it {
-        m_progLists[tr("Live TV").toLower()].begin(), m_progLists[""].begin() };
+        m_progLists[tr("Live TV").toLower()].begin(), m_progLists[""].begin(), };
     std::array<ProgramList::iterator,2> _end {
-        m_progLists[tr("Live TV").toLower()].end(),   m_progLists[""].end()   };
+        m_progLists[tr("Live TV").toLower()].end(),   m_progLists[""].end(),   };
 
     if (recgroup != "LiveTV")
     {
@@ -3845,60 +3834,59 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 {
     QStringList tokens = command.simplified().split(" ");
 
-    if (tokens.size() >= 4 && (tokens[1] == "PLAY" || tokens[1] == "RESUME"))
+    if (tokens.size() == 6 &&
+        (tokens[1] == "PLAY" || tokens[1] == "RESUME") &&
+        tokens[2] == "PROGRAM")
     {
-        if (tokens.size() == 6 && tokens[2] == "PROGRAM")
+        int clientID = tokens[5].toInt();
+
+        LOG(VB_GENERAL, LOG_INFO, LOC +
+            QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
+            .arg(tokens[1], tokens[3], tokens[4]));
+
+        if (m_playingSomething)
         {
-            int clientID = tokens[5].toInt();
+            LOG(VB_GENERAL, LOG_ERR, LOC +
+                "NetworkControl: Already playing");
 
-            LOG(VB_GENERAL, LOG_INFO, LOC +
-                QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
-                    .arg(tokens[1], tokens[3], tokens[4]));
+            QString msg = QString(
+                "NETWORK_CONTROL RESPONSE %1 ERROR: Unable to play, "
+                "player is already playing another recording.")
+                .arg(clientID);
 
-            if (m_playingSomething)
-            {
-                LOG(VB_GENERAL, LOG_ERR, LOC +
-                    "NetworkControl: Already playing");
+            MythEvent me(msg);
+            gCoreContext->dispatch(me);
+            return;
+        }
 
-                QString msg = QString(
-                    "NETWORK_CONTROL RESPONSE %1 ERROR: Unable to play, "
-                    "player is already playing another recording.")
-                    .arg(clientID);
+        uint chanid = tokens[3].toUInt();
+        QDateTime recstartts = MythDate::fromString(tokens[4]);
+        ProgramInfo pginfo(chanid, recstartts);
 
-                MythEvent me(msg);
-                gCoreContext->dispatch(me);
-                return;
-            }
+        if (pginfo.GetChanID())
+        {
+            QString msg = QString("NETWORK_CONTROL RESPONSE %1 OK")
+                .arg(clientID);
+            MythEvent me(msg);
+            gCoreContext->dispatch(me);
 
-            uint chanid = tokens[3].toUInt();
-            QDateTime recstartts = MythDate::fromString(tokens[4]);
-            ProgramInfo pginfo(chanid, recstartts);
+            pginfo.SetPathname(pginfo.GetPlaybackURL());
 
-            if (pginfo.GetChanID())
-            {
-                QString msg = QString("NETWORK_CONTROL RESPONSE %1 OK")
-                                      .arg(clientID);
-                MythEvent me(msg);
-                gCoreContext->dispatch(me);
-
-                pginfo.SetPathname(pginfo.GetPlaybackURL());
-
-                const bool ignoreBookmark = (tokens[1] == "PLAY");
-                const bool ignoreProgStart = true;
-                const bool ignoreLastPlayPos = true;
-                const bool underNetworkControl = true;
-                PlayX(pginfo, ignoreBookmark, ignoreProgStart,
-                      ignoreLastPlayPos, underNetworkControl);
-            }
-            else
-            {
-                QString message = QString("NETWORK_CONTROL RESPONSE %1 "
-                                          "ERROR: Could not find recording for "
-                                          "chanid %2 @ %3")
-                    .arg(tokens[5], tokens[3], tokens[4]);
-                MythEvent me(message);
-                gCoreContext->dispatch(me);
-            }
+            const bool ignoreBookmark = (tokens[1] == "PLAY");
+            const bool ignoreProgStart = true;
+            const bool ignoreLastPlayPos = true;
+            const bool underNetworkControl = true;
+            PlayX(pginfo, ignoreBookmark, ignoreProgStart,
+                  ignoreLastPlayPos, underNetworkControl);
+        }
+        else
+        {
+            QString message = QString("NETWORK_CONTROL RESPONSE %1 "
+                                      "ERROR: Could not find recording for "
+                                      "chanid %2 @ %3")
+                .arg(tokens[5], tokens[3], tokens[4]);
+            MythEvent me(message);
+            gCoreContext->dispatch(me);
         }
     }
 }
@@ -4699,7 +4687,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
     else if (newRecGroup == ProgramInfo::i18n("Deleted"))
         newRecGroup = "Deleted";
 
-    m_recGroup = newRecGroup;
+    m_recGroup = std::move(newRecGroup);
 
     m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
@@ -5627,7 +5615,7 @@ void PlaybackBox::PbbJobQueue::Update()
         {
             m_jobs.insert(qMakePair(job.chanid, job.recstartts), job);
         }
-        m_lastUpdated = now;
+        m_lastUpdated = std::move(now);
     }
 }
 

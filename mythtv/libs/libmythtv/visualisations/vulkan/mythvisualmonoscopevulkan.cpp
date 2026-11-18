@@ -13,20 +13,20 @@ static const MythBindingMap k450LineBindings = {
         { VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
         { { 0, { .binding=0, .descriptorType=VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                  .descriptorCount=1, .stageFlags=VK_SHADER_STAGE_VERTEX_BIT,
-                 .pImmutableSamplers=nullptr } } },
+                 .pImmutableSamplers=nullptr, }, }, },
         { .binding=0, .stride=2 * sizeof(float),
-          .inputRate=VK_VERTEX_INPUT_RATE_VERTEX },
+          .inputRate=VK_VERTEX_INPUT_RATE_VERTEX, },
         { { 0, 0, VK_FORMAT_R32G32_SFLOAT, 0 } },
         { .stageFlags=VK_SHADER_STAGE_VERTEX_BIT, .offset=0,
-          .size=sizeof(PushBuffer) } }
+          .size=sizeof(PushBuffer), }, },
     },
     { LineFragment450,
         { VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
         { },
         { },
         { },
-        { } }
-    }
+        { }, },
+    },
 };
 
 static const MythShaderMap k450LineShaders = {
@@ -145,8 +145,8 @@ LineVertex450,
 0x00050041, 0x0000002C, 0x0000002D, 0x00000019,
 0x0000002B, 0x0004003D, 0x00000007, 0x0000002E,
 0x0000002D, 0x0003003E, 0x0000002A, 0x0000002E,
-0x000100FD, 0x00010038
-} } },
+0x000100FD, 0x00010038,
+}, }, },
 {
 LineFragment450,
 {
@@ -183,8 +183,8 @@ LineFragment450,
 0x00050036, 0x00000002, 0x00000004, 0x00000000,
 0x00000003, 0x000200F8, 0x00000005, 0x0004003D,
 0x00000007, 0x0000000C, 0x0000000B, 0x0003003E,
-0x00000009, 0x0000000C, 0x000100FD, 0x00010038
-} } }
+0x00000009, 0x0000000C, 0x000100FD, 0x00010038,
+}, }, },
 };
 
 MythVisualMonoScopeVulkan::MythVisualMonoScopeVulkan(AudioPlayer *Audio, MythRender *Render, bool Fade)

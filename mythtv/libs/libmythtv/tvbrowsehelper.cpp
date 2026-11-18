@@ -302,22 +302,22 @@ void TVBrowseHelper::GetNextProgram(BrowseDirection Direction, InfoMap& Infomap)
         QString lenM;
         QString lenHM;
         format_time(static_cast<int>(begts.secsTo(endts)), lenM, lenHM);
-        Infomap["lenmins"] = lenM;
-        Infomap["lentime"] = lenHM;
+        Infomap["lenmins"] = std::move(lenM);
+        Infomap["lentime"] = std::move(lenHM);
     }
 
-    Infomap["dbstarttime"] = starttime;
-    Infomap["dbendtime"]   = endtime;
-    Infomap["title"]       = title;
-    Infomap["subtitle"]    = subtitle;
-    Infomap["description"] = desc;
-    Infomap["category"]    = category;
-    Infomap["callsign"]    = callsign;
-    Infomap["channum"]     = channum;
-    Infomap["chanid"]      = chanid;
-    Infomap["iconpath"]    = iconpath;
-    Infomap["seriesid"]    = seriesid;
-    Infomap["programid"]   = programid;
+    Infomap["dbstarttime"] = std::move(starttime);
+    Infomap["dbendtime"]   = std::move(endtime);
+    Infomap["title"]       = std::move(title);
+    Infomap["subtitle"]    = std::move(subtitle);
+    Infomap["description"] = std::move(desc);
+    Infomap["category"]    = std::move(category);
+    Infomap["callsign"]    = std::move(callsign);
+    Infomap["channum"]     = std::move(channum);
+    Infomap["chanid"]      = std::move(chanid);
+    Infomap["iconpath"]    = std::move(iconpath);
+    Infomap["seriesid"]    = std::move(seriesid);
+    Infomap["programid"]   = std::move(programid);
 }
 
 void TVBrowseHelper::GetNextProgramDB(BrowseDirection direction, InfoMap& Infomap) const
@@ -434,7 +434,7 @@ void TVBrowseHelper::run()
                                chanids_extra.end());
             }
             m_browseChanNum   = bi.m_chanNum;
-            m_browseChanId    = (chanids.empty()) ? bi.m_chanId : chanids[0];
+            m_browseChanId    = chanids.empty() ? bi.m_chanId : chanids[0];
             m_browseStartTime = bi.m_startTime;
         }
 

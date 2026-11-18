@@ -132,25 +132,25 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     //   table_type_PID                13  2.3
     uint TablePID(uint i) const
     {
-        return ((m_ptrs[i][2]<<8) | (m_ptrs[i][3])) & 0x1fff;
+        return ((m_ptrs[i][2]<<8) | m_ptrs[i][3]) & 0x1fff;
     }
     //   reserved                       3  4.0    0x7
     //   table_type_version_number      5  4.3
     uint TableVersion(uint i) const
     {
-        return (m_ptrs[i][4]) & 0x1f;
+        return m_ptrs[i][4] & 0x1f;
     }
     //   number_bytes for table desc.  32  5.0
     uint TableDescriptorsBytes(uint i) const
     {
         return ((m_ptrs[i][5]<<24) | (m_ptrs[i][6]<<16) |
-                (m_ptrs[i][7]<<8)  | (m_ptrs[i][8]));
+                (m_ptrs[i][7]<<8)  | m_ptrs[i][8]);
     }
     //   reserved                       4  9.0    0xf
     //   table_type_descriptors_length 12  9.4
     uint TableDescriptorsLength(uint i) const
     {
-        return ((m_ptrs[i][9]<<8) | (m_ptrs[i][10])) & 0xfff;
+        return ((m_ptrs[i][9]<<8) | m_ptrs[i][10]) & 0xfff;
     }
 
     //   for (I = 0; I<M; I++)
@@ -166,7 +166,7 @@ class MTV_PUBLIC MasterGuideTable : public PSIPTable
     uint GlobalDescriptorsLength() const
     {
         return ((m_ptrs[TableCount()][0]<<8) |
-                (m_ptrs[TableCount()][1])) & 0xfff;
+                m_ptrs[TableCount()][1]) & 0xfff;
     }
 
     const unsigned char* GlobalDescriptors() const
@@ -249,12 +249,12 @@ class MTV_PUBLIC VirtualChannelTable : public PSIPTable
     //              JJ JJjj jjjj  mm MMMM MMMM
     uint MajorChannel(uint i) const
     {
-        return (((m_ptrs[i][14])<<6)&0x3c0) | (m_ptrs[i][15]>>2);
+        return ((m_ptrs[i][14]<<6)&0x3c0) | (m_ptrs[i][15]>>2);
     }
     //   minor_channel_number  10  14.6
     uint MinorChannel(uint i) const
     {
-        return (((m_ptrs[i][15])<<8)&0x300) | m_ptrs[i][16];
+        return ((m_ptrs[i][15]<<8)&0x300) | m_ptrs[i][16];
     }
     //   modulation_mode        8  16.0
     uint ModulationMode(uint i) const
@@ -569,7 +569,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint StartTimeRaw(uint i) const
     {
         return ((m_ptrs[i][2]<<24) | (m_ptrs[i][3]<<16) |
-                (m_ptrs[i][4]<<8)  | (m_ptrs[i][5]));
+                (m_ptrs[i][4]<<8)  | m_ptrs[i][5]);
     }
     QDateTime StartTimeGPS(uint i) const
     {
@@ -586,7 +586,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint LengthInSeconds(uint i) const
     {
         return ((m_ptrs[i][6]<<16) | (m_ptrs[i][7]<<8) |
-                (m_ptrs[i][8])) & 0xfffff;
+                m_ptrs[i][8]) & 0xfffff;
     }
     //   title_length           8   9.0
     uint TitleLength(uint i) const
@@ -601,7 +601,7 @@ class MTV_PUBLIC EventInformationTable : public PSIPTable
     uint DescriptorsLength(uint i) const
     {
         unsigned char *desc=m_ptrs[i]+10+TitleLength(i);
-        return ((desc[0]<<8)|(desc[1]))&0xfff;
+        return ((desc[0]<<8)|desc[1])&0xfff;
     }
     //   for (i=0;i<N;i++)
     //   {

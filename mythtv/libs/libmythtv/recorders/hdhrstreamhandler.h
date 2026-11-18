@@ -36,7 +36,7 @@ enum HDHRTuneMode : std::uint8_t {
     hdhrTuneModeFrequency,
     hdhrTuneModeFrequencyPid,
     hdhrTuneModeFrequencyProgram,
-    hdhrTuneModeVChannel
+    hdhrTuneModeVChannel,
 };
 
 // Note : This class never uses a DRB && always uses a TS reader.

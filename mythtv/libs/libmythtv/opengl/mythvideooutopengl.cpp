@@ -114,13 +114,13 @@ MythVideoOutputOpenGL::MythVideoOutputOpenGL(MythMainWindow* MainWindow,
         FMT_YUV420P9, FMT_YUV420P10, FMT_YUV420P12, FMT_YUV420P14, FMT_YUV420P16,
         FMT_YUV422P9, FMT_YUV422P10, FMT_YUV422P12, FMT_YUV422P14, FMT_YUV422P16,
         FMT_YUV444P9, FMT_YUV444P10, FMT_YUV444P12, FMT_YUV444P14, FMT_YUV444P16,
-        FMT_P010,     FMT_P016
+        FMT_P010,     FMT_P016,
     };
 
     // OpenGL ES 2.0 and OpenGL1.X only allow luminance textures
     static VideoFrameTypes s_openglRenderFormatsLegacy =
     {
-        FMT_YV12, FMT_YUV422P, FMT_YUV444P
+        FMT_YV12, FMT_YUV422P, FMT_YUV444P,
     };
 
     // Retrieve render context
@@ -278,13 +278,10 @@ void MythVideoOutputOpenGL::RenderFrame(MythVideoFrame* Frame, FrameScanType Sca
 
     // If process frame has not been called (double rate hardware deint), then
     // we need to start the first 2 performance timers here
-    if (m_openGLPerf)
+    if (m_openGLPerf && (!m_openGLPerf->GetTimersRunning()))
     {
-        if (!m_openGLPerf->GetTimersRunning())
-        {
-            m_openGLPerf->RecordSample();
-            m_openGLPerf->RecordSample();
-        }
+        m_openGLPerf->RecordSample();
+        m_openGLPerf->RecordSample();
     }
 
     m_openglRender->BindFramebuffer(nullptr);

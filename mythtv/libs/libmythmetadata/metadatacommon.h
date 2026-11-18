@@ -28,7 +28,7 @@ class ProgramInfo;
 enum LookupStep : std::uint8_t {
     kLookupSearch = 0,
     kLookupData = 1,
-    kLookupCollection = 2
+    kLookupCollection = 2,
 };
 
 struct PersonInfo
@@ -44,7 +44,7 @@ enum MetadataType : std::uint8_t {
     kMetadataVideo = 0,
     kMetadataRecording = 1,
     kMetadataMusic = 2,
-    kMetadataGame = 3
+    kMetadataGame = 3,
 };
 
 // Determines the lookup fallback strategy
@@ -54,7 +54,7 @@ enum LookupType : std::uint8_t {
     kProbableMovie = 2,
     kUnknownVideo = 3,
     kProbableMusic = 4,
-    kProbableGame = 5
+    kProbableGame = 5,
 };
 
 // Actual type of content
@@ -64,7 +64,7 @@ enum VideoContentType : std::uint8_t {
     kContentAdult = 2,
     kContentMusicVideo = 3,
     kContentHomeMovie = 4,
-    kContentUnknown = 5
+    kContentUnknown = 5,
 };
 
 enum PeopleType : std::uint8_t {
@@ -79,7 +79,7 @@ enum PeopleType : std::uint8_t {
     kPersonCastingDirector = 8,
     kPersonArtist = 9,
     kPersonAlbumArtist = 10,
-    kPersonGuestStar = 11
+    kPersonGuestStar = 11,
 };
 
 using DownloadMap = QMap< VideoArtworkType, ArtworkInfo >;

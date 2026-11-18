@@ -17,28 +17,26 @@ bool MythTVMenuItemContext::AddButton(MythOSDDialogData *Menu, bool Active, cons
                                       bool IsMenu, const QString& TextArg) const
 {
     bool result = false;
-    if (m_category == kMenuCategoryItemlist || Action == m_action)
+    if ((m_category == kMenuCategoryItemlist || Action == m_action) &&
+        ((m_showContext != kMenuShowInactive && Active) || (m_showContext != kMenuShowActive && !Active)))
     {
-        if ((m_showContext != kMenuShowInactive && Active) || (m_showContext != kMenuShowActive && !Active))
+        result = true;
+        if (m_visible)
         {
-            result = true;
-            if (m_visible)
-            {
-                QString text = m_actionText;
-                if (text.isEmpty())
-                    text = (Active || DefaultTextInactive.isEmpty()) ? DefaultTextActive : DefaultTextInactive;
+            QString text = m_actionText;
+            if (text.isEmpty())
+                text = (Active || DefaultTextInactive.isEmpty()) ? DefaultTextActive : DefaultTextInactive;
 
-                if (!TextArg.isEmpty())
-                    text = text.arg(TextArg);
+            if (!TextArg.isEmpty())
+                text = text.arg(TextArg);
 
-                bool current = false;
-                if (m_currentContext == kMenuCurrentActive)
-                    current = Active;
-                else if (m_currentContext == kMenuCurrentAlways)
-                    current = true;
+            bool current = false;
+            if (m_currentContext == kMenuCurrentActive)
+                current = Active;
+            else if (m_currentContext == kMenuCurrentAlways)
+                current = true;
 
-                Menu->m_buttons.push_back( { text, Action, IsMenu, current });
-            }
+            Menu->m_buttons.push_back( { text, Action, IsMenu, current });
         }
     }
     return result;

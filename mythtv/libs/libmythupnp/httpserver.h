@@ -58,7 +58,7 @@ enum ContentProtection : std::uint8_t
 {
     cpLocalNoAuth = 0x00,  // Can only be accessed locally, but no authentication is required
     cpLocalAuth   = 0x01,  // Can only be accessed locally, authentication is required
-    cpRemoteAuth  = 0x02   // Can be accessed remotely, authentication is required
+    cpRemoteAuth  = 0x02,   // Can be accessed remotely, authentication is required
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ class UPNP_PUBLIC HttpServerExtension : public QObject
         // HTTP::RequestType. Defaults, extensions may extend the list
         uint        m_nSupportedMethods
 	  {RequestTypeGet | RequestTypePost |
-	   RequestTypeHead | RequestTypeOptions};
+	   RequestTypeHead | RequestTypeOptions,};
         
     public:
 

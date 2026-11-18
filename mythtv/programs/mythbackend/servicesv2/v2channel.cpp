@@ -149,7 +149,7 @@ V2ChannelInfoList* V2Channel::GetChannelInfoList( uint nSourceID,
         {
             delete pChannelInfo;
             delete pChannelInfos;
-            throw( QString("V2Channel ID appears invalid."));
+            throw std::runtime_error("V2Channel ID appears invalid.");
         }
     }
 
@@ -188,7 +188,7 @@ V2ChannelInfoList* V2Channel::GetChannelInfoList( uint nSourceID,
 V2ChannelInfo* V2Channel::GetChannelInfo( uint nChanID )
 {
     if (nChanID == 0)
-        throw( QString("V2Channel ID appears invalid."));
+        throw std::runtime_error("V2Channel ID appears invalid.");
 
     auto *pChannelInfo = new V2ChannelInfo();
 
@@ -225,14 +225,14 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
                                int           CommMethod )
 {
     if (!HAS_PARAMv2("ChannelID"))
-        throw QString("ChannelId is required");
+        throw std::runtime_error("ChannelId is required");
 
     if (m_request->m_queries.size() < 2 )
-        throw QString("Nothing to update");
+        throw std::runtime_error("Nothing to update");
 
     ChannelInfo channel;
     if (!channel.Load(ChannelID))
-        throw QString("ChannelId %1 doesn't exist");
+        throw std::runtime_error("ChannelId %1 doesn't exist");
 
     if (HAS_PARAMv2("MplexID"))
         channel.m_mplexId = MplexID;
@@ -267,7 +267,7 @@ bool V2Channel::UpdateDBChannel( uint          MplexID,
         else if ((channel.m_visible == kChannelAlwaysVisible && !Visible) ||
                  (channel.m_visible == kChannelNeverVisible && Visible))
         {
-            throw QString("Can't override Always/NeverVisible");
+            throw std::runtime_error("Can't override Always/NeverVisible");
         }
     }
     if (HAS_PARAMv2("FrequencyID"))
@@ -313,7 +313,7 @@ uint V2Channel::GetAvailableChanid ( void ) {
     if (!query.exec())
     {
         MythDB::DBError("V2Channel::AddDBChannel", query);
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
     if (query.next())
         chanId = query.value(0).toUInt() + 1;
@@ -394,8 +394,8 @@ V2VideoSourceList* V2Channel::GetVideoSourceList()
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Video Sources."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Video Sources.");
 
     query.prepare("SELECT sourceid, name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
@@ -407,7 +407,7 @@ V2VideoSourceList* V2Channel::GetVideoSourceList()
     {
         MythDB::DBError("MythAPI::GetVideoSourceList()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -453,8 +453,8 @@ V2VideoSource* V2Channel::GetVideoSource( uint nSourceID )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Video Sources."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Video Sources.");
 
     query.prepare("SELECT name, xmltvgrabber, userid, "
                   "freqtable, lineupid, password, useeit, configpath, "
@@ -468,7 +468,7 @@ V2VideoSource* V2Channel::GetVideoSource( uint nSourceID )
     {
         MythDB::DBError("MythAPI::GetVideoSource()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     // ----------------------------------------------------------------------
@@ -607,7 +607,7 @@ bool V2Channel::UpdateVideoSource( uint          nSourceId,
     {
         MythDB::DBError("MythAPI::UpdateVideoSource()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     return true;
@@ -678,7 +678,7 @@ int V2Channel::FetchChannelsFromSource( const uint nSourceId,
                                       bool       bWaitForFinish )
 {
     if ( nSourceId < 1 || nCardId < 1)
-        throw( QString("A source ID and card ID are both required."));
+        throw std::runtime_error("A source ID and card ID are both required.");
 
     int nResult = 0;
 
@@ -711,8 +711,8 @@ V2VideoMultiplexList* V2Channel::GetVideoMultiplexList( uint nSourceID,
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Video Sources."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Video Sources.");
     QString where;
     if (nSourceID > 0)
         where = "WHERE sourceid = :SOURCEID";
@@ -732,7 +732,7 @@ V2VideoMultiplexList* V2Channel::GetVideoMultiplexList( uint nSourceID,
     {
         MythDB::DBError("MythAPI::GetVideoMultiplexList()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     uint muxCount = (uint)query.size();
@@ -843,8 +843,8 @@ V2VideoMultiplex* V2Channel::GetVideoMultiplex( uint nMplexID )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to list "
-                       "Video Multiplex."));
+        throw std::runtime_error("Database not open while trying to list "
+                                 "Video Multiplex.");
 
     query.prepare("SELECT sourceid, transportid, networkid, "
                   "frequency, inversion, symbolrate, fec, polarity, "
@@ -859,7 +859,7 @@ V2VideoMultiplex* V2Channel::GetVideoMultiplex( uint nMplexID )
     {
         MythDB::DBError("MythAPI::GetVideoMultiplex()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     auto *pVideoMultiplex = new V2VideoMultiplex();
@@ -905,7 +905,7 @@ QStringList V2Channel::GetXMLTVIdList( uint SourceID )
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
-        throw( QString("Database not open while trying to get source name."));
+        throw std::runtime_error("Database not open while trying to get source name.");
 
     query.prepare("SELECT name FROM videosource WHERE sourceid = :SOURCEID ");
     query.bindValue(":SOURCEID", SourceID);
@@ -914,7 +914,7 @@ QStringList V2Channel::GetXMLTVIdList( uint SourceID )
     {
         MythDB::DBError("MythAPI::GetXMLTVIdList()", query);
 
-        throw( QString( "Database Error executing query." ));
+        throw std::runtime_error("Database Error executing query.");
     }
 
     QStringList idList;
@@ -947,7 +947,7 @@ QStringList V2Channel::GetXMLTVIdList( uint SourceID )
     }
     else
     {
-        throw(QString("SourceID (%1) not found").arg(SourceID));
+        throw std::runtime_error(QString("SourceID (%1) not found").arg(SourceID).toStdString());
     }
 
     return idList;
@@ -1172,7 +1172,7 @@ V2ChannelRestore* V2Channel::GetRestoreData ( uint SourceId,
     RestoreData* rd = RestoreData::getInstance(SourceId);
     QString result = rd->doRestore(XmltvId, Icon, Visible);
     if (result.isEmpty())
-        throw( QString("GetRestoreData failed."));
+        throw std::runtime_error("GetRestoreData failed.");
     pResult->setNumChannels(rd->m_num_channels);
     pResult->setNumXLMTVID(rd->m_num_xmltvid);
     pResult->setNumIcon(rd->m_num_icon);

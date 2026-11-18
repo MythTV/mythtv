@@ -79,7 +79,7 @@ class ProgramRecPriority : public ScheduleCommon
         byCount,
         byRecCount,
         byLastRecord,
-        byAvgDelay
+        byAvgDelay,
     };
 
   protected:

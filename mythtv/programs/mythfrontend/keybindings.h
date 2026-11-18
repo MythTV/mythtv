@@ -40,11 +40,11 @@ class KeyBindings
     {
         AllBindings,
         NoModifiers,
-        JustModifiers
+        JustModifiers,
     };
 
     /// \brief Levels of conflict
-    enum ConflictLevels : std::uint8_t { kKeyBindingWarning, kKeyBindingError, };
+    enum ConflictLevels : std::uint8_t { kKeyBindingWarning, kKeyBindingError };
 
     explicit KeyBindings(QString hostname, Filter Filters = AllBindings);
 

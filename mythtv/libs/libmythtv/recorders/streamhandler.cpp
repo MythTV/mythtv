@@ -136,19 +136,16 @@ void StreamHandler::Start(void)
 {
     QMutexLocker locker(&m_startStopLock);
 
-    if (m_running)
+    if (m_running && ((m_usingSectionReader && !m_allowSectionReader) ||
+            (m_needsBuffering && !m_usingBuffering)))
     {
-        if ((m_usingSectionReader && !m_allowSectionReader) ||
-            (m_needsBuffering     && !m_usingBuffering))
-        {
-            LOG(VB_RECORD, LOG_INFO, LOC + "Restarting StreamHandler");
-            SetRunningDesired(false);
-            m_restarting = true;
-            locker.unlock();
-            wait();
-            locker.relock();
-            m_restarting = false;
-        }
+        LOG(VB_RECORD, LOG_INFO, LOC + "Restarting StreamHandler");
+        SetRunningDesired(false);
+        m_restarting = true;
+        locker.unlock();
+        wait();
+        locker.relock();
+        m_restarting = false;
     }
 
     if (m_running)

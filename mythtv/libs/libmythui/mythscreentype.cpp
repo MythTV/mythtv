@@ -224,15 +224,13 @@ MythScreenStack *MythScreenType::GetScreenStack(void) const
 
 void MythScreenType::aboutToHide(void)
 {
-    if (!m_fullScreen)
+    if (!m_fullScreen &&
+        !GetMythMainWindow()->GetPaintWindow()->mask().isEmpty() &&
+        !m_savedMask.isEmpty())
     {
-        if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
-        {
-            // remove this screen's area from the mask so any embedded video is
-            // shown which was covered by this screen
-            if (!m_savedMask.isEmpty())
-                GetMythMainWindow()->GetPaintWindow()->setMask(m_savedMask);
-        }
+        // remove this screen's area from the mask so any embedded video is
+        // shown which was covered by this screen
+        GetMythMainWindow()->GetPaintWindow()->setMask(m_savedMask);
     }
 
     ActivateAnimations(MythUIAnimation::AboutToHide);
@@ -240,17 +238,15 @@ void MythScreenType::aboutToHide(void)
 
 void MythScreenType::aboutToShow(void)
 {
-    if (!m_fullScreen)
+    if (!m_fullScreen &&
+        !GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
     {
-        if (!GetMythMainWindow()->GetPaintWindow()->mask().isEmpty())
-        {
-            // add this screens area to the mask so any embedded video isn't
-            // shown in front of this screen
-            QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
-            m_savedMask = region;
-            region = region.united(QRegion(m_area));
-            GetMythMainWindow()->GetPaintWindow()->setMask(region);
-        }
+        // add this screens area to the mask so any embedded video isn't
+        // shown in front of this screen
+        QRegion region = GetMythMainWindow()->GetPaintWindow()->mask();
+        m_savedMask = region;
+        region = region.united(QRegion(m_area));
+        GetMythMainWindow()->GetPaintWindow()->setMask(region);
     }
 
     ActivateAnimations(MythUIAnimation::AboutToShow);
@@ -461,18 +457,11 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
 bool MythScreenType::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
-    if (event->GetGesture() == MythGestureEvent::Click)
+    if ((event->GetGesture() == MythGestureEvent::Click) &&
+        (event->GetButton() == Qt::RightButton))
     {
-        switch (event->GetButton())
-        {
-            case Qt::RightButton:
-                ShowMenu();
-                handled = true;
-                break;
-            default :
-                break;
-        }
-
+        ShowMenu();
+        handled = true;
     }
 
     if (!handled)

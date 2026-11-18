@@ -68,9 +68,10 @@ void ExitPrompter::DoHalt(bool Confirmed)
         }
 
         // Otherwise use MythPower
-        if (!handled && m_power && m_power->IsFeatureSupported(MythPower::FeatureShutdown))
-            if (m_power->RequestFeature(MythPower::FeatureShutdown))
-                handled = true;
+        if (!handled && m_power &&
+            m_power->IsFeatureSupported(MythPower::FeatureShutdown) &&
+            m_power->RequestFeature(MythPower::FeatureShutdown))
+            handled = true;
 
         // halt of last resort
         if (!handled)
@@ -104,9 +105,10 @@ void ExitPrompter::DoReboot(bool Confirmed)
         }
 
         // Otherwise use MythPower
-        if (!handled && m_power && m_power->IsFeatureSupported(MythPower::FeatureRestart))
-            if (m_power->RequestFeature(MythPower::FeatureRestart))
-                handled = true;
+        if (!handled && m_power &&
+            m_power->IsFeatureSupported(MythPower::FeatureRestart) &&
+            m_power->RequestFeature(MythPower::FeatureRestart))
+            handled = true;
 
         // reboot of last resort
         if (!handled)

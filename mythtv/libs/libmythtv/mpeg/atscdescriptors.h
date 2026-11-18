@@ -98,23 +98,23 @@ class CaptionServiceDescriptor : public MPEGDescriptor
         { return iso639_key_to_str3(CanonicalLanguageKey(i)); }
     //   uimsbf cc_type         1  3.0
     bool Type(int i) const
-        { return (((Offset(i,-1)[3])>>7) & 1) != 0; }
+        { return ((Offset(i,-1)[3]>>7) & 1) != 0; }
     //   bslbf reserved         1  3.1           1
     //   if (cc_type==line21) {
     //      reserved            5  3.2        0x1f
     //      line21_field        1  3.7
     bool Line21Field(int i) const
-        { return bool((Offset(i,-1)[3]) & 1); }
+        { return bool(Offset(i,-1)[3] & 1); }
     //   } else
     //      cap_service_number  6  3.2
     int CaptionServiceNumber(int i) const
-        { return (Offset(i,-1)[3]) & 0x3f; }
+        { return Offset(i,-1)[3] & 0x3f; }
     //   easy_reader            1  4.0
     bool EasyReader(int i) const
-        { return bool(((Offset(i,-1)[4])>>7) & 1); }
+        { return bool((Offset(i,-1)[4]>>7) & 1); }
     //   wide_aspect_ratio      1  4.1
     bool WideAspectRatio(int i) const
-        { return bool(((Offset(i,-1)[4])>>6) & 1); }
+        { return bool((Offset(i,-1)[4]>>6) & 1); }
     //   reserved              14  4.2      0x3fff
     //}                            6.0
     bool Parse(void);
@@ -234,7 +234,7 @@ class AC3AudioStreamDescriptor : public MPEGDescriptor
 
     // full service that can be presented alone to listener?
     // full_svc                              1   4.7
-    bool FullService(void) const { return bool((m_data[4])&1); }
+    bool FullService(void) const { return bool(m_data[4]&1); }
 
     // langcod                               8   5.0
     // ignore for language specification

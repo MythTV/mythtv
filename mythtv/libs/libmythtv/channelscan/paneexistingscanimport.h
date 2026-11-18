@@ -64,7 +64,7 @@ class PaneExistingScanImport : public GroupSetting
         for (auto & scan : std::ranges::reverse_view(scans))
         {
             QString scanDate = MythDate::toString(scan.m_scandate, MythDate::kDateTimeFull);
-            QString proc     = (scan.m_processed) ? tr("processed") : tr("unprocessed");
+            QString proc     = scan.m_processed ? tr("processed") : tr("unprocessed");
 
             m_scanSelect->addSelection(
                 QString("%1 %2").arg(scanDate, proc),

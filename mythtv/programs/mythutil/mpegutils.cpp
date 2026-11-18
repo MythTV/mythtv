@@ -385,12 +385,9 @@ bool PTSListener::ProcessTSPacket(const TSPacket &tspacket)
                     (uint64_t(bufptr[i+4] & 0xfe) >> 1);
                 m_ptsStreams[stream_id] = stream_id;
                 m_ptsLast[stream_id] = pts;
-                if (m_ptsCount[stream_id] < 30)
-                {
-                    if ((!m_ptsCount[stream_id]) ||
-                        (pts < m_ptsFirst[stream_id]))
-                        m_ptsFirst[stream_id] = pts;
-                }
+                if ((m_ptsCount[stream_id] < 30) &&
+                    ((!m_ptsCount[stream_id]) || (pts < m_ptsFirst[stream_id])))
+                    m_ptsFirst[stream_id] = pts;
                 m_ptsCount[stream_id]++;
             }
         }
@@ -424,7 +421,7 @@ class PrintOutput
     {
         if (!psip)
             return;
-        Output(((m_useXml) ? psip->toStringXML(0) : psip->toString()) + "\n");
+        Output((m_useXml ? psip->toStringXML(0) : psip->toString()) + "\n");
     }
 
   protected:

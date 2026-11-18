@@ -155,7 +155,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         if (avg_diff * 1.1F < max_diff)
         {
             float last_diff = m_maximas.constLast() -
-                              m_maximas.at((uint)(m_maximas.size())-2);
+                              m_maximas.at((uint)m_maximas.size()-2);
             if (last_diff*1.01F >= max_diff || last_diff > avg_diff * 1.2F)
             {
                 m_maximas.pop_back();
@@ -172,7 +172,7 @@ bool VBI608Extractor::FindClocks(const unsigned char *buf, uint width)
         if (avg_diff * 0.9F > min_diff)
         {
             float last_diff = m_maximas.constLast() -
-                              m_maximas.at((uint)(m_maximas.size())-2);
+                              m_maximas.at((uint)m_maximas.size()-2);
             if ((m_maximas.size() > 7) &&
                 (last_diff*0.99F <= min_diff || last_diff < avg_diff * 0.80F))
             {

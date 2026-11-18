@@ -71,7 +71,7 @@ class ExternalStreamHandler : public StreamHandler
     enum constants { MAX_API_VERSION = 3,
                      TS_PACKET_SIZE = 188,
                      PACKET_SIZE = TS_PACKET_SIZE * 8192,
-                     TOO_FAST_SIZE = TS_PACKET_SIZE * 32768 };
+                     TOO_FAST_SIZE = TS_PACKET_SIZE * 32768, };
 
   public:
     static ExternalStreamHandler *Get(const QString& devname,

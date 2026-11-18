@@ -30,7 +30,7 @@ class MythVideoGPU : public QObject
         Performance  = 0x004,
         Framebuffer  = 0x008,
         ToneMap      = 0x010,
-        Bicubic      = 0x020
+        Bicubic      = 0x020,
     };
 
     Q_DECLARE_FLAGS(VideoResizing, VideoResize)

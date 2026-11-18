@@ -912,7 +912,7 @@ class MTV_PUBLIC SpliceScheduleView
     uint SpliceEventID(uint i) const
     {
         return ((m_ptrs0[i][0] << 24) | (m_ptrs0[i][1] << 16) |
-                (m_ptrs0[i][2] <<  8) | (m_ptrs0[i][3]));
+                (m_ptrs0[i][2] <<  8) | m_ptrs0[i][3]);
     }
     //   splice_event_cancel_indicator 1 4.0 + m_ptrs0[i]
     //   reserved               7   4.1 + m_ptrs0[i]
@@ -958,7 +958,7 @@ class MTV_PUBLIC SpliceInsertView
     uint SpliceEventID(void) const
     {
         return ((m_ptrs1[0][0] << 24) | (m_ptrs1[0][1] << 16) |
-                (m_ptrs1[0][2] <<  8) | (m_ptrs1[0][3]));
+                (m_ptrs1[0][2] <<  8) | m_ptrs1[0][3]);
     }
     //   splice_event_cancel    1    4.0 + m_ptrs1[0]
     bool IsSpliceEventCancel(void) const { return ( m_ptrs1[0][4] & 0x80 ) != 0; }
@@ -1161,7 +1161,7 @@ class MTV_PUBLIC SpliceInformationTable : public PSIPTable
     //   splice_descriptor()   ??   ??.?
     const unsigned char *SpliceDescriptors(void) const
     {
-        return (m_epilog) ? m_epilog + 2 : nullptr;
+        return m_epilog ? m_epilog + 2 : nullptr;
     }
     // for (i = 0; i < ?; i++)
     //   alignment_stuffing     8   ??.0

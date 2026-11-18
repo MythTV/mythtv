@@ -27,7 +27,7 @@ enum FSTYPE : std::uint8_t
 {
     FSTYPE_FILELIST = 0,
     FSTYPE_FILE = 1,
-    FSTYPE_DIRECTORY = 2
+    FSTYPE_DIRECTORY = 2,
 };
 
 class MythUIText;

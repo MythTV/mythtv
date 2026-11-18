@@ -157,7 +157,7 @@ static QByteArray get_ip(const QString &h)
         return QString("").toLatin1();
     }
 
-    sin_addr = ((struct sockaddr_in*)(result->ai_addr))->sin_addr;
+    sin_addr = ((struct sockaddr_in*)result->ai_addr)->sin_addr;
     hba = QByteArray(inet_ntoa(sin_addr));
     freeaddrinfo(result);
 
@@ -230,7 +230,7 @@ bool LIRC::Init(void)
         if (2 == tmp.size())
         {
             dev  = tmp[0];
-            port = (tmp[1].toUInt()) ? tmp[1].toUInt() : port;
+            port = tmp[1].toUInt() ? tmp[1].toUInt() : port;
         }
         QByteArray device = get_ip(dev);
         struct sockaddr_in addr {};

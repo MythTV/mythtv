@@ -262,16 +262,13 @@ void ProgFinder::customEvent(QEvent *event)
 
         const QString& message = me->Message();
 
-        if (message == "SCHEDULE_CHANGE"
-            || message == "GROUPBY_CHANGE")
+        if ((message == "SCHEDULE_CHANGE" || message == "GROUPBY_CHANGE") &&
+            (GetFocusWidget() == m_timesList))
         {
-            if (GetFocusWidget() == m_timesList)
-            {
-                ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
-                if (curPick)
-                    selectShowData(curPick->GetTitle(),
-                                   m_timesList->GetCurrentPos());
-            }
+            ProgramInfo *curPick = m_showData[m_timesList->GetCurrentPos()];
+            if (curPick)
+                selectShowData(curPick->GetTitle(),
+                               m_timesList->GetCurrentPos());
         }
     }
     else if (event->type() == DialogCompletionEvent::kEventType)
@@ -333,7 +330,7 @@ void ProgFinder::customEvent(QEvent *event)
         }
         else if (resultid == "searchtext")
         {
-            m_searchStr = resulttext;
+            m_searchStr = std::move(resulttext);
             if (m_searchText)
                 m_searchText->SetText(m_searchStr);
             updateShowList();
@@ -940,7 +937,7 @@ const std::vector<QChar> RuProgFinder::kSearchChars
     QChar('M'),   QChar('N'),   QChar('O'),   QChar('P'),
     QChar('Q'),   QChar('R'),   QChar('S'),   QChar('T'),
     QChar('U'),   QChar('V'),   QChar('W'),   QChar('X'),
-    QChar('Y'),   QChar('Z')
+    QChar('Y'),   QChar('Z'),
 };
 
 void RuProgFinder::initAlphabetList()

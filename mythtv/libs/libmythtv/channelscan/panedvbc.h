@@ -46,7 +46,7 @@ class PaneDVBC : public GroupSetting
                                       m_pmodulation  = new ScanModulation(),
                                       m_pmodsys      = new ScanDVBCModSys(),
                                       m_pinversion   = new ScanInversion(),
-                                      m_pfec         = new ScanFec()});
+                                      m_pfec         = new ScanFec(),});
     }
 
     QString frequency(void)  const { return m_pfrequency->getValue();  }

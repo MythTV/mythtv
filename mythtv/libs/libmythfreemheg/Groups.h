@@ -199,7 +199,7 @@ class MHSetTimer: public MHElemAction
     enum : std::uint8_t {
         ST_NoNewTimer,
         ST_TimerAbsolute,
-        ST_TimerRelative
+        ST_TimerRelative,
     } m_timerType { ST_NoNewTimer };
     MHGenericInteger m_timerValue;
     MHGenericBoolean m_absFlag;

@@ -250,7 +250,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
         QJsonObject response = {
             {"status", "ERR"},
-            {"message", "Unknown command"}
+            {"message", "Unknown command"},
         };
 
         sendResponse(message, response, LOG_WARNING);
@@ -279,7 +279,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
         QJsonObject response = {
             {"status", "ERR"},
-            {"message", msg}
+            {"message", msg},
         };
 
         sendResponse(message, response);
@@ -292,7 +292,7 @@ bool Recorder::processCommand(const QJsonObject &message)
 
         QJsonObject response = {
             {"status", "ERR"},
-            {"message", "Unknown error"}
+            {"message", "Unknown error"},
         };
 
         sendResponse(message, response, LOG_CRIT);
@@ -375,7 +375,7 @@ bool Recorder::description(const QJsonObject &params)
         m_config->getValue("RECORDER", "desc",
                            m_defaultDesc.toStdString(), true);
     QJsonObject response = {{"status", "OK"},
-                            {"message", QString::fromStdString(desc)}};
+                            {"message", QString::fromStdString(desc)},};
 
     sendResponse(params, response);
     return true;
@@ -416,7 +416,7 @@ bool Recorder::hasTuner(const QJsonObject &params)
     }
 
     QJsonObject response = {{"status", "OK"},
-                            {"message", m_hasTuner ? "Yes" : "No"}};
+                            {"message", m_hasTuner ? "Yes" : "No"},};
 
     sendResponse(params, response);
     return true;
@@ -602,7 +602,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
     if (tuneCmd.isEmpty())
     {
         QJsonObject response = {{"status", "ERR"},
-                                {"message", "No tune command provided"}};
+                                {"message", "No tune command provided"},};
 
         sendResponse(params, response);
         return true;
@@ -639,7 +639,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
                     QString("Already tuning to `%1`").arg(tuneCmd));
 
                 QJsonObject response = {{"status", "OK"},
-                                        {"message", "InProgress"}};
+                                        {"message", "InProgress"},};
 
                 sendResponse(params, response, LOG_DEBUG);
                 return true;
@@ -658,7 +658,7 @@ bool Recorder::tuneChannel(const QJsonObject &params)
 
     QJsonObject response = {
         {"status", "OK"},
-        {"message", "InProgress"}
+        {"message", "InProgress"},
     };
 
     sendResponse(params, response, LOG_DEBUG);
@@ -766,7 +766,7 @@ bool Recorder::startStreaming(const QJsonObject &params)
         LOG(VB_GENERAL, LOG_INFO, "Already streaming");
 
         QJsonObject response = {{"status", "WARN"},
-                                {"message", "Already streaming"}};
+                                {"message", "Already streaming"},};
 
         sendResponse(params, response);
         return true;
@@ -877,7 +877,7 @@ bool Recorder::stopStreaming(const QJsonObject &params)
 
         QJsonObject response = {
             {"status", "ERR"},
-            {"message", "Not streaming"}
+            {"message", "Not streaming"},
         };
 
         sendResponse(params, response);
@@ -895,7 +895,7 @@ bool Recorder::stopStreaming(const QJsonObject &params)
 
     QJsonObject response = {
         {"status", "OK"},
-        {"message", "Streaming stopped"}
+        {"message", "Streaming stopped"},
     };
 
     sendResponse(params, response);
@@ -963,7 +963,7 @@ void Recorder::channelInfo(const QJsonObject &params,
                                 "," + channel->icon;
 
     QJsonObject response = {{"status", "OK"},
-                            {"message", QString::fromStdString(message)}};
+                            {"message", QString::fromStdString(message)},};
 
     sendResponse(params, response);
 }
@@ -983,7 +983,7 @@ bool Recorder::loadChannels(const QJsonObject &params)
 
     QJsonObject response = {
         {"status", "OK"},
-        {"value", static_cast<int>(m_config->channelCount())}};
+        {"value", static_cast<int>(m_config->channelCount())},};
 
     sendResponse(params, response);
     return true;
@@ -1082,7 +1082,7 @@ void Recorder::executeCommand(QString command, const QString& desc, bool backgro
                             {"status", "DAMAGED"},
                             {"message", QString("DAMAGED: '%1' failed (%2)")
                              .arg(command)
-                             .arg(exitCode)}
+                             .arg(exitCode),},
                         };
 
                         sendResponse(message, response, LOG_WARNING);
@@ -1233,7 +1233,7 @@ void Recorder::StderrLine(const QString &line)
         QJsonObject context = {{"command", "STATUS"}};
         QJsonObject response = {
             {"status", status},
-            {"message", message.remove(trailing_space)}
+            {"message", message.remove(trailing_space)},
         };
 
         sendResponse(context, response, level);
@@ -1309,7 +1309,7 @@ void Recorder::streamLoop(const QString& command)
         QJsonObject response = {
             {"status", "ERR"},
             {"message",
-             QString("Failed to start stream process: %1").arg(res.error)}};
+             QString("Failed to start stream process: %1").arg(res.error),},};
         sendResponse(context, response, LOG_ERR);
         return;
     }
@@ -1384,7 +1384,7 @@ void Recorder::streamLoop(const QString& command)
             QJsonObject context = {{"command", "STATUS"}};
             QJsonObject response = {
                 {"status", "ERR"},
-                {"message", "Stream process crashed or exited unexpectedly."}};
+                {"message", "Stream process crashed or exited unexpectedly."},};
             sendResponse(context, response, LOG_ERR);
         }
         else

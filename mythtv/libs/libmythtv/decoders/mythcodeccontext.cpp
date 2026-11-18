@@ -600,22 +600,19 @@ AVBufferRef* MythCodecContext::CreateDevice(AVHWDeviceType Type, MythInteropGPU*
 /// Most hardware decoders do not support these codecs/profiles
 bool MythCodecContext::IsUnsupportedProfile(AVCodecContext *Context)
 {
-    switch (Context->codec_id)
+    if (Context->codec_id == AV_CODEC_ID_H264)
     {
-        case AV_CODEC_ID_H264:
-            switch (Context->profile)
-            {
-                case AV_PROFILE_H264_HIGH_10:
-                case AV_PROFILE_H264_HIGH_10_INTRA:
-                case AV_PROFILE_H264_HIGH_422:
-                case AV_PROFILE_H264_HIGH_422_INTRA:
-                case AV_PROFILE_H264_HIGH_444_PREDICTIVE:
-                case AV_PROFILE_H264_HIGH_444_INTRA:
-                case AV_PROFILE_H264_CAVLC_444: return true;
-                default: break;
-            }
-            break;
-        default: break;
+        switch (Context->profile)
+        {
+            case AV_PROFILE_H264_HIGH_10:
+            case AV_PROFILE_H264_HIGH_10_INTRA:
+            case AV_PROFILE_H264_HIGH_422:
+            case AV_PROFILE_H264_HIGH_422_INTRA:
+            case AV_PROFILE_H264_HIGH_444_PREDICTIVE:
+            case AV_PROFILE_H264_HIGH_444_INTRA:
+            case AV_PROFILE_H264_CAVLC_444: return true;
+            default: break;
+        }
     }
     return false;
 }

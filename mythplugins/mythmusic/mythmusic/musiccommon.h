@@ -41,7 +41,7 @@ enum MusicView : std::uint8_t
     MV_TRACKINFO,
     MV_RADIO,
     MV_MINIPLAYER,
-    MV_VISUALIZERINFO
+    MV_VISUALIZERINFO,
 };
 
 Q_DECLARE_METATYPE(MusicView);

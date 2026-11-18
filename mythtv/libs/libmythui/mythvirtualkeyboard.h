@@ -12,7 +12,7 @@ enum PopupPosition : std::uint8_t
     VK_POSBELOWEDIT,
     VK_POSTOPDIALOG,
     VK_POSBOTTOMDIALOG,
-    VK_POSCENTERDIALOG
+    VK_POSCENTERDIALOG,
 };
 
 struct KeyDefinition

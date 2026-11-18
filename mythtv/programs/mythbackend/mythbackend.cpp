@@ -143,7 +143,7 @@ int main(int argc, char **argv)
     // If setup has not been done (ie. the config.xml does not exist),
     // set the ignoreDB flag, which will cause only the web-app to
     // start, so that setup can be done.
-    bool ignoreDB = !(XmlConfiguration().FileExists());
+    bool ignoreDB = !XmlConfiguration().FileExists();
     if (ignoreDB)
         V2Myth::s_WebOnlyStartup = V2Myth::kWebOnlyDBSetup;
 

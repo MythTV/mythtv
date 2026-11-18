@@ -51,35 +51,32 @@ void UPnpEventTask::Execute( TaskQueue * /*pQueue*/ )
 
     const std::chrono::milliseconds timeout {3s};
     BlockingTcpSocket socket;
-    if (socket.connect(m_peerAddress, m_nPeerPort, timeout))
+    if (socket.connect(m_peerAddress, m_nPeerPort, timeout) &&
+        (socket.write(m_pPayload->constData(), m_pPayload->size(), timeout) != -1))
     {
         // ------------------------------------------------------------------
         // Send NOTIFY message
         // ------------------------------------------------------------------
+        // --------------------------------------------------------------
+        // Read first line to determine success/Fail
+        // --------------------------------------------------------------
 
-        if (socket.write(m_pPayload->constData(), m_pPayload->size(), timeout) != -1)
+        QString sResponseLine = socket.readLine(timeout);
+
+        if ( sResponseLine.length() > 0)
         {
-            // --------------------------------------------------------------
-            // Read first line to determine success/Fail
-            // --------------------------------------------------------------
-
-            QString sResponseLine = socket.readLine(timeout);
-
-            if ( sResponseLine.length() > 0)
+#if 0
+            if (sResponseLine.contains("200 OK"))
             {
-#if 0
-                if (sResponseLine.contains("200 OK"))
-                {
 #endif
-                    LOG(VB_UPNP, LOG_INFO,
-                        QString("UPnpEventTask::Execute - NOTIFY to "
-                                "%1:%2 returned %3.")
-                            .arg(m_peerAddress.toString()) .arg(m_nPeerPort)
-                            .arg(sResponseLine));
+                LOG(VB_UPNP, LOG_INFO,
+                    QString("UPnpEventTask::Execute - NOTIFY to "
+                            "%1:%2 returned %3.")
+                    .arg(m_peerAddress.toString()) .arg(m_nPeerPort)
+                    .arg(sResponseLine));
 #if 0
-                }
-#endif
             }
+#endif
         }
     }
 }

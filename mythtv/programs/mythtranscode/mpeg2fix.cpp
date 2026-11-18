@@ -151,7 +151,7 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
         it = ++m_offset[idx].begin();
         if (((static_cast<int>((*it).type) == 0) &&
              (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
-            (((*it).type) /* Pos type */ &&
+            ((*it).type /* Pos type */ &&
              ((pkt->pos >= (*it).pos_pts) || (pkt->duration > (*it).framenum))))
         {
             m_offset[idx].pop_front();
@@ -475,7 +475,7 @@ static int fill_buffers(void *r, int finish)
     if (finish)
         return 0;
 
-    return (rx->WaitBuffers());
+    return rx->WaitBuffers();
 }
 
 MPEG2replex::~MPEG2replex()
@@ -1836,13 +1836,10 @@ int MPEG2fixup::ConvertToI(FrameList *orderedFrames, int headPos)
 #endif
 
     //head_pos == 0 means that we are decoding B frames after a seq_header
-    if (headPos == 0)
+    if ((headPos == 0) && PlaybackSecondary())
     {
-        if (PlaybackSecondary())
-        {
-            av_packet_free(&pkt);
-            return 1;
-        }
+        av_packet_free(&pkt);
+        return 1;
     }
 
     for (const auto & of : std::as_const(*orderedFrames))

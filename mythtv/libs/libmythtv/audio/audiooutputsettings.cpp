@@ -25,12 +25,12 @@ extern "C" {
 const rate_array AudioOutputSettings::kStdRates
 {
     5512, 8000,  11025, 16000, 22050, 32000,  44100,
-    48000, 88200, 96000, 176400, 192000
+    48000, 88200, 96000, 176400, 192000,
 };
 
 const format_array AudioOutputSettings::kStdFormats
 {
-    FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB, FORMAT_S24, FORMAT_S32, FORMAT_FLT
+    FORMAT_U8,  FORMAT_S16, FORMAT_S24LSB, FORMAT_S24, FORMAT_S32, FORMAT_FLT,
 };
 
 AudioOutputSettings::AudioOutputSettings(bool invalid) :
@@ -291,7 +291,7 @@ void AudioOutputSettings::SetBestSupportedChannels(int channels)
     std::ranges::copy_if(m_channels,
                  std::back_inserter(tmp),
                  [channels](int value){ return channels > value; } );
-    m_channels = tmp;
+    m_channels = std::move(tmp);
     m_channels.push_back(channels);
 }
 
@@ -452,7 +452,7 @@ static const std::array<featureStruct,7> feature {{
     { .flag=FEATURE_TRUEHD, .name="TRUEHD"},
     { .flag=FEATURE_DTSHD,  .name="DTSHD"},
     { .flag=FEATURE_AAC,    .name="AAC"},
-}};
+},};
 
 QString AudioOutputSettings::FeaturesToString(DigitalFeature arg)
 {

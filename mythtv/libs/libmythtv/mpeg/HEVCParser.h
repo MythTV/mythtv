@@ -142,7 +142,7 @@ class HEVCParser : public H2645Parser
         UNSPEC60   = 60,
         UNSPEC61   = 61,
         UNSPEC62   = 62,
-        UNSPEC63   = 63
+        UNSPEC63   = 63,
     };
 
     struct SPS {
@@ -208,7 +208,7 @@ class HEVCParser : public H2645Parser
         QUANT_MATIX_4X4   = 0,
         QUANT_MATIX_8X8   = 1,
         QUANT_MATIX_16X16 = 2,
-        QUANT_MATIX_32X32 = 3
+        QUANT_MATIX_32X32 = 3,
     };
 
 

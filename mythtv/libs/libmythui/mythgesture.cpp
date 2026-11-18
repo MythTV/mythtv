@@ -79,7 +79,7 @@ const std::map<QString, MythGestureEvent::Gesture>MythGesture::kSequences =
     { "45654", MythGestureEvent::RightThenLeft },
     { "65456", MythGestureEvent::LeftThenRight },
     { "85258", MythGestureEvent::UpThenDown    },
-    { "25852", MythGestureEvent::DownThenUp    }
+    { "25852", MythGestureEvent::DownThenUp    },
 };
 
 /*! \brief Get the symbolic name of the gesture.

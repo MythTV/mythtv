@@ -151,7 +151,7 @@ void VideoScannerThread::SetDirs(QStringList dirs)
         }
     }
 
-    m_directories = dirs;
+    m_directories = std::move(dirs);
 }
 
 void VideoScannerThread::run()
@@ -178,18 +178,16 @@ void VideoScannerThread::run()
                           tr("Searching for video files"));
     for (const auto & dir : std::as_const(m_directories))
     {
-        if (!buildFileList(dir, imageExtensions, fs_files))
+        if (!buildFileList(dir, imageExtensions, fs_files) &&
+            dir.startsWith("myth://"))
         {
-            if (dir.startsWith("myth://"))
-            {
-                QUrl sgurl { dir };
-                QString host = sgurl.host().toLower();
+            QUrl sgurl { dir };
+            QString host = sgurl.host().toLower();
 
-                m_liveSGHosts.removeAll(host);
+            m_liveSGHosts.removeAll(host);
 
-                LOG(VB_GENERAL, LOG_ERR,
-                    QString("Failed to scan :%1:").arg(dir));
-            }
+            LOG(VB_GENERAL, LOG_ERR,
+                QString("Failed to scan :%1:").arg(dir));
         }
         if (m_hasGUI)
             SendProgressEvent(++counter);

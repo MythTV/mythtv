@@ -23,7 +23,7 @@ enum UPnpCMGRMethod : std::uint8_t
     CMGRM_GetProtocolInfo          = 2,
     CMGRM_GetCurrentConnectionInfo = 3,
     CMGRM_GetCurrentConnectionIDs  = 4,
-    CMGRM_GetFeatureList           = 5
+    CMGRM_GetFeatureList           = 5,
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ enum UPnpCMGRConnectionStatus : std::uint8_t
     CMGRSTATUS_OK                    = 1,
     CMGRSTATUS_ContentFormatMismatch = 2,
     CMGRSTATUS_InsufficientBandwidth = 3,
-    CMGRSTATUS_UnreliableChannel     = 4
+    CMGRSTATUS_UnreliableChannel     = 4,
 };
 
 //////////////////////////////////////////////////////////////////////////////

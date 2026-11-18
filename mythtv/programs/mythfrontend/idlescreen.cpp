@@ -268,19 +268,17 @@ void IdleScreen::customEvent(QEvent* event)
         }
         else if (me->Message().startsWith("SHUTDOWN_NOW"))
         {
-            if (gCoreContext->IsFrontendOnly())
+            if (gCoreContext->IsFrontendOnly() &&
+                (gCoreContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1))
             {
                 // does the user want to shutdown this frontend only machine
                 // when the BE shuts down?
-                if (gCoreContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1)
-                {
-                     LOG(VB_GENERAL, LOG_NOTICE,
-                         "Backend has gone offline, Shutting down frontend");
-                     QString poweroff_cmd =
-                        gCoreContext->GetSetting("MythShutdownPowerOff", "");
-                     if (!poweroff_cmd.isEmpty())
-                         myth_system(poweroff_cmd);
-                }
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "Backend has gone offline, Shutting down frontend");
+                QString poweroff_cmd =
+                    gCoreContext->GetSetting("MythShutdownPowerOff", "");
+                if (!poweroff_cmd.isEmpty())
+                    myth_system(poweroff_cmd);
             }
         }
         else if (me->Message().startsWith("SCHEDULE_CHANGE") ||

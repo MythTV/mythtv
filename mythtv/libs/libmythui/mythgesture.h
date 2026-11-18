@@ -74,7 +74,7 @@ class MUI_PUBLIC MythGestureEvent : public QEvent
         /* A click */
         // NB LongClick before Click as MythMainWindow filters out otherwise
         LongClick,
-        Click
+        Click,
     };
     Q_ENUM(Gesture)
 

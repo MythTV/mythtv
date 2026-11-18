@@ -99,7 +99,7 @@ public:
         // This test stolen from FileRingBuffer::OpenFile()
         bool is_local =
             (!filename.startsWith("/dev")) &&
-            ((filename.startsWith("/")) || QFile::exists(filename));
+            (filename.startsWith("/") || QFile::exists(filename));
         m_isRemote = !is_local;
         if (m_isRemote)
         {

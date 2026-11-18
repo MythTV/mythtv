@@ -278,7 +278,7 @@ static bool InitializeVideoSchema(void)
 "INSERT INTO videotypes VALUES (29,'ts','Internal',0,0);",
 "INSERT INTO videotypes VALUES (30,'swf','Internal',0,0);",
 "INSERT INTO videotypes VALUES (31,'f4v','Internal',0,0);",
-"INSERT INTO videotypes VALUES (32,'nuv','Internal',0,0);"
+"INSERT INTO videotypes VALUES (32,'nuv','Internal',0,0);",
 };
 
     QString dbver = "";
@@ -349,7 +349,7 @@ bool doUpgradeVideoDatabaseSchema(void)
 "  MODIFY playcommand varbinary(255) default NULL;",
 "ALTER TABLE videotypes"
 "  MODIFY extension varbinary(128) NOT NULL,"
-"  MODIFY playcommand varbinary(255) NOT NULL;"
+"  MODIFY playcommand varbinary(255) NOT NULL;",
 };
 
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
@@ -409,7 +409,7 @@ bool doUpgradeVideoDatabaseSchema(void)
 "ALTER TABLE videotypes"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY extension varchar(128) CHARACTER SET utf8 NOT NULL,"
-"  MODIFY playcommand varchar(255) CHARACTER SET utf8 NOT NULL;"
+"  MODIFY playcommand varchar(255) CHARACTER SET utf8 NOT NULL;",
 };
 
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
@@ -425,7 +425,7 @@ bool doUpgradeVideoDatabaseSchema(void)
             "DELETE FROM settings WHERE value="
             "'MovieDataCommandLine' AND data LIKE '%imdb%';",
             "DELETE FROM settings WHERE value="
-            "'MoviePosterCommandLine' AND data LIKE '%imdb%';"
+            "'MoviePosterCommandLine' AND data LIKE '%imdb%';",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1019", dbver))
@@ -435,7 +435,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1019")
     {
         DBUpdates updates {
-            "ALTER TABLE videometadata ADD `trailer` TEXT;"
+            "ALTER TABLE videometadata ADD `trailer` TEXT;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1020", dbver))
@@ -468,7 +468,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     if (dbver == "1021")
     {
         DBUpdates updates {
-            "ALTER TABLE videometadata ADD host text CHARACTER SET utf8 NOT NULL;"
+            "ALTER TABLE videometadata ADD host text CHARACTER SET utf8 NOT NULL;",
         };
 
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
@@ -481,7 +481,7 @@ bool doUpgradeVideoDatabaseSchema(void)
         DBUpdates updates {
             "ALTER TABLE videometadata ADD `screenshot` TEXT;",
             "ALTER TABLE videometadata ADD `banner` TEXT;",
-            "ALTER TABLE videometadata ADD `fanart` TEXT;"
+            "ALTER TABLE videometadata ADD `fanart` TEXT;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1023", dbver))
@@ -496,7 +496,7 @@ bool doUpgradeVideoDatabaseSchema(void)
             "ALTER TABLE videometadata ADD `season` SMALLINT "
             "UNSIGNED NOT NULL DEFAULT '0' AFTER `length`;",
             "ALTER TABLE videometadata ADD `episode` SMALLINT "
-            "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;"
+            "UNSIGNED NOT NULL DEFAULT '0' AFTER `season`;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1024", dbver))
@@ -507,7 +507,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videometadata ADD watched BOOL "
-            "NOT NULL DEFAULT 0 AFTER browse;"
+            "NOT NULL DEFAULT 0 AFTER browse;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1025", dbver))
@@ -518,7 +518,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videometadata ADD `insertdate` TIMESTAMP "
-            "NULL DEFAULT CURRENT_TIMESTAMP AFTER `fanart`;"
+            "NULL DEFAULT CURRENT_TIMESTAMP AFTER `fanart`;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1026", dbver))
@@ -529,7 +529,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "DELETE FROM keybindings "
-            " WHERE action = 'DELETE' AND context = 'Video';"
+            " WHERE action = 'DELETE' AND context = 'Video';",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1027", dbver))
@@ -597,7 +597,7 @@ bool doUpgradeVideoDatabaseSchema(void)
             "ALTER TABLE videometadata ADD `releasedate` DATE "
             "NOT NULL AFTER `year`;",
             "ALTER TABLE videometadata ADD `homepage` TEXT "
-            "NOT NULL AFTER `inetref`;"
+            "NOT NULL AFTER `inetref`;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1029", dbver))
@@ -608,7 +608,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videometadata ADD `hash` VARCHAR(128) "
-            "NOT NULL AFTER `filename`;"
+            "NOT NULL AFTER `filename`;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1030", dbver))
@@ -683,7 +683,7 @@ bool doUpgradeVideoDatabaseSchema(void)
             "DROP TEMPORARY TABLE bad_videometadatacountry,",
             "ALTER TABLE videometadatacast ADD UNIQUE INDEX (`idvideo`,`idcast`),",
             "ALTER TABLE videometadatagenre ADD UNIQUE INDEX (`idvideo`,`idgenre`),",
-            "ALTER TABLE videometadatacountry ADD UNIQUE INDEX (`idvideo`,`idcountry`);"
+            "ALTER TABLE videometadatacountry ADD UNIQUE INDEX (`idvideo`,`idcountry`);",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1033", dbver))
@@ -713,7 +713,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videometadata ADD `tagline` VARCHAR (255) "
-            "AFTER `subtitle`;"
+            "AFTER `subtitle`;",
         };
 
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
@@ -725,7 +725,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE videometadata ADD processed BOOL "
-            "NOT NULL DEFAULT 0 AFTER watched;"
+            "NOT NULL DEFAULT 0 AFTER watched;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1036", dbver))
@@ -736,7 +736,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "ALTER TABLE  videometadata ADD  `studio` VARCHAR( 128 ) "
-            "AFTER `director`;"
+            "AFTER `director`;",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1037", dbver))
@@ -747,7 +747,7 @@ bool doUpgradeVideoDatabaseSchema(void)
     {
         DBUpdates updates {
             "DELETE FROM videotypes WHERE extension = 'VIDEO_TS';",
-            "DELETE FROM videotypes WHERE extension = 'BDMV';"
+            "DELETE FROM videotypes WHERE extension = 'BDMV';",
         };
         if (!performActualUpdate("MythVideo", MythVideoVersionName,
                                  updates, "1038", dbver))

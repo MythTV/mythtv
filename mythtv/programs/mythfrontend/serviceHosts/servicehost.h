@@ -42,7 +42,7 @@ class MethodInfo
         QMetaMethod     m_oMethod;
         HttpRequestType m_eRequestType {(HttpRequestType)(RequestTypeGet |
                                                           RequestTypePost |
-                                                          RequestTypeHead)};
+                                                          RequestTypeHead),};
 
     public:
         MethodInfo() = default;

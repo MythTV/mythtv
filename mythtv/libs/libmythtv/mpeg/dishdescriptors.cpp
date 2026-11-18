@@ -309,7 +309,7 @@ QString dish_theme_type_to_string(uint theme_type)
     static const std::array<const std::string,kThemeLast> s_themes =
     {
         "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-        "Series/Special", "Music/Art", "Religious", "Off-Air"
+        "Series/Special", "Music/Art", "Religious", "Off-Air",
     };
 
     if ((theme_type > kThemeNone) && (theme_type < kThemeLast))
@@ -323,7 +323,7 @@ DishThemeType string_to_dish_theme_type(const QString &theme_type)
     static const std::array<const std::string,kThemeLast> s_themes
     {
         "", "Movie", "Sports", "News/Business", "Family/Children", "Education",
-        "Series/Special", "Music/Art", "Religious", "Off-Air"
+        "Series/Special", "Music/Art", "Religious", "Off-Air",
     };
 
     for (uint i = 1; i < 10; i++)

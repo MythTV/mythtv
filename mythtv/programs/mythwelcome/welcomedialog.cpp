@@ -200,18 +200,16 @@ void WelcomeDialog::customEvent(QEvent *e)
         {
             LOG(VB_GENERAL, LOG_NOTICE,
                 "MythWelcome received a SHUTDOWN_NOW event");
-            if (gCoreContext->IsFrontendOnly())
+            if (gCoreContext->IsFrontendOnly() &&
+                (gCoreContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1))
             {
                 // does the user want to shutdown this frontend only machine
                 // when the BE shuts down?
-                if (gCoreContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1)
-                {
-                     LOG(VB_GENERAL, LOG_NOTICE,
-                         "MythWelcome is shutting this computer down now");
-                     QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
-                     if (!poweroff_cmd.isEmpty())
-                         myth_system(poweroff_cmd, kMSDontBlockInputDevs);
-                }
+                LOG(VB_GENERAL, LOG_NOTICE,
+                    "MythWelcome is shutting this computer down now");
+                QString poweroff_cmd = gCoreContext->GetSetting("MythShutdownPowerOff", "");
+                if (!poweroff_cmd.isEmpty())
+                    myth_system(poweroff_cmd, kMSDontBlockInputDevs);
             }
         }
     }

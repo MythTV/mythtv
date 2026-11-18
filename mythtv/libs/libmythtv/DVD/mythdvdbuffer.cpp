@@ -38,12 +38,12 @@ static const std::array<const std::string,8> DVDMenuTable
     QT_TRANSLATE_NOOP("(DVD menu)", "Audio Menu"),
     QT_TRANSLATE_NOOP("(DVD menu)", "Angle Menu"),
     //: DVD part/chapter menu
-    QT_TRANSLATE_NOOP("(DVD menu)", "Part Menu")
+    QT_TRANSLATE_NOOP("(DVD menu)", "Part Menu"),
 };
 
 const QMap<int, int> MythDVDBuffer::kSeekSpeedMap =
 { {  3,  1 }, {  5,  2 }, { 10,   4 }, {  20,  8 },
-  { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 } };
+  { 30, 10 }, { 60, 15 }, { 120, 20 }, { 180, 60 }, };
 
 MythDVDBuffer::MythDVDBuffer(const QString &Filename)
   : MythOpticalBuffer(kMythBufferDVD)
@@ -1441,7 +1441,7 @@ AVSubtitle *MythDVDBuffer::GetMenuSubtitle(uint &Version)
     if ((m_menuBuflength > 4) && m_buttonExists && (NumMenuButtons() > 0))
     {
         Version = m_buttonVersion;
-        return &(m_dvdMenuButton);
+        return &m_dvdMenuButton;
     }
 
     return nullptr;

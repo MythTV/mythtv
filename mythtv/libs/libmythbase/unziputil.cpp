@@ -104,7 +104,7 @@ QByteArray gzipCompress(const QByteArray& data)
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;
     strm.avail_in = data.length();
-    strm.next_in  = (Bytef*)(data.data());
+    strm.next_in  = (Bytef*)data.data();
 
     int ret = deflateInit2(&strm,
                            Z_DEFAULT_COMPRESSION,
@@ -122,7 +122,7 @@ QByteArray gzipCompress(const QByteArray& data)
     while (strm.avail_out == 0)
     {
         strm.avail_out = out.size();
-        strm.next_out  = (Bytef*)(out.data());
+        strm.next_out  = (Bytef*)out.data();
 
         ret = deflate(&strm, Z_FINISH);
 
@@ -162,7 +162,7 @@ QByteArray gzipUncompress(const QByteArray &data)
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;
     strm.avail_in = data.length();
-    strm.next_in  = (Bytef*)(data.data());
+    strm.next_in  = (Bytef*)data.data();
 
     int ret = inflateInit2(&strm, 15 + 16);
 

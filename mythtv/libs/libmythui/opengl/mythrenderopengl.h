@@ -47,7 +47,7 @@ enum GLFeatures : std::uint16_t
     kGLNVMemory        = 0x0020,
     kGL16BitFBO        = 0x0040,
     kGLComputeShaders  = 0x0080,
-    kGLGeometryShaders = 0x0100
+    kGLGeometryShaders = 0x0100,
 };
 
 static constexpr size_t TEX_OFFSET { 8 };

@@ -62,14 +62,12 @@ bool MythBrowser::Create(void)
 
     // create the default favicon
     QString favIcon = "mb_default_favicon.png";
-    if (GetMythUI()->FindThemeFile(favIcon))
+    if (GetMythUI()->FindThemeFile(favIcon) &&
+        QFile::exists(favIcon))
     {
-        if (QFile::exists(favIcon))
-        {
-            QImage image(favIcon);
-            m_defaultFavIcon = GetMythPainter()->GetFormatImage();
-            m_defaultFavIcon->Assign(image);
-        }
+        QImage image(favIcon);
+        m_defaultFavIcon = GetMythPainter()->GetFormatImage();
+        m_defaultFavIcon->Assign(image);
     }
 
     // this is the template for all other browser tabs

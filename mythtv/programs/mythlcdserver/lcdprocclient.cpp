@@ -401,10 +401,9 @@ void LCDProcClient::serverSendingData()
                 "passed to LCDd that it doesn't understand");
             LOG(VB_GENERAL, LOG_WARNING, "last command: " + m_lastCommand );
         }
-        else if (aList.first() == "key")
+        else if ((aList.first() == "key") && m_parentLCDServer )
         {
-           if ( m_parentLCDServer )
-                m_parentLCDServer->sendKeyPress(aList.last().trimmed());
+           m_parentLCDServer->sendKeyPress(aList.last().trimmed());
         }
     }
 }
@@ -899,7 +898,7 @@ void LCDProcClient::outputRightText(const QString& theScreen, QString theText, c
                           int row)
 {
     QString aString;
-    unsigned int x = (int)( m_lcdWidth - theText.length()) + 1;
+    unsigned int x = (m_lcdWidth - theText.length()) + 1;
 
     aString = "widget_set ";
     aString += theScreen;
@@ -2399,19 +2398,18 @@ void LCDProcClient::customEvent(QEvent *e)
         if (me == nullptr)
             return;
 
-        if (me->Message().startsWith("RECORDING_LIST_CHANGE") ||
-            me->Message() == "UPDATE_PROG_INFO")
+        if ((me->Message().startsWith("RECORDING_LIST_CHANGE") ||
+             me->Message() == "UPDATE_PROG_INFO") &&
+            m_lcdShowRecstatus &&
+            !m_updateRecInfoTimer->isActive())
         {
-            if ( m_lcdShowRecstatus && !m_updateRecInfoTimer->isActive())
-            {
-               if (debug_level > 1)
-                   LOG(VB_GENERAL, LOG_INFO,
-                       "LCDProcClient: Received recording list change");
+            if (debug_level > 1)
+                LOG(VB_GENERAL, LOG_INFO,
+                    "LCDProcClient: Received recording list change");
 
-                // we can't query the backend from inside the customEvent
-                // so fire the recording list update from a timer
-                m_updateRecInfoTimer->start(500ms);
-            }
+            // we can't query the backend from inside the customEvent
+            // so fire the recording list update from a timer
+            m_updateRecInfoTimer->start(500ms);
         }
     }
 }
@@ -2421,23 +2419,21 @@ void LCDProcClient::updateRecordingList(void)
     m_tunerList.clear();
     m_isRecording = false;
 
-    if (!gCoreContext->IsConnectedToMaster())
+    if (!gCoreContext->IsConnectedToMaster() &&
+        !gCoreContext->ConnectToMasterServer(false))
     {
-        if (!gCoreContext->ConnectToMasterServer(false))
-        {
-            LOG(VB_GENERAL, LOG_ERR,
-                "LCDProcClient: Cannot get recording status "
-                "- is the master server running?\n\t\t\t"
-                "Will retry in 30 seconds");
-            QTimer::singleShot(30s, this, &LCDProcClient::updateRecordingList);
+        LOG(VB_GENERAL, LOG_ERR,
+            "LCDProcClient: Cannot get recording status "
+            "- is the master server running?\n\t\t\t"
+            "Will retry in 30 seconds");
+        QTimer::singleShot(30s, this, &LCDProcClient::updateRecordingList);
 
-            // If we can't get the recording status and we're showing
-            // it, switch back to time. Maybe it would be even better
-            // to show that the backend is unreachable ?
-            if (m_activeScreen == "RecStatus")
-                switchToTime();
-            return;
-        }
+        // If we can't get the recording status and we're showing
+        // it, switch back to time. Maybe it would be even better
+        // to show that the backend is unreachable ?
+        if (m_activeScreen == "RecStatus")
+            switchToTime();
+        return;
     }
 
     m_isRecording = RemoteGetRecordingStatus(&m_tunerList, false);

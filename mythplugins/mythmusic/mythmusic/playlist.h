@@ -24,14 +24,14 @@ enum InsertPLOption : std::uint8_t
     PL_REPLACE = 1,
     PL_INSERTATBEGINNING,
     PL_INSERTATEND,
-    PL_INSERTAFTERCURRENT
+    PL_INSERTAFTERCURRENT,
 };
 
 enum PlayPLOption : std::uint8_t
 {
     PL_FIRST = 1,
     PL_FIRSTNEW,
-    PL_CURRENT
+    PL_CURRENT,
 };
 
 struct PlaylistOptions

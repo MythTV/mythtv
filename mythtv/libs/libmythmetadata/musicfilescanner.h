@@ -17,7 +17,7 @@ class META_PUBLIC MusicFileScanner
     {
         kFileSystem,
         kNeedUpdate,
-        kBoth
+        kBoth,
     };
 
     struct MusicFileData

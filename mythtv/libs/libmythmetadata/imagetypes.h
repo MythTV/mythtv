@@ -37,7 +37,7 @@ enum ImageNodeType : std::uint8_t {
     kCloneDir  = 2, //!< A device sub dir comprised from multiple SG dirs
     kDirectory = 3, //!< A device sub directory
     kImageFile = 4, //!< A picture
-    kVideoFile = 5  //!< A video
+    kVideoFile = 5,  //!< A video
 };
 
 
@@ -52,7 +52,7 @@ enum ImageSortOrder : std::uint8_t {
     kSortBySizeAsc     = 7, //!< File size Smallest -> Largest
     kSortBySizeDesc    = 8, //!< File size Largest -> Smallest
     kSortByDateAsc     = 9, //!< Exif date Earliest -> Latest
-    kSortByDateDesc    = 10 //!< Exif date Latest -> Earliest
+    kSortByDateDesc    = 10, //!< Exif date Latest -> Earliest
 };
 
 

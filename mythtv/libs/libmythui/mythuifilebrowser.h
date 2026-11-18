@@ -122,7 +122,7 @@ class MUI_PUBLIC MythUIFileBrowser : public MythScreenType
 
     QDir::Filters      m_typeFilter      {QDir::AllDirs | QDir::Drives |
                                           QDir::Files | QDir::Readable |
-                                          QDir::Writable | QDir::Executable};
+                                          QDir::Writable | QDir::Executable,};
     QStringList        m_nameFilter;
 
     MythUIButtonList  *m_fileList        {nullptr};

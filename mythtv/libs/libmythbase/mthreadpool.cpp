@@ -344,7 +344,7 @@ void MThreadPool::start(QRunnable *runnable, const QString& debugName, int prior
     {
         MPoolQueue list;
         list.push_back(MPoolEntry(runnable,debugName));
-        m_priv->m_runQueues[priority] = list;
+        m_priv->m_runQueues[priority] = std::move(list);
     }
 }
 

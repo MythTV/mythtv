@@ -40,7 +40,7 @@ UK MHEG content hook values: 2 => MPEG I-frame, 4 => PNG bitmap
 
 MHBitmap::~MHBitmap()
 {
-    delete(m_pContent);
+    delete m_pContent;
 }
 
 void MHBitmap::Initialise(MHParseNode *p, MHEngine *engine)

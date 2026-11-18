@@ -336,11 +336,9 @@ void FileSelector::updateSelectedList()
     {
         auto f = std::ranges::find(std::as_const(m_fileData), a->filename,
                                    &FileData::filename);
-        if (f != m_fileData.cend())
-        {
-            if (m_selectedList.indexOf((*f)->filename) == -1)
-                m_selectedList.append((*f)->filename);
-        }
+        if ((f != m_fileData.cend()) &&
+            (m_selectedList.indexOf((*f)->filename) == -1))
+            m_selectedList.append((*f)->filename);
     }
 }
 

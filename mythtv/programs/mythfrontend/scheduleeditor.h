@@ -229,7 +229,7 @@ class ScheduleEditor : public ScheduleCommon,
         kFilterView,
         kStoreOptView,
         kPostProcView,
-        kMetadataView
+        kMetadataView,
     };
 
     int               m_view            {kMainView};

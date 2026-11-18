@@ -51,7 +51,7 @@ class PaneDVBT2 : public GroupSetting
                                       m_pcoderateHp    = new ScanCodeRateHP(),
                                       m_ptransMode     = new ScanTransmissionMode(),
                                       m_pguardInterval = new ScanGuardInterval(),
-                                      m_phierarchy      = new ScanHierarchy()});
+                                      m_phierarchy      = new ScanHierarchy(),});
     }
 
     QString frequency(void)      const { return m_pfrequency->getValue();     }

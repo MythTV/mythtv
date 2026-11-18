@@ -148,7 +148,7 @@ QChar toQChar(RecordingType rectype)
         default:
             ret = " ";
     }
-    return (ret.isEmpty()) ? QChar(' ') : ret[0];
+    return ret.isEmpty() ? QChar(' ') : ret[0];
 }
 
 QString toString(RecordingDupInType recdupin)

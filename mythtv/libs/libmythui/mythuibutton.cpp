@@ -156,17 +156,14 @@ bool MythUIButton::keyPressEvent(QKeyEvent *event)
  */
 bool MythUIButton::gestureEvent(MythGestureEvent *event)
 {
-    if (event->GetGesture() == MythGestureEvent::Click)
+    if ((event->GetGesture() == MythGestureEvent::Click) && IsEnabled())
     {
-        if (IsEnabled())
-        {
-            if (m_pushed)
-                UnPush();
-            else
-                Push();
+        if (m_pushed)
+            UnPush();
+        else
+            Push();
 
-            return true;
-        }
+        return true;
     }
 
     return false;

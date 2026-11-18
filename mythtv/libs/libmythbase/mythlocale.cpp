@@ -138,23 +138,20 @@ bool MythLocale::LoadDefaultsFromXML(void)
             n = n.nextSibling())
     {
         QDomElement e = n.toElement();
-        if (!e.isNull())
+        if (!e.isNull() && (e.tagName() == "setting"))
         {
-            if (e.tagName() == "setting")
-            {
-                QString name = e.attribute("name", "");
-                bool global = (e.attribute("global", "false") == "true");
-                QString value = e.firstChild().toText().data();
+            QString name = e.attribute("name", "");
+            bool global = (e.attribute("global", "false") == "true");
+            QString value = e.firstChild().toText().data();
 
-                // TODO Assumes no setting accepts an empty value, which may not
-                // be the case
-                if (!name.isEmpty() && !value.isEmpty())
-                {
-                    if (global)
-                        m_globalSettings[name] = value;
-                    else
-                        m_hostSettings[name] = value;
-                }
+            // TODO Assumes no setting accepts an empty value, which may not
+            // be the case
+            if (!name.isEmpty() && !value.isEmpty())
+            {
+                if (global)
+                    m_globalSettings[name] = value;
+                else
+                    m_hostSettings[name] = value;
             }
         }
     }

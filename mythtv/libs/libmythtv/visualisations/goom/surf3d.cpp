@@ -22,7 +22,7 @@ grid3d *grid3d_new (int sizex, int defx, int sizez, int defz, v3d center) {
 	int x = defx;
 	int y = defz;
 	auto *g = new grid3d;
-	surf3d *s = &(g->surf);
+	surf3d *s = &g->surf;
 	s->nbvertex = x*y;
 #ifdef __cpp_size_t_suffix
 	s->vertex.resize(1Z*x*y);
@@ -102,7 +102,7 @@ void surf3d_translate (surf3d *s) {
 void grid3d_update (grid3d *g, float angle, const floatvec& vals, float dist) {
 	float cosa = cosf(angle);
 	float sina = sinf(angle);
-	surf3d *s = &(g->surf);
+	surf3d *s = &g->surf;
 	v3d cam = s->center;
 	cam.z += dist;
 	cam.y += sinf(angle/4.3F)*2.0F;

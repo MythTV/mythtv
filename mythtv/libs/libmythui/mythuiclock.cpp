@@ -98,7 +98,7 @@ bool MythUIClock::ParseElement(
         format.replace("%TIME%", m_timeFormat, Qt::CaseInsensitive);
         format.replace("%DATE%", m_dateFormat, Qt::CaseInsensitive);
         format.replace("%SHORTDATE%", m_shortDateFormat, Qt::CaseInsensitive);
-        m_format = format;
+        m_format = std::move(format);
         m_message = gCoreContext->GetQLocale().toString(QDateTime::currentDateTime(), m_format);
     }
     else

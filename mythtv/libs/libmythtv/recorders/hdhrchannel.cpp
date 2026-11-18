@@ -67,7 +67,7 @@ bool HDHRChannel::Open(void)
                                              GetMajorID());
 
     m_tunerTypes = m_streamHandler->GetTunerTypes();
-    m_tunerType = (m_tunerTypes.empty()) ?
+    m_tunerType = m_tunerTypes.empty() ?
         DTVTunerType::kTunerTypeUnknown : (int) m_tunerTypes[0];
 
     if (!InitializeInput())

@@ -29,7 +29,7 @@ static inline bool VERBOSE_LEVEL_NONE() { return verboseMask == 0; };
 static inline bool VERBOSE_LEVEL_CHECK(uint64_t mask, LogLevel_t level)
 {
     if (componentLogLevel.contains(mask))
-        return *(componentLogLevel.find(mask)) >= level;
+        return *componentLogLevel.find(mask) >= level;
     return (((verboseMask & mask) == mask) && (logLevel >= level));
 }
 

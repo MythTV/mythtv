@@ -123,7 +123,7 @@ V2MusicMetadataInfo* V2Music::GetTrack(int Id)
     if (!metadata)
     {
         delete all_music;
-        throw(QString("No metadata found for selected ID!."));
+        throw std::runtime_error("No metadata found for selected ID!.");
     }
 
     auto *pMusicMetadataInfo = new V2MusicMetadataInfo();

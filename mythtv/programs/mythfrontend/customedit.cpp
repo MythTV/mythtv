@@ -600,7 +600,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
 
     auto rule = item->GetData().value<CustomRuleInfo>();
 
-    QString msg = (m_evaluate) ? evaluate(rule.description) : rule.description;
+    QString msg = m_evaluate ? evaluate(rule.description) : rule.description;
     msg = QString("\"%1\"").arg(msg.simplified());
     m_clauseText->SetText(msg);
 
@@ -624,7 +624,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
     static const QRegularExpression kNonWhitespaceRE { "\\S" };
     if (desc.contains(kNonWhitespaceRE))
         clause = "AND ";
-    clause += (m_evaluate) ? evaluate(rule.description) : rule.description;
+    clause += m_evaluate ? evaluate(rule.description) : rule.description;
 
     m_descriptionEdit->SetText(desc.append(clause));
 

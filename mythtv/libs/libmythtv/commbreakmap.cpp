@@ -292,7 +292,7 @@ bool CommBreakMap::DoSkipCommercials(uint64_t &jumpToFrame,
     {
         m_commBreakIter--;
 
-        int skipped_seconds = (int)(((int64_t)(m_commBreakIter.key()) -
+        int skipped_seconds = (int)(((int64_t)m_commBreakIter.key() -
                               (int64_t)framesPlayed) / video_frame_rate);
 
         // special case when hitting 'skip backwards' <3 seconds after break

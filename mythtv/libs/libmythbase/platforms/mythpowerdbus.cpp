@@ -85,22 +85,16 @@ void MythPowerDBus::Init(void)
     m_upowerInterface = new QDBusInterface(UPOWER_SERVICE, UPOWER_PATH, UPOWER_INTERFACE, m_bus);
     m_logindInterface = new QDBusInterface(LOGIN1_SERVICE, LOGIN1_PATH, LOGIN1_INTERFACE, m_bus);
 
-    if (m_upowerInterface)
+    if (m_upowerInterface && !m_upowerInterface->isValid())
     {
-        if (!m_upowerInterface->isValid())
-        {
-            delete m_upowerInterface;
-            m_upowerInterface = nullptr;
-        }
+        delete m_upowerInterface;
+        m_upowerInterface = nullptr;
     }
 
-    if (m_logindInterface)
+    if (m_logindInterface && !m_logindInterface->isValid())
     {
-        if (!m_logindInterface->isValid())
-        {
-            delete m_logindInterface;
-            m_logindInterface = nullptr;
-        }
+        delete m_logindInterface;
+        m_logindInterface = nullptr;
     }
 
     if (!m_upowerInterface)

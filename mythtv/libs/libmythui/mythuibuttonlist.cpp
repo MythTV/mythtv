@@ -3870,7 +3870,7 @@ void MythUIButtonListItem::DoButtonLookupText (MythUIText *text,
             tempString.replace(match.captured(0), replacement);
         }
 
-        newText = tempString;
+        newText = std::move(tempString);
     }
     else
     {

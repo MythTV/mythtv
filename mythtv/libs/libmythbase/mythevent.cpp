@@ -42,7 +42,7 @@ void MythEvent::log(const QString& prefix)
     if ((m_extradata.count() == 1) && (m_extradata[0] == "empty"))
         return;
     QStringList tmp = m_extradata;
-    if ((m_message.startsWith("GENERATED_PIXMAP")) && (tmp[0] == "OK"))
+    if (m_message.startsWith("GENERATED_PIXMAP") && (tmp[0] == "OK"))
         tmp[6]="Encoded pixmap";
     LOG(VB_GENERAL, LOG_INFO, QString("Extra data: %1").arg(tmp.join('|')));
 }
