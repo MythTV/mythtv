@@ -194,6 +194,9 @@ class DTVRecorder :
     mutable QAtomicInt       m_continuityErrorCount       {0};
     unsigned long long       m_framesSeenCount            {0};
     unsigned long long       m_framesWrittenCount         {0};
+    // TODO Convert m_totalDuration and m_tdBase to std::chrono::nanoseconds or
+    // convert AvFormatDecoder::PreProcessVideoPacket() and
+    // MPEG2fixup::BuildKeyframeIndex() to the same as this.
     /// @brief Total milliseconds that have passed since the start of the recording.
     double                   m_totalDuration              {0.0};
     /// @brief Milliseconds from the start to m_tdTickCount = 0.
