@@ -55,7 +55,6 @@ __version__="v0.2.3"
 import os, struct, sys, re, datetime, time, subprocess, string
 import urllib.request, urllib.parse, urllib.error
 import logging
-import telnetlib
 from threading import Thread
 
 from .common_exceptions import (WebCgiUrlError, WebCgiHttpError, WebCgiRssError, WebCgiVideoNotFound, WebCgiXmlError, )
