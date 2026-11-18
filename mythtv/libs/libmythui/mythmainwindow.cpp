@@ -664,6 +664,14 @@ void MythMainWindow::Init(bool MayReInit)
         flags |= Qt::FramelessWindowHint;
     }
 
+    // Wayland client side decorations (e.g. adwaita) draw translucent shadows
+    // and rounded corners into the top level surface, so it needs an alpha
+    // channel. The UI is rendered into the opaque painter window (a separate
+    // wl_subsurface) so this does not affect UI rendering. Must be set before
+    // setWindowFlags() (re)creates the native window.
+    if (QGuiApplication::platformName().contains("wayland", Qt::CaseInsensitive))
+        setAttribute(Qt::WA_TranslucentBackground, inwindow);
+
     // Workaround Qt/Windows playback bug?
 #ifdef Q_OS_WINDOWS
     flags |= Qt::MSWindowsOwnDC;

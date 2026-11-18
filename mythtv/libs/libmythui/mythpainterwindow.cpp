@@ -179,7 +179,19 @@ void MythPainterWindow::resizeEvent(QResizeEvent* /*ResizeEvent*/)
 {
 #if CONFIG_WAYLANDEXTRAS
     if (m_waylandDev)
-        m_waylandDev->SetOpaqueRegion(rect());
+    {
+        // m_waylandDev wraps the top level surface. With client side
+        // decorations its origin is the outer edge of the decoration
+        // (including shadows), not the top left of the UI.
+        QRect region = rect();
+        QWindow* toplevel = window()->windowHandle();
+        if (toplevel)
+        {
+            auto margins = toplevel->frameMargins();
+            region.translate(margins.left(), margins.top());
+        }
+        m_waylandDev->SetOpaqueRegion(region);
+    }
 #endif
 }
 
