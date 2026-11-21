@@ -61,11 +61,11 @@ void MythDVDPlayer::DoDisableDVDSubtitles()
         SetCaptionsEnabled(false, false);
 }
 
-void MythDVDPlayer::DisableCaptions(uint Mode, bool OSDMsg)
+void MythDVDPlayer::DisableCaptions(uint Mode, bool OSDMsg, bool SaveInDb)
 {
     if ((kDisplayAVSubtitle & Mode) && m_playerCtx->m_buffer->IsDVD())
         m_playerCtx->m_buffer->DVD()->SetTrack(kTrackTypeSubtitle, -1);
-    MythPlayerUI::DisableCaptions(Mode, OSDMsg);
+    MythPlayerUI::DisableCaptions(Mode, OSDMsg, SaveInDb);
 }
 
 void MythDVDPlayer::EnableCaptions(uint Mode, bool OSDMsg)
