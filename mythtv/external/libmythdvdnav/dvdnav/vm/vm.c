@@ -199,6 +199,7 @@ static int dvd_read_name(const vm_t *vm, char *name, char *serial, const char *d
   ssize_t read_size = 0;
   int fd = -1;
   uint8_t data[DVD_VIDEO_LB_LEN];
+  char buffer[49] = {0};
 
   /* Read DVD name */
   if (device == NULL) {
@@ -232,7 +233,6 @@ static int dvd_read_name(const vm_t *vm, char *name, char *serial, const char *d
     goto fail;
   }
 
-  char buffer[49] = {0};
   strncpy(name, (const char*) &data[25], 48);
   name[48] = 0;
   escaped_strcpy(buffer, name, 48);
