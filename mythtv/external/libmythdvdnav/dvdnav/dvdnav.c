@@ -585,7 +585,7 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
       /* we seeked -> check for multiple angles */
       vm_get_angle_info(this->vm, &current, &num_angles);
       if (num_angles > 1) {
-        int32_t result, block;
+        int32_t block;
         /* we have to skip the first VOBU when seeking in a multiangle feature,
          * because it might belong to the wrong angle */
         block = this->position_next.cell_start + this->position_next.block;
@@ -724,7 +724,6 @@ dvdnav_status_t dvdnav_get_next_cache_block(dvdnav_t *this, uint8_t **buf,
       (this->position_current.cell_start != this->position_next.cell_start) ) {
     dvdnav_cell_change_event_t *cell_event = (dvdnav_cell_change_event_t *)*buf;
     int32_t first_cell_nr, last_cell_nr, i;
-    dvd_state_t *state = &this->vm->state;
 
     this->cur_cell_time = 0;
     (*event) = DVDNAV_CELL_CHANGE;
