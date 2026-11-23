@@ -192,7 +192,6 @@ std::chrono::microseconds MythPlayerAVSync::AVSync(AudioPlayer *Audio, MythVideo
         }
     }
     m_priorVideoTimecode = videotimecode;
-    m_dispTimecode = videotimecode;
 
     m_avsyncAvg = static_cast<int>(m_lastFix * 1000 / s_av_control_gain);
 

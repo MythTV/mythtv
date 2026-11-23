@@ -157,7 +157,6 @@ void MythVideoFrame::ClearMetadata()
     m_frameNumber         = 0;
     m_frameCounter        = 0;
     m_timecode            = 0ms;
-    m_displayTimecode     = 0ms;
     m_priv                = { nullptr };
     m_interlaced          = false;
     m_topFieldFirst       = true;
@@ -338,7 +337,6 @@ bool MythVideoFrame::CopyFrame(MythVideoFrame *From)
     m_frameNumber         = From->m_frameNumber;
     m_frameCounter        = From->m_frameCounter;
     m_timecode            = From->m_timecode;
-    m_displayTimecode     = From->m_displayTimecode;
     m_interlaced          = From->m_interlaced;
     m_topFieldFirst       = From->m_topFieldFirst;
     m_interlacedReverse   = From->m_interlacedReverse;

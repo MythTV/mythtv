@@ -28,8 +28,6 @@ class MythPlayerAVSync
                                       std::chrono::microseconds FrameInterval,
                                       float PlaySpeed, bool HaveVideo, bool Force);
     void     WaitForFrame        (std::chrono::microseconds FrameDue);
-    std::chrono::milliseconds& DisplayTimecode()
-        { return m_dispTimecode; }
     void     ResetAVSyncClockBase()
         { m_rtcBase = 0us; }
     void     GetAVSyncData       (InfoMap& Map) const;
@@ -46,7 +44,6 @@ class MythPlayerAVSync
     QElapsedTimer m_avTimer;
     AVSyncAudioPausedType     m_avsyncAudioPaused  { kAVSyncAudioNotPaused };
     int        m_avsyncAvg          { 0 };
-    std::chrono::milliseconds m_dispTimecode       { 0ms };
     std::chrono::microseconds m_rtcBase { 0us }; // real time clock base for presentation time
     std::chrono::milliseconds m_maxTcVal           { 0ms }; // maximum to date video tc
     std::chrono::milliseconds m_priorAudioTimecode { 0ms }; // time code from prior frame
