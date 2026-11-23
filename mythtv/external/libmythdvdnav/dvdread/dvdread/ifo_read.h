@@ -22,8 +22,9 @@
 #ifndef LIBDVDREAD_IFO_READ_H
 #define LIBDVDREAD_IFO_READ_H
 
-#include "ifo_types.h"
-#include "dvdread/dvd_reader.h"
+#include <dvdread/ifo_types.h>
+#include <dvdread/attributes.h>
+#include <dvdread/dvd_reader.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,32 +37,33 @@ extern "C" {
  * given title.  If title 0 is given, the video manager IFO file is read.
  * Returns a handle to a completely parsed structure.
  */
-ifo_handle_t *ifoOpen(dvd_reader_t *, int );
+DVDREAD_API ifo_handle_t *ifoOpen(dvd_reader_t *, int );
 
 /**
  * handle = ifoOpenVMGI(dvd);
  *
  * Opens an IFO and reads in _only_ the vmgi_mat data.  This call can be used
  * together with the calls below to read in each segment of the IFO file on
- * demand.
+ * demand. If the dvd_reader opened an DVD-Audio Disc, this will open the AMGI
+ * if the dvd_reader opened a DVD-VR disc, this will open the RTAV_VMGI
  */
-ifo_handle_t *ifoOpenVMGI(dvd_reader_t *);
+DVDREAD_API ifo_handle_t *ifoOpenVMGI(dvd_reader_t *);
 
 /**
  * handle = ifoOpenVTSI(dvd, title);
  *
  * Opens an IFO and reads in _only_ the vtsi_mat data.  This call can be used
  * together with the calls below to read in each segment of the IFO file on
- * demand.
+ * demand. If the dvd_reader opened an DVD-Audio Disc, this will open the ATSI
  */
-ifo_handle_t *ifoOpenVTSI(dvd_reader_t *, int);
+DVDREAD_API ifo_handle_t *ifoOpenVTSI(dvd_reader_t *, int);
 
 /**
  * ifoClose(ifofile);
  * Cleans up the IFO information.  This will free all data allocated for the
  * substructures.
  */
-void ifoClose(ifo_handle_t *);
+DVDREAD_API void ifoClose(ifo_handle_t *);
 
 /**
  * The following functions are for reading only part of the VMGI/VTSI files.
@@ -76,7 +78,7 @@ void ifoClose(ifo_handle_t *);
  * located in the video manager information file.  This fills the
  * ifofile->ptl_mait structure and all its substructures.
  */
-int ifoRead_PTL_MAIT(ifo_handle_t *);
+DVDREAD_API int ifoRead_PTL_MAIT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_VTS_ATRT(ifofile);
@@ -86,7 +88,7 @@ int ifoRead_PTL_MAIT(ifo_handle_t *);
  * video manager information file.  This fills in the ifofile->vts_atrt
  * structure and all its substructures.
  */
-int ifoRead_VTS_ATRT(ifo_handle_t *);
+DVDREAD_API int ifoRead_VTS_ATRT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_TT_SRPT(ifofile);
@@ -95,7 +97,7 @@ int ifoRead_VTS_ATRT(ifo_handle_t *);
  * structure and its substructures.  This data is only located in the video
  * manager information file.  This structure is mandatory in the IFO file.
  */
-int ifoRead_TT_SRPT(ifo_handle_t *);
+DVDREAD_API int ifoRead_TT_SRPT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_VTS_PTT_SRPT(ifofile);
@@ -105,7 +107,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *);
  * located in the video title set information file.  This structure is
  * mandatory, and must be included in the VTSI file.
  */
-int ifoRead_VTS_PTT_SRPT(ifo_handle_t *);
+DVDREAD_API int ifoRead_VTS_PTT_SRPT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_FP_PGC(ifofile);
@@ -114,7 +116,7 @@ int ifoRead_VTS_PTT_SRPT(ifo_handle_t *);
  * ifofile->first_play_pgc structure.  This data is only located in the video
  * manager information file (VMGI).  This structure is optional.
  */
-int ifoRead_FP_PGC(ifo_handle_t *);
+DVDREAD_API int ifoRead_FP_PGC(ifo_handle_t *);
 
 /**
  * okay = ifoRead_PGCIT(ifofile);
@@ -125,7 +127,7 @@ int ifoRead_FP_PGC(ifo_handle_t *);
  * the video title set information file.  This structure is mandatory, and must
  * be included in the VTSI file.
  */
-int ifoRead_PGCIT(ifo_handle_t *);
+DVDREAD_API int ifoRead_PGCIT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_PGCI_UT(ifofile);
@@ -137,17 +139,17 @@ int ifoRead_PGCIT(ifo_handle_t *);
  * fills the ifofile->vmgi_pgci_ut structure and all its substructures.  For
  * VTSI files, this fills the ifofile->vtsm_pgci_ut structure.
  */
-int ifoRead_PGCI_UT(ifo_handle_t *);
+DVDREAD_API int ifoRead_PGCI_UT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_VTS_TMAPT(ifofile);
  *
  * Reads in the VTS Time Map Table, this data is only located in the video
  * title set information file.  This fills the ifofile->vts_tmapt structure
- * and all its substructures.  When pressent enables VOBU level time-based
+ * and all its substructures.  When present enables VOBU level time-based
  * seeking for One_Sequential_PGC_Titles.
  */
-int ifoRead_VTS_TMAPT(ifo_handle_t *);
+DVDREAD_API int ifoRead_VTS_TMAPT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_C_ADT(ifofile);
@@ -159,7 +161,7 @@ int ifoRead_VTS_TMAPT(ifo_handle_t *);
  * fills the ifofile->vmgm_c_adt structure and all its substructures.  For VTSI
  * files, this fills the ifofile->vtsm_c_adt structure.
  */
-int ifoRead_C_ADT(ifo_handle_t *);
+DVDREAD_API int ifoRead_C_ADT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_TITLE_C_ADT(ifofile);
@@ -169,7 +171,7 @@ int ifoRead_C_ADT(ifo_handle_t *);
  * file.  This structure is mandatory, and must be included in the VTSI file.
  * This call fills the ifofile->vts_c_adt structure and its substructures.
  */
-int ifoRead_TITLE_C_ADT(ifo_handle_t *);
+DVDREAD_API int ifoRead_TITLE_C_ADT(ifo_handle_t *);
 
 /**
  * okay = ifoRead_VOBU_ADMAP(ifofile);
@@ -181,7 +183,7 @@ int ifoRead_TITLE_C_ADT(ifo_handle_t *);
  * fills the ifofile->vmgm_vobu_admap structure and all its substructures.  For
  * VTSI files, this fills the ifofile->vtsm_vobu_admap structure.
  */
-int ifoRead_VOBU_ADMAP(ifo_handle_t *);
+DVDREAD_API int ifoRead_VOBU_ADMAP(ifo_handle_t *);
 
 /**
  * okay = ifoRead_TITLE_VOBU_ADMAP(ifofile);
@@ -191,7 +193,7 @@ int ifoRead_VOBU_ADMAP(ifo_handle_t *);
  * mandatory, and must be included in the VTSI file.  Fills the
  * ifofile->vts_vobu_admap structure and its substructures.
  */
-int ifoRead_TITLE_VOBU_ADMAP(ifo_handle_t *);
+DVDREAD_API int ifoRead_TITLE_VOBU_ADMAP(ifo_handle_t *);
 
 /**
  * okay = ifoRead_TXTDT_MGI(ifofile);
@@ -201,7 +203,80 @@ int ifoRead_TITLE_VOBU_ADMAP(ifo_handle_t *);
  * manager information file.  This structure is mandatory, and must be included
  * in the VMGI file.
  */
-int ifoRead_TXTDT_MGI(ifo_handle_t *);
+DVDREAD_API int ifoRead_TXTDT_MGI(ifo_handle_t *);
+
+/**
+ * okay = ifoRead_TT(ifofile);
+ *
+ * Reads the Title Track Table in ATS IFO's.
+ * This structure. This structure is mandatory, and must be included
+ * in the AMGI file.
+ */
+DVDREAD_API int ifoRead_TT(ifo_handle_t *);
+
+/**
+ * okay = ifoRead_TIF(ifofile, table_nr);
+ *
+ * Reads one of the two title search pointer tables of AUDIO_TS.IFO.
+ * Table 1 is the ATT_SRPT, which on a hybrid disc also lists the titles in
+ * the video zone. Table 2 is the AOTT_SRPT, which lists audio zone titles only.
+ * Without video titles both tables list the same titles. Both tables are
+ * mandatory in the AMGI file.
+ */
+DVDREAD_API int ifoRead_TIF(ifo_handle_t *, int);
+
+/**
+ * handle = ifoOpen_SAMG(ifofile);
+ *
+ * the SAMG menu contains all the information for all the ATS and AMG
+ * But only for audio titles, and without any menu information
+ * is loaded in ifoOpen as a part of the audio manager
+ * Can be for simple audio playback
+ *
+ */
+DVDREAD_API ifo_handle_t *ifoOpenSAMG(dvd_reader_t *ctx);
+
+/**
+ * handle = ifoOpenASVS(ifofile);
+ *
+ * the ASVS ifo contains the sector addresses of each still frame
+ * in Audio_sv.vob, to access audio_sv.vob load menu > 0 in dvdopenvob
+ * is loaded in ifoOpen as a part of the audio manager
+ *
+ */
+DVDREAD_API ifo_handle_t *ifoOpenASVS(dvd_reader_t *ctx);
+
+/**
+ * okay = ifoRead_PGCI(ifofile);
+ *
+ * Reads the Program Chain Information Table (pgci).
+ * This structure contains the technical definitions for the recordings, including
+ * video attributes (aspect ratio, resolution), audio stream counts, and formats.
+ * Use this data to configure the decoder element (ES format) before playback starts.
+ */
+DVDREAD_API int ifoRead_PGCI(ifo_handle_t *ifofile);
+
+/**
+ * okay = ifoRead_PGC_GI(ifofile);
+ *
+ * Reads the Program Chain General Information (pgc_gi).
+ * This is the master database of all physical video clips ("Programs") on the disc.
+ * It provides the raw byte offsets, durations, and timestamps (PGTM) for every
+ * recording. This is required to locate content sectors and to generate "Title 0"
+ * (the raw/original timeline).
+ */
+DVDREAD_API int ifoRead_PGC_GI(ifo_handle_t *ifofile);
+
+/**
+ * okay = ifoRead_UD_PGCIT(ifofile);
+ *
+ * Reads the Program Set General Information (ud_pgcit).
+ * This defines the user-created "Titles" (Playlists) and their text labels.
+ * It maps logical groupings of content to the physical programs found in pgc_gi.
+ * Use this to build the main navigation menu and "Next/Prev" chapter logic
+ * intended by the user.
+ */
+DVDREAD_API int ifoRead_UD_PGCIT(ifo_handle_t *ifofile);
 
 /**
  * The following functions are used for freeing parsed sections of the
@@ -209,19 +284,22 @@ int ifoRead_TXTDT_MGI(ifo_handle_t *);
  * below are safe:  they will not mind if you attempt to free part of an IFO
  * file which was not read in or which does not exist.
  */
-void ifoFree_PTL_MAIT(ifo_handle_t *);
-void ifoFree_VTS_ATRT(ifo_handle_t *);
-void ifoFree_TT_SRPT(ifo_handle_t *);
-void ifoFree_VTS_PTT_SRPT(ifo_handle_t *);
-void ifoFree_FP_PGC(ifo_handle_t *);
-void ifoFree_PGCIT(ifo_handle_t *);
-void ifoFree_PGCI_UT(ifo_handle_t *);
-void ifoFree_VTS_TMAPT(ifo_handle_t *);
-void ifoFree_C_ADT(ifo_handle_t *);
-void ifoFree_TITLE_C_ADT(ifo_handle_t *);
-void ifoFree_VOBU_ADMAP(ifo_handle_t *);
-void ifoFree_TITLE_VOBU_ADMAP(ifo_handle_t *);
-void ifoFree_TXTDT_MGI(ifo_handle_t *);
+DVDREAD_API void ifoFree_PTL_MAIT(ifo_handle_t *);
+DVDREAD_API void ifoFree_VTS_ATRT(ifo_handle_t *);
+DVDREAD_API void ifoFree_TT_SRPT(ifo_handle_t *);
+DVDREAD_API void ifoFree_VTS_PTT_SRPT(ifo_handle_t *);
+DVDREAD_API void ifoFree_FP_PGC(ifo_handle_t *);
+DVDREAD_API void ifoFree_PGCIT(ifo_handle_t *);
+DVDREAD_API void ifoFree_PGCI_UT(ifo_handle_t *);
+DVDREAD_API void ifoFree_VTS_TMAPT(ifo_handle_t *);
+DVDREAD_API void ifoFree_C_ADT(ifo_handle_t *);
+DVDREAD_API void ifoFree_TITLE_C_ADT(ifo_handle_t *);
+DVDREAD_API void ifoFree_VOBU_ADMAP(ifo_handle_t *);
+DVDREAD_API void ifoFree_TITLE_VOBU_ADMAP(ifo_handle_t *);
+DVDREAD_API void ifoFree_TXTDT_MGI(ifo_handle_t *);
+DVDREAD_API void ifoFree_TT(ifo_handle_t *);
+DVDREAD_API void ifoFree_PGC_GI(ifo_handle_t *);
+DVDREAD_API void ifoFree_UD_PGCIT(ifo_handle_t *);
 
 #ifdef __cplusplus
 };

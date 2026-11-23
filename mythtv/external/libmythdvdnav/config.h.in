@@ -8,8 +8,11 @@
 
 // libdvdread
 #cmakedefine HAVE_DLFCN_H
-#cmakedefine HAVE_SYS_PARAM_H
 #cmakedefine HAVE_DVDCSS_DVDCSS_H
+#cmakedefine HAVE_DVDCSS_DVDCPXM_H
+#cmakedefine HAVE_GETMNTENT_R
+#cmakedefine HAVE_STRERROR_R
+#cmakedefine HAVE_STRERROR_S
 
 #if defined(__GNUC__)
 # define UNUSED     __attribute__((unused))

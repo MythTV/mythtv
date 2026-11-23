@@ -101,7 +101,7 @@
   | FFmpeg           | embedded   | Separate Project | always         |
   | libudfread       | embedded   | Separate Project | system < 1.1.1 |
   | nv-codec-headers | embedded   | Separate Project | always         |
-  | mythdvdnav       | embedded   | Part of MythTV   | always         |
+  | mythdvdnav       | embedded   | Separate Project | always         |
   | mythbluray       | embedded   | Part of MythTV   | system < 0.9.3 |
 
   For a cross compilation of Android or Windows build, there is a much

@@ -57,7 +57,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 
 #include <pthread.h>
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef __ANDROID__
 # undef  lseek
@@ -77,7 +77,7 @@ static inline int _private_gettimeofday( struct timeval *tv, void *tz )
 #endif
 
 typedef enum {
-  DSI_ILVU_PRE   = 1 << 15, /* set during the last 3 VOBU preceeding an interleaved block. */
+  DSI_ILVU_PRE   = 1 << 15, /* set during the last 3 VOBU preceding an interleaved block. */
   DSI_ILVU_BLOCK = 1 << 14, /* set for all VOBU in an interleaved block */
   DSI_ILVU_FIRST = 1 << 13, /* set for the first VOBU for a given angle or scene within a ILVU, or the first VOBU in the preparation (PREU) sequence */
   DSI_ILVU_LAST  = 1 << 12, /* set for the last VOBU for a given angle or scene within a ILVU, or the last VOBU in the preparation (PREU) sequence */
@@ -94,15 +94,15 @@ typedef struct read_cache_s read_cache_t;
 #ifndef audio_status_t
 typedef struct {
 #ifdef WORDS_BIGENDIAN
-  unsigned int available     : 1;
-  unsigned int zero1         : 4;
-  unsigned int stream_number : 3;
+  unsigned char available     : 1;
+  unsigned char zero1         : 4;
+  unsigned char stream_number : 3;
   uint8_t zero2;
 #else
   uint8_t zero2;
-  unsigned int stream_number : 3;
-  unsigned int zero1         : 4;
-  unsigned int available     : 1;
+  unsigned char stream_number : 3;
+  unsigned char zero1         : 4;
+  unsigned char available     : 1;
 #endif
 } ATTRIBUTE_PACKED audio_status_t;
 #endif
@@ -110,25 +110,25 @@ typedef struct {
 #ifndef spu_status_t
 typedef struct {
 #ifdef WORDS_BIGENDIAN
-  unsigned int available               : 1;
-  unsigned int zero1                   : 2;
-  unsigned int stream_number_4_3       : 5;
-  unsigned int zero2                   : 3;
-  unsigned int stream_number_wide      : 5;
-  unsigned int zero3                   : 3;
-  unsigned int stream_number_letterbox : 5;
-  unsigned int zero4                   : 3;
-  unsigned int stream_number_pan_scan  : 5;
+  unsigned char available               : 1;
+  unsigned char zero1                   : 2;
+  unsigned char stream_number_4_3       : 5;
+  unsigned char zero2                   : 3;
+  unsigned char stream_number_wide      : 5;
+  unsigned char zero3                   : 3;
+  unsigned char stream_number_letterbox : 5;
+  unsigned char zero4                   : 3;
+  unsigned char stream_number_pan_scan  : 5;
 #else
-  unsigned int stream_number_pan_scan  : 5;
-  unsigned int zero4                   : 3;
-  unsigned int stream_number_letterbox : 5;
-  unsigned int zero3                   : 3;
-  unsigned int stream_number_wide      : 5;
-  unsigned int zero2                   : 3;
-  unsigned int stream_number_4_3       : 5;
-  unsigned int zero1                   : 2;
-  unsigned int available               : 1;
+  unsigned char stream_number_pan_scan  : 5;
+  unsigned char zero4                   : 3;
+  unsigned char stream_number_letterbox : 5;
+  unsigned char zero3                   : 3;
+  unsigned char stream_number_wide      : 5;
+  unsigned char zero2                   : 3;
+  unsigned char stream_number_4_3       : 5;
+  unsigned char zero1                   : 2;
+  unsigned char available               : 1;
 #endif
 } ATTRIBUTE_PACKED spu_status_t;
 #endif
@@ -158,7 +158,7 @@ typedef struct {
 typedef struct {
   vobu_admap_t        *admap;
   int32_t             admap_len;
-  vts_tmap_t          *tmap;
+  const vts_tmap_t    *tmap;
   int32_t             tmap_len;
   int32_t             tmap_interval;
 } dvdnav_jump_args_t;
@@ -210,6 +210,10 @@ struct dvdnav_s {
   vm_t *vm;
   pthread_mutex_t vm_lock;
 
+  /* private context and logger*/
+  void *priv;
+  dvdnav_logger_cb logcb;
+
   /* Read-ahead cache */
   read_cache_t *cache;
 
@@ -220,7 +224,7 @@ struct dvdnav_s {
 /** HELPER FUNCTIONS **/
 
 /* converts a dvd_time_t to PTS ticks */
-int64_t dvdnav_convert_time(dvd_time_t *time);
+DVDNAV_API int64_t dvdnav_convert_time(const dvd_time_t *time);
 
 /** USEFUL MACROS **/
 
@@ -234,7 +238,7 @@ int64_t dvdnav_convert_time(dvd_time_t *time);
 #else
 #define printerrf(...) \
     do { if (this) snprintf(this->err_str, MAX_ERR_LEN, __VA_ARGS__); } while (0)
-#endif /* WIN32 */
+#endif /* _MSC_VER */
 #endif
 #define printerr(str) \
     do { if (this) strncpy(this->err_str, str, MAX_ERR_LEN - 1); } while (0)

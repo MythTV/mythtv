@@ -28,6 +28,9 @@ LIBS += -L../../../../external/FFmpeg/libswscale -lmythswscale-$$LIBVERSION
 LIBS += -L../../../../external/FFmpeg/libavformat -lmythavformat-$$LIBVERSION
 LIBS += -L../../../../external/FFmpeg/libavfilter -lmythavfilter-$$LIBVERSION
 using_mheg:LIBS += -L../../../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
+LIBS += -L../../../../external/libmythdvdnav
+LIBS += -lmythdvdnav-$$LIBVERSION
+QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../external/libmythdvdnav
 
 using_mheg:QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythfreemheg
 QMAKE_LFLAGS += -Wl,$$_RPATH_$(PWD)/../../../../libs/libmythmetadata

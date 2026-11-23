@@ -10,7 +10,7 @@
  * Copyright 1998, 1999 Eric Smith <eric@brouhaha.com>
  *
  * VOBDUMP is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as
+ * under the terms of the GNU General Public License version 2 or version 3 as
  * published by the Free Software Foundation.  Note that I am not
  * granting permission to redistribute or modify VOBDUMP under the terms
  * of any later version of the General Public License.
@@ -29,7 +29,9 @@
 #define LIBDVDREAD_NAV_TYPES_H
 
 #include <inttypes.h>
-#include "ifo_types.h" /* only dvd_time_t, vm_cmd_t and user_ops_t */
+
+#include <dvdread/attributes.h>
+#include <dvdread/ifo_types.h> /* only dvd_time_t, vm_cmd_t and user_ops_t */
 
 /* The length including the substream id byte. */
 #define PCI_BYTES 0x3d4
@@ -40,6 +42,10 @@
 
 /* Remove this */
 #define DSI_START_BYTE 1031
+
+#if PRAGMA_PACK
+#pragma pack(push, 1)
+#endif
 
 /**
  * PCI General Information
@@ -77,14 +83,14 @@ typedef struct {
   uint32_t hli_s_ptm;              /**< start ptm of hli */
   uint32_t hli_e_ptm;              /**< end ptm of hli */
   uint32_t btn_se_e_ptm;           /**< end ptm of button select */
-  unsigned int zero1 : 2;          /**< reserved */
-  unsigned int btngr_ns : 2;       /**< number of button groups 1, 2 or 3 with 36/18/12 buttons */
-  unsigned int zero2 : 1;          /**< reserved */
-  unsigned int btngr1_dsp_ty : 3;  /**< display type of subpic stream for button group 1 */
-  unsigned int zero3 : 1;          /**< reserved */
-  unsigned int btngr2_dsp_ty : 3;  /**< display type of subpic stream for button group 2 */
-  unsigned int zero4 : 1;          /**< reserved */
-  unsigned int btngr3_dsp_ty : 3;  /**< display type of subpic stream for button group 3 */
+  unsigned char zero1 : 2;          /**< reserved */
+  unsigned char btngr_ns : 2;       /**< number of button groups 1, 2 or 3 with 36/18/12 buttons */
+  unsigned char zero2 : 1;          /**< reserved */
+  unsigned char btngr1_dsp_ty : 3;  /**< display type of subpic stream for button group 1 */
+  unsigned char zero3 : 1;          /**< reserved */
+  unsigned char btngr2_dsp_ty : 3;  /**< display type of subpic stream for button group 2 */
+  unsigned char zero4 : 1;          /**< reserved */
+  unsigned char btngr3_dsp_ty : 3;  /**< display type of subpic stream for button group 3 */
   uint8_t btn_ofn;     /**< button offset number range 0-255 */
   uint8_t btn_ns;      /**< number of valid buttons  <= 36/18/12 (low 6 bits) */
   uint8_t nsl_btn_ns;  /**< number of buttons selectable by U_BTNNi (low 6 bits)   nsl_btn_ns <= btn_ns */
@@ -96,7 +102,7 @@ typedef struct {
 
 /**
  * Button Color Information Table
- * Each entry beeing a 32bit word that contains the color indexs and alpha
+ * Each entry is a 32bit word that contains the color indices and alpha
  * values to use.  They are all represented by 4 bit number and stored
  * like this [Ci3, Ci2, Ci1, Ci0, A3, A2, A1, A0].   The actual palette
  * that the indexes reference is in the PGC.
@@ -105,6 +111,12 @@ typedef struct {
 typedef struct {
   uint32_t btn_coli[3][2];  /**< [button color number-1][select:0/action:1] */
 } ATTRIBUTE_PACKED btn_colit_t;
+
+/* btni_t, hli_t and pci_t are not read as packed structures but bit by bit
+ * in navRead_PCI(), they must not be packed */
+#if PRAGMA_PACK
+#pragma pack(pop)
+#endif
 
 /**
  * Button Information
@@ -133,7 +145,7 @@ typedef struct {
   unsigned int zero6            : 2;  /**< reserved */
   unsigned int right            : 6;  /**< button index when pressing right */
   vm_cmd_t cmd;
-} ATTRIBUTE_PACKED btni_t;
+} btni_t;
 
 /**
  * Highlight Information
@@ -142,7 +154,7 @@ typedef struct {
   hl_gi_t     hl_gi;
   btn_colit_t btn_colit;
   btni_t      btnit[36];
-} ATTRIBUTE_PACKED hli_t;
+} hli_t;
 
 /**
  * PCI packet
@@ -152,7 +164,11 @@ typedef struct {
   nsml_agli_t nsml_agli;
   hli_t       hli;
   uint8_t     zero1[189];
-} ATTRIBUTE_PACKED pci_t;
+} pci_t;
+
+#if PRAGMA_PACK
+#pragma pack(push, 1)
+#endif
 
 
 
@@ -242,7 +258,7 @@ typedef struct {
 
 
 #if PRAGMA_PACK
-#pragma pack()
+#pragma pack(pop)
 #endif
 
 #endif /* LIBDVDREAD_NAV_TYPES_H */

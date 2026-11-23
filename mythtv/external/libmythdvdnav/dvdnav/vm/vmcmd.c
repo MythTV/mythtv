@@ -24,15 +24,15 @@
 #include "config.h"
 #endif
 
+#include "dvdnav/dvdnav.h"
+#include <dvdread/nav_types.h>
+
 #include <stdio.h>
 #include <ctype.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <sys/time.h>
 
-#include "dvdnav/dvdnav.h"
-#include <dvdread/nav_types.h>
-#include <dvdread/ifo_types.h>
 #include "decoder.h"
 #include "vm.h"
 #include "vmcmd.h"
@@ -484,7 +484,7 @@ void vm_print_mnemonic(vm_cmd_t *vm_command)  {
         print_jump_instruction(&command);
       } else {
         print_if_version_1(&command);
-        print_link_instruction(&command, 0); /*  must be pressent */
+        print_link_instruction(&command, 0); /*  must be present */
       }
       break;
     case 2: /*  Set System Parameters instructions */
