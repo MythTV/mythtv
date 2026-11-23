@@ -181,9 +181,6 @@ class DecoderBase
 
     float GetVideoAspect(void) const { return m_currentAspect; }
 
-    virtual std::chrono::milliseconds NormalizeVideoTimecode(std::chrono::milliseconds timecode)
-        { return timecode; }
-
     virtual bool IsLastFrameKey(void) const = 0;
 
     virtual double  GetFPS(void) const { return m_fps; }

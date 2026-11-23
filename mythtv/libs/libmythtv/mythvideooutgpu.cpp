@@ -666,7 +666,7 @@ void MythVideoOutputGPU::RenderFrame(MythVideoFrame *Frame, FrameScanType Scan)
         m_render->SetViewPort(GetWindowRect());
 }
 
-void MythVideoOutputGPU::UpdatePauseFrame(std::chrono::milliseconds& DisplayTimecode, FrameScanType Scan)
+void MythVideoOutputGPU::UpdatePauseFrame(FrameScanType Scan)
 {
     MythVideoFrame* release = nullptr;
     m_videoBuffers.BeginLock(kVideoBuffer_used);
@@ -684,7 +684,6 @@ void MythVideoOutputGPU::UpdatePauseFrame(std::chrono::milliseconds& DisplayTime
             if (m_video)
                 m_video->PrepareFrame(used, Scan);
         }
-        DisplayTimecode = used->m_displayTimecode;
     }
     else
     {

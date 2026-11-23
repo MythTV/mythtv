@@ -580,7 +580,7 @@ void MythPlayerUI::RefreshPauseFrame()
     {
         if (m_videoOutput->ValidVideoFrames())
         {
-            m_videoOutput->UpdatePauseFrame(m_avSync.DisplayTimecode(), GetScanType());
+            m_videoOutput->UpdatePauseFrame(GetScanType());
             m_needNewPauseFrame = false;
 
             if (m_deleteMap.IsEditing())

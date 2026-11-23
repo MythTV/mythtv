@@ -323,7 +323,7 @@ void VideoOutputD3D::EndFrame()
         m_render->Present(IsEmbedding() ? m_hEmbedWnd : nullptr);
 }
 
-void VideoOutputD3D::UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType)
+void VideoOutputD3D::UpdatePauseFrame(FrameScanType)
 {
     QMutexLocker locker(&m_lock);
     MythVideoFrame *used_frame = m_videoBuffers.Head(kVideoBuffer_used);
@@ -333,14 +333,12 @@ void VideoOutputD3D::UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, 
         if (!used_frame)
             used_frame = m_videoBuffers.GetScratchFrame();
         CopyFrame(&m_pauseFrame, used_frame);
-        disp_timecode = m_pauseFrame.m_displayTimecode;
     }
     else if (codec_is_dxva2(m_videoCodecID))
     {
         if (used_frame)
         {
             m_pauseSurface = used_frame->m_buffer;
-            disp_timecode = used_frame->m_displayTimecode;
         }
         else
             LOG(VB_PLAYBACK, LOG_WARNING, LOC + "Failed to update pause frame");

@@ -36,7 +36,7 @@ class VideoOutputD3D : public MythVideoOutputGPU
                       bool        &aspect_only,
                       int          reference_frames,
                       bool         force_change) override; // VideoOutput
-    void UpdatePauseFrame(std::chrono::milliseconds &disp_timecode, FrameScanType Scan = kScan_Progressive) override; // VideoOutput
+    void UpdatePauseFrame(FrameScanType Scan = kScan_Progressive) override; // VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
     static MythCodecID GetSupportedCodec(AVCodecContext **Context,

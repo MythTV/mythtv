@@ -128,9 +128,6 @@ class AvFormatDecoder : public DecoderBase
     void SetIdrOnlyKeyframes(bool value) override // DecoderBase
         { m_avcParser->use_I_forKeyframes(!value); }
 
-    std::chrono::milliseconds NormalizeVideoTimecode(std::chrono::milliseconds timecode) override; // DecoderBase
-    virtual std::chrono::milliseconds NormalizeVideoTimecode(AVStream *st, std::chrono::milliseconds timecode);
-
     int  GetTeletextDecoderType(void) const override; // DecoderBase
 
     QString GetXDS(const QString &Key) const override; // DecoderBase
