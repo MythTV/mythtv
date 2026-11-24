@@ -3,7 +3,7 @@
 #include "libmythbase/mythlogging.h"
 
 extern "C" {
-static void MythDVDread_log(void *, dvd_logger_level_t level, const char * fmt, va_list vl)
+static void MythDVDread_log([[maybe_unused]] void *priv, dvd_logger_level_t level, const char * fmt, va_list vl)
 {
     if (VERBOSE_LEVEL_NONE())
     {
@@ -36,7 +36,7 @@ static void MythDVDread_log(void *, dvd_logger_level_t level, const char * fmt, 
     LOG(verbose_mask, verbose_level, QString("libdvdread: ") + QString::vasprintf(fmt, vl));
 }
 
-static void MythDVDnav_log(void *, dvdnav_logger_level_t level, const char * fmt, va_list vl)
+static void MythDVDnav_log([[maybe_unused]] void *priv, dvdnav_logger_level_t level, const char * fmt, va_list vl)
 {
     if (VERBOSE_LEVEL_NONE())
     {

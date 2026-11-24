@@ -95,5 +95,5 @@ dvd_reader_filesystem_h s_vfs =
     .file_open  = &MythDVD_file_open,
     .file_read  = &MythDVD_file_read,
     .file_seek  = &MythDVD_file_seek,
-    .file_close = &MythDVD_file_close
+    .file_close = &MythDVD_file_close,
 };
