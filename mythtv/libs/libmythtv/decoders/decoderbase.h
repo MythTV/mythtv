@@ -148,7 +148,14 @@ class DecoderBase
     virtual void ForceSetupAudioStream(void) { }
 
     virtual void SetWatchingRecording(bool mode);
-    /// Demux, preprocess and possibly decode a frame of video/audio.
+    /** Demux, preprocess and possibly decode a frame of video/audio.
+    @param[in]  Type  What stream types should be decoded.
+    @param[out] Retry True if the packet will be sent to the decoder again.
+                      This may happen if the decoder's buffers are full, which
+                      is more likely to occur with hardware decoding; a brief delay
+                      is recommended before calling again.
+    @return False on a fatal error.
+    */
     virtual bool GetFrame(DecodeType Type, bool &Retry) = 0;
     MythPlayer *GetPlayer() { return m_parent; }
 

@@ -146,9 +146,8 @@ int MythDVDDecoder::ReadPacket(AVFormatContext *Ctx, AVPacket* Pkt, bool& StoreP
                             StorePacket = false;
                             // Return the first buffered packet
                             AVPacket *storedPkt = m_storedPackets.takeFirst();
-                            av_packet_ref(Pkt, storedPkt);
-                            av_packet_unref(storedPkt);
-                            delete storedPkt;
+                            av_packet_move_ref(Pkt, storedPkt);
+                            av_packet_free(&storedPkt);
                             return 0;
                         }
                         break;
@@ -273,7 +272,7 @@ void MythDVDDecoder::CheckContext(int64_t Pts)
 }
 
 
-bool MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVStream *Stream, AVPacket *Pkt, bool &Retry)
+int MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVPacket *Pkt)
 {
     int64_t pts = Pkt->pts;
 
@@ -282,11 +281,8 @@ bool MythDVDDecoder::ProcessVideoPacket(AVCodecContext* codecContext, AVStream *
 
     CheckContext(pts);
 
-    bool ret = AvFormatDecoder::ProcessVideoPacket(codecContext, Stream, Pkt, Retry);
-    if (Retry)
-        return ret;
-
-    if (ret && m_curContext && (pts != AV_NOPTS_VALUE) && (pts + Pkt->duration == m_curContext->GetSeqEndPTS()))
+    int ret = AvFormatDecoder::ProcessVideoPacket(codecContext, Pkt);
+    if ((ret == 0) && m_curContext && (pts != AV_NOPTS_VALUE) && (pts + Pkt->duration == m_curContext->GetSeqEndPTS()))
     {
         // If this video frame is the last in the sequence,
         // make a copy of it so we can 'generate' more
