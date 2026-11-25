@@ -79,6 +79,7 @@ MythVideoTextureVulkan::CreateSoftwareTextures([[maybe_unused]] MythVulkanObject
         return result;
     }
 
+    result.reserve(count);
     for (uint plane = 0; plane < count; ++plane)
     {
         QSize size = Size;

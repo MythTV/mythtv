@@ -344,7 +344,7 @@ QString MusicBrainz::queryCoverart(const std::string &releaseId)
 
 #endif // HAVE_MUSICBRAINZ
 
-bool MusicBrainz::queryForDevice(const QString &deviceName)
+bool MusicBrainz::queryForDevice([[maybe_unused]] const QString & deviceName)
 {
 #ifdef HAVE_MUSICBRAINZ
     const auto discId = queryDiscId(deviceName.toStdString());

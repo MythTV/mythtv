@@ -4,6 +4,7 @@
 #define ATSC_DESCRIPTORS_H
 
 #include <array>
+#include <cstddef>
 #include <vector>
 
 #include <QString>
@@ -118,7 +119,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
   private:
     const unsigned char *Service(int i) const
     {
-        return m_data + 3 + 6 * i;
+        return m_data + 3 + (static_cast<ptrdiff_t>(6 * i));
     }
 
 };
@@ -146,24 +147,24 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     //   for (j=0;j<rated_dimensions;j++) {
     //     rating_dimension_j   8 y+0.0
     uint RatingDimension(uint i, uint j) const
-        { return region(i)[2 + 2 * j]; }
+        { return region(i)[2 + (2 * j)]; }
     //     reserved             4 y+1.0       0x0f
     //     rating_value         4 y+1.4
     uint RatingValue(uint i, uint j) const
-        { return (region(i)[2 + 2 * j + 1]) & 0xf; }
+        { return region(i)[2 + (2 * j) + 1] & 0xf; }
     //   }
     //   rating_desc_length     8 x+2+(rated_dimensions*2)+0.0
     uint RatingDescriptionLength(uint i) const
     {
         const unsigned char *ret = region(i);
-        ret += 2 + ret[1] * 2;
+        ret += 2 + (ret[1] * 2);
         return *ret;
     }
     //   rating_desc_text         x+2+(rated_dimensions*2)+1.0
     MultipleStringStructure RatingDescription(uint i) const
     {
         const unsigned char *data = region(i);
-        data += 2 + data[1] * 2 + 1;
+        data += 2 + (data[1] * 2) + 1;
         return MultipleStringStructure(data);
     }
     // }
@@ -175,7 +176,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
         const unsigned char *ret = m_data + 2;
         for (int i = 0; i < n; i++)
         {
-            ret += 2 + ret[1] * 2; // rating_region + rated_dimensions and values
+            ret += 2 + (ret[1] * 2); // rating_region + rated_dimensions and values
             ret += 1 + ret[1]; // rating_description_length + rating_description_text()
         }
         return ret;

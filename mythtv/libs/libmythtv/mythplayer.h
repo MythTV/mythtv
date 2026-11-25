@@ -77,11 +77,11 @@ enum PlayerFlags
 
 // Start recording playback or Live TV with Captions
 // Off, Captions On, or match the Last Caption state.
-enum StartCaptions : uint
+enum StartCaptions : std::uint8_t
 {
     StartCaptionsOff  = 0,
     StartCaptionsOn   = 1,
-    StartCaptionsLast = 2
+    StartCaptionsLast = 2,
 };
 
 // Padding between class members reduced from 113 to 73 bytes, but its

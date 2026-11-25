@@ -1364,7 +1364,8 @@ bool MythCoreContext::IsLocalSubnet(const QHostAddress &peer, bool log)
     }
 
     // check AllowConnFromSubnets
-    for (const auto &subnet : allowedSubnets())
+    auto allowList = allowedSubnets();
+    for (const auto &subnet : std::as_const(allowList))
     {
         if (peer.isInSubnet(subnet.first, subnet.second))
         {
@@ -1385,11 +1386,13 @@ QList<QPair<QHostAddress, int>> MythCoreContext::allowedSubnets()
 {
     QList<QPair<QHostAddress, int>> subnets{};
 
-    auto subnetList = GetSetting("AllowConnFromSubnets", "");
-    if (subnetList == "")
+    auto subnetListStr = GetSetting("AllowConnFromSubnets", "");
+    if (subnetListStr == "")
         return subnets;
 
-    for (const auto &subnet : subnetList.split(";"))
+    auto subnetList = subnetListStr.split(";");
+    subnets.reserve(subnetList.size());
+    for (const auto &subnet : std::as_const(subnetList))
     {
         const auto parsed = QHostAddress::parseSubnet(subnet);
         subnets.append(parsed);

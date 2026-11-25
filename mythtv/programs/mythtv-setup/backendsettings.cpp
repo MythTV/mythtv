@@ -949,6 +949,8 @@ BackendSettings::BackendSettings()
     m_ipAddressSettings(new IpAddressSettings()),
     // These two are included for backward compatibility -
     // used by python bindings. They could be removed later
+    m_allowConnFromAll(AllowConnFromAll()),
+    m_allowConnFromSubnets(AllowConnFromSubnets()),
     m_masterServerIP(MasterServerIP()),
     m_masterServerPort(MasterServerPort())
 {
@@ -958,9 +960,7 @@ BackendSettings::BackendSettings()
     server->addChild(m_localServerPort);
     server->addChild(LocalStatusPort());
     server->addChild(LocalSecurityPin());
-    m_allowConnFromAll = AllowConnFromAll();
     server->addChild(m_allowConnFromAll);
-    m_allowConnFromSubnets = AllowConnFromSubnets();
     server->addChild(m_allowConnFromSubnets);
     connect(m_allowConnFromAll, qOverload<bool>(&HostCheckBoxSetting::valueChanged),
              this, &BackendSettings::allowConnFromAllChanged);

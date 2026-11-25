@@ -34,7 +34,7 @@ class BackendSettings : public GroupSetting
     void masterBackendChanged(void);
     void listenChanged(void);
     static void LocalServerPortChanged(void);
-    void allowConnFromAllChanged(bool);
+    void allowConnFromAllChanged(bool /*allowAll*/);
 };
 
 #endif

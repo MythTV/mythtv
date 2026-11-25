@@ -460,7 +460,9 @@ void MythPlayerUI::VideoStart()
         }
     }
     if (hasForcedTextTrack)
+    {
         SetTrack(kTrackTypeRawText, forcedTrackNumber);
+    }
     else
     {
         switch (m_captionsEnabledbyDefault)
