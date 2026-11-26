@@ -723,11 +723,17 @@ bool MSqlQuery::exec()
         auto match = placeholders.match(str);
         while (match.hasMatch())
         {
+            QString replacement = b.isEmpty() ?
+                QString("INVALID") : b.takeFirst().toString();
             str.replace(match.capturedStart(), match.capturedLength(),
-                        b.isEmpty()
-                        ? "\'INVALID\'"
-                        : '\'' + b.takeFirst().toString() + '\'');
-            match = placeholders.match(str);
+                '\'' + replacement + '\'');
+            // Some bound values, such as datetimes, include ':'
+            // characters. We don't want the match() operation to
+            // mistake such characters as the start of placeholders,
+            // so we need to search for the next match starting after
+            // the replacement we just made.
+            qsizetype endPos = match.capturedStart() + replacement.length() + 2;
+            match = placeholders.match(str, endPos);
         }
 #endif
 
