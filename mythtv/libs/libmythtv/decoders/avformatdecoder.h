@@ -18,6 +18,7 @@ extern "C" {
 #include "decoderbase.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
+#include "mpeg/mpeg2ccextractor.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
 #include "programinfo.h"
@@ -172,11 +173,23 @@ class AvFormatDecoder : public DecoderBase
     void InitVideoCodec(AVStream *stream, AVCodecContext *codecContext,
                         bool selectedStream = false);
 
+    /** Increment m_averrorCount and set m_resetHardwareDecoders and m_streamsChanged
+    as needed.
+    @param error AVError code.  Note: not checked if equal to 0 (success).
+    */
+    void incrementAVErrorCount(int error, AVCodecContext* codecContext);
+    /** Call avcodec_receive_frame() and then ProcessVideoFrame() if a frame was received.
+    @return The return value of avcodec_receive_frame().
+    */
+    int receiveVideoFrame(AVCodecContext* codecContext, AVStream *stream);
     /// Preprocess a packet, setting the video parms if necessary.
     void MpegPreProcessPkt(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
     int  H264PreProcessPkt(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt);
-    virtual bool ProcessVideoPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt, bool &Retry);
+    /** Call avcodec_send_packet().
+    @return The return value of avcodec_send_packet().
+    */
+    virtual int ProcessVideoPacket(AVCodecContext* codecContext, AVPacket *pkt);
     virtual bool ProcessVideoFrame(AVCodecContext* codecContext, AVStream *Stream, AVFrame *AvFrame);
     bool ProcessAudioPacket(AVCodecContext* codecContext, AVStream *stream, AVPacket *pkt,
                             DecodeType decodetype);
@@ -249,6 +262,9 @@ class AvFormatDecoder : public DecoderBase
     int                m_seqCount                     {0};
 
     QList<AVPacket*>   m_storedPackets;
+    /// If not nullptr, a video packet that has been pre-processed,
+    /// but not sent to the decoder.
+    AVPacket*          m_preprocessedPacket           {nullptr};
 
     int                m_prevGopPos                   {0};
 
@@ -260,6 +276,8 @@ class AvFormatDecoder : public DecoderBase
     bool               m_allowedQuit                  {false};
 
     uint32_t           m_startCodeState               {0xffffffff};
+    bool               m_top_field_first              {false};
+    Mpeg2ClosedCaptionsExtractor m_captions_extractor;
 
     std::chrono::milliseconds  m_lastVPts             {0ms};
     std::chrono::milliseconds  m_lastAPts             {0ms};

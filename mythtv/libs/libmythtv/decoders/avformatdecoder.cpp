@@ -415,6 +415,7 @@ AvFormatDecoder::~AvFormatDecoder()
         AVPacket *pkt = m_storedPackets.takeFirst();
         av_packet_free(&pkt);
     }
+    av_packet_free(&m_preprocessedPacket);
 
     CloseContext();
     delete m_ccd608;
@@ -681,6 +682,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             AVPacket *pkt = m_storedPackets.takeFirst();
             av_packet_free(&pkt);
         }
+        av_packet_free(&m_preprocessedPacket);
 
         m_prevGopPos = 0;
         m_gopSet = false;
@@ -2960,12 +2962,16 @@ void AvFormatDecoder::HandleGopStart(
     }
 }
 
+static constexpr uint32_t k_user_data_start_code { 0x000001B2 };
 static constexpr uint32_t SEQ_START       { 0x000001b3 };
+static constexpr uint32_t k_extension_start_code { 0x000001B5 };
 static constexpr uint32_t GOP_START       { 0x000001b8 };
 //static constexpr uint32_t PICTURE_START { 0x00000100 };
 static constexpr uint32_t SLICE_MIN       { 0x00000101 };
 static constexpr uint32_t SLICE_MAX       { 0x000001af };
 //static constexpr uint32_t SEQ_END_CODE  { 0x000001b7 };
+
+static constexpr uint8_t k_Picture_Coding_Extension_ID {0b1000};
 
 void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext* context, AVStream *stream, AVPacket *pkt)
 {
@@ -3055,6 +3061,34 @@ void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext* context, AVStream *strea
             HandleGopStart(pkt, true);
             m_seenGop = true;
             pkt->flags |= AV_PKT_FLAG_KEY;
+        }
+        else if (k_extension_start_code == m_startCodeState)
+        {
+            if ((bufptr[0] & 0xF0) == k_Picture_Coding_Extension_ID)
+            {
+                // FFmpeg's mpeg12dec.c verifies that the last start code was the picture_start_code
+                m_top_field_first = (bufptr[3] & 0x80) != 0;
+            }
+        }
+        else if (k_user_data_start_code == m_startCodeState)
+        {
+            // Extract A/53 part 4 closed captions and convert others to CTA-708 format
+            m_captions_extractor.append(bufptr, bufend - bufptr, m_top_field_first);
+        }
+    }
+    // Attach captions to the AVPacket to have FFmpeg reorder the frames as needed.
+    // FFmpeg's software decoder should replace this with its own identical
+    // version since we did not set AVCodecContext::side_data_prefer_packet.
+    // This is needed for hardware decoders (e.g. NVDEC/VDPAU) which don't extract
+    // the captions.
+    auto captions = m_captions_extractor.extract();
+    if (!captions.empty())
+    {
+        uint8_t* buf = static_cast<uint8_t*>(av_memdup(captions.data(), captions.size()));
+        // ignore AVERROR(ENOMEM)
+        if (buf != nullptr)
+        {
+            av_packet_add_side_data(pkt, AV_PKT_DATA_A53_CC, buf, captions.size());
         }
     }
 }
@@ -3220,118 +3254,94 @@ bool AvFormatDecoder::PreProcessVideoPacket(AVCodecContext* context, AVStream *c
     return true;
 }
 
-bool AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVStream *curstream, AVPacket *pkt, bool &Retry)
+void AvFormatDecoder::incrementAVErrorCount(int error, AVCodecContext* codecContext)
 {
-    int ret = 0;
-    int gotpicture = 0;
-    MythAVFrame mpa_pic;
-    if (!mpa_pic)
-        return false;
+    m_averrorCount++;
+    if (m_averrorCount > SEQ_PKT_ERR_MAX)
+    {
+        // If erroring on GPU assist, try switching to software decode
+        if (codec_is_std(m_videoCodecId))
+            m_parent->SetErrored(QObject::tr("Video Decode Error"));
+        else
+            m_streamsChanged = true;
+    }
 
-    bool sentPacket = false;
-    int ret2 = 0;
+    if (m_mythCodecCtx->DecoderNeedsReset(codecContext))
+    {
+        LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder needs reset");
+        m_resetHardwareDecoders = m_streamsChanged = true;
+    }
 
+    if (error == AVERROR_EXTERNAL)
+    {
+        LOG(VB_PLAYBACK, LOG_INFO, LOC + "FFmpeg external library error - assuming streams changed");
+        m_streamsChanged = true;
+    }
+}
+
+int AvFormatDecoder::receiveVideoFrame(AVCodecContext* codecContext, AVStream *stream)
+{
+    MythAVFrame frame;
+    if (!frame)
+        return AVERROR(ENOMEM);
     m_avCodecLock.lock();
-
-    //  SUGGESTION
-    //  Now that avcodec_decode_video2 is deprecated and replaced
-    //  by 2 calls (receive frame and send packet), this could be optimized
-    //  into separate routines or separate threads.
-    //  Also now that it always consumes a whole buffer some code
-    //  in the caller may be able to be optimized.
-
     // FilteredReceiveFrame will call avcodec_receive_frame and
     // apply any codec-dependent filtering
-    ret = m_mythCodecCtx->FilteredReceiveFrame(context, mpa_pic);
-
-    if (ret == 0)
-        gotpicture = 1;
-    else
-        gotpicture = 0;
-    if (ret == AVERROR(EAGAIN))
-        ret = 0;
-    // If we got a picture do not send the packet until we have
-    // all available pictures
-    if (ret==0 && !gotpicture)
-    {
-        ret2 = avcodec_send_packet(context, pkt);
-        if (ret2 == AVERROR(EAGAIN))
-        {
-            Retry = true;
-            ret2 = 0;
-        }
-        else
-        {
-            sentPacket = true;
-        }
-    }
+    int ret = m_mythCodecCtx->FilteredReceiveFrame(codecContext, frame);
     m_avCodecLock.unlock();
 
-    if (ret < 0 || ret2 < 0)
+    if (ret == 0)
     {
-        std::string error;
-        if (ret < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("video avcodec_receive_frame error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_stdstring(error, ret))
-                .arg(ret).arg(gotpicture));
-        }
-
-        if (ret2 < 0)
-        {
-            LOG(VB_GENERAL, LOG_ERR, LOC +
-                QString("video avcodec_send_packet error: %1 (%2) gotpicture:%3")
-                .arg(av_make_error_stdstring(error, ret2))
-                .arg(ret2).arg(gotpicture));
-        }
-
-        if (++m_averrorCount > SEQ_PKT_ERR_MAX)
-        {
-            // If erroring on GPU assist, try switching to software decode
-            if (codec_is_std(m_videoCodecId))
-                m_parent->SetErrored(QObject::tr("Video Decode Error"));
-            else
-                m_streamsChanged = true;
-        }
-
-        if (m_mythCodecCtx->DecoderNeedsReset(context))
-        {
-            LOG(VB_GENERAL, LOG_INFO, LOC + "Decoder needs reset");
-            m_resetHardwareDecoders = m_streamsChanged = true;
-        }
-
-        if (ret == AVERROR_EXTERNAL || ret2 == AVERROR_EXTERNAL)
-        {
-            LOG(VB_PLAYBACK, LOG_INFO, LOC + "FFmpeg external library error - assuming streams changed");
-            m_streamsChanged = true;
-        }
-
-        return false;
-    }
-
-    // averror_count counts sequential errors, so if you have a successful
-    // packet then reset it
-    m_averrorCount = 0;
-    if (gotpicture)
-    {
+        // averror_count counts sequential errors, so if you have a successful
+        // packet then reset it
+        m_averrorCount = 0;
         LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
-            QString("video timecodes packet-pts:%1 frame-pts:%2 packet-dts: %3 frame-dts:%4")
-                .arg(pkt->pts).arg(mpa_pic->pts).arg(pkt->dts)
-                .arg(mpa_pic->pkt_dts));
+            QString("video timecodes frame-pts:%1 frame-dts:%2")
+                .arg(QString::number(frame->pts), QString::number(frame->pkt_dts))
+            );
 
-        ProcessVideoFrame(context, curstream, mpa_pic);
+        ProcessVideoFrame(codecContext, stream, frame);
     }
-
-    if (!sentPacket)
+    else if (ret == AVERROR(EAGAIN))
     {
-        // MythTV logic expects that only one frame is processed
-        // Save the packet for later and return.
-        auto *newPkt = av_packet_clone(pkt);
-        if (newPkt)
-            m_storedPackets.prepend(newPkt);
+        ;
     }
-    return true;
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("video avcodec_receive_frame error: %1 (%2)")
+            .arg(QString::fromStdString(av_make_error_stdstring(ret)), QString::number(ret))
+            );
+        incrementAVErrorCount(ret, codecContext);
+    }
+    return ret;
+}
+
+int AvFormatDecoder::ProcessVideoPacket(AVCodecContext* context, AVPacket *pkt)
+{
+    m_avCodecLock.lock();
+    int ret = avcodec_send_packet(context, pkt);
+    m_avCodecLock.unlock();
+    if (ret == 0 || ret == AVERROR(EAGAIN))
+    {
+        // averror_count counts sequential errors, so if you have a successful
+        // packet then reset it
+        m_averrorCount = 0;
+        LOG(VB_PLAYBACK | VB_TIMESTAMP, LOG_INFO, LOC +
+            QString("video timecodes packet-pts:%1 packet-dts:%2")
+                .arg(QString::number(pkt->pts), QString::number(pkt->dts))
+            );
+    }
+    else
+    {
+        LOG(VB_GENERAL, LOG_ERR, LOC +
+            QString("video avcodec_send_packet error: %1 (%2)")
+            .arg(QString::fromStdString(av_make_error_stdstring(ret)), QString::number(ret))
+            );
+        incrementAVErrorCount(ret, context);
+    }
+
+    return ret;
 }
 
 bool AvFormatDecoder::ProcessVideoFrame(AVCodecContext* context, AVStream *Stream, AVFrame *AvFrame)
@@ -4519,6 +4529,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVCodecContext* context, AVStream *curs
 // documented in decoderbase.h
 bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 {
+    Retry = false;
     AVPacket *pkt = nullptr;
     bool have_err = false;
 
@@ -4613,7 +4624,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
             }
         }
 
-        if (!storevideoframes && m_storedPackets.count() > 0)
+        bool already_preprocessed = false;
+        if (!storevideoframes && m_preprocessedPacket != nullptr)
+        {
+            if (pkt)
+                av_packet_free(&pkt);
+            pkt = m_preprocessedPacket;
+            m_preprocessedPacket = nullptr;
+            already_preprocessed = true;
+        }
+        else if (!storevideoframes && m_storedPackets.count() > 0)
         {
             if (pkt)
                 av_packet_free(&pkt);
@@ -4771,32 +4791,78 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
                     break;
                 }
 
-                if (!PreProcessVideoPacket(context, curstream, pkt))
-                    continue;
-
-                // If the resolution changed in XXXPreProcessPkt, we may
-                // have a fatal error, so check for this before continuing.
-                if (m_parent->IsErrored())
-                {
-                    av_packet_free(&pkt);
-                    return false;
-                }
-
-                if (pkt->pts != AV_NOPTS_VALUE)
-                {
-                    m_lastCcPtsu = microsecondsFromFloat
-                                 (av_q2d(curstream->time_base)*pkt->pts*1000000);
-                }
-
                 if (!(decodetype & kDecodeVideo))
                 {
+                    if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
+                        continue;
+
+                    // If the resolution changed in XXXPreProcessPkt, we may
+                    // have a fatal error, so check for this before continuing.
+                    if (m_parent->IsErrored())
+                    {
+                        av_packet_free(&pkt);
+                        return false;
+                    }
+
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                    {
+                        m_lastCcPtsu = microsecondsFromFloat
+                                     (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                    }
+
                     m_framesPlayed++;
                     m_gotVideoFrame = true;
                     break;
                 }
 
-                if (!ProcessVideoPacket(context, curstream, pkt, Retry))
+                int error = receiveVideoFrame(context, curstream);
+                if (error == 0)
+                {
+                    // save unsent packet for later
+                    if (already_preprocessed) // unlikely
+                    {
+                        m_preprocessedPacket = pkt;
+                        pkt = nullptr;
+                    }
+                    else
+                    {
+                        m_storedPackets.prepend(pkt);
+                        pkt = nullptr;
+                    }
+                }
+                else if (error == AVERROR(EAGAIN))
+                {
+                    if (!already_preprocessed && !PreProcessVideoPacket(context, curstream, pkt))
+                        continue;
+
+                    // If the resolution changed in XXXPreProcessPkt, we may
+                    // have a fatal error, so check for this before continuing.
+                    if (m_parent->IsErrored())
+                    {
+                        av_packet_free(&pkt);
+                        return false;
+                    }
+
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                    {
+                        m_lastCcPtsu = microsecondsFromFloat
+                                     (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                    }
+
+                    error = ProcessVideoPacket(context, pkt);
+                }
+
+                if (error == AVERROR(EAGAIN))
+                {
+                    Retry = true;
+                    // resend packet later
+                    m_preprocessedPacket = pkt;
+                    pkt = nullptr;
+                }
+                else if (error < 0)
+                {
                     have_err = true;
+                }
                 break;
             }
 
@@ -4820,7 +4886,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype, bool &Retry)
 
         if (!have_err && !Retry)
             m_frameDecoded = 1;
-        av_packet_unref(pkt);
+        if (pkt)
+        {
+            av_packet_unref(pkt);
+        }
         if (Retry)
             break;
     }
