@@ -18,6 +18,7 @@ extern "C" {
 #include "decoderbase.h"
 #include "io/mythavformatbuffer.h"
 #include "mpeg/AVCParser.h"
+#include "mpeg/mpeg2ccextractor.h"
 #include "mythcodeccontext.h"
 #include "mythplayer.h"
 #include "programinfo.h"
@@ -275,6 +276,8 @@ class AvFormatDecoder : public DecoderBase
     bool               m_allowedQuit                  {false};
 
     uint32_t           m_startCodeState               {0xffffffff};
+    bool               m_top_field_first              {false};
+    Mpeg2ClosedCaptionsExtractor m_captions_extractor;
 
     std::chrono::milliseconds  m_lastVPts             {0ms};
     std::chrono::milliseconds  m_lastAPts             {0ms};

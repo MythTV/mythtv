@@ -2961,12 +2961,16 @@ void AvFormatDecoder::HandleGopStart(
     }
 }
 
+static constexpr uint32_t k_user_data_start_code { 0x000001B2 };
 static constexpr uint32_t SEQ_START       { 0x000001b3 };
+static constexpr uint32_t k_extension_start_code { 0x000001B5 };
 static constexpr uint32_t GOP_START       { 0x000001b8 };
 //static constexpr uint32_t PICTURE_START { 0x00000100 };
 static constexpr uint32_t SLICE_MIN       { 0x00000101 };
 static constexpr uint32_t SLICE_MAX       { 0x000001af };
 //static constexpr uint32_t SEQ_END_CODE  { 0x000001b7 };
+
+static constexpr uint8_t k_Picture_Coding_Extension_ID {0b1000};
 
 void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext* context, AVStream *stream, AVPacket *pkt)
 {
@@ -3056,6 +3060,34 @@ void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext* context, AVStream *strea
             HandleGopStart(pkt, true);
             m_seenGop = true;
             pkt->flags |= AV_PKT_FLAG_KEY;
+        }
+        else if (k_extension_start_code == m_startCodeState)
+        {
+            if ((bufptr[0] & 0xF0) == k_Picture_Coding_Extension_ID)
+            {
+                // FFmpeg's mpeg12dec.c verifies that the last start code was the picture_start_code
+                m_top_field_first = (bufptr[3] & 0x80) != 0;
+            }
+        }
+        else if (k_user_data_start_code == m_startCodeState)
+        {
+            // Extract A/53 part 4 closed captions and convert others to CTA-708 format
+            m_captions_extractor.append(bufptr, bufend - bufptr, m_top_field_first);
+        }
+    }
+    // Attach captions to the AVPacket to have FFmpeg reorder the frames as needed.
+    // FFmpeg's software decoder should replace this with its own identical
+    // version since we did not set AVCodecContext::side_data_prefer_packet.
+    // This is needed for hardware decoders (e.g. NVDEC/VDPAU) which don't extract
+    // the captions.
+    auto captions = m_captions_extractor.extract();
+    if (!captions.empty())
+    {
+        uint8_t* buf = static_cast<uint8_t*>(av_memdup(captions.data(), captions.size()));
+        // ignore AVERROR(ENOMEM)
+        if (buf != nullptr)
+        {
+            av_packet_add_side_data(pkt, AV_PKT_DATA_A53_CC, buf, captions.size());
         }
     }
 }

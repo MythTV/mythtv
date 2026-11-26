@@ -214,6 +214,8 @@ add_library(
   mpeg/HEVCParser.h
   mpeg/iso6937tables.cpp
   mpeg/iso6937tables.h
+  mpeg/mpeg2ccextractor.cpp
+  mpeg/mpeg2ccextractor.h
   mpeg/mpegdescriptors.cpp
   mpeg/mpegdescriptors.h
   mpeg/mpegstreamdata.cpp

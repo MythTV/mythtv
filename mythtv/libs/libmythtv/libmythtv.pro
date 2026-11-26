@@ -218,6 +218,7 @@ HEADERS += mpeg/freesat_huffman.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
 HEADERS += mpeg/H2645Parser.h mpeg/AVCParser.h mpeg/HEVCParser.h
+HEADERS += mpeg/mpeg2ccextractor.h
 HEADERS += mpeg/tablestatus.h
 HEADERS += mpeg/tsstreamdata.h
 
@@ -235,6 +236,7 @@ SOURCES += mpeg/atsc_huffman.cpp    mpeg/freesat_tables.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
 SOURCES += mpeg/H2645Parser.cpp mpeg/AVCParser.cpp mpeg/HEVCParser.cpp
+SOURCES += mpeg/mpeg2ccextractor.cpp
 SOURCES += mpeg/tablestatus.cpp
 SOURCES += mpeg/tsstreamdata.cpp
 
