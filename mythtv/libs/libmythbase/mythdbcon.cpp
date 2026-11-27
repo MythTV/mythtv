@@ -718,23 +718,23 @@ bool MSqlQuery::exec()
             str.replace(b.key(), '\'' + b.value().toString() + '\'');
         }
 #else
+        QString newStr;
+        qsizetype lastPos = 0;
         QVariantList b = boundValues();
         static const QRegularExpression placeholders { "(:\\w+)" };
-        auto match = placeholders.match(str);
-        while (match.hasMatch())
+        auto iter = placeholders.globalMatch(str);
+        while (iter.hasNext())
         {
+            auto match = iter.next();
             QString replacement = b.isEmpty() ?
                 QString("INVALID") : b.takeFirst().toString();
-            str.replace(match.capturedStart(), match.capturedLength(),
-                '\'' + replacement + '\'');
-            // Some bound values, such as datetimes, include ':'
-            // characters. We don't want the match() operation to
-            // mistake such characters as the start of placeholders,
-            // so we need to search for the next match starting after
-            // the replacement we just made.
-            qsizetype endPos = match.capturedStart() + replacement.length() + 2;
-            match = placeholders.match(str, endPos);
+            newStr.append(str.sliced(lastPos, match.capturedStart() - lastPos));
+            newStr.append('\'' + replacement + '\'');
+            lastPos = match.capturedEnd();
         }
+        // Append any remaining text after the final match
+        newStr.append(str.sliced(lastPos));
+        str = newStr;
 #endif
 
         LOG(VB_DATABASE, LOG_INFO,
