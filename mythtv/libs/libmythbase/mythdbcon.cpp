@@ -719,16 +719,23 @@ bool MSqlQuery::exec()
         }
 #else
         QVariantList b = boundValues();
+        QString newStr;
+        newStr.reserve(str.size() + (b.size() * 20));
+        qsizetype lastPos = 0;
         static const QRegularExpression placeholders { "(:\\w+)" };
-        auto match = placeholders.match(str);
-        while (match.hasMatch())
+        auto iter = placeholders.globalMatch(str);
+        while (iter.hasNext())
         {
-            str.replace(match.capturedStart(), match.capturedLength(),
-                        b.isEmpty()
-                        ? "\'INVALID\'"
-                        : '\'' + b.takeFirst().toString() + '\'');
-            match = placeholders.match(str);
+            auto match = iter.next();
+            QString replacement = b.isEmpty() ?
+                QString("INVALID") : b.takeFirst().toString();
+            newStr.append(str.sliced(lastPos, match.capturedStart() - lastPos));
+            newStr.append('\'' + replacement + '\'');
+            lastPos = match.capturedEnd();
         }
+        // Append any remaining text after the final match
+        newStr.append(str.sliced(lastPos));
+        str = newStr;
 #endif
 
         LOG(VB_DATABASE, LOG_INFO,
