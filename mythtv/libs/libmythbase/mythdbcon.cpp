@@ -718,9 +718,10 @@ bool MSqlQuery::exec()
             str.replace(b.key(), '\'' + b.value().toString() + '\'');
         }
 #else
-        QString newStr;
-        qsizetype lastPos = 0;
         QVariantList b = boundValues();
+        QString newStr;
+        newStr.reserve(str.size() + (b.size() * 20));
+        qsizetype lastPos = 0;
         static const QRegularExpression placeholders { "(:\\w+)" };
         auto iter = placeholders.globalMatch(str);
         while (iter.hasNext())
