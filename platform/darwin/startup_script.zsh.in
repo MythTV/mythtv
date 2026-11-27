@@ -33,8 +33,41 @@ export PYTHONPATH=$PYTHON_BASE_PATH:$PYTHON_BASE_PATH/site-packages:$PYTHON_BASE
 # set the mythtv share dir
 export MYTHTVDIR="$RSRC_DIR"
 
-# Automatically trust the mariadb server ssl certificate
-export MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+# Configure trusted root CAs for TLS database connections, defaulting to macOS's system bundle
+CONF_DIR="${MYTHTVCONFDIR:-$HOME/.mythtv}"
+CUSTOM_CA_FOUND=0
+
+if [ -z "$SSL_CERT_FILE" ]; then
+  for CERT_CANDIDATE in \
+    "$CONF_DIR/certificates/mysql-ca.pem" \
+    "$CONF_DIR/certificates/ca.pem" \
+    "$HOME/Library/Application Support/MythTV/certificates/mysql-ca.pem" \
+    "$HOME/Library/Application Support/MythTV/certificates/ca.pem"
+  do
+    if [ -f "$CERT_CANDIDATE" ]; then
+      export SSL_CERT_FILE="$CERT_CANDIDATE"
+      CUSTOM_CA_FOUND=1
+      break
+    fi
+  done
+else
+  CUSTOM_CA_FOUND=1
+fi
+
+export SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/cert.pem}"
+
+# If no custom CA was supplied and config.xml points to an IP address or local hostname
+# (which cannot be validated by public root CAs in /etc/ssl/cert.pem), disable peer verification.
+if [ -z "$MARIADB_TLS_DISABLE_PEER_VERIFICATION" ] && [ "$CUSTOM_CA_FOUND" -eq 0 ] && [ -f "$CONF_DIR/config.xml" ]; then
+  DB_HOST=$(xmllint --xpath 'string(//Database/Host)' "$CONF_DIR/config.xml" 2>/dev/null | tr -d '[:space:]')
+  if [[ -z "$DB_HOST" ]] || \
+     [[ "$DB_HOST" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || \
+     [[ "$DB_HOST" == *:* ]] || \
+     [[ "$DB_HOST" != *.* ]] || \
+     [[ "$DB_HOST" == *.local ]]; then
+    export MARIADB_TLS_DISABLE_PEER_VERIFICATION=1
+  fi
+fi
 
 # Define the runtime path to the bundled database plugins
 export MARIADB_PLUGIN_DIR="$PLUGIN_DIR/@QT_MYSQL_PROVIDER@/plugin"
